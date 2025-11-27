@@ -1,0 +1,50 @@
+{
+  "name": "getquickresume-api",
+  "version": "1.0.0",
+  "description": "API backend for GetQuickResume application",
+  "main": "src/handlers/auth.js",
+  "scripts": {
+    "offline": "serverless offline start --stage dev --region us-east-1 --httpPort 3001 --lambdaPort 3002",
+    "offline:debug": "NODE_OPTIONS='--inspect' serverless offline start --stage dev --region us-east-1 --httpPort 3001 --lambdaPort 3002 --verbose",
+    "dev": "npm run offline",
+    "start": "npm run offline",
+    "deploy": "serverless deploy",
+    "deploy:prod": "serverless deploy --stage prod",
+    "remove": "serverless remove",
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "create-tables": "node scripts/create-tables.js",
+    "migrate-suggestions": "node scripts/migrate-suggestions.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.450.0",
+    "@aws-sdk/client-s3": "^3.918.0",
+    "@aws-sdk/lib-dynamodb": "^3.450.0",
+    "aws-sdk": "^2.1000.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "google-auth-library": "^9.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "oauth4webapi": "^3.8.2"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.0",
+    "@types/jsonwebtoken": "^9.0.0",
+    "@types/node": "^20.0.0",
+    "dynamodb-local": "^0.0.35",
+    "serverless": "^3.38.0",
+    "serverless-dynamodb-local": "^0.2.40",
+    "serverless-offline": "^13.9.0",
+    "serverless-plugin-typescript": "^2.1.5",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "serverless",
+    "aws",
+    "lambda",
+    "dynamodb",
+    "google-oauth"
+  ],
+  "author": "GetQuickResume Team",
+  "license": "MIT"
+}

@@ -1,0 +1,376 @@
+
+# 🧭 Prompt Maestro para Cursor AI
+
+### Proyecto: Plataforma de creación de currículums optimizados, traducibles y gamificados con monetización y login social obligatorio.
+
+---
+
+## 🔧 INSTRUCCIÓN PRINCIPAL
+
+**Eliminar todo el frontend actual y reconstruir desde cero** una aplicación **moderna, motivadora y accesible**, desarrollada con:
+
+* **React 18 + TypeScript + Tailwind CSS**
+* **Zustand o Context API** (estado global)
+* **Zod** (validación de esquemas y límites)
+* **OAuth 2.0 / OIDC** (autenticación obligatoria)
+* **i18n (es/en)** para textos, tooltips y mensajes de ayuda
+* **WCAG AA Accessibility** (teclado, contraste, ARIA)
+* **Responsive design completo** (mobile-first)
+
+El sistema permitirá a los usuarios **crear, optimizar, traducir y descargar su CV profesional**, con opciones **Free y Premium**.
+
+---
+
+## 🧩 ESTRUCTURA GLOBAL DE PÁGINAS Y MÓDULOS
+
+| Ruta                             | Descripción        | Contenido clave                          |
+| -------------------------------- | ------------------ | ---------------------------------------- |
+| `/`                              | Landing Page       | Hero, beneficios, CTAs, banners          |
+| `/login`                         | Login social       | Google, Facebook, LinkedIn               |
+| `/wizard/*`                      | Wizard 7 pasos     | Creación del CV (manual o guiado)        |
+| `/premium`                       | Planes y tokens    | Explicación y compra de tokens           |
+| `/account`                       | Perfil del usuario | Datos, tokens, idioma, descargas previas |
+| `/contact`                       | Contacto           | Formulario + links sociales              |
+| `/about`                         | Misión             | Breve descripción de propósito           |
+| `/legal/privacy`, `/legal/terms` | Políticas legales  | Texto estático con scroll                |
+
+### Carpetas sugeridas
+
+`/components`, `/hooks`, `/layouts`, `/widgets`, `/pages`, `/stores`, `/i18n`, `/types`, `/utils`, `/services`.
+
+---
+
+## 🔐 AUTENTICACIÓN SOCIAL (OBLIGATORIA)
+
+**Proveedores:**
+
+* Google
+* Facebook
+* LinkedIn
+
+**Flujo:**
+
+1. Usuario entra al sitio `/`.
+2. Presiona **“Crea tu CV Gratis”** → redirige a `/login`.
+3. En `/login` se muestran tres botones:
+   “Continuar con Google”, “Continuar con Facebook”, “Continuar con LinkedIn”.
+4. Tras autenticación → redirige a `/wizard/step-1`.
+
+**Datos obtenibles del Identity Provider (IdP):**
+
+* `contact.full_name`
+* `contact.email`
+* `contact.location`
+* `contact.linkedin`
+* `avatar_url`
+* `target_function` (si el IdP provee headline profesional)
+
+**Reglas UX:**
+
+* No pedir de nuevo campos que provengan del IdP.
+* Si un dato falta → mostrar campo vacío editable.
+* Feedback visual ante errores de autenticación.
+* Loader con texto: *“Conectando tu cuenta segura…”*
+
+---
+
+## 🏠 LANDING PAGE (FOCO EN CONVERSIÓN Y VALOR)
+
+### 🎯 Objetivo:
+
+Capturar al usuario y llevarlo al registro/login con una propuesta clara de valor.
+
+### ✨ Hero principal:
+
+> **Crea tu currículum profesional en minutos.**
+> Gratuito, optimizado y traducible con IA.
+> Crea, mejora y traduce tu CV a inglés, español, árabe, chino o hindi con un solo clic.
+
+**CTA principal:** “Crea tu CV Gratis” (→ `/login`)
+**CTA secundario:** “Descubre cómo funciona”
+
+---
+
+### 🧠 Sección de beneficios:
+
+* ✅ 100% gratuito con versión Premium opcional.
+* ⚙️ CV optimizado con IA: mejora redacción, claridad y compatibilidad ATS.
+* 🌐 **AI Language Adaptor:** traduce tu CV sin perder formato.
+* 💬 **Preguntas guiadas:** te ayudamos paso a paso con tips y ejemplos.
+* 🔒 Login seguro con Google, Facebook o LinkedIn.
+
+---
+
+### 🚀 “Cómo funciona” (3 pasos visuales)
+
+1. Inicia sesión con un clic.
+2. Completa tu información (modo manual o guiado).
+3. Descarga o traduce tu CV optimizado.
+
+---
+
+### 💥 CTA Final
+
+* “Comienza Gratis Ahora”
+* “Optimiza tu CV con IA”
+* “Traduce tu CV Profesionalmente”
+* “Hazlo en 5 minutos o menos”
+
+---
+
+### 🪧 Espacios publicitarios
+
+* Banner superior y banner inferior (visibles 100%).
+* Margen `mt-6 mb-6` para evitar solapamientos.
+* `bg-gray-100 rounded-lg shadow-sm p-4 text-center`.
+
+---
+
+## 🧭 WIZARD PRINCIPAL (7 PASOS)
+
+* Dos modos:
+
+  1. **Modo Manual:** llenado clásico de inputs.
+  2. **Modo Guiado:** flujo de preguntas, con tips y ejemplos.
+* Usuario puede cambiar de modo en cualquier momento.
+* Flujo no lineal permitido (volver pasos anteriores sin perder datos).
+* Auto guardado local (`localStorage: resume_wizard_v1`).
+
+---
+
+### Paso 1️⃣: Perfil Profesional
+
+**Campos:** `language`, `target_level`, `industry`, `tone`
+**Preguntas guiadas:**
+
+* “¿En qué área deseas desarrollarte?”
+* “¿Qué nivel de experiencia tienes?”
+  **Tips:** “Usa palabras clave de tu sector (Ej. ‘Diseñador UX’ o ‘Desarrollador Backend’).”
+  **Motivador:** “¡Gran inicio! Tu perfil es la primera impresión profesional.”
+
+---
+
+### Paso 2️⃣: Habilidades
+
+**Campos:** `skills_raw[]`, `tools_raw[]`
+**Preguntas guiadas:**
+
+* “¿Qué habilidades te diferencian?”
+* “¿Qué herramientas dominas en tu día a día?”
+  **Tips:** “Combina habilidades técnicas (‘React’) y blandas (‘liderazgo’).”
+  **Motivador:** “¡Excelente! Tus habilidades muestran tu potencial.”
+
+---
+
+### Paso 3️⃣: Experiencia Laboral
+
+**Campos:** `title`, `company`, `start`, `end`, `achievements_notes[]`, `responsibilities_notes[]`
+**Preguntas guiadas:**
+
+* “¿Cuál fue tu puesto y principales responsabilidades?”
+* “¿Qué logros cuantificables alcanzaste?”
+  **Tips:** “Usa métricas: ‘Aumenté ventas un 20%’ o ‘Reduje errores 30%’.”
+  **Motivador:** “¡Tus logros hablan por ti! Buen trabajo.”
+
+---
+
+### Paso 4️⃣: Educación y Certificaciones
+
+**Campos:** `education_raw[]`, `certs_raw[]`
+**Regla clave:**
+Debe poder omitirse (“No tengo estudios formales”).
+Si el usuario omite → marcar como `skipped`.
+**Preguntas guiadas:**
+
+* “¿Dónde estudiaste o te capacitaste?”
+* “¿Tienes cursos o certificaciones relevantes?”
+  **Tips:** “Destaca formación autodidacta o logros laborales.”
+  **Motivador:** “Tu aprendizaje es valioso, con o sin títulos.”
+
+---
+
+### Paso 5️⃣: Proyectos e Idiomas
+
+**Campos:** `projects_raw[]`, `languages_raw[]`
+**Preguntas guiadas:**
+
+* “¿Qué proyectos personales o laborales te enorgullecen?”
+* “¿Qué idiomas hablas y con qué nivel?”
+  **Tips:** “Incluye proyectos personales o de voluntariado.”
+  **Motivador:** “Cada proyecto refleja tu crecimiento.”
+
+---
+
+### Paso 6️⃣: Resumen y Logros Clave
+
+**Campos:** `summary_notes`, `job_description`
+**Preguntas guiadas:**
+
+* “¿Cómo describirías tu experiencia en una frase?”
+* “¿Qué te diferencia de otros profesionales?”
+  **Tips:** “Sé breve y enfocado: 3-4 líneas máximo.”
+  **Motivador:** “¡Tu resumen será la joya de tu currículum!”
+  **Premium:** botón “Mejorar redacción” (consume tokens, confirm modal).
+
+---
+
+### Paso 7️⃣: Revisión y Descarga
+
+* Vista previa editable del CV completo.
+* Mostrar contadores y barra de completitud.
+* Botones:
+
+  * “Descargar CV”
+  * “Ver anuncio para desbloquear” (Free)
+  * “Actualizar a Premium”
+  * “Traducir con AI Language Adaptor” → abre modal.
+
+**Modal de Traducción:**
+
+* Idiomas: Inglés 🇬🇧, Español 🇪🇸, Árabe 🇸🇦, Chino 🇨🇳, Hindi 🇮🇳
+* Mantener formato, estilo y tipografía.
+  **Motivador:** “🎉 ¡Tu CV está listo para brillar en cualquier idioma!”
+
+---
+
+## ⚙️ HUD PERSISTENTE
+
+* Siempre visible (`position: fixed` → top-right desktop / bottom mobile).
+* Datos mostrados:
+
+  * Total de caracteres usados (`current / 3500`).
+  * Paso actual / total (ej. 4/7).
+  * Barra de progreso de caracteres (verde/ámbar/rojo).
+  * Tooltip: *“Los currículums claros generan más entrevistas.”*
+* Animaciones suaves + microfeedback al superar hitos (ej. check ✅).
+
+---
+
+## 🪧 BANNERS PUBLICITARIOS
+
+**TopBanner / BottomBanner**
+
+* Clases: `w-full bg-gray-100 rounded-lg shadow-sm p-4 text-center`.
+* No deben superponerse con HUD o botones.
+* Safe spacing: `mt-6 mb-6` superior, `mt-8 mb-4` inferior.
+
+---
+
+## 🧠 MONETIZACIÓN Y PLANES
+
+### Usuarios Free
+
+* Verán banners en cada paso.
+* Deberán ver un rewarded ad antes de descargar.
+* Límite total: 3500 caracteres.
+
+### Usuarios Premium
+
+* Sin anuncios ni límites.
+* Acceso a funciones de optimización y traducción (consume tokens).
+
+---
+
+## 💎 SECCIÓN PREMIUM / TOKENS
+
+Ruta: `/premium`
+Debe incluir:
+
+* Explicación clara del sistema de tokens.
+* Tabla de planes y beneficios.
+* CTA fijo “Comprar tokens ahora”.
+* Visualización del saldo actual.
+
+### Tabla de paquetes:
+
+| Plan     | Tokens | Precio | Beneficio                      |
+| -------- | ------ | ------ | ------------------------------ |
+| Starter  | 100    | $4.99  | Prueba funciones Premium       |
+| Pro      | 300    | $9.99  | Ideal para mejoras frecuentes  |
+| Expert   | 1000   | $19.99 | Sin anuncios, acceso total     |
+| Lifetime | ∞      | $49.99 | Acceso de por vida sin límites |
+
+**Lógica UX:**
+
+* Cada acción premium muestra confirm modal:
+  “¿Deseas gastar 10 tokens para mejorar este texto?”
+* Mostrar saldo actualizado en `/account`.
+
+---
+
+## 🌐 AI LANGUAGE ADAPTOR
+
+**Descripción:**
+Traduce el CV a inglés, español, árabe, chino o hindi.
+Mantiene formato, estructura y estilo profesional.
+
+**UI:**
+
+* Botón “Traducir CV” visible en última etapa y en `/account`.
+* Modal con selector de idioma y resumen de tokens requeridos.
+* Mostrar preview traducido antes de descarga.
+
+**Texto promocional (landing):**
+
+> “🌐 **AI Language Adaptor:** Traduce tu currículum a varios idiomas con un clic, conservando formato y estilo profesional.”
+
+---
+
+## 💬 CONTACTO Y LEGALES
+
+* `/contact`: formulario (nombre, email, mensaje) + botones hacia Facebook, Instagram y Gmail.
+* `/about`:
+
+  > “Nuestra misión es ayudar a profesionales de todas las áreas a destacar con currículums claros, optimizados y multilingües.”
+* Footer: enlaces a Privacy, Terms, About.
+
+---
+
+## 🎨 DISEÑO Y MOTIVACIÓN
+
+### Colores sugeridos:
+
+* Primario: `#2563EB` (azul profesional).
+* Secundario: `#10B981` (verde éxito).
+* Fondo neutro: `#F9FAFB`.
+* Tipografía: Inter / Poppins.
+
+### Feedback emocional:
+
+* Mensajes de motivación en cada paso:
+
+  * “¡Excelente progreso!”
+  * “Tu experiencia luce increíble.”
+  * “Ya casi terminas, sigue así.”
+  * “Este será un CV ganador.”
+* Microanimaciones en botones y checks.
+* Progreso animado visible en HUD.
+
+---
+
+## ✅ RESULTADO ESPERADO
+
+El sitio final debe ofrecer:
+
+1. **Flujo completo, guiado y motivador.**
+2. **Login obligatorio con Google/Facebook/LinkedIn.**
+3. **Modo manual y guiado con tips personalizados.**
+4. **Compatibilidad con perfiles sin educación formal.**
+5. **HUD persistente con progreso y contador global.**
+6. **Banners visibles (top/bottom) en todo el wizard.**
+7. **Sistema Freemium con rewarded ads y tokens Premium.**
+8. **AI Language Adaptor multilingüe (5 idiomas).**
+9. **Landing persuasiva con CTAs y storytelling claro.**
+10. **UX coherente, accesible, responsiva y emocionalmente positiva.**
+
+
+-----------------------------------------
+cuando hago login en el sitio y entro al dashboard veo mis resumes
+cada resume es desplegado en un tile  y ese tile tiene dos opciones para ver el resume 
+1) el boton abajo del tile que dice "Ver CV". 
+2) los 3 elipsis buton del tile -> Ver
+
+sinembargo cuando le doy click no carga nada
+quiero activar esta funcionalidad y que cuando el usuario selecciona ver un resume se le despligue en una nueva pagina con su resume cargado para ser visto.
+el usuario luego puede navegar de vuelta a el dashboard 
+esta interfaz nueva que despliega el resume

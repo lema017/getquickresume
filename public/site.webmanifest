@@ -1,0 +1,21 @@
+{
+  "name": "GetQuickResume",
+  "short_name": "GetQuickResume",
+  "description": "Crea tu currículum profesional en minutos. Gratuito, optimizado y traducible con IA.",
+  "icons": [
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#3B82F6",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "/"
+}

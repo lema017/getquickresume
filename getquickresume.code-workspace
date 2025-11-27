@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"typescript.preferences.includePackageJsonAutoImports": "auto",
+		"debug.allowBreakpointsEverywhere": true,
+		"debug.javascript.breakOnConditionalError": true,
+		"debug.javascript.unmapMissingSources": true,
+		"debug.console.fontSize": 14,
+		"debug.console.lineHeight": 20
+	}
+}
