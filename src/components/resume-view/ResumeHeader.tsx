@@ -1,15 +1,17 @@
 import { Resume } from '@/types';
 import { useTranslation } from 'react-i18next';
-import { Edit2, Download, Calendar, FileText } from 'lucide-react';
+import { Edit2, Download, Calendar, FileText, Globe, Share2 } from 'lucide-react';
 
 interface ResumeHeaderProps {
   resume: Resume;
   onEdit: () => void;
   onDownload: () => void;
+  onTranslate?: () => void;
+  onShare?: () => void;
   isGeneratingPDF?: boolean;
 }
 
-export function ResumeHeader({ resume, onEdit, onDownload, isGeneratingPDF = false }: ResumeHeaderProps) {
+export function ResumeHeader({ resume, onEdit, onDownload, onTranslate, onShare, isGeneratingPDF = false }: ResumeHeaderProps) {
   const { t } = useTranslation();
   const { resumeData, status, updatedAt, title } = resume;
 
@@ -69,6 +71,26 @@ export function ResumeHeader({ resume, onEdit, onDownload, isGeneratingPDF = fal
             <Edit2 className="w-4 h-4" />
             <span>{t('resumeView.actions.edit')}</span>
           </button>
+          {onTranslate && (
+            <button
+              onClick={onTranslate}
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+              aria-label={t('resumeView.actions.translate')}
+            >
+              <Globe className="w-4 h-4" />
+              <span>{t('resumeView.actions.translate')}</span>
+            </button>
+          )}
+          {onShare && resume.generatedResume && (
+            <button
+              onClick={onShare}
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              aria-label={t('resumeView.actions.share')}
+            >
+              <Share2 className="w-4 h-4" />
+              <span>{t('resumeView.actions.share')}</span>
+            </button>
+          )}
           <button
             onClick={onDownload}
             disabled={isGeneratingPDF}

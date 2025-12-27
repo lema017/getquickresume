@@ -1,7 +1,9 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { suggestionService } from '../services/suggestionService';
 import { SuggestionsResponse } from '../types';
-import { checkRateLimit } from '../middleware/rateLimiter';
+import { checkRateLimit, refundRateLimit } from '../middleware/rateLimiter';
+import { getUserById } from '../services/dynamodb';
+import { verifyResumeOwnership } from '../services/resumeService';
 
 export const getSuggestions = async (
   event: APIGatewayProxyEvent
@@ -27,8 +29,48 @@ export const getSuggestions = async (
 
     const userId = event.requestContext.authorizer.userId;
 
-    // Rate limiting: 5 requests por minuto
-    const rateLimitResult = await checkRateLimit(userId, 'profession-suggestions', 5, 60000);
+    // Check user premium status and free resume usage
+    const user = await getUserById(userId);
+    if (!user) {
+      return {
+        statusCode: 404,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+          'Access-Control-Allow-Methods': 'GET,OPTIONS',
+        },
+        body: JSON.stringify({
+          success: false,
+          error: 'User not found',
+          message: 'User account not found'
+        } as SuggestionsResponse)
+      };
+    }
+
+    // Premium check: AI suggestions are only available for premium users or free users who haven't used their quota
+    if (!user.isPremium && user.freeResumeUsed) {
+      return {
+        statusCode: 403,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+          'Access-Control-Allow-Methods': 'GET,OPTIONS',
+        },
+        body: JSON.stringify({
+          success: false,
+          error: 'Premium feature required',
+          message: 'AI suggestions are only available for premium users or free users who haven\'t used their free resume quota.',
+          code: 'PREMIUM_REQUIRED',
+          fromCache: false
+        } as SuggestionsResponse)
+      };
+    }
+
+    // Rate limiting: 1 request/minute for free users, 10 requests/minute for premium users
+    const maxRequests = user.isPremium ? 10 : 1;
+    const rateLimitResult = await checkRateLimit(userId, 'profession-suggestions', maxRequests, 60000);
     if (!rateLimitResult.allowed) {
       return {
         statusCode: 429,
@@ -42,7 +84,9 @@ export const getSuggestions = async (
           success: false,
           error: 'Rate limit exceeded',
           message: 'Too many suggestion requests. Please wait before trying again.',
-          resetTime: rateLimitResult.resetTime
+          resetTime: rateLimitResult.resetTime,
+          code: 'RATE_LIMIT_EXCEEDED',
+          fromCache: false
         } as SuggestionsResponse)
       };
     }
@@ -86,6 +130,31 @@ export const getSuggestions = async (
       };
     }
 
+    // Get optional resumeId for AI cost tracking
+    const resumeId = event.queryStringParameters?.resumeId;
+
+    // Validate resume ownership if resumeId is provided
+    if (resumeId) {
+      const isOwner = await verifyResumeOwnership(userId, resumeId);
+      if (!isOwner) {
+        return {
+          statusCode: 403,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+            'Access-Control-Allow-Methods': 'GET,OPTIONS',
+          },
+          body: JSON.stringify({
+            success: false,
+            error: 'Access denied',
+            message: 'Resume not found or access denied',
+            fromCache: false
+          } as SuggestionsResponse)
+        };
+      }
+    }
+
     // Decodificar la profesión (puede venir URL encoded)
     const decodedProfession = decodeURIComponent(profession);
 
@@ -96,7 +165,7 @@ export const getSuggestions = async (
     };
 
     // Obtener sugerencias para el idioma especificado (solo skills unificado)
-    const suggestions = await suggestionService.getSuggestions(decodedProfession, language, requestContext);
+    const suggestions = await suggestionService.getSuggestions(decodedProfession, language, requestContext, resumeId);
 
     const response: SuggestionsResponse = {
       success: true,
@@ -124,6 +193,12 @@ export const getSuggestions = async (
 
   } catch (error) {
     console.error('Error in getSuggestions handler:', error);
+    
+    // Refund rate limit on server error - user shouldn't be penalized
+    const userId = event.requestContext.authorizer?.userId;
+    if (userId) {
+      await refundRateLimit(userId, 'profession-suggestions');
+    }
     
     const errorResponse: SuggestionsResponse = {
       success: false,

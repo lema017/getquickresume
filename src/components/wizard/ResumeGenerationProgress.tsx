@@ -6,6 +6,7 @@ interface ResumeGenerationProgressProps {
   isGenerating: boolean;
   estimatedTime?: number; // in seconds
   onTimeout?: () => void;
+  includeScoring?: boolean; // Whether to include scoring phases (default: true)
 }
 
 interface ProgressPhase {
@@ -18,7 +19,8 @@ interface ProgressPhase {
 export function ResumeGenerationProgress({ 
   isGenerating, 
   estimatedTime = 90,
-  onTimeout 
+  onTimeout,
+  includeScoring = true
 }: ResumeGenerationProgressProps) {
   const { t } = useTranslation();
   const [currentPhase, setCurrentPhase] = useState(0);
@@ -26,44 +28,71 @@ export function ResumeGenerationProgress({
   const [elapsedTime, setElapsedTime] = useState(0);
   const [showTimeoutWarning, setShowTimeoutWarning] = useState(false);
 
-  const phases: ProgressPhase[] = [
+  // Base generation phases
+  const generationPhases: ProgressPhase[] = [
     {
       id: 0,
       message: t('wizard.steps.preview.generation.phases.analyzing'),
-      progress: 20,
-      duration: 15
+      progress: 15,
+      duration: 8
     },
     {
       id: 1,
       message: t('wizard.steps.preview.generation.phases.optimizing'),
-      progress: 40,
-      duration: 15
+      progress: 30,
+      duration: 8
     },
     {
       id: 2,
       message: t('wizard.steps.preview.generation.phases.summary'),
-      progress: 60,
-      duration: 15
+      progress: 45,
+      duration: 8
     },
     {
       id: 3,
       message: t('wizard.steps.preview.generation.phases.organizing'),
-      progress: 80,
-      duration: 15
+      progress: 55,
+      duration: 8
     },
     {
       id: 4,
       message: t('wizard.steps.preview.generation.phases.ats'),
-      progress: 95,
+      progress: 65,
+      duration: 5
+    }
+  ];
+
+  // Scoring phases (only included when includeScoring is true)
+  const scoringPhases: ProgressPhase[] = [
+    {
+      id: 5,
+      message: t('wizard.steps.preview.generation.phases.scoring', 'Analyzing and scoring your resume...'),
+      progress: 80,
+      duration: 15
+    },
+    {
+      id: 6,
+      message: t('wizard.steps.preview.generation.phases.calculating', 'Calculating improvement recommendations...'),
+      progress: 92,
       duration: 10
     },
     {
-      id: 5,
+      id: 7,
       message: t('wizard.steps.preview.generation.phases.finalizing'),
       progress: 100,
       duration: 5
     }
   ];
+
+  // Combine phases based on includeScoring prop
+  const phases = includeScoring 
+    ? [...generationPhases, ...scoringPhases]
+    : [...generationPhases, {
+        id: 5,
+        message: t('wizard.steps.preview.generation.phases.finalizing'),
+        progress: 100,
+        duration: 5
+      }];
 
   useEffect(() => {
     if (!isGenerating) {

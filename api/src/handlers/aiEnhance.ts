@@ -1,7 +1,9 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { aiService } from '../services/aiService';
 import { EnhanceTextRequest, EnhanceTextResponse } from '../types';
-import { checkRateLimit } from '../middleware/rateLimiter';
+import { checkRateLimit, refundRateLimit } from '../middleware/rateLimiter';
+import { getUserById } from '../services/dynamodb';
+import { verifyResumeOwnership } from '../services/resumeService';
 
 export const enhanceTextWithAI = async (
   event: APIGatewayProxyEvent
@@ -27,8 +29,47 @@ export const enhanceTextWithAI = async (
 
     const userId = event.requestContext.authorizer.userId;
 
-    // Rate limiting: 5 requests por minuto
-    const rateLimitResult = await checkRateLimit(userId, 'ai-enhance', 5, 60000);
+    // Check user premium status and free resume usage
+    const user = await getUserById(userId);
+    if (!user) {
+      return {
+        statusCode: 404,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+          'Access-Control-Allow-Methods': 'POST,OPTIONS',
+        },
+        body: JSON.stringify({
+          success: false,
+          error: 'User not found',
+          message: 'User account not found'
+        } as EnhanceTextResponse)
+      };
+    }
+
+    // Premium check: AI suggestions are only available for premium users or free users who haven't used their quota
+    if (!user.isPremium && user.freeResumeUsed) {
+      return {
+        statusCode: 403,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+          'Access-Control-Allow-Methods': 'POST,OPTIONS',
+        },
+        body: JSON.stringify({
+          success: false,
+          error: 'Premium feature required',
+          message: 'AI suggestions are only available for premium users or free users who haven\'t used their free resume quota.',
+          code: 'PREMIUM_REQUIRED'
+        } as EnhanceTextResponse)
+      };
+    }
+
+    // Rate limiting: 3 requests/minute for free users, 10 requests/minute for premium users
+    const maxRequests = user.isPremium ? 10 : 3;
+    const rateLimitResult = await checkRateLimit(userId, 'ai-enhance', maxRequests, 60000);
     if (!rateLimitResult.allowed) {
       return {
         statusCode: 429,
@@ -41,8 +82,11 @@ export const enhanceTextWithAI = async (
         body: JSON.stringify({
           success: false,
           error: 'Rate limit exceeded',
-          message: 'Too many AI enhancement requests. Please wait before trying again.',
-          resetTime: rateLimitResult.resetTime
+          message: user.isPremium 
+            ? 'You have reached the limit of 10 AI enhancement requests per minute. Please wait a moment before trying again.'
+            : 'You have reached the limit of 3 AI enhancement requests per minute. Please wait a moment before trying again, or upgrade to Premium for 10 requests per minute.',
+          resetTime: rateLimitResult.resetTime,
+          code: 'RATE_LIMIT_EXCEEDED'
         } as EnhanceTextResponse)
       };
     }
@@ -158,6 +202,27 @@ export const enhanceTextWithAI = async (
       };
     }
 
+    // Validate resume ownership if resumeId is provided (for AI cost tracking)
+    if (requestData.resumeId) {
+      const isOwner = await verifyResumeOwnership(userId, requestData.resumeId);
+      if (!isOwner) {
+        return {
+          statusCode: 403,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+            'Access-Control-Allow-Methods': 'POST,OPTIONS',
+          },
+          body: JSON.stringify({
+            success: false,
+            error: 'Access denied',
+            message: 'Resume not found or access denied'
+          } as EnhanceTextResponse)
+        };
+      }
+    }
+
     // Extract requestContext to pass to AI service (contains userId from JWT token)
     const requestContext = {
       authorizer: event.requestContext.authorizer as { userId: string }
@@ -169,7 +234,8 @@ export const enhanceTextWithAI = async (
       requestData.text.trim(),
       language,
       requestContext,
-      requestData.jobTitle
+      requestData.jobTitle,
+      requestData.resumeId
     );
 
     const response: EnhanceTextResponse = {
@@ -193,6 +259,12 @@ export const enhanceTextWithAI = async (
 
   } catch (error) {
     console.error('Error in enhanceTextWithAI handler:', error);
+    
+    // Refund rate limit on server error - user shouldn't be penalized
+    const userId = event.requestContext.authorizer?.userId;
+    if (userId) {
+      await refundRateLimit(userId, 'ai-enhance');
+    }
     
     const errorResponse: EnhanceTextResponse = {
       success: false,

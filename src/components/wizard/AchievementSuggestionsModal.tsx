@@ -2,19 +2,24 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Check, Loader2, Sparkles } from 'lucide-react';
 import { experienceAchievementService } from '@/services/experienceAchievementService';
+import { RateLimitWarning } from '@/components/RateLimitWarning';
 
 interface AchievementSuggestionsModalProps {
   isOpen: boolean;
   onClose: () => void;
   jobTitle: string;
+  language?: 'es' | 'en';
   onSelect: (suggestions: string[]) => void;
+  resumeId?: string; // Optional resume ID for AI cost tracking
 }
 
 export function AchievementSuggestionsModal({
   isOpen,
   onClose,
   jobTitle,
-  onSelect
+  language = 'es',
+  onSelect,
+  resumeId
 }: AchievementSuggestionsModalProps) {
   const { t } = useTranslation();
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -22,6 +27,7 @@ export function AchievementSuggestionsModal({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fromCache, setFromCache] = useState(false);
+  const [isRateLimited, setIsRateLimited] = useState(false);
 
   useEffect(() => {
     if (isOpen && jobTitle) {
@@ -32,13 +38,20 @@ export function AchievementSuggestionsModal({
   const loadSuggestions = async () => {
     setIsLoading(true);
     setError(null);
+    setIsRateLimited(false);
     
     try {
-      const result = await experienceAchievementService.getAchievementsByJobTitle(jobTitle);
+      const result = await experienceAchievementService.getAchievementsByJobTitle(jobTitle, language, resumeId);
       setSuggestions(result.suggestions);
       setFromCache(result.fromCache);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al cargar sugerencias');
+    } catch (err: any) {
+      // Check if it's a rate limit error
+      if (err?.code === 'RATE_LIMIT_EXCEEDED' || err?.status === 429) {
+        setIsRateLimited(true);
+        setError(err.message);
+      } else {
+        setError(err instanceof Error ? err.message : 'Error al cargar sugerencias');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -63,7 +76,14 @@ export function AchievementSuggestionsModal({
   const handleClose = () => {
     setSelectedSuggestions(new Set());
     setError(null);
+    setIsRateLimited(false);
     onClose();
+  };
+
+  const handleRetry = () => {
+    setIsRateLimited(false);
+    setError(null);
+    loadSuggestions();
   };
 
   if (!isOpen) return null;
@@ -109,8 +129,16 @@ export function AchievementSuggestionsModal({
             </div>
           )}
 
-          {/* Error State */}
-          {error && (
+          {/* Rate Limit Error State */}
+          {isRateLimited && error && (
+            <RateLimitWarning 
+              message={error} 
+              onRetry={handleRetry}
+            />
+          )}
+
+          {/* Generic Error State */}
+          {error && !isRateLimited && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
               <p className="text-red-800 text-sm">{error}</p>
               <button

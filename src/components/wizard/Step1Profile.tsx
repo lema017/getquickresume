@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
+import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { useAuthStore } from '@/stores/authStore';
 import { ArrowRight, ArrowLeft, CheckCircle, Linkedin, Lightbulb } from 'lucide-react';
 import { countries } from '@/utils/countries';
@@ -11,18 +12,21 @@ import { SanitizedInput } from '@/components/SanitizedInput';
 import { PhoneInput } from '@/components/PhoneInput';
 import { FloatingTips } from '@/components/FloatingTips';
 import { TipsButton } from '@/components/TipsButton';
+import { MandatoryFieldLabel } from '@/components/MandatoryFieldLabel';
 import { useTips } from '@/hooks/useTips';
+import { formatName, formatProfession } from '@/utils/textFormatting';
 
 export function Step1Profile() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { navigateToStep } = useWizardNavigation();
   const { resumeData, updateResumeData, markStepCompleted, setCurrentStep } = useResumeStore();
   const { user } = useAuthStore();
   const { areTipsClosed, closeTips, showTips } = useTips();
   const [errors, setErrors] = useState<FieldValidation>({});
   const [formData, setFormData] = useState({
-    firstName: resumeData.firstName || user?.fullName?.split(' ')[0] || '',
-    lastName: resumeData.lastName || user?.fullName?.split(' ').slice(1).join(' ') || '',
+    firstName: formatName(resumeData.firstName || user?.firstName || user?.fullName?.split(' ')[0] || ''),
+    lastName: formatName(resumeData.lastName || user?.lastName || user?.fullName?.split(' ').slice(1).join(' ') || ''),
     country: resumeData.country || user?.country || '',
     linkedin: resumeData.linkedin || user?.linkedin || '',
     language: resumeData.language || 'es',
@@ -39,8 +43,8 @@ export function Step1Profile() {
     console.log('🔧 Step1Profile - profession from resumeData:', resumeData.profession);
     
     setFormData({
-      firstName: resumeData.firstName || user?.fullName?.split(' ')[0] || '',
-      lastName: resumeData.lastName || user?.fullName?.split(' ').slice(1).join(' ') || '',
+      firstName: formatName(resumeData.firstName || user?.firstName || user?.fullName?.split(' ')[0] || ''),
+      lastName: formatName(resumeData.lastName || user?.lastName || user?.fullName?.split(' ').slice(1).join(' ') || ''),
       country: resumeData.country || user?.country || '',
       linkedin: resumeData.linkedin || user?.linkedin || '',
       language: resumeData.language || 'es',
@@ -55,20 +59,38 @@ export function Step1Profile() {
   }, [resumeData, user]);
 
   const handleChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
-    // Validar el campo específico cuando cambia
-    const fieldValidation = validateProfile({ ...formData, [field]: value });
-    
-    // Actualizar errores solo para este campo
-    setErrors(prev => {
-      const newErrors = { ...prev };
-      if (fieldValidation[field]) {
-        newErrors[field] = fieldValidation[field];
+    // Format profession field to Title Case
+    if (field === 'profession' && typeof value === 'string') {
+      const formatted = formatProfession(value);
+      // Defensive check: if formatting results in empty/whitespace-only, use original value
+      // but only if original had non-whitespace content
+      if (formatted.trim() === '' && value.trim() !== '') {
+        // This shouldn't happen, but if it does, use the trimmed original
+        value = value.trim();
       } else {
-        delete newErrors[field];
+        value = formatted;
       }
-      return newErrors;
+    }
+    
+    // Calculate the updated formData immediately
+    setFormData(prev => {
+      const updated = { ...prev, [field]: value };
+      
+      // Validate with the updated formData immediately (don't wait for state update)
+      const fieldValidation = validateProfile(updated);
+      
+      // Update errors for this specific field
+      setErrors(prevErrors => {
+        const newErrors = { ...prevErrors };
+        if (fieldValidation[field]) {
+          newErrors[field] = fieldValidation[field];
+        } else {
+          delete newErrors[field];
+        }
+        return newErrors;
+      });
+      
+      return updated;
     });
   };
 
@@ -94,7 +116,7 @@ export function Step1Profile() {
     updateResumeData(formData);
     markStepCompleted(1);
     setCurrentStep(2);
-    navigate('/wizard/manual/step-2');
+    navigateToStep(2);
   };
 
   const handleBack = () => {
@@ -150,37 +172,43 @@ export function Step1Profile() {
             {/* Nombre y Apellidos */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <p className="text-blue-800 font-medium mb-2">
-                  {t('wizard.steps.profile.ui.guided.firstName.label')}
-                </p>
+                <MandatoryFieldLabel
+                  label={t('wizard.steps.profile.ui.guided.firstName.label')}
+                  required={true}
+                  className="text-blue-800"
+                />
                 <SanitizedInput
                   value={formData.firstName}
                   onChange={(value) => handleChange('firstName', value)}
                   placeholder={t('wizard.steps.profile.ui.guided.firstName.placeholder')}
                   error={!!errors.firstName}
                 />
-                <ValidationError message={errors.firstName?.message || ''} />
+                <ValidationError message={errors.firstName?.messageKey ? t(errors.firstName.messageKey) : (errors.firstName?.message || '')} />
               </div>
               
               <div>
-                <p className="text-blue-800 font-medium mb-2">
-                  {t('wizard.steps.profile.ui.guided.lastName.label')}
-                </p>
+                <MandatoryFieldLabel
+                  label={t('wizard.steps.profile.ui.guided.lastName.label')}
+                  required={true}
+                  className="text-blue-800"
+                />
                 <SanitizedInput
                   value={formData.lastName}
                   onChange={(value) => handleChange('lastName', value)}
                   placeholder={t('wizard.steps.profile.ui.guided.lastName.placeholder')}
                   error={!!errors.lastName}
                 />
-                <ValidationError message={errors.lastName?.message || ''} />
+                <ValidationError message={errors.lastName?.messageKey ? t(errors.lastName.messageKey) : (errors.lastName?.message || '')} />
               </div>
             </div>
             
             {/* País */}
             <div>
-              <p className="text-blue-800 font-medium mb-2">
-                {t('wizard.steps.profile.ui.guided.country.label')}
-              </p>
+              <MandatoryFieldLabel
+                label={t('wizard.steps.profile.ui.guided.country.label')}
+                required={true}
+                className="text-blue-800"
+              />
               <select
                 value={formData.country}
                 onChange={(e) => handleChange('country', e.target.value)}
@@ -195,7 +223,7 @@ export function Step1Profile() {
                   </option>
                 ))}
               </select>
-              <ValidationError message={errors.country?.message || ''} />
+              <ValidationError message={errors.country?.messageKey ? t(errors.country.messageKey) : (errors.country?.message || '')} />
             </div>
             
             {/* LinkedIn */}
@@ -211,23 +239,25 @@ export function Step1Profile() {
                 placeholder={t('wizard.steps.profile.ui.guided.linkedin.placeholder')}
                 error={!!errors.linkedin}
               />
-              <ValidationError message={errors.linkedin?.message || ''} />
+              <ValidationError message={errors.linkedin?.messageKey ? t(errors.linkedin.messageKey) : (errors.linkedin?.message || '')} />
               <p className="text-blue-600 text-sm mt-1">
                 {t('wizard.steps.profile.ui.guided.linkedin.hint')}
               </p>
             </div>
             
             <div>
-              <p className="text-blue-800 font-medium mb-2">
-                {t('wizard.steps.profile.ui.guided.profession.label')}
-              </p>
+              <MandatoryFieldLabel
+                label={t('wizard.steps.profile.ui.guided.profession.label')}
+                required={true}
+                className="text-blue-800"
+              />
               <SanitizedInput
                 value={formData.profession}
                 onChange={(value) => handleChange('profession', value)}
                 placeholder={t('wizard.steps.profile.ui.guided.profession.placeholder')}
                 error={!!errors.profession}
               />
-              <ValidationError message={errors.profession?.message || ''} />
+              <ValidationError message={errors.profession?.messageKey ? t(errors.profession.messageKey) : (errors.profession?.message || '')} />
             </div>
             
             <div>
@@ -247,25 +277,29 @@ export function Step1Profile() {
             </div>
             
             <div>
-              <p className="text-blue-800 font-medium mb-2">
-                {t('wizard.steps.profile.ui.guided.phone.label')}
-              </p>
+              <MandatoryFieldLabel
+                label={t('wizard.steps.profile.ui.guided.phone.label')}
+                required={true}
+                className="text-blue-800"
+              />
               <PhoneInput
                 value={formData.phone}
                 onChange={(value) => handleChange('phone', value)}
                 placeholder={t('wizard.steps.profile.ui.guided.phone.placeholder')}
                 error={!!errors.phone}
               />
-              <ValidationError message={errors.phone?.message || ''} />
+              <ValidationError message={errors.phone?.messageKey ? t(errors.phone.messageKey) : (errors.phone?.message || '')} />
               <p className="text-blue-600 text-sm mt-1">
                 {t('wizard.steps.profile.ui.guided.phone.hint')}
               </p>
             </div>
             
             <div>
-              <p className="text-blue-800 font-medium mb-2">
-                {t('wizard.steps.profile.ui.guided.email.label')}
-              </p>
+              <MandatoryFieldLabel
+                label={t('wizard.steps.profile.ui.guided.email.label')}
+                required={true}
+                className="text-blue-800"
+              />
               <SanitizedInput
                 type="email"
                 value={formData.email}
@@ -273,7 +307,7 @@ export function Step1Profile() {
                 placeholder={t('wizard.steps.profile.ui.guided.email.placeholder')}
                 error={!!errors.email}
               />
-              <ValidationError message={errors.email?.message || ''} />
+              <ValidationError message={errors.email?.messageKey ? t(errors.email.messageKey) : (errors.email?.message || '')} />
               <p className="text-blue-600 text-sm mt-1">
                 {t('wizard.steps.profile.ui.guided.email.hint')}
               </p>
@@ -329,11 +363,13 @@ export function Step1Profile() {
         {showErrors && !isFormValid && (
           <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-red-800 font-medium mb-2">
-              {t('wizard.validation.pleaseComplete') || 'Por favor, completa los siguientes campos:'}
+              {t('wizard.validation.pleaseComplete')}
             </p>
             <ul className="list-disc list-inside text-red-700 space-y-1">
               {Object.entries(validationErrors).map(([field, error]) => (
-                <li key={field}>{error.message}</li>
+                <li key={field}>
+                  {error.messageKey ? t(error.messageKey) : error.message}
+                </li>
               ))}
             </ul>
           </div>

@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { sectionImprovementService } from '@/services/sectionImprovementService';
 import { Loader2, AlertCircle, CheckCircle, RotateCcw, X, Sparkles } from 'lucide-react';
+import { RateLimitWarning } from '@/components/RateLimitWarning';
 
 interface SectionImprovementModalProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface SectionImprovementModalProps {
   sectionType: 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language';
   originalText: string;
   onApprove: (improvedText: string) => void;
+  resumeId?: string; // Optional resume ID for AI usage tracking
 }
 
 export function SectionImprovementModal({
@@ -16,7 +18,8 @@ export function SectionImprovementModal({
   onClose,
   sectionType,
   originalText,
-  onApprove
+  onApprove,
+  resumeId
 }: SectionImprovementModalProps) {
   const { t } = useTranslation();
   const [instructions, setInstructions] = useState('');
@@ -51,7 +54,8 @@ export function SectionImprovementModal({
         sectionType,
         originalText,
         userInstructions: sanitized,
-        language: 'es' // TODO: Get from user preferences
+        language: 'es', // TODO: Get from user preferences
+        resumeId
       });
       
       setImprovedText(result.data || '');
@@ -176,8 +180,16 @@ export function SectionImprovementModal({
             )}
           </div>
           
-          {/* Error */}
-          {error && (
+          {/* Rate Limit Error */}
+          {isRateLimited && error && (
+            <RateLimitWarning 
+              message={error} 
+              onRetry={handleTryAgain}
+            />
+          )}
+
+          {/* Generic Error */}
+          {error && !isRateLimited && (
             <div className="bg-red-50 border border-red-200 rounded p-3 flex items-start gap-2">
               <AlertCircle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
               <p className="text-sm text-red-800">{error}</p>

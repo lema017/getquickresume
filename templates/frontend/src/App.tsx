@@ -11,6 +11,7 @@ import {
   wouldBeOrphaned,
 } from './paginationService';
 import { extractColorsFromCode, applyColorChanges, ExtractedColor } from './utils/colorExtractor';
+import { extractFontsFromCode, applyFontChanges, generateGoogleFontsUrl, getCuratedFonts, ExtractedFont } from './utils/fontExtractor';
 
 interface SampleData {
   // Header fields at root level (not nested)
@@ -226,7 +227,8 @@ function generateMockData(size: MockDataSize): SampleData {
 // GetQuickResume API runs on port 3001 (see serverless.yml)
 // Templates server API runs on port 4000 (see templates/server/server.js)
 // Note: serverless-offline uses /dev/ prefix for local development
-const API_BASE_URL = 'http://localhost:3001/dev';
+// Environment variable is set by start.sh script (dev: http://localhost:3001/dev, prod: https://api.getquickresume.com)
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/dev';
 
 function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -262,6 +264,16 @@ function App() {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [colorModifiedCode, setColorModifiedCode] = useState<string | null>(null);
   const [colorsModified, setColorsModified] = useState(false);
+  
+  // Font modification state
+  const [extractedFonts, setExtractedFonts] = useState<ExtractedFont[]>([]);
+  const [selectedHeadingFont, setSelectedHeadingFont] = useState<string | null>(null);
+  const [selectedBodyFont, setSelectedBodyFont] = useState<string | null>(null);
+  const [showFontPicker, setShowFontPicker] = useState(false);
+  const [fontModifiedCode, setFontModifiedCode] = useState<string | null>(null);
+  const [fontsModified, setFontsModified] = useState(false);
+  const [fontSearchQuery, setFontSearchQuery] = useState<string>('');
+  const [availableFonts, setAvailableFonts] = useState<string[]>([]);
   
   // Template metadata - collected BEFORE image upload
   const [templateMetadata, setTemplateMetadata] = useState({
@@ -421,6 +433,13 @@ function App() {
       setColorsModified(false);
       setShowColorPicker(false);
       
+      // Reset font modification state
+      setSelectedHeadingFont(null);
+      setSelectedBodyFont(null);
+      setFontModifiedCode(null);
+      setFontsModified(false);
+      setShowFontPicker(false);
+      
       // Small delay to ensure state is set before rendering
       setTimeout(() => {
         console.log('[App] Rendering template in iframe...');
@@ -497,6 +516,13 @@ function App() {
       setColorModifiedCode(null);
       setColorsModified(false);
       setShowColorPicker(false);
+      
+      // Reset font modification state
+      setSelectedHeadingFont(null);
+      setSelectedBodyFont(null);
+      setFontModifiedCode(null);
+      setFontsModified(false);
+      setShowFontPicker(false);
       
       // Get current mock data (preserve current size)
       const currentMockData = sampleData || generateMockData(mockDataSize);
@@ -823,6 +849,167 @@ function App() {
     setModifiedColors(new Map());
     setColorModifiedCode(null);
     setColorsModified(false);
+    
+    // Re-render with original code
+    const codeToRender = isCodeEdited && editedCode ? editedCode : generatedCode;
+    if (codeToRender) {
+      const currentMockData = sampleData || generateMockData(mockDataSize);
+      const iframe = previewIframeRef.current;
+      if (iframe) {
+        iframe.onload = null;
+        iframe.src = 'about:blank';
+        
+        const waitForIframeReload = (): Promise<void> => {
+          return new Promise((resolve) => {
+            const checkIframe = () => {
+              if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+                resolve();
+              } else {
+                setTimeout(checkIframe, 50);
+              }
+            };
+            setTimeout(checkIframe, 100);
+          });
+        };
+        
+        waitForIframeReload().then(() => {
+          setTimeout(() => {
+            renderTemplateInIframe(codeToRender, currentMockData);
+            setTimeout(() => {
+              applyPagination(codeToRender, currentMockData);
+            }, 2000);
+          }, 100);
+        });
+      }
+    }
+  };
+
+  /**
+   * Load Google Fonts list
+   * Note: Google Fonts API requires an API key. For now, we use a curated list.
+   * To use the full API, you would need to:
+   * 1. Get a Google Fonts API key from https://developers.google.com/fonts/docs/developer_api
+   * 2. Replace the fetch URL with: `https://www.googleapis.com/webfonts/v1/webfonts?key=YOUR_API_KEY&sort=popularity`
+   */
+  useEffect(() => {
+    // For now, use curated list. In production, you could fetch from Google Fonts API
+    setAvailableFonts(getCuratedFonts());
+    
+    // Optional: Fetch full list from Google Fonts API if you have an API key
+    // Uncomment and add your API key:
+    /*
+    const loadGoogleFonts = async () => {
+      try {
+        const response = await fetch('https://www.googleapis.com/webfonts/v1/webfonts?key=YOUR_API_KEY&sort=popularity');
+        if (!response.ok) {
+          setAvailableFonts(getCuratedFonts());
+          return;
+        }
+        const data = await response.json();
+        const fontNames = data.items?.map((item: any) => item.family) || getCuratedFonts();
+        setAvailableFonts(fontNames);
+      } catch (error) {
+        console.warn('Failed to load Google Fonts list, using curated list:', error);
+        setAvailableFonts(getCuratedFonts());
+      }
+    };
+    loadGoogleFonts();
+    */
+  }, []);
+
+  /**
+   * Extract fonts when code is generated or modified
+   * Extract from base code (not fontModifiedCode) to avoid circular dependency
+   */
+  useEffect(() => {
+    // Use base code for extraction (consider color-modified code but not font-modified)
+    const codeToExtract = (colorsModified && colorModifiedCode) || (isCodeEdited && editedCode) || generatedCode;
+    if (codeToExtract && showFontPicker) {
+      const fonts = extractFontsFromCode(codeToExtract);
+      setExtractedFonts(fonts);
+      
+      // Auto-select fonts based on category if not already selected
+      if (!selectedHeadingFont) {
+        const headingFont = fonts.find(f => f.category === 'heading');
+        if (headingFont) {
+          setSelectedHeadingFont(headingFont.value);
+        }
+      }
+      if (!selectedBodyFont) {
+        const bodyFont = fonts.find(f => f.category === 'body');
+        if (bodyFont) {
+          setSelectedBodyFont(bodyFont.value);
+        }
+      }
+    }
+  }, [generatedCode, editedCode, colorModifiedCode, colorsModified, showFontPicker, selectedHeadingFont, selectedBodyFont]);
+
+  /**
+   * Handle font change
+   */
+  const handleFontChange = (type: 'heading' | 'body', fontName: string | null) => {
+    if (type === 'heading') {
+      setSelectedHeadingFont(fontName);
+    } else {
+      setSelectedBodyFont(fontName);
+    }
+    
+    // Get the code to modify (consider color-modified code if available)
+    const codeToModify = fontModifiedCode || (colorsModified && colorModifiedCode) || (isCodeEdited && editedCode) || generatedCode;
+    if (!codeToModify) return;
+    
+    // Apply font changes
+    const newHeadingFont = type === 'heading' ? fontName : selectedHeadingFont;
+    const newBodyFont = type === 'body' ? fontName : selectedBodyFont;
+    const modifiedCode = applyFontChanges(codeToModify, newHeadingFont, newBodyFont);
+    setFontModifiedCode(modifiedCode);
+    setFontsModified(true);
+    
+    // Get current mock data
+    const currentMockData = sampleData || generateMockData(mockDataSize);
+    
+    // Force reload iframe to clear custom element registry
+    const iframe = previewIframeRef.current;
+    if (iframe) {
+      // Clean up any existing onload handler to prevent cycles
+      iframe.onload = null;
+      
+      // Set iframe src to 'about:blank' to clear the document and custom element registry
+      iframe.src = 'about:blank';
+      
+      // Wait for iframe to reload using a Promise-based approach
+      const waitForIframeReload = (): Promise<void> => {
+        return new Promise((resolve) => {
+          const checkIframe = () => {
+            if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+              resolve();
+            } else {
+              setTimeout(checkIframe, 50);
+            }
+          };
+          setTimeout(checkIframe, 100);
+        });
+      };
+      
+      waitForIframeReload().then(() => {
+        setTimeout(() => {
+          renderTemplateInIframe(modifiedCode, currentMockData);
+          setTimeout(() => {
+            applyPagination(modifiedCode, currentMockData);
+          }, 2000);
+        }, 100);
+      });
+    }
+  };
+
+  /**
+   * Reset fonts to original
+   */
+  const handleResetFonts = () => {
+    setSelectedHeadingFont(null);
+    setSelectedBodyFont(null);
+    setFontModifiedCode(null);
+    setFontsModified(false);
     
     // Re-render with original code
     const codeToRender = isCodeEdited && editedCode ? editedCode : generatedCode;
@@ -1677,11 +1864,16 @@ function App() {
         iframeDoc.open();
         
         // Build HTML content using safer method - create script element separately
+        // Generate Google Fonts URL if fonts are selected
+        const googleFontsUrl = generateGoogleFontsUrl(selectedHeadingFont, selectedBodyFont);
+        const fontLinkTag = googleFontsUrl ? `    <link href="${googleFontsUrl}" rel="stylesheet">` : '';
+        
         const htmlStart = `<!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    ${fontLinkTag}
     <style>
       * {
         margin: 0;
@@ -1987,9 +2179,11 @@ function App() {
   };
 
   const downloadTemplate = () => {
-    // Priority: colorModifiedCode > editedCode > generatedCode
+    // Priority: fontModifiedCode > colorModifiedCode > editedCode > generatedCode
     let codeToDownload: string | null = null;
-    if (colorsModified && colorModifiedCode) {
+    if (fontsModified && fontModifiedCode) {
+      codeToDownload = fontModifiedCode;
+    } else if (colorsModified && colorModifiedCode) {
       codeToDownload = colorModifiedCode;
     } else if (isCodeEdited && editedCode) {
       codeToDownload = editedCode;
@@ -2010,9 +2204,11 @@ function App() {
   };
 
   const copyToClipboard = async () => {
-    // Priority: colorModifiedCode > editedCode > generatedCode
+    // Priority: fontModifiedCode > colorModifiedCode > editedCode > generatedCode
     let codeToCopy: string | null = null;
-    if (colorsModified && colorModifiedCode) {
+    if (fontsModified && fontModifiedCode) {
+      codeToCopy = fontModifiedCode;
+    } else if (colorsModified && colorModifiedCode) {
       codeToCopy = colorModifiedCode;
     } else if (isCodeEdited && editedCode) {
       codeToCopy = editedCode;
@@ -2209,9 +2405,11 @@ function App() {
    * Promote template to getquickresume API
    */
   const promoteTemplate = async () => {
-    // Priority: colorModifiedCode > editedCode > generatedCode
+    // Priority: fontModifiedCode > colorModifiedCode > editedCode > generatedCode
     let codeToPromote: string | null = null;
-    if (colorsModified && colorModifiedCode) {
+    if (fontsModified && fontModifiedCode) {
+      codeToPromote = fontModifiedCode;
+    } else if (colorsModified && colorModifiedCode) {
       codeToPromote = colorModifiedCode;
     } else if (isCodeEdited && editedCode) {
       codeToPromote = editedCode;
@@ -2521,6 +2719,35 @@ function App() {
                     Modify Colors
                   </button>
                   <button
+                    className="action-button modify-fonts-button"
+                    onClick={() => {
+                      // Extract from base code (consider color-modified but not font-modified to avoid circular dependency)
+                      const codeToExtract = (colorsModified && colorModifiedCode) || (isCodeEdited && editedCode) || generatedCode;
+                      if (codeToExtract) {
+                        const fonts = extractFontsFromCode(codeToExtract);
+                        setExtractedFonts(fonts);
+                        // Auto-select fonts based on category if not already selected
+                        if (!selectedHeadingFont) {
+                          const headingFont = fonts.find(f => f.category === 'heading');
+                          if (headingFont) {
+                            setSelectedHeadingFont(headingFont.value);
+                          }
+                        }
+                        if (!selectedBodyFont) {
+                          const bodyFont = fonts.find(f => f.category === 'body');
+                          if (bodyFont) {
+                            setSelectedBodyFont(bodyFont.value);
+                          }
+                        }
+                        setShowFontPicker(true);
+                        setFontsModified(false);
+                      }
+                    }}
+                    disabled={!generatedCode && !editedCode}
+                  >
+                    Modify Fonts
+                  </button>
+                  <button
                     className="action-button promote-button"
                     onClick={openPromoteModal}
                     disabled={!generatedCode}
@@ -2626,6 +2853,118 @@ function App() {
                       onClick={handleResetAllColors}
                     >
                       Reset All Colors
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Font Modification Section */}
+            {showFontPicker && (
+              <div className="font-modification-section">
+                <div className="font-modification-header">
+                  <h2>Modify Fonts</h2>
+                  <p className="font-modification-description">
+                    Select fonts from Google Fonts for headings and body text. Changes are applied in real-time.
+                  </p>
+                  <button
+                    className="action-button close-font-picker-button"
+                    onClick={() => {
+                      setShowFontPicker(false);
+                    }}
+                  >
+                    Close
+                  </button>
+                </div>
+                <div className="font-picker-grid">
+                  <div className="font-picker-item">
+                    <label className="font-picker-label">Heading Font</label>
+                    <div className="font-search-container">
+                      <input
+                        type="text"
+                        className="font-search-input"
+                        placeholder="Search fonts..."
+                        value={fontSearchQuery}
+                        onChange={(e) => setFontSearchQuery(e.target.value)}
+                      />
+                    </div>
+                    <select
+                      className="font-select"
+                      value={selectedHeadingFont || ''}
+                      onChange={(e) => handleFontChange('heading', e.target.value || null)}
+                    >
+                      <option value="">Select heading font...</option>
+                      {availableFonts
+                        .filter(font => 
+                          !fontSearchQuery || 
+                          font.toLowerCase().includes(fontSearchQuery.toLowerCase())
+                        )
+                        .map((font) => (
+                          <option key={font} value={font} style={{ fontFamily: font }}>
+                            {font}
+                          </option>
+                        ))}
+                    </select>
+                    {selectedHeadingFont && (
+                      <div className="font-preview" style={{ fontFamily: selectedHeadingFont }}>
+                        Preview: {selectedHeadingFont}
+                      </div>
+                    )}
+                  </div>
+                  <div className="font-picker-item">
+                    <label className="font-picker-label">Body Font</label>
+                    <div className="font-search-container">
+                      <input
+                        type="text"
+                        className="font-search-input"
+                        placeholder="Search fonts..."
+                        value={fontSearchQuery}
+                        onChange={(e) => setFontSearchQuery(e.target.value)}
+                      />
+                    </div>
+                    <select
+                      className="font-select"
+                      value={selectedBodyFont || ''}
+                      onChange={(e) => handleFontChange('body', e.target.value || null)}
+                    >
+                      <option value="">Select body font...</option>
+                      {availableFonts
+                        .filter(font => 
+                          !fontSearchQuery || 
+                          font.toLowerCase().includes(fontSearchQuery.toLowerCase())
+                        )
+                        .map((font) => (
+                          <option key={font} value={font} style={{ fontFamily: font }}>
+                            {font}
+                          </option>
+                        ))}
+                    </select>
+                    {selectedBodyFont && (
+                      <div className="font-preview" style={{ fontFamily: selectedBodyFont }}>
+                        Preview: {selectedBodyFont}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {extractedFonts.length > 0 && (
+                  <div className="font-extracted-info">
+                    <h3>Detected Fonts in Template</h3>
+                    <ul>
+                      {extractedFonts.map((font) => (
+                        <li key={font.id}>
+                          <strong>{font.label}</strong>: {font.value} ({font.category}, {font.occurrences} uses)
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {fontsModified && (
+                  <div className="font-modification-actions">
+                    <button
+                      className="action-button reset-fonts-button"
+                      onClick={handleResetFonts}
+                    >
+                      Reset All Fonts
                     </button>
                   </div>
                 )}

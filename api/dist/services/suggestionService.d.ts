@@ -15,7 +15,7 @@ declare class SuggestionService {
         authorizer: {
             userId: string;
         };
-    }): Promise<ProfessionSuggestion>;
+    }, resumeId?: string): Promise<ProfessionSuggestion>;
     /**
      * Guarda sugerencias bilingües en la base de datos (solo skills)
      */
@@ -41,7 +41,7 @@ declare class SuggestionService {
         authorizer: {
             userId: string;
         };
-    }): Promise<{
+    }, resumeId?: string): Promise<{
         skills: string[];
         fromCache: boolean;
     }>;

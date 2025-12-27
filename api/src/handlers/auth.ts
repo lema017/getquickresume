@@ -3,9 +3,9 @@ import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import { verifyGoogleToken, parseLocation } from '../services/googleAuth';
 import { exchangeCodeForToken, verifyLinkedInToken, parseLinkedInProfile } from '../services/linkedinAuth';
-import { getUserByEmail, createUser, updateUser } from '../services/dynamodb';
+import { getUserByEmail, createUser, updateUser, getUserById } from '../services/dynamodb';
 import { generateToken } from '../services/jwt';
-import { User } from '../types';
+import { User, AuthorizedEvent } from '../types';
 
 // Configuración simplificada para desarrollo local
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -147,6 +147,8 @@ export const googleAuth = async (event: APIGatewayProxyEvent): Promise<APIGatewa
           profession: user.profession,
           provider: user.provider,
           isPremium: user.isPremium,
+          freeResumeUsed: user.freeResumeUsed,
+          freeDownloadUsed: user.freeDownloadUsed,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
         }
@@ -375,6 +377,8 @@ export const linkedinAuth = async (event: APIGatewayProxyEvent): Promise<APIGate
             profession: user.profession,
             provider: user.provider,
             isPremium: user.isPremium,
+            freeResumeUsed: user.freeResumeUsed,
+            freeDownloadUsed: user.freeDownloadUsed,
             createdAt: user.createdAt,
             updatedAt: user.updatedAt,
           }
@@ -416,6 +420,104 @@ export const linkedinAuth = async (event: APIGatewayProxyEvent): Promise<APIGate
       body: JSON.stringify({
         success: false,
         error: errorResponse
+      })
+    };
+  }
+};
+
+export const getMe = async (
+  event: APIGatewayProxyEvent & AuthorizedEvent
+): Promise<APIGatewayProxyResult> => {
+  try {
+    // Verify authorization context
+    if (!event.requestContext?.authorizer) {
+      return {
+        statusCode: 401,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent',
+          'Access-Control-Allow-Methods': 'GET,OPTIONS'
+        },
+        body: JSON.stringify({
+          success: false,
+          error: 'Unauthorized: Missing authorization context'
+        })
+      };
+    }
+
+    const userId = event.requestContext.authorizer.userId;
+
+    // Fetch fresh user data from database
+    const user = await getUserById(userId);
+    
+    if (!user) {
+      return {
+        statusCode: 404,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent',
+          'Access-Control-Allow-Methods': 'GET,OPTIONS'
+        },
+        body: JSON.stringify({
+          success: false,
+          error: 'User not found'
+        })
+      };
+    }
+
+    // Return user data (excluding sensitive fields if needed)
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent',
+        'Access-Control-Allow-Methods': 'GET,OPTIONS'
+      },
+      body: JSON.stringify({
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          fullName: user.fullName,
+          avatarUrl: user.avatarUrl,
+          city: user.city,
+          country: user.country,
+          location: user.location,
+          linkedin: user.linkedin,
+          targetFunction: user.targetFunction,
+          profession: user.profession,
+          provider: user.provider,
+          isPremium: user.isPremium,
+          freeResumeUsed: user.freeResumeUsed,
+          freeDownloadUsed: user.freeDownloadUsed,
+          subscriptionExpiration: user.subscriptionExpiration,
+          planType: user.planType,
+          subscriptionStartDate: user.subscriptionStartDate,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        }
+      })
+    };
+
+  } catch (error) {
+    console.error('Error in getMe:', error);
+    
+    return {
+      statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent',
+        'Access-Control-Allow-Methods': 'GET,OPTIONS'
+      },
+      body: JSON.stringify({
+        success: false,
+        error: 'Internal server error'
       })
     };
   }

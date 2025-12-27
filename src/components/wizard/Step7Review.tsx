@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
+import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { useAuthStore } from '@/stores/authStore';
 import { ArrowLeft, Download, Eye, Globe, Crown, CheckCircle } from 'lucide-react';
 import { FloatingTips } from '@/components/FloatingTips';
@@ -11,6 +12,7 @@ import { useTips } from '@/hooks/useTips';
 export function Step7Review() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { navigateToStep } = useWizardNavigation();
   const { resumeData, calculateCharacters } = useResumeStore();
   const { user } = useAuthStore();
   const { areTipsClosed, closeTips, showTips } = useTips();  
@@ -215,7 +217,7 @@ export function Step7Review() {
       {/* Navigation */}
       <div className="flex justify-between mt-8">
         <button
-          onClick={() => navigate('/wizard/manual/step-6')}
+          onClick={() => navigateToStep(6)}
           className="btn-outline flex items-center"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />

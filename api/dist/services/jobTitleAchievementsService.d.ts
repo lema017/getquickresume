@@ -6,7 +6,7 @@ declare class JobTitleAchievementsService {
         authorizer: {
             userId: string;
         };
-    }): Promise<{
+    }, resumeId?: string): Promise<{
         suggestions: string[];
         fromCache: boolean;
     }>;

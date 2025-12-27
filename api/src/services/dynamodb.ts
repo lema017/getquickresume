@@ -17,6 +17,22 @@ const client = new DynamoDBClient({
 const dynamodb = DynamoDBDocumentClient.from(client);
 const tableName = process.env.DYNAMODB_TABLE || 'getquickresume-api-users-dev';
 
+// AI Usage Statistics for tracking costs
+export interface AIUsageStats {
+  totalInputTokens: number;
+  totalOutputTokens: number;
+  totalCostUSD: number;
+  totalAICalls: number;
+  lastAICallAt: string;
+  monthlyStats: {
+    month: string;  // YYYY-MM
+    inputTokens: number;
+    outputTokens: number;
+    costUSD: number;
+    callCount: number;
+  };
+}
+
 export interface User {
   id: string;
   email: string;
@@ -35,6 +51,15 @@ export interface User {
   freeResumeUsed: boolean;
   premiumResumeCount: number;
   premiumResumeMonth: string; // YYYY-MM format
+  freeDownloadUsed: boolean; // Tracks if free user used their 1 free download
+  totalDownloads: number; // Tracks total downloads for analytics
+  subscriptionExpiration?: string; // ISO date
+  planType?: 'monthly' | 'yearly';
+  subscriptionStartDate?: string; // ISO date
+  paddleCustomerId?: string;
+  paddleSubscriptionId?: string;
+  paddleTransactionId?: string;
+  aiUsageStats?: AIUsageStats; // AI usage tracking for cost analysis
   createdAt: string;
   updatedAt: string;
 }
@@ -88,6 +113,8 @@ export const createUser = async (userData: Partial<User>): Promise<User> => {
       freeResumeUsed: false,
       premiumResumeCount: 0,
       premiumResumeMonth: currentMonth,
+      freeDownloadUsed: false,
+      totalDownloads: 0,
       createdAt: now,
       updatedAt: now,
     };
@@ -231,6 +258,63 @@ export const updateUser = async (id: string, updates: Partial<User>): Promise<Us
     return result.Attributes as User;
   } catch (error) {
     console.error('Error updating user:', error);
+    throw new Error('Database error');
+  }
+};
+
+/**
+ * Upgrade user to premium status
+ * Sets isPremium to true and stores subscription details
+ */
+export const upgradeUserToPremium = async (
+  userId: string,
+  planType: 'monthly' | 'yearly',
+  paddleCustomerId: string,
+  paddleSubscriptionId?: string,
+  paddleTransactionId?: string
+): Promise<User> => {
+  try {
+    const now = new Date().toISOString();
+    const startDate = now;
+    
+    // Calculate expiration date based on plan type
+    const expirationDate = new Date(startDate);
+    if (planType === 'monthly') {
+      expirationDate.setMonth(expirationDate.getMonth() + 1);
+    } else {
+      expirationDate.setFullYear(expirationDate.getFullYear() + 1);
+    }
+
+    const command = new UpdateCommand({
+      TableName: tableName,
+      Key: { id: userId },
+      UpdateExpression: `
+        SET isPremium = :isPremium,
+            planType = :planType,
+            subscriptionStartDate = :startDate,
+            subscriptionExpiration = :expiration,
+            paddleCustomerId = :customerId,
+            paddleSubscriptionId = :subscriptionId,
+            paddleTransactionId = :transactionId,
+            updatedAt = :updatedAt
+      `,
+      ExpressionAttributeValues: {
+        ':isPremium': true,
+        ':planType': planType,
+        ':startDate': startDate,
+        ':expiration': expirationDate.toISOString(),
+        ':customerId': paddleCustomerId,
+        ':subscriptionId': paddleSubscriptionId || null,
+        ':transactionId': paddleTransactionId || null,
+        ':updatedAt': now,
+      },
+      ReturnValues: 'ALL_NEW',
+    });
+
+    const result = await dynamodb.send(command);
+    return result.Attributes as User;
+  } catch (error) {
+    console.error('Error upgrading user to premium:', error);
     throw new Error('Database error');
   }
 };

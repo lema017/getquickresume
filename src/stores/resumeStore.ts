@@ -778,19 +778,91 @@ export const useResumeStore = create<ResumeStore>((set, get) => ({
             break;
           
           case 'education':
+            // Education entries are formatted as "degree in field from institution"
+            // Handle both single education entry and multiple entries
             if (sectionId && updatedResume.education) {
+              // Update specific education entry
               const eduIndex = parseInt(sectionId, 10);
               if (!isNaN(eduIndex) && updatedResume.education[eduIndex]) {
-                // For education, we might need to update multiple fields
-                // For now, we'll update the degree field or create a combined text
-                updatedResume.education[eduIndex] = {
-                  ...updatedResume.education[eduIndex],
-                  // Store enhanced text in a way that makes sense
-                };
+                // Try to parse enhanced text: "degree in field from institution"
+                // Pattern: "Degree in Field from Institution"
+                const text = enhancedText.trim();
+                const inMatch = text.match(/^(.+?)\s+in\s+(.+?)\s+from\s+(.+)$/i);
+                
+                if (inMatch) {
+                  // Successfully parsed format
+                  updatedResume.education[eduIndex] = {
+                    ...updatedResume.education[eduIndex],
+                    degree: inMatch[1].trim(),
+                    field: inMatch[2].trim(),
+                    institution: inMatch[3].trim()
+                  };
+                } else {
+                  // Couldn't parse - try simpler patterns or update degree field
+                  // Check if it contains "from" to extract institution
+                  const fromMatch = text.match(/^(.+?)\s+from\s+(.+)$/i);
+                  if (fromMatch) {
+                    updatedResume.education[eduIndex] = {
+                      ...updatedResume.education[eduIndex],
+                      degree: fromMatch[1].trim(),
+                      institution: fromMatch[2].trim()
+                    };
+                  } else {
+                    // Last resort: update degree field with enhanced text
+                    updatedResume.education[eduIndex] = {
+                      ...updatedResume.education[eduIndex],
+                      degree: text
+                    };
+                  }
+                }
+              }
+            } else if (updatedResume.education && updatedResume.education.length > 0) {
+              // No sectionId - update first education entry
+              // Try to parse enhanced text
+              const text = enhancedText.trim();
+              
+              // Handle multiple education entries separated by newlines
+              const entries = text.split('\n\n').filter(e => e.trim().length > 0);
+              
+              if (entries.length > 1) {
+                // Multiple education entries - update all that exist
+                entries.forEach((entry, index) => {
+                  if (updatedResume.education[index]) {
+                    const inMatch = entry.match(/^(.+?)\s+in\s+(.+?)\s+from\s+(.+)$/i);
+                    if (inMatch) {
+                      updatedResume.education[index] = {
+                        ...updatedResume.education[index],
+                        degree: inMatch[1].trim(),
+                        field: inMatch[2].trim(),
+                        institution: inMatch[3].trim()
+                      };
+                    }
+                  }
+                });
+              } else if (entries.length === 1) {
+                // Single education entry - update first
+                const entry = entries[0];
+                const inMatch = entry.match(/^(.+?)\s+in\s+(.+?)\s+from\s+(.+)$/i);
+                
+                if (inMatch) {
+                  updatedResume.education[0] = {
+                    ...updatedResume.education[0],
+                    degree: inMatch[1].trim(),
+                    field: inMatch[2].trim(),
+                    institution: inMatch[3].trim()
+                  };
+                } else {
+                  // Fallback: update degree field
+                  updatedResume.education[0] = {
+                    ...updatedResume.education[0],
+                    degree: entry.trim()
+                  };
+                }
               }
             }
             break;
           
+          case 'project':
           case 'projects':
             if (sectionId && updatedResume.projects) {
               const projIndex = parseInt(sectionId, 10);
@@ -808,11 +880,63 @@ export const useResumeStore = create<ResumeStore>((set, get) => ({
             }
             break;
           
+          case 'achievement':
           case 'achievements':
             // Achievements are typically part of experience entries
-            // Split enhanced text by newlines to create achievement array
+            // Intelligent parsing: handle both newline-separated and sentence-separated formats
             if (updatedResume.experience && updatedResume.experience.length > 0) {
-              const achievements = enhancedText.split('\n').filter(a => a.trim().length > 0);
+              let achievements: string[] = [];
+              
+              // First, try splitting by newlines (preferred format)
+              const newlineSplit = enhancedText.split('\n').filter(a => a.trim().length > 0);
+              
+              if (newlineSplit.length > 1) {
+                // Multiple achievements separated by newlines - use as is
+                achievements = newlineSplit;
+              } else if (newlineSplit.length === 1) {
+                // Single item - might be a combined paragraph, try to split by sentences
+                const singleText = newlineSplit[0];
+                
+                // Try splitting by periods followed by capital letters or newlines
+                // This handles cases where AI combined achievements into one paragraph
+                const sentencePattern = /([^.!?]+[.!?])\s*(?=[A-Z]|$)/g;
+                const sentences = singleText.match(sentencePattern);
+                
+                if (sentences && sentences.length > 1) {
+                  // Successfully split into multiple sentences
+                  achievements = sentences.map(s => s.trim()).filter(s => s.length > 0);
+                } else {
+                  // Fallback: try splitting by common achievement separators
+                  const separators = ['; ', '. ', '.\n', '.\r\n'];
+                  let foundSplit = false;
+                  
+                  for (const sep of separators) {
+                    const split = singleText.split(sep).filter(a => a.trim().length > 0);
+                    if (split.length > 1) {
+                      achievements = split.map(s => s.trim());
+                      foundSplit = true;
+                      break;
+                    }
+                  }
+                  
+                  if (!foundSplit) {
+                    // Last resort: use as single achievement
+                    achievements = [singleText.trim()];
+                    console.warn('Could not parse achievements into multiple items, using as single achievement');
+                  }
+                }
+              } else {
+                // Empty result - shouldn't happen, but handle gracefully
+                achievements = [];
+              }
+              
+              // Validate: if original had multiple achievements, try to preserve that structure
+              const originalAchievements = updatedResume.experience[0]?.achievements || [];
+              if (originalAchievements.length > 1 && achievements.length === 1) {
+                // Original had multiple but we got one - log warning but use what we have
+                console.warn('Achievements were combined into single item during enhancement. Original had', originalAchievements.length, 'items, enhanced has', achievements.length);
+              }
+              
               updatedResume.experience[0] = {
                 ...updatedResume.experience[0],
                 achievements: achievements
@@ -821,8 +945,48 @@ export const useResumeStore = create<ResumeStore>((set, get) => ({
             break;
           
           case 'skills':
-            // Split enhanced text by commas to create skills array
-            const skills = enhancedText.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            // Intelligent parsing: handle comma-separated, newline-separated, and semicolon-separated formats
+            let skills: string[] = [];
+            
+            // First, try splitting by commas (preferred format)
+            const commaSplit = enhancedText.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            
+            if (commaSplit.length > 1) {
+              // Multiple skills separated by commas - use as is
+              skills = commaSplit;
+            } else if (commaSplit.length === 1) {
+              // Single item - might be combined, try other separators
+              const singleText = commaSplit[0];
+              
+              // Try newline-separated
+              const newlineSplit = singleText.split('\n').filter(s => s.trim().length > 0);
+              if (newlineSplit.length > 1) {
+                skills = newlineSplit;
+              } else {
+                // Try semicolon-separated
+                const semicolonSplit = singleText.split(';').map(s => s.trim()).filter(s => s.length > 0);
+                if (semicolonSplit.length > 1) {
+                  skills = semicolonSplit;
+                } else {
+                  // Last resort: use as single skill
+                  skills = [singleText.trim()];
+                  console.warn('Could not parse skills into multiple items, using as single skill');
+                }
+              }
+            } else {
+              skills = [];
+            }
+            
+            // Validate: check against original skills count if available
+            const originalSkills = [
+              ...(updatedResume.skills?.technical || []),
+              ...(updatedResume.skills?.soft || []),
+              ...(updatedResume.skills?.tools || [])
+            ];
+            if (originalSkills.length > 1 && skills.length === 1) {
+              console.warn('Skills were combined into single item during enhancement. Original had', originalSkills.length, 'items, enhanced has', skills.length);
+            }
+            
             updatedResume.skills = {
               technical: skills,
               soft: updatedResume.skills?.soft || [],
@@ -830,8 +994,12 @@ export const useResumeStore = create<ResumeStore>((set, get) => ({
             };
             break;
           
+          case 'language':
           case 'languages':
+            // Intelligent parsing: handle both single language and multiple languages
+            // Format expected: "Language (Level)" or "Language1 (Level1), Language2 (Level2)" or one per line
             if (sectionId && updatedResume.languages) {
+              // Update specific language entry
               const langIndex = parseInt(sectionId, 10);
               if (!isNaN(langIndex) && updatedResume.languages[langIndex]) {
                 // Parse enhanced text to extract language and level
@@ -845,6 +1013,82 @@ export const useResumeStore = create<ResumeStore>((set, get) => ({
                     certifications: updatedResume.languages[langIndex].certifications || []
                   };
                 }
+              }
+            } else {
+              // No sectionId - parse multiple languages from enhanced text
+              let languages: Array<{ language: string; level: string; certifications?: string[] }> = [];
+              
+              // First, try splitting by newlines
+              const newlineSplit = enhancedText.split('\n').filter(l => l.trim().length > 0);
+              
+              if (newlineSplit.length > 1) {
+                // Multiple languages separated by newlines
+                languages = newlineSplit.map(langText => {
+                  const parts = langText.trim().split('(');
+                  if (parts.length >= 2) {
+                    return {
+                      language: parts[0].trim(),
+                      level: parts[1].replace(')', '').trim(),
+                      certifications: []
+                    };
+                  }
+                  // Fallback: treat as language name only
+                  return {
+                    language: langText.trim(),
+                    level: 'intermediate',
+                    certifications: []
+                  };
+                }).filter(l => l.language.length > 0);
+              } else if (newlineSplit.length === 1) {
+                // Single item - might be comma-separated
+                const singleText = newlineSplit[0];
+                const commaSplit = singleText.split(',').map(s => s.trim()).filter(s => s.length > 0);
+                
+                if (commaSplit.length > 1) {
+                  // Multiple languages separated by commas
+                  languages = commaSplit.map(langText => {
+                    const parts = langText.trim().split('(');
+                    if (parts.length >= 2) {
+                      return {
+                        language: parts[0].trim(),
+                        level: parts[1].replace(')', '').trim(),
+                        certifications: []
+                      };
+                    }
+                    return {
+                      language: langText.trim(),
+                      level: 'intermediate',
+                      certifications: []
+                    };
+                  }).filter(l => l.language.length > 0);
+                } else {
+                  // Single language
+                  const parts = singleText.trim().split('(');
+                  if (parts.length >= 2) {
+                    languages = [{
+                      language: parts[0].trim(),
+                      level: parts[1].replace(')', '').trim(),
+                      certifications: []
+                    }];
+                  } else {
+                    languages = [{
+                      language: singleText.trim(),
+                      level: 'intermediate',
+                      certifications: []
+                    }];
+                  }
+                }
+              }
+              
+              // Validate: check against original languages count
+              const originalLanguages = updatedResume.languages || [];
+              if (originalLanguages.length > 1 && languages.length === 1) {
+                console.warn('Languages were combined into single item during enhancement. Original had', originalLanguages.length, 'items, enhanced has', languages.length);
+              }
+              
+              // Update languages array if we have valid parsed languages
+              if (languages.length > 0) {
+                updatedResume.languages = languages;
               }
             }
             break;

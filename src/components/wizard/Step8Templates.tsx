@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
+import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { useAuthStore } from '@/stores/authStore';
 import { templatesService, ResumeTemplate } from '@/services/templatesService';
 import { TemplatePreview } from './TemplatePreview';
@@ -11,6 +12,7 @@ import { FixedSizeList as List, ListChildComponentProps } from 'react-window';
 export function Step8Templates() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { navigateToStep } = useWizardNavigation();
   const { resumeData, markStepCompleted, setCurrentStep, selectedTemplateId, selectedTemplateCategory, setSelectedTemplate } = useResumeStore();
   const { user } = useAuthStore();
 
@@ -50,7 +52,7 @@ export function Step8Templates() {
     setMainTemplateId(tpl.id);
   };
 
-  const handleBack = () => navigate('/wizard/manual/step-7');
+  const handleBack = () => navigateToStep(7);
 
   const handleNext = () => {
     if (selectedTemplateCategory === 'premium' && !user?.isPremium) {
@@ -59,7 +61,7 @@ export function Step8Templates() {
     }
     markStepCompleted(8);
     setCurrentStep(9);
-    navigate('/wizard/manual/step-9');
+    navigateToStep(9);
   };
 
   return (

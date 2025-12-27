@@ -25,6 +25,9 @@ export const useGoogleAuth = () => {
       // Almacenar el JWT en localStorage
       localStorage.setItem('auth-token', response.token);
       
+      // Guardar datos del usuario en localStorage para validación posterior
+      localStorage.setItem('user-data', JSON.stringify(response.user));
+      
       login(response.user);
       toast.success('¡Bienvenido! Iniciando sesión...');
       

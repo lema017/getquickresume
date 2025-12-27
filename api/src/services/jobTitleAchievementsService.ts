@@ -21,7 +21,8 @@ class JobTitleAchievementsService {
   async getAchievementsByJobTitle(
     jobTitle: string, 
     language: 'es' | 'en',
-    requestContext: { authorizer: { userId: string } }
+    requestContext: { authorizer: { userId: string } },
+    resumeId?: string
   ): Promise<{ suggestions: string[]; fromCache: boolean }> {
     try {
       // Normalizar jobTitle
@@ -38,7 +39,7 @@ class JobTitleAchievementsService {
 
       // Premium users: Skip cache, always generate fresh suggestions
       if (isPremium) {
-        const aiSuggestions = await aiService.generateJobTitleAchievements(normalizedJobTitle, language, requestContext);
+        const aiSuggestions = await aiService.generateJobTitleAchievements(normalizedJobTitle, language, requestContext, resumeId);
         
         // Guardar en DynamoDB para cache (for future free users)
         await this.saveSuggestionsToCache(normalizedJobTitle, aiSuggestions, language);
@@ -64,7 +65,7 @@ class JobTitleAchievementsService {
       }
 
       // Si no existe en cache, generar con AI
-      const aiSuggestions = await aiService.generateJobTitleAchievements(normalizedJobTitle, language, requestContext);
+      const aiSuggestions = await aiService.generateJobTitleAchievements(normalizedJobTitle, language, requestContext, resumeId);
       
       // Guardar en DynamoDB para cache
       await this.saveSuggestionsToCache(normalizedJobTitle, aiSuggestions, language);

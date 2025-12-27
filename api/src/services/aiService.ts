@@ -2,11 +2,20 @@ import { ResumeData, GeneratedResume, ImproveSectionRequest, LinkedInDataRequest
 import { sanitizeUserInput, validateInput, sanitizeSectionType, sanitizeLanguage } from '../utils/inputSanitizer';
 import { validateImprovedText, validateSectionType, validateTextLength, validateLanguage } from '../utils/outputValidator';
 import { getUserById } from './dynamodb';
+import { jsonrepair } from 'jsonrepair';
+import { TokenUsage, AIResponse, AIProvider, AIEndpointType, trackAIUsage } from './aiUsageService';
 
 interface AIConfig {
   provider: 'openai' | 'anthropic' | 'groq';
   apiKey: string;
   model: string;
+}
+
+// Export types for tracking context
+export interface AITrackingContext {
+  userId: string;
+  resumeId?: string;
+  isPremium: boolean;
 }
 
 class AIService {
@@ -20,24 +29,42 @@ class AIService {
     };
   }
 
-  async generateResume(resumeData: ResumeData, isPremium: boolean = false): Promise<GeneratedResume> {
+  async generateResume(
+    resumeData: ResumeData, 
+    isPremium: boolean = false,
+    trackingContext?: AITrackingContext
+  ): Promise<GeneratedResume> {
     const prompt = this.buildPrompt(resumeData);
     
     try {
-      let response: string;
+      let aiResponse: AIResponse;
       
       // Select provider based on user type: Groq for free users, OpenAI for premium
-      const provider = isPremium ? 'openai' : 'groq';
+      const provider: AIProvider = isPremium ? 'openai' : 'groq';
+      const model = provider === 'groq' ? 'openai/gpt-oss-20b' : this.config.model;
       
       if (provider === 'openai') {
-        response = await this.callOpenAI(prompt);
+        aiResponse = await this.callOpenAIWithUsage(prompt);
       } else if (provider === 'groq') {
-        response = await this.callGroq(prompt);
+        aiResponse = await this.callGroqWithUsage(prompt);
       } else {
-        response = await this.callAnthropic(prompt);
+        aiResponse = await this.callAnthropicWithUsage(prompt);
       }
 
-      return this.parseAIResponse(response, resumeData, provider);
+      // Track AI usage if context provided
+      if (trackingContext) {
+        await trackAIUsage({
+          userId: trackingContext.userId,
+          resumeId: trackingContext.resumeId,
+          endpoint: 'generateResume',
+          provider,
+          model,
+          usage: aiResponse.usage,
+          isPremium: trackingContext.isPremium
+        });
+      }
+
+      return this.parseAIResponse(aiResponse.content, resumeData, provider);
     } catch (error) {
       console.error('Error generating resume with AI:', error);
       throw new Error('Failed to generate resume with AI');
@@ -285,7 +312,8 @@ interface LanguageProficiency {
 
   async generateProfessionSuggestions(
     profession: string,
-    requestContext: { authorizer: { userId: string } }
+    requestContext: { authorizer: { userId: string } },
+    resumeId?: string
   ): Promise<{
     es: { skills: string[] };
     en: { skills: string[] };
@@ -302,20 +330,32 @@ interface LanguageProficiency {
       
       const isPremium = user.isPremium;
       
-      let response: string;
+      let aiResponse: AIResponse;
       
       // Select provider based on premium status: OpenAI for premium, Groq for free
-      const provider = isPremium ? 'openai' : 'groq';
+      const provider: AIProvider = isPremium ? 'openai' : 'groq';
+      const model = provider === 'groq' ? 'openai/gpt-oss-20b' : this.config.model;
       
       if (provider === 'openai') {
-        response = await this.callOpenAI(prompt);
+        aiResponse = await this.callOpenAIWithUsage(prompt);
       } else if (provider === 'groq') {
-        response = await this.callGroq(prompt);
+        aiResponse = await this.callGroqWithUsage(prompt);
       } else {
-        response = await this.callAnthropic(prompt);
+        aiResponse = await this.callAnthropicWithUsage(prompt);
       }
 
-      return this.parseBilingualProfessionSuggestionsResponse(response);
+      // Track AI usage
+      await trackAIUsage({
+        userId,
+        resumeId,
+        endpoint: 'professionSuggestions',
+        provider,
+        model,
+        usage: aiResponse.usage,
+        isPremium
+      });
+
+      return this.parseBilingualProfessionSuggestionsResponse(aiResponse.content);
     } catch (error) {
       console.error('Error generating bilingual profession suggestions with AI:', error);
       throw new Error('Failed to generate bilingual profession suggestions with AI');
@@ -414,7 +454,8 @@ Generate specific and relevant skills for this profession in both languages:`;
       technologies: string[];
     }>,
     language: 'es' | 'en',
-    requestContext: { authorizer: { userId: string } }
+    requestContext: { authorizer: { userId: string } },
+    resumeId?: string
   ): Promise<Array<{ title: string; description: string }>> {
     const prompt = this.buildAchievementSuggestionsPrompt(profession, projects, language);
 
@@ -428,20 +469,32 @@ Generate specific and relevant skills for this profession in both languages:`;
       
       const isPremium = user.isPremium;
       
-      let response: string;
+      let aiResponse: AIResponse;
 
       // Select provider based on premium status: OpenAI for premium, Groq for free
-      const provider = isPremium ? 'openai' : 'groq';
+      const provider: AIProvider = isPremium ? 'openai' : 'groq';
+      const model = provider === 'groq' ? 'openai/gpt-oss-20b' : this.config.model;
       
       if (provider === 'openai') {
-        response = await this.callOpenAI(prompt);
+        aiResponse = await this.callOpenAIWithUsage(prompt);
       } else if (provider === 'groq') {
-        response = await this.callGroq(prompt);
+        aiResponse = await this.callGroqWithUsage(prompt);
       } else {
-        response = await this.callAnthropic(prompt);
+        aiResponse = await this.callAnthropicWithUsage(prompt);
       }
 
-      return this.parseAchievementSuggestionsResponse(response);
+      // Track AI usage
+      await trackAIUsage({
+        userId,
+        resumeId,
+        endpoint: 'achievementSuggestions',
+        provider,
+        model,
+        usage: aiResponse.usage,
+        isPremium
+      });
+
+      return this.parseAchievementSuggestionsResponse(aiResponse.content);
     } catch (error) {
       console.error('Error generating achievement suggestions with AI:', error);
       throw new Error('Failed to generate achievement suggestions with AI');
@@ -457,16 +510,25 @@ Generate specific and relevant skills for this profession in both languages:`;
     }>,
     language: 'es' | 'en'
   ): string {
-    const projectList = projects.map(project => 
+    const hasProjects = projects && projects.length > 0;
+    const projectList = hasProjects 
+      ? projects.map(project => 
       `- ${project.name}: ${project.description} (Technologies: ${project.technologies.join(', ')})`
-    ).join('\n');
+        ).join('\n')
+      : 'No specific projects provided.';
 
     const languageText = language === 'es' ? 'Spanish' : 'English';
 
-    return `You are an expert career coach with over 20 years of experience. Generate 3-5 key achievements for a ${profession} based on their projects.
-
-**Projects:**
+    const projectContext = hasProjects 
+      ? `**Projects:**
 ${projectList}
+
+Generate achievements that are relevant to these specific projects and the ${profession} profession.`
+      : `Generate general achievements that are typical and relevant for a ${profession} professional. Base the achievements on common responsibilities, skills, and impact areas for this profession.`;
+
+    return `You are an expert career coach with over 20 years of experience. Generate 3-5 key achievements for a ${profession}.
+
+${projectContext}
 
 **Instructions:**
 Generate achievements that:
@@ -492,7 +554,7 @@ Generate achievements that:
 **Profession:** ${profession}
 **Language:** ${languageText}
 
-Generate specific and relevant achievements based on the projects provided, using qualitative language only:`;
+Generate specific and relevant achievements using qualitative language only:`;
   }
 
   private parseAchievementSuggestionsResponse(response: string): Array<{ title: string; description: string }> {
@@ -535,7 +597,8 @@ Generate specific and relevant achievements based on the projects provided, usin
     projectDescriptions: string[],
     language: 'es' | 'en',
     type: 'experience' | 'differentiators',
-    requestContext: { authorizer: { userId: string } }
+    requestContext: { authorizer: { userId: string } },
+    resumeId?: string
   ): Promise<string[]> {
     const prompt = this.buildSummarySuggestionsPrompt(profession, achievements, projectDescriptions, language, type);
 
@@ -549,20 +612,32 @@ Generate specific and relevant achievements based on the projects provided, usin
       
       const isPremium = user.isPremium;
       
-      let response: string;
+      let aiResponse: AIResponse;
 
       // Select provider based on premium status: OpenAI for premium, Groq for free
-      const provider = isPremium ? 'openai' : 'groq';
+      const provider: AIProvider = isPremium ? 'openai' : 'groq';
+      const model = provider === 'groq' ? 'openai/gpt-oss-20b' : this.config.model;
       
       if (provider === 'openai') {
-        response = await this.callOpenAI(prompt);
+        aiResponse = await this.callOpenAIWithUsage(prompt);
       } else if (provider === 'groq') {
-        response = await this.callGroq(prompt);
+        aiResponse = await this.callGroqWithUsage(prompt);
       } else {
-        response = await this.callAnthropic(prompt);
+        aiResponse = await this.callAnthropicWithUsage(prompt);
       }
 
-      return this.parseSummarySuggestionsResponse(response);
+      // Track AI usage
+      await trackAIUsage({
+        userId,
+        resumeId,
+        endpoint: 'summarySuggestions',
+        provider,
+        model,
+        usage: aiResponse.usage,
+        isPremium
+      });
+
+      return this.parseSummarySuggestionsResponse(aiResponse.content);
     } catch (error) {
       console.error('Error generating summary suggestions with AI:', error);
       throw new Error('Failed to generate summary suggestions with AI');
@@ -656,7 +731,8 @@ Generate specific and relevant ${type} suggestions based on the provided informa
   async generateJobTitleAchievements(
     jobTitle: string,
     language: 'es' | 'en',
-    requestContext: { authorizer: { userId: string } }
+    requestContext: { authorizer: { userId: string } },
+    resumeId?: string
   ): Promise<string[]> {
     const prompt = this.buildJobTitleAchievementsPrompt(jobTitle, language);
 
@@ -670,20 +746,32 @@ Generate specific and relevant ${type} suggestions based on the provided informa
       
       const isPremium = user.isPremium;
       
-      let response: string;
+      let aiResponse: AIResponse;
 
       // Select provider based on premium status: OpenAI for premium, Groq for free
-      const provider = isPremium ? 'openai' : 'groq';
+      const provider: AIProvider = isPremium ? 'openai' : 'groq';
+      const model = provider === 'groq' ? 'openai/gpt-oss-20b' : this.config.model;
       
       if (provider === 'openai') {
-        response = await this.callOpenAI(prompt);
+        aiResponse = await this.callOpenAIWithUsage(prompt);
       } else if (provider === 'groq') {
-        response = await this.callGroq(prompt);
+        aiResponse = await this.callGroqWithUsage(prompt);
       } else {
-        response = await this.callAnthropic(prompt);
+        aiResponse = await this.callAnthropicWithUsage(prompt);
       }
 
-      return this.parseJobTitleAchievementsResponse(response);
+      // Track AI usage
+      await trackAIUsage({
+        userId,
+        resumeId,
+        endpoint: 'jobTitleAchievements',
+        provider,
+        model,
+        usage: aiResponse.usage,
+        isPremium
+      });
+
+      return this.parseJobTitleAchievementsResponse(aiResponse.content);
     } catch (error) {
       console.error('Error generating job title achievements with AI:', error);
       throw new Error('Failed to generate job title achievements with AI');
@@ -771,7 +859,8 @@ Generate specific and relevant achievements for this job title (without specific
     text: string,
     language: 'es' | 'en',
     requestContext: { authorizer: { userId: string } },
-    jobTitle?: string
+    jobTitle?: string,
+    resumeId?: string
   ): Promise<string> {
     const prompt = this.buildEnhanceTextPrompt(context, text, language, jobTitle);
 
@@ -785,20 +874,32 @@ Generate specific and relevant achievements for this job title (without specific
       
       const isPremium = user.isPremium;
       
-      let response: string;
+      let aiResponse: AIResponse;
 
       // Select provider based on premium status: OpenAI for premium, Groq for free
-      const provider = isPremium ? 'openai' : 'groq';
+      const provider: AIProvider = isPremium ? 'openai' : 'groq';
+      const model = provider === 'groq' ? 'openai/gpt-oss-20b' : this.config.model;
       
       if (provider === 'openai') {
-        response = await this.callOpenAI(prompt);
+        aiResponse = await this.callOpenAIWithUsage(prompt);
       } else if (provider === 'groq') {
-        response = await this.callGroq(prompt);
+        aiResponse = await this.callGroqWithUsage(prompt);
       } else {
-        response = await this.callAnthropic(prompt);
+        aiResponse = await this.callAnthropicWithUsage(prompt);
       }
 
-      return this.parseEnhanceTextResponse(response);
+      // Track AI usage
+      await trackAIUsage({
+        userId,
+        resumeId,
+        endpoint: 'enhanceText',
+        provider,
+        model,
+        usage: aiResponse.usage,
+        isPremium
+      });
+
+      return this.parseEnhanceTextResponse(aiResponse.content);
     } catch (error) {
       console.error('Error enhancing text with AI:', error);
       throw new Error('Failed to enhance text with AI');
@@ -873,9 +974,24 @@ Enhance the text:`;
   private parseAIResponse(response: string, originalData: ResumeData, provider: 'openai' | 'anthropic' | 'groq' = 'openai'): GeneratedResume {
     try {
       // Limpiar la respuesta de posibles caracteres extra
-      const cleanResponse = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      let cleanResponse = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
       
-      const parsed = JSON.parse(cleanResponse);
+      // Try to parse JSON, if it fails, attempt to repair it
+      let parsed;
+      try {
+        parsed = JSON.parse(cleanResponse);
+      } catch (parseError) {
+        console.log('Initial JSON parse failed, attempting repair...');
+        try {
+          // Use jsonrepair to fix common JSON syntax errors
+          const repairedJson = jsonrepair(cleanResponse);
+          parsed = JSON.parse(repairedJson);
+          console.log('JSON repair successful');
+        } catch (repairError) {
+          console.error('JSON repair also failed:', repairError);
+          throw parseError; // Re-throw original error
+        }
+      }
       
       // Validar que la respuesta tenga la estructura esperada
       if (!parsed.professionalSummary || !parsed.experience || !parsed.education) {
@@ -908,7 +1024,8 @@ Enhance the text:`;
     originalText: string,
     userInstructions: string,
     language: 'es' | 'en',
-    gatheredContext?: Array<{ questionId: string; answer: string }>
+    gatheredContext?: Array<{ questionId: string; answer: string }>,
+    trackingContext?: AITrackingContext
   ): Promise<string> {
     
     // 1. Validar y sanitizar inputs
@@ -947,17 +1064,33 @@ Enhance the text:`;
     );
 
     // 4. Llamar AI con configuración segura
-    let improvedText: string;
+    let aiResponse: AIResponse;
+    const provider: AIProvider = this.config.provider === 'openai' ? 'openai' : 'anthropic';
     try {
       if (this.config.provider === 'openai') {
-        improvedText = await this.callOpenAI(prompt, { temperature: 0.3, max_tokens: 2000 });
+        aiResponse = await this.callOpenAIWithUsage(prompt, { temperature: 0.3, max_tokens: 2000 });
       } else {
-        improvedText = await this.callAnthropic(prompt, { temperature: 0.3, max_tokens: 2000 });
+        aiResponse = await this.callAnthropicWithUsage(prompt, { temperature: 0.3, max_tokens: 2000 });
       }
     } catch (error) {
       console.error('AI call failed for section improvement:', error);
       throw new Error('Failed to improve section with AI');
     }
+
+    // Track AI usage if context provided
+    if (trackingContext) {
+      await trackAIUsage({
+        userId: trackingContext.userId,
+        resumeId: trackingContext.resumeId,
+        endpoint: 'improveSection',
+        provider,
+        model: this.config.model,
+        usage: aiResponse.usage,
+        isPremium: trackingContext.isPremium
+      });
+    }
+
+    const improvedText = aiResponse.content;
 
     // 5. Validar output
     const outputValidation = validateImprovedText(improvedText, originalText, sanitizedSectionType);
@@ -985,7 +1118,8 @@ Enhance the text:`;
     recommendation: string,
     originalText: string,
     language: 'es' | 'en',
-    requestContext: { authorizer: { userId: string } }
+    requestContext: { authorizer: { userId: string } },
+    resumeId?: string
   ): Promise<Array<{ id: string; question: string; category: string; required: boolean }>> {
     const prompt = this.buildEnhancementQuestionsPrompt(sectionType, recommendation, originalText, language);
 
@@ -999,13 +1133,24 @@ Enhance the text:`;
       
       // This is a premium-only feature, but we already check in the handler
       // Use OpenAI for question generation (premium feature)
-      const response = await this.callOpenAI(prompt, { 
+      const aiResponse = await this.callOpenAIWithUsage(prompt, { 
         temperature: 0.7, 
         max_tokens: 1500,
         responseFormatJson: true
       });
 
-      return this.parseEnhancementQuestionsResponse(response);
+      // Track AI usage (always OpenAI for premium feature)
+      await trackAIUsage({
+        userId,
+        resumeId,
+        endpoint: 'enhancementQuestions',
+        provider: 'openai',
+        model: this.config.model,
+        usage: aiResponse.usage,
+        isPremium: true // This is a premium-only feature
+      });
+
+      return this.parseEnhancementQuestionsResponse(aiResponse.content);
     } catch (error) {
       console.error('Error generating enhancement questions with AI:', error);
       throw new Error('Failed to generate enhancement questions with AI');
@@ -1110,7 +1255,8 @@ Generate questions that will help create a more impactful and detailed version o
     recommendation: string,
     sectionType: 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language',
     language: 'es' | 'en',
-    requestContext: { authorizer: { userId: string } }
+    requestContext: { authorizer: { userId: string } },
+    resumeId?: string
   ): Promise<string> {
     const prompt = this.buildAnswerSuggestionPrompt(
       question,
@@ -1131,13 +1277,24 @@ Generate questions that will help create a more impactful and detailed version o
       
       // This is a premium-only feature, but we already check in the handler
       // Use OpenAI for answer suggestion generation (premium feature)
-      const response = await this.callOpenAI(prompt, { 
+      const aiResponse = await this.callOpenAIWithUsage(prompt, { 
         temperature: 0.7, 
         max_tokens: 500,
         responseFormatJson: false
       });
 
-      return this.parseAnswerSuggestionResponse(response);
+      // Track AI usage (always OpenAI for premium feature)
+      await trackAIUsage({
+        userId,
+        resumeId,
+        endpoint: 'answerSuggestion',
+        provider: 'openai',
+        model: this.config.model,
+        usage: aiResponse.usage,
+        isPremium: true // This is a premium-only feature
+      });
+
+      return this.parseAnswerSuggestionResponse(aiResponse.content);
     } catch (error) {
       console.error('Error generating answer suggestion with AI:', error);
       throw new Error('Failed to generate answer suggestion with AI');
@@ -1264,6 +1421,39 @@ Improve the text according to the instructions, maintaining the section context.
       .map(ctx => `- ${ctx.answer}`)
       .join('\n');
 
+    // Add section-specific format instructions
+    let formatInstructions = '';
+    if (sectionType === 'achievement' || sectionType === 'achievements') {
+      formatInstructions = `
+
+CRITICAL FORMAT REQUIREMENTS FOR ACHIEVEMENTS:
+- If the original text contains multiple achievements (separated by newlines), you MUST return them as separate achievements, one per line
+- Each achievement should be a complete sentence on its own line
+- Do NOT combine multiple achievements into a single paragraph
+- Preserve the number of achievements from the original text
+- Each achievement should start on a new line
+- Format: One achievement per line, separated by newlines`;
+    } else if (sectionType === 'skills') {
+      formatInstructions = `
+
+CRITICAL FORMAT REQUIREMENTS FOR SKILLS:
+- The original text is a comma-separated list of skills
+- You MUST return skills in the same format: comma-separated list (e.g., "skill1, skill2, skill3")
+- Preserve the number of skills from the original text
+- Do NOT combine skills into paragraphs or sentences
+- Format: Comma-separated list of skills (e.g., "JavaScript, React, Node.js, Python")`;
+    } else if (sectionType === 'language' || sectionType === 'languages') {
+      formatInstructions = `
+
+CRITICAL FORMAT REQUIREMENTS FOR LANGUAGES:
+- If the original text contains multiple languages, you MUST return them in the same format
+- Each language should be in the format: "Language (Level)" (e.g., "English (Native)", "Spanish (Advanced)")
+- If multiple languages, separate them by commas or newlines
+- Preserve the number of languages from the original text
+- Do NOT combine multiple languages into a single entry
+- Format: "Language1 (Level1), Language2 (Level2)" or one per line`;
+    }
+
     const systemPrompt = `You are an expert in professional resume optimization.
 
 STRICT RULES:
@@ -1278,7 +1468,7 @@ STRICT RULES:
 9. If instructions are inappropriate or out of context, return the original text unchanged
 10. Maintain the format and structure of the original text
 11. Use the gathered context to add specific, quantifiable details where appropriate
-12. Make the text more impactful by incorporating the user's provided information
+12. Make the text more impactful by incorporating the user's provided information${formatInstructions}
 
 Response format: Only improved text, no markdown, no explanations.`;
 
@@ -1310,6 +1500,34 @@ Improve the text according to the instructions and user-provided context, mainta
            model.startsWith('o3-');
   }
 
+  // OpenAI model-specific completion token caps to avoid API errors
+  private getOpenAIModelLimit(model: string): number {
+    const normalized = model.toLowerCase();
+
+    if (normalized.startsWith('gpt-4o-mini')) {
+      return 16384;
+    }
+
+    if (normalized.startsWith('gpt-4o')) {
+      return 16384;
+    }
+
+    if (normalized.startsWith('gpt-4-turbo')) {
+      return 4096;
+    }
+
+    if (normalized.startsWith('gpt-4')) {
+      return 8192;
+    }
+
+    if (normalized.startsWith('gpt-5') || normalized.startsWith('o1-') || normalized.startsWith('o3-')) {
+      return 4000;
+    }
+
+    // Default conservative cap if model is unknown
+    return 8000;
+  }
+
   // Helper method to detect models with restricted parameters (temperature, etc.)
   private hasRestrictedParameters(model: string): boolean {
     // Models that have restrictions on temperature and other parameters
@@ -1322,9 +1540,19 @@ Improve the text according to the instructions and user-provided context, mainta
     prompt: string,
     options: { temperature?: number; max_tokens?: number; responseFormatJson?: boolean } = {}
   ): Promise<string> {
+    const result = await this.callOpenAIWithUsage(prompt, options);
+    return result.content;
+  }
+
+  private async callOpenAIWithUsage(
+    prompt: string,
+    options: { temperature?: number; max_tokens?: number; responseFormatJson?: boolean } = {}
+  ): Promise<AIResponse> {
     const hasRestrictions = this.hasRestrictedParameters(this.config.model);
     const requiresCompletionTokens = this.requiresMaxCompletionTokens(this.config.model);
-    const maxTokensValue = options.max_tokens || 3000;
+    const modelTokenLimit = this.getOpenAIModelLimit(this.config.model);
+    const requestedTokens = options.max_tokens || 16000;
+    const safeMaxTokens = Math.min(requestedTokens, modelTokenLimit);
     
     const requestBody: any = {
         model: this.config.model,
@@ -1348,9 +1576,9 @@ Improve the text according to the instructions and user-provided context, mainta
 
     // Use the correct parameter based on model requirements
     if (requiresCompletionTokens) {
-      requestBody.max_completion_tokens = maxTokensValue;
+      requestBody.max_completion_tokens = safeMaxTokens;
     } else {
-      requestBody.max_tokens = maxTokensValue;
+      requestBody.max_tokens = safeMaxTokens;
     }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -1390,12 +1618,19 @@ Improve the text according to the instructions and user-provided context, mainta
     const data = await response.json() as any;
     const content = data.choices[0]?.message?.content || '';
     
+    // Extract usage data
+    const usage: TokenUsage = {
+      promptTokens: data.usage?.prompt_tokens || 0,
+      completionTokens: data.usage?.completion_tokens || 0,
+      totalTokens: data.usage?.total_tokens || 0
+    };
+    
     // Log response details for debugging
     console.log('OpenAI API response details:', {
       model: this.config.model,
       responseLength: content.length,
       finishReason: data.choices[0]?.finish_reason,
-      usage: data.usage,
+      usage,
       hasContent: !!content
     });
     
@@ -1407,10 +1642,15 @@ Improve the text according to the instructions and user-provided context, mainta
       throw new Error('OpenAI API returned empty response. The model may have hit token limits or encountered an error.');
     }
     
-    return content;
+    return { content, usage };
   }
 
   private async callAnthropic(prompt: string, options: { temperature?: number; max_tokens?: number } = {}): Promise<string> {
+    const result = await this.callAnthropicWithUsage(prompt, options);
+    return result.content;
+  }
+
+  private async callAnthropicWithUsage(prompt: string, options: { temperature?: number; max_tokens?: number } = {}): Promise<AIResponse> {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -1420,7 +1660,7 @@ Improve the text according to the instructions and user-provided context, mainta
       },
       body: JSON.stringify({
         model: this.config.model,
-        max_tokens: options.max_tokens || 3000,
+        max_tokens: options.max_tokens || 20000,
         messages: [
           {
             role: 'user',
@@ -1436,16 +1676,33 @@ Improve the text according to the instructions and user-provided context, mainta
     }
 
     const data = await response.json() as any;
-    return data.content[0].text;
+    const content = data.content[0].text;
+    
+    // Extract usage data from Anthropic response
+    const usage: TokenUsage = {
+      promptTokens: data.usage?.input_tokens || 0,
+      completionTokens: data.usage?.output_tokens || 0,
+      totalTokens: (data.usage?.input_tokens || 0) + (data.usage?.output_tokens || 0)
+    };
+    
+    return { content, usage };
   }
 
   private async callGroq(
     prompt: string,
     options: { temperature?: number; max_tokens?: number; responseFormatJson?: boolean } = {}
   ): Promise<string> {
+    const result = await this.callGroqWithUsage(prompt, options);
+    return result.content;
+  }
+
+  private async callGroqWithUsage(
+    prompt: string,
+    options: { temperature?: number; max_tokens?: number; responseFormatJson?: boolean } = {}
+  ): Promise<AIResponse> {
     const groqApiKey = process.env.GROQ_API_KEY || '';
     const groqModel = 'openai/gpt-oss-20b';
-    const maxTokensValue = options.max_tokens || 3000;
+    const maxTokensValue = options.max_tokens || 20000;
     
     const requestBody: any = {
       model: groqModel,
@@ -1500,12 +1757,19 @@ Improve the text according to the instructions and user-provided context, mainta
     const data = await response.json() as any;
     const content = data.choices[0]?.message?.content || '';
     
+    // Extract usage data
+    const usage: TokenUsage = {
+      promptTokens: data.usage?.prompt_tokens || 0,
+      completionTokens: data.usage?.completion_tokens || 0,
+      totalTokens: data.usage?.total_tokens || 0
+    };
+    
     // Log response details for debugging
     console.log('Groq API response details:', {
       model: groqModel,
       responseLength: content.length,
       finishReason: data.choices[0]?.finish_reason,
-      usage: data.usage,
+      usage,
       hasContent: !!content
     });
     
@@ -1517,13 +1781,14 @@ Improve the text according to the instructions and user-provided context, mainta
       throw new Error('Groq API returned empty response. The model may have hit token limits or encountered an error.');
     }
     
-    return content;
+    return { content, usage };
   }
 
   // LinkedIn Data Processing Methods
   async parseLinkedInTextToResumeData(
     linkedInData: LinkedInDataRequest,
-    requestContext: { authorizer: { userId: string } }
+    requestContext: { authorizer: { userId: string } },
+    resumeId?: string
   ): Promise<Partial<ResumeData>> {
     // Log profession received from handler
     console.log('🔧 AI Service - Profession received:', linkedInData.profession);
@@ -1542,30 +1807,42 @@ Improve the text according to the instructions and user-provided context, mainta
       
       const isPremium = user.isPremium;
       
-      let response: string;
+      let aiResponse: AIResponse;
       
       // Select provider based on premium status: OpenAI for premium, Groq for free
-      const provider = isPremium ? 'openai' : 'groq';
+      const provider: AIProvider = isPremium ? 'openai' : 'groq';
+      const model = provider === 'groq' ? 'openai/gpt-oss-20b' : this.config.model;
       
       if (provider === 'openai') {
         // For gpt-5 models, use higher max_completion_tokens due to large prompt size
         const hasRestrictions = this.hasRestrictedParameters(this.config.model);
         const maxTokens = hasRestrictions ? 16000 : 6000; // gpt-5 models need more tokens for large responses
-        response = await this.callOpenAI(prompt, { responseFormatJson: true, max_tokens: maxTokens, temperature: 0.1 });
+        aiResponse = await this.callOpenAIWithUsage(prompt, { responseFormatJson: true, max_tokens: maxTokens, temperature: 0.1 });
       } else if (provider === 'groq') {
         // Groq also supports JSON mode
-        response = await this.callGroq(prompt, { responseFormatJson: true, max_tokens: 6000, temperature: 0.1 });
+        aiResponse = await this.callGroqWithUsage(prompt, { responseFormatJson: true, max_tokens: 6000, temperature: 0.1 });
       } else {
-        response = await this.callAnthropic(prompt);
+        aiResponse = await this.callAnthropicWithUsage(prompt);
       }
+
+      // Track AI usage
+      await trackAIUsage({
+        userId,
+        resumeId,
+        endpoint: 'linkedInParsing',
+        provider,
+        model,
+        usage: aiResponse.usage,
+        isPremium
+      });
       
       // Log response before parsing
       console.log('AI response received:', {
-        responseLength: response?.length || 0,
-        responsePreview: response?.substring(0, 200) || '(empty)'
+        responseLength: aiResponse.content?.length || 0,
+        responsePreview: aiResponse.content?.substring(0, 200) || '(empty)'
       });
 
-      const parsed = this.parseLinkedInResponse(response);
+      const parsed = this.parseLinkedInResponse(aiResponse.content);
       console.log('🔧 AI Service - Profession from AI response:', parsed.profession);
       
       // Preservar el profession proporcionado por el usuario SIEMPRE que exista en linkedInData

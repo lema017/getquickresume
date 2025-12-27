@@ -1,4 +1,5 @@
 import { User } from '@/types';
+import { handleAuthError } from '@/utils/authErrorHandler';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/dev';
 
@@ -65,6 +66,11 @@ export const authService = {
       });
 
       if (!response.ok) {
+        // If token is invalid (401/403), handle auth error and redirect
+        if (response.status === 401 || response.status === 403) {
+          handleAuthError();
+          return false; // Return false since we're redirecting
+        }
         throw new Error('Token inválido');
       }
 
@@ -138,6 +144,47 @@ export const authService = {
       return null;
     } catch (error) {
       console.error('Error getting user from token:', error);
+      return null;
+    }
+  },
+
+  async getCurrentUser(token: string): Promise<User | null> {
+    try {
+      const response = await fetch(`${API_URL}/api/user/me`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          // Token is invalid or forbidden, handle auth error
+          handleAuthError();
+          return null;
+        }
+        throw new Error(`Failed to fetch user: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success && data.user) {
+        // Update localStorage with fresh user data
+        localStorage.setItem('user-data', JSON.stringify(data.user));
+        
+        console.log('[AuthService] getCurrentUser - Fresh user data fetched:', {
+          userId: data.user.id,
+          email: data.user.email,
+          isPremium: data.user.isPremium
+        });
+        
+        return data.user;
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Error fetching current user:', error);
       return null;
     }
   }

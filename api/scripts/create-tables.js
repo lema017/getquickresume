@@ -12,11 +12,13 @@ const client = new DynamoDBClient({
 
 const usersTableName = process.env.DYNAMODB_TABLE || 'getquickresume-api-users-dev';
 const resumesTableName = process.env.RESUMES_TABLE || 'getquickresume-api-resumes-dev';
-const jobInterestsTableName = process.env.JOB_INTERESTS_TABLE || 'getquickresume-api-job-interests-dev';
 const professionSuggestionsTableName = process.env.PROFESSION_SUGGESTIONS_TABLE || 'getquickresume-api-profession-suggestions-dev';
 const jobTitleAchievementsTableName = process.env.JOB_TITLE_ACHIEVEMENTS_TABLE || 'getquickresume-api-job-title-achievements-dev';
 const rateLimitsTableName = process.env.RATE_LIMITS_TABLE || 'getquickresume-api-rate-limits-dev';
 const templatesTableName = process.env.TEMPLATES_TABLE || 'getquickresume-api-templates-dev';
+const supportTicketsTableName = process.env.SUPPORT_TICKETS_TABLE || 'getquickresume-api-support-tickets-dev';
+const resumeViewsTableName = process.env.RESUME_VIEWS_TABLE || 'getquickresume-api-resume-views-dev';
+const aiUsageLogsTableName = process.env.AI_USAGE_LOGS_TABLE || 'getquickresume-api-ai-usage-logs-dev';
 
 /**
  * Creates the Users table
@@ -98,6 +100,10 @@ async function createResumesTable() {
         {
           AttributeName: 'resumeId',
           AttributeType: 'S'
+        },
+        {
+          AttributeName: 'shareToken',
+          AttributeType: 'S'
         }
       ],
       KeySchema: [
@@ -122,55 +128,12 @@ async function createResumesTable() {
           Projection: {
             ProjectionType: 'ALL'
           }
-        }
-      ],
-      BillingMode: 'PAY_PER_REQUEST'
-    });
-
-    await client.send(command);
-    console.log(`✅ Table ${resumesTableName} created successfully!`);
-  } catch (error) {
-    if (error.name === 'ResourceInUseException') {
-      console.log(`ℹ️  Table ${resumesTableName} already exists`);
-    } else {
-      console.error('❌ Error creating table:', error);
-      throw error;
-    }
-  }
-}
-
-async function createJobInterestsTable() {
-  try {
-    console.log(`Creating table: ${jobInterestsTableName}`);
-    
-    const command = new CreateTableCommand({
-      TableName: jobInterestsTableName,
-      AttributeDefinitions: [
-        {
-          AttributeName: 'userId',
-          AttributeType: 'S'
         },
         {
-          AttributeName: 'jobId',
-          AttributeType: 'S'
-        }
-      ],
-      KeySchema: [
-        {
-          AttributeName: 'userId',
-          KeyType: 'HASH'
-        },
-        {
-          AttributeName: 'jobId',
-          KeyType: 'RANGE'
-        }
-      ],
-      GlobalSecondaryIndexes: [
-        {
-          IndexName: 'jobId-index',
+          IndexName: 'shareToken-index',
           KeySchema: [
             {
-              AttributeName: 'jobId',
+              AttributeName: 'shareToken',
               KeyType: 'HASH'
             }
           ],
@@ -183,16 +146,18 @@ async function createJobInterestsTable() {
     });
 
     await client.send(command);
-    console.log(`✅ Table ${jobInterestsTableName} created successfully!`);
+    console.log(`✅ Table ${resumesTableName} created successfully!`);
   } catch (error) {
     if (error.name === 'ResourceInUseException') {
-      console.log(`ℹ️  Table ${jobInterestsTableName} already exists`);
+      console.log(`ℹ️  Table ${resumesTableName} already exists`);
+      console.log(`⚠️  Note: If shareToken-index GSI is missing, you may need to delete and recreate this table.`);
     } else {
       console.error('❌ Error creating table:', error);
       throw error;
     }
   }
 }
+
 
 async function createProfessionSuggestionsTable() {
   try {
@@ -330,6 +295,177 @@ async function createTemplatesTable() {
   }
 }
 
+async function createSupportTicketsTable() {
+  try {
+    console.log(`Creating table: ${supportTicketsTableName}`);
+    
+    const command = new CreateTableCommand({
+      TableName: supportTicketsTableName,
+      AttributeDefinitions: [
+        {
+          AttributeName: 'ticketId',
+          AttributeType: 'S'
+        },
+        {
+          AttributeName: 'userId',
+          AttributeType: 'S'
+        }
+      ],
+      KeySchema: [
+        {
+          AttributeName: 'ticketId',
+          KeyType: 'HASH'
+        }
+      ],
+      GlobalSecondaryIndexes: [
+        {
+          IndexName: 'userId-index',
+          KeySchema: [
+            {
+              AttributeName: 'userId',
+              KeyType: 'HASH'
+            }
+          ],
+          Projection: {
+            ProjectionType: 'ALL'
+          }
+        }
+      ],
+      BillingMode: 'PAY_PER_REQUEST'
+    });
+
+    await client.send(command);
+    console.log(`✅ Table ${supportTicketsTableName} created successfully!`);
+  } catch (error) {
+    if (error.name === 'ResourceInUseException') {
+      console.log(`ℹ️  Table ${supportTicketsTableName} already exists`);
+    } else {
+      console.error('❌ Error creating table:', error);
+      throw error;
+    }
+  }
+}
+
+async function createResumeViewsTable() {
+  try {
+    console.log(`Creating table: ${resumeViewsTableName}`);
+    
+    const command = new CreateTableCommand({
+      TableName: resumeViewsTableName,
+      AttributeDefinitions: [
+        {
+          AttributeName: 'shareToken',
+          AttributeType: 'S'
+        },
+        {
+          AttributeName: 'viewedAt',
+          AttributeType: 'S'
+        }
+      ],
+      KeySchema: [
+        {
+          AttributeName: 'shareToken',
+          KeyType: 'HASH'
+        },
+        {
+          AttributeName: 'viewedAt',
+          KeyType: 'RANGE'
+        }
+      ],
+      BillingMode: 'PAY_PER_REQUEST'
+    });
+
+    await client.send(command);
+    console.log(`✅ Table ${resumeViewsTableName} created successfully!`);
+  } catch (error) {
+    if (error.name === 'ResourceInUseException') {
+      console.log(`ℹ️  Table ${resumeViewsTableName} already exists`);
+    } else {
+      console.error('❌ Error creating table:', error);
+      throw error;
+    }
+  }
+}
+
+async function createAIUsageLogsTable() {
+  try {
+    console.log(`Creating table: ${aiUsageLogsTableName}`);
+    
+    const command = new CreateTableCommand({
+      TableName: aiUsageLogsTableName,
+      AttributeDefinitions: [
+        {
+          AttributeName: 'id',
+          AttributeType: 'S'
+        },
+        {
+          AttributeName: 'userId',
+          AttributeType: 'S'
+        },
+        {
+          AttributeName: 'resumeId',
+          AttributeType: 'S'
+        },
+        {
+          AttributeName: 'timestamp',
+          AttributeType: 'S'
+        }
+      ],
+      KeySchema: [
+        {
+          AttributeName: 'id',
+          KeyType: 'HASH'
+        }
+      ],
+      GlobalSecondaryIndexes: [
+        {
+          IndexName: 'userId-index',
+          KeySchema: [
+            {
+              AttributeName: 'userId',
+              KeyType: 'HASH'
+            },
+            {
+              AttributeName: 'timestamp',
+              KeyType: 'RANGE'
+            }
+          ],
+          Projection: {
+            ProjectionType: 'ALL'
+          }
+        },
+        {
+          IndexName: 'resumeId-index',
+          KeySchema: [
+            {
+              AttributeName: 'resumeId',
+              KeyType: 'HASH'
+            },
+            {
+              AttributeName: 'timestamp',
+              KeyType: 'RANGE'
+            }
+          ],
+          Projection: {
+            ProjectionType: 'ALL'
+          }
+        }
+      ],
+      BillingMode: 'PAY_PER_REQUEST'
+    });
+
+    await client.send(command);
+    console.log(`✅ Table ${aiUsageLogsTableName} created successfully!`);
+  } catch (error) {
+    if (error.name === 'ResourceInUseException') {
+      console.log(`ℹ️  Table ${aiUsageLogsTableName} already exists`);
+    } else {
+      console.error('❌ Error creating table:', error);
+      throw error;
+    }
+  }
+}
+
 async function main() {
   try {
     console.log('🚀 Setting up DynamoDB local tables...');
@@ -338,20 +474,24 @@ async function main() {
     console.log(`DynamoDB Endpoint: ${process.env.DYNAMODB_ENDPOINT || 'http://localhost:8000'}`);
     console.log(`Users Table: ${usersTableName}`);
     console.log(`Resumes Table: ${resumesTableName}`);
-    console.log(`Job Interests Table: ${jobInterestsTableName}`);
     console.log(`Profession Suggestions Table: ${professionSuggestionsTableName}`);
     console.log(`Job Title Achievements Table: ${jobTitleAchievementsTableName}`);
     console.log(`Rate Limits Table: ${rateLimitsTableName}`);
     console.log(`Templates Table: ${templatesTableName}`);
+    console.log(`Support Tickets Table: ${supportTicketsTableName}`);
+    console.log(`Resume Views Table: ${resumeViewsTableName}`);
+    console.log(`AI Usage Logs Table: ${aiUsageLogsTableName}`);
     console.log('');
 
     await createUsersTable();
     await createResumesTable();
-    await createJobInterestsTable();
     await createProfessionSuggestionsTable();
     await createJobTitleAchievementsTable();
     await createRateLimitsTable();
     await createTemplatesTable();
+    await createSupportTicketsTable();
+    await createResumeViewsTable();
+    await createAIUsageLogsTable();
     
     console.log('');
     console.log('✅ All tables created successfully!');

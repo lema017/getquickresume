@@ -2,11 +2,13 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
+import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { useAuthStore } from '@/stores/authStore';
 import { templatesService, ResumeTemplate } from '@/services/templatesService';
 import { TemplatePreviewModal } from './TemplatePreviewModal';
+import { PremiumActionModal } from '@/components/PremiumActionModal';
 import { WebComponentRenderer } from './WebComponentRenderer';
-import { ArrowLeft, ArrowRight, Crown, Eye, Code, Download, X, Copy, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Crown, Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { convertGeneratedResumeToResumeData } from './TemplatePreviewModal';
 import { calculateA4PreviewScale, getA4ContainerStyles, getA4WrapperSize } from '@/utils/a4Dimensions';
@@ -234,6 +236,7 @@ export function calculateAndAssignPageNumbers(
 export function Step9Preview() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { navigateToStep } = useWizardNavigation();
   const { generatedResume, markStepCompleted, setCurrentStep, selectedTemplateId, setSelectedTemplate, resumeData: storeResumeData, updateResumeData } = useResumeStore();
   const { user } = useAuthStore();
 
@@ -242,17 +245,16 @@ export function Step9Preview() {
   const [error, setError] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplateState] = useState<ResumeTemplate | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [calculatingPagination, setCalculatingPagination] = useState(false);
-  const [showCodeModal, setShowCodeModal] = useState(false);
-  const [codeModalTemplate, setCodeModalTemplate] = useState<ResumeTemplate | null>(null);
 
   // Validate that generatedResume exists
   useEffect(() => {
     if (!generatedResume) {
       toast.error('Debes generar tu CV primero');
-      navigate('/wizard/manual/step-9');
+      navigateToStep(9);
     }
-  }, [generatedResume, navigate]);
+  }, [generatedResume, navigateToStep]);
 
   // Load templates
   useEffect(() => {
@@ -327,31 +329,12 @@ export function Step9Preview() {
     setShowModal(true);
   };
 
-  const handleViewCode = (template: ResumeTemplate) => {
-    console.log('🔍 [DEBUG] Opening code modal for template:', template.name);
-    setCodeModalTemplate(template);
-    setShowCodeModal(true);
-  };
-
-  const handleDownloadTemplate = (template: ResumeTemplate) => {
-    const blob = new Blob([template.jsCode], { type: 'text/javascript' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${template.tagName}.js`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast.success('Template descargado');
-  };
-
   const handleCloseModal = () => {
     setShowModal(false);
   };
 
   const handleBack = () => {
-    navigate('/wizard/manual/step-9');
+    navigateToStep(9);
   };
 
   const handleNext = () => {
@@ -360,21 +343,21 @@ export function Step9Preview() {
       return;
     }
     
-    if (selectedTemplateState?.category === 'premium' && !user?.isPremium) {
-      toast.error('Este template es Premium. Actualiza tu plan para usarlo.');
+    if (selectedTemplate?.category === 'premium' && !user?.isPremium) {
+      setShowPremiumModal(true);
       return;
     }
 
     markStepCompleted(10);
     setCurrentStep(11);
-    navigate('/wizard/manual/step-11');
+    navigateToStep(11);
   };
 
   if (!generatedResume) {
     return (
       <div className="max-w-4xl mx-auto text-center py-12">
         <p className="text-gray-600 mb-4">Debes generar tu CV primero</p>
-        <button onClick={() => navigate('/wizard/manual/step-8')} className="btn-primary">
+        <button onClick={() => navigateToStep(8)} className="btn-primary">
           Ir a Generar CV
         </button>
       </div>
@@ -430,16 +413,15 @@ export function Step9Preview() {
             // Use mock data for gallery previews (small, fast rendering)
             const mockTemplateData = generateSmallMockResumeData();
             return (
-            <TemplatePreviewCard
+              <TemplatePreviewCard
                 key={template.id}
-              template={template}
+                template={template}
                 templateData={mockTemplateData}
-              isSelected={template.id === selectedTemplateId}
-              onSelect={() => handleSelectTemplate(template)}
-              onPreview={() => handlePreviewTemplate(template)}
-              onViewCode={() => handleViewCode(template)}
-              onDownload={() => handleDownloadTemplate(template)}
-            />
+                isSelected={template.id === selectedTemplateId}
+                onSelect={() => handleSelectTemplate(template)}
+                onPreview={() => handlePreviewTemplate(template)}
+                resumeLanguage={(storeResumeData?.language as 'en' | 'es') || 'en'}
+              />
             );
           })}
         </div>
@@ -471,17 +453,13 @@ export function Step9Preview() {
         />
       )}
 
-      {/* Code View Modal */}
-      {codeModalTemplate && (
-        <TemplateCodeModal
-          template={codeModalTemplate}
-          isOpen={showCodeModal}
-          onClose={() => {
-            setShowCodeModal(false);
-            setCodeModalTemplate(null);
-          }}
-        />
-      )}
+      {/* Premium Action Modal for premium templates */}
+      <PremiumActionModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        feature="premiumTemplate"
+      />
+
     </div>
   );
 }
@@ -493,17 +471,16 @@ function TemplatePreviewCard({
   isSelected,
   onSelect,
   onPreview,
-  onViewCode,
-  onDownload,
+  resumeLanguage = 'en',
 }: {
   template: ResumeTemplate;
   templateData: ReturnType<typeof generateSmallMockResumeData>;
   isSelected: boolean;
   onSelect: () => void;
   onPreview: () => void;
-  onViewCode: () => void;
-  onDownload: () => void;
+  resumeLanguage?: 'en' | 'es';
 }) {
+  const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.5);
@@ -609,7 +586,7 @@ function TemplatePreviewCard({
               tagName={template.tagName}
               jsCode={template.jsCode}
               data={templateData as any}
-              language="en"
+              language={resumeLanguage}
               style={{ width: '100%', height: '100%' }}
             />
           </div>
@@ -621,35 +598,12 @@ function TemplatePreviewCard({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            console.log('🔍 [DEBUG] Preview button clicked for template:', template.name);
             onPreview();
           }}
           className="flex-1 btn-outline text-sm py-2 flex items-center justify-center"
         >
           <Eye className="w-4 h-4 mr-1" />
-          Ver Preview
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            console.log('🔍 [DEBUG] View Code button clicked for template:', template.name);
-            onViewCode();
-          }}
-          className="btn-outline text-sm py-2 px-3 flex items-center justify-center min-w-[40px]"
-          title="Ver código del template"
-        >
-          <Code className="w-4 h-4" />
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            console.log('🔍 [DEBUG] Download button clicked for template:', template.name);
-            onDownload();
-          }}
-          className="btn-outline text-sm py-2 px-3 flex items-center justify-center min-w-[40px]"
-          title="Descargar template"
-        >
-          <Download className="w-4 h-4" />
+          {t('common.preview')}
         </button>
         {isSelected && (
           <div className="flex items-center text-blue-600 text-sm px-2">
@@ -661,94 +615,4 @@ function TemplatePreviewCard({
   );
 }
 
-// Modal component for viewing template code
-function TemplateCodeModal({
-  template,
-  isOpen,
-  onClose,
-}: {
-  template: ResumeTemplate;
-  isOpen: boolean;
-  onClose: () => void;
-}) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopyCode = async () => {
-    try {
-      await navigator.clipboard.writeText(template.jsCode);
-      setCopied(true);
-      toast.success('Código copiado al portapapeles');
-      setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
-      console.error('Error copying code:', error);
-      toast.error('Error al copiar el código');
-    }
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) {
-          onClose();
-        }
-      }}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="code-modal-title"
-    >
-      <div className="bg-white rounded-xl shadow-2xl max-w-7xl w-full max-h-[90vh] flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
-          <div className="flex-1">
-            <h2 id="code-modal-title" className="text-2xl font-bold text-gray-900">
-              Código del Template: {template.name}
-            </h2>
-            <p className="text-gray-600 mt-1 text-sm">
-              {template.jsCode.length} caracteres
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleCopyCode}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
-            >
-              {copied ? (
-                <>
-                  <Check className="w-4 h-4" />
-                  Copiado
-                </>
-              ) : (
-                <>
-                  <Copy className="w-4 h-4" />
-                  Copiar
-                </>
-              )}
-            </button>
-            <button
-              onClick={onClose}
-              className="ml-2 p-2 hover:bg-gray-100 rounded-full transition-colors"
-              aria-label="Cerrar modal"
-            >
-              <X className="w-6 h-6 text-gray-500" />
-            </button>
-          </div>
-        </div>
-
-        {/* Code Content */}
-        <div className="flex-1 overflow-auto p-6 bg-gray-50">
-          <div className="bg-gray-900 rounded-lg shadow-lg overflow-hidden">
-            <div className="overflow-auto max-h-[calc(90vh-150px)]">
-              <pre className="p-4 text-sm text-gray-100 font-mono leading-relaxed">
-                <code>{template.jsCode}</code>
-              </pre>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 

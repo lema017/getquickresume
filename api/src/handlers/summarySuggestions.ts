@@ -1,7 +1,9 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { aiService } from '../services/aiService';
 import { SummarySuggestionRequest, SummarySuggestionResponse } from '../types';
-import { checkRateLimit } from '../middleware/rateLimiter';
+import { checkRateLimit, refundRateLimit } from '../middleware/rateLimiter';
+import { getUserById } from '../services/dynamodb';
+import { verifyResumeOwnership } from '../services/resumeService';
 
 export const generateSuggestions = async (
   event: APIGatewayProxyEvent
@@ -27,8 +29,47 @@ export const generateSuggestions = async (
 
     const userId = event.requestContext.authorizer.userId;
 
-    // Rate limiting: 5 requests por minuto
-    const rateLimitResult = await checkRateLimit(userId, 'summary-suggestions', 5, 60000);
+    // Check user premium status and free resume usage
+    const user = await getUserById(userId);
+    if (!user) {
+      return {
+        statusCode: 404,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+          'Access-Control-Allow-Methods': 'POST,OPTIONS',
+        },
+        body: JSON.stringify({
+          success: false,
+          error: 'User not found',
+          message: 'User account not found'
+        } as SummarySuggestionResponse)
+      };
+    }
+
+    // Premium check: AI suggestions are only available for premium users or free users who haven't used their quota
+    if (!user.isPremium && user.freeResumeUsed) {
+      return {
+        statusCode: 403,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+          'Access-Control-Allow-Methods': 'POST,OPTIONS',
+        },
+        body: JSON.stringify({
+          success: false,
+          error: 'Premium feature required',
+          message: 'AI suggestions are only available for premium users or free users who haven\'t used their free resume quota.',
+          code: 'PREMIUM_REQUIRED'
+        } as SummarySuggestionResponse)
+      };
+    }
+
+    // Rate limiting: 1 request/minute for free users, 10 requests/minute for premium users
+    const maxRequests = user.isPremium ? 10 : 1;
+    const rateLimitResult = await checkRateLimit(userId, 'summary-suggestions', maxRequests, 60000);
     if (!rateLimitResult.allowed) {
       return {
         statusCode: 429,
@@ -42,7 +83,8 @@ export const generateSuggestions = async (
           success: false,
           error: 'Rate limit exceeded',
           message: 'Too many summary suggestion requests. Please wait before trying again.',
-          resetTime: rateLimitResult.resetTime
+          resetTime: rateLimitResult.resetTime,
+          code: 'RATE_LIMIT_EXCEEDED'
         } as SummarySuggestionResponse)
       };
     }
@@ -173,6 +215,27 @@ export const generateSuggestions = async (
       };
     }
 
+    // Validate resume ownership if resumeId is provided (for AI cost tracking)
+    if (requestData.resumeId) {
+      const isOwner = await verifyResumeOwnership(userId, requestData.resumeId);
+      if (!isOwner) {
+        return {
+          statusCode: 403,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+            'Access-Control-Allow-Methods': 'POST,OPTIONS',
+          },
+          body: JSON.stringify({
+            success: false,
+            error: 'Access denied',
+            message: 'Resume not found or access denied'
+          } as SummarySuggestionResponse)
+        };
+      }
+    }
+
     // Extract requestContext to pass to AI service (contains userId from JWT token)
     // Cast to match the expected type structure
     const requestContext = {
@@ -186,7 +249,8 @@ export const generateSuggestions = async (
       requestData.projectDescriptions,
       language,
       requestData.type,
-      requestContext
+      requestContext,
+      requestData.resumeId
     );
 
     const response: SummarySuggestionResponse = {
@@ -210,6 +274,12 @@ export const generateSuggestions = async (
 
   } catch (error) {
     console.error('Error in generateSuggestions handler:', error);
+    
+    // Refund rate limit on server error - user shouldn't be penalized
+    const userId = event.requestContext.authorizer?.userId;
+    if (userId) {
+      await refundRateLimit(userId, 'summary-suggestions');
+    }
     
     const errorResponse: SummarySuggestionResponse = {
       success: false,

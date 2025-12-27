@@ -14,7 +14,7 @@ export function ContactPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Mock form submission
-    toast.success('Mensaje enviado correctamente');
+    toast.success(t('contact.toast.success'));
     setFormData({ name: '', email: '', message: '' });
   };
 
@@ -42,7 +42,7 @@ export function ContactPage() {
           {/* Contact Form */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-              Envíanos un mensaje
+              {t('contact.form.title')}
             </h2>
             
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -58,7 +58,7 @@ export function ContactPage() {
                   onChange={handleChange}
                   required
                   className="input-field"
-                  placeholder="Tu nombre completo"
+                  placeholder={t('contact.form.placeholders.name')}
                 />
               </div>
 
@@ -74,7 +74,7 @@ export function ContactPage() {
                   onChange={handleChange}
                   required
                   className="input-field"
-                  placeholder="tu@email.com"
+                  placeholder={t('contact.form.placeholders.email')}
                 />
               </div>
 
@@ -90,7 +90,7 @@ export function ContactPage() {
                   required
                   rows={5}
                   className="input-field resize-none"
-                  placeholder="Cuéntanos cómo podemos ayudarte..."
+                  placeholder={t('contact.form.placeholders.message')}
                 />
               </div>
 
@@ -109,14 +109,14 @@ export function ContactPage() {
             {/* Contact Information */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-                Información de Contacto
+                {t('contact.info.title')}
               </h2>
               
               <div className="space-y-4">
                 <div className="flex items-center">
                   <Mail className="w-5 h-5 text-primary mr-3" />
                   <div>
-                    <p className="font-medium text-gray-900">Email</p>
+                    <p className="font-medium text-gray-900">{t('contact.info.emailLabel')}</p>
                     <p className="text-gray-600">contacto@getquickresume.com</p>
                   </div>
                 </div>
@@ -124,7 +124,7 @@ export function ContactPage() {
                 <div className="flex items-center">
                   <Mail className="w-5 h-5 text-primary mr-3" />
                   <div>
-                    <p className="font-medium text-gray-900">Soporte</p>
+                    <p className="font-medium text-gray-900">{t('contact.info.supportLabel')}</p>
                     <p className="text-gray-600">soporte@getquickresume.com</p>
                   </div>
                 </div>
@@ -171,36 +171,20 @@ export function ContactPage() {
             {/* FAQ */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-                Preguntas Frecuentes
+                {t('contact.faq.title')}
               </h2>
               
               <div className="space-y-4">
-                <div>
-                  <h3 className="font-medium text-gray-900 mb-1">
-                    ¿Cuánto tiempo toma crear un CV?
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    Con nuestro wizard guiado, puedes crear un CV profesional en menos de 10 minutos.
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="font-medium text-gray-900 mb-1">
-                    ¿Es realmente gratuito?
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    Sí, la versión básica es completamente gratuita. Solo pagas por funciones Premium opcionales.
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="font-medium text-gray-900 mb-1">
-                    ¿Mis datos están seguros?
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    Absolutamente. Usamos encriptación de extremo a extremo y cumplimos con las regulaciones de privacidad.
-                  </p>
-                </div>
+                {(t('contact.faq.items', { returnObjects: true }) as unknown as { question: string; answer: string }[]).map((item, index) => (
+                  <div key={index}>
+                    <h3 className="font-medium text-gray-900 mb-1">
+                      {item.question}
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      {item.answer}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

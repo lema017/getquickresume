@@ -3,6 +3,7 @@
 export interface ValidationResult {
   isValid: boolean;
   message?: string;
+  messageKey?: string; // Translation key for internationalization
 }
 
 export interface FieldValidation {
@@ -10,11 +11,12 @@ export interface FieldValidation {
 }
 
 // Validaciones básicas
-export const validateRequired = (value: string | undefined | null, fieldName: string): ValidationResult => {
+export const validateRequired = (value: string | undefined | null, fieldKey: string): ValidationResult => {
   if (!value || value.trim() === '') {
     return {
       isValid: false,
-      message: `${fieldName} es requerido`
+      messageKey: `validation.profile.${fieldKey}`,
+      message: '' // Will be translated in component
     };
   }
   return { isValid: true };
@@ -41,14 +43,15 @@ export const validateMaxLength = (value: string, maxLength: number, fieldName: s
 };
 
 // Validaciones de caracteres especiales
-export const validateAllowedCharacters = (value: string, fieldName: string): ValidationResult => {
+export const validateAllowedCharacters = (value: string, fieldKey: string): ValidationResult => {
   // Caracteres básicos permitidos: letras, números, espacios, puntos, comas, guiones, paréntesis, arroba, símbolos básicos, y ampersand
   const allowedRegex = /^[a-zA-Z0-9\s.,\-+()/@<>=:&áéíóúÁÉÍÓÚñÑüÜ]+$/;
   
   if (!allowedRegex.test(value)) {
     return {
       isValid: false,
-      message: `${fieldName} contiene caracteres no permitidos. Solo se permiten letras, números y símbolos básicos (. , - + ( ) / @ < > = : &)`
+      messageKey: 'validation.invalidCharacters',
+      message: '' // Will be translated in component
     };
   }
   return { isValid: true };
@@ -61,7 +64,8 @@ export const validatePhoneCharacters = (phone: string): ValidationResult => {
   if (!phoneRegex.test(phone)) {
     return {
       isValid: false,
-      message: 'El teléfono solo puede contener números, espacios, guiones, paréntesis y el símbolo +'
+      messageKey: 'validation.phoneCharacters',
+      message: '' // Will be translated in component
     };
   }
   return { isValid: true };
@@ -73,7 +77,8 @@ export const validateEmail = (email: string): ValidationResult => {
   if (!emailRegex.test(email)) {
     return {
       isValid: false,
-      message: 'Formato de email inválido'
+      messageKey: 'validation.email',
+      message: '' // Will be translated in component
     };
   }
   return { isValid: true };
@@ -87,7 +92,8 @@ export const validatePhone = (phone: string): ValidationResult => {
   if (!phoneRegex.test(cleanPhone)) {
     return {
       isValid: false,
-      message: 'Formato de teléfono inválido (mínimo 7 dígitos)'
+      messageKey: 'validation.phone',
+      message: '' // Will be translated in component
     };
   }
   return { isValid: true };
@@ -103,7 +109,8 @@ export const validateLinkedIn = (linkedin: string): ValidationResult => {
   if (cleanLinkedin.includes('https//') && !cleanLinkedin.includes('https://')) {
     return {
       isValid: false,
-      message: 'Formato de LinkedIn inválido. Debe ser https:// (con dos puntos)'
+      messageKey: 'validation.linkedin',
+      message: '' // Will be translated in component
     };
   }
   
@@ -112,7 +119,8 @@ export const validateLinkedIn = (linkedin: string): ValidationResult => {
   if (!linkedinRegex.test(cleanLinkedin)) {
     return {
       isValid: false,
-      message: 'Formato de LinkedIn inválido (ej: https://linkedin.com/in/tu-perfil)'
+      messageKey: 'validation.linkedin',
+      message: '' // Will be translated in component
     };
   }
   return { isValid: true };
@@ -194,16 +202,16 @@ export const validateProfile = (formData: any): FieldValidation => {
   
   // Validar campos requeridos
   const requiredFields = [
-    { key: 'firstName', name: 'Nombre' },
-    { key: 'lastName', name: 'Apellido' },
-    { key: 'country', name: 'País' },
-    { key: 'profession', name: 'Profesión' },
-    { key: 'phone', name: 'Teléfono' },
-    { key: 'email', name: 'Email' }
+    { key: 'firstName', translationKey: 'firstName' },
+    { key: 'lastName', translationKey: 'lastName' },
+    { key: 'country', translationKey: 'country' },
+    { key: 'profession', translationKey: 'profession' },
+    { key: 'phone', translationKey: 'phone' },
+    { key: 'email', translationKey: 'email' }
   ];
   
   requiredFields.forEach(field => {
-    const result = validateRequired(formData[field.key], field.name);
+    const result = validateRequired(formData[field.key], field.translationKey);
     if (!result.isValid) {
       errors[field.key] = result;
     }
@@ -211,14 +219,14 @@ export const validateProfile = (formData: any): FieldValidation => {
   
   // Validar caracteres permitidos en campos de texto
   const textFields = [
-    { key: 'firstName', name: 'Nombre' },
-    { key: 'lastName', name: 'Apellido' },
-    { key: 'profession', name: 'Profesión' }
+    { key: 'firstName', translationKey: 'firstName' },
+    { key: 'lastName', translationKey: 'lastName' },
+    { key: 'profession', translationKey: 'profession' }
   ];
   
   textFields.forEach(field => {
     if (formData[field.key] && !errors[field.key]) {
-      const charResult = validateAllowedCharacters(formData[field.key], field.name);
+      const charResult = validateAllowedCharacters(formData[field.key], field.translationKey);
       if (!charResult.isValid) {
         errors[field.key] = charResult;
       }

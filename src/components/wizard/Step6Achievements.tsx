@@ -2,9 +2,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
-import { ArrowRight, ArrowLeft, Plus, X, CheckCircle, Trophy, Sparkles, Loader2 } from 'lucide-react';
+import { useWizardNavigation } from '@/hooks/useWizardNavigation';
+import { useAuthStore } from '@/stores/authStore';
+import { ArrowRight, ArrowLeft, Plus, X, CheckCircle, Trophy, Sparkles, Loader2, Crown } from 'lucide-react';
 import { FloatingTips } from '@/components/FloatingTips';
 import { TipsButton } from '@/components/TipsButton';
+import { MandatoryFieldLabel } from '@/components/MandatoryFieldLabel';
+import { PremiumActionModal } from '@/components/PremiumActionModal';
 import { useTips } from '@/hooks/useTips';
 import { achievementSuggestionService } from '@/services/achievementSuggestionService';
 import { AchievementSuggestion } from '@/types';
@@ -12,7 +16,9 @@ import { AchievementSuggestion } from '@/types';
 export function Step6Achievements() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep } = useResumeStore();
+  const { navigateToStep } = useWizardNavigation();
+  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, currentResumeId } = useResumeStore();
+  const { user } = useAuthStore();
   const { areTipsClosed, closeTips, showTips } = useTips();  
   const [achievements, setAchievements] = useState(resumeData.achievements || []);
 
@@ -27,6 +33,11 @@ export function Step6Achievements() {
   const [showAISuggestions, setShowAISuggestions] = useState(false);
   const [suggestionsError, setSuggestionsError] = useState<string | null>(null);
   const [usedSuggestions, setUsedSuggestions] = useState<Set<string>>(new Set());
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [isRateLimited, setIsRateLimited] = useState(false);
+
+  // Check if user can use AI features (premium OR free user who hasn't used their quota)
+  const canUseAIFeatures = user?.isPremium || !user?.freeResumeUsed;
 
   const addAchievement = () => {
     const newAchievement = {
@@ -61,13 +72,14 @@ export function Step6Achievements() {
   };
 
   const loadAISuggestions = async () => {
-    if (!resumeData.profession || resumeData.profession.trim() === '') {
-      setSuggestionsError('Completa tu profesión en el paso anterior para usar las sugerencias de IA');
+    // Check if user can use AI features - show CTA if not
+    if (!canUseAIFeatures) {
+      setShowPremiumModal(true);
       return;
     }
 
-    if (!resumeData.projects || resumeData.projects.length === 0) {
-      setSuggestionsError('Agrega al menos un proyecto en el paso anterior para usar las sugerencias de IA');
+    if (!resumeData.profession || resumeData.profession.trim() === '') {
+      setSuggestionsError('Completa tu profesión en el paso anterior para usar las sugerencias de IA');
       return;
     }
 
@@ -79,11 +91,22 @@ export function Step6Achievements() {
     try {
       const suggestions = await achievementSuggestionService.getAchievementSuggestions(
         resumeData.profession,
-        resumeData.projects
+        resumeData.projects || [],
+        resumeData.language,
+        currentResumeId || undefined
       );
       setAiSuggestions(suggestions);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading AI suggestions:', error);
+      // Check if it's a premium required error from API
+      if (error?.code === 'PREMIUM_REQUIRED' || error?.status === 403) {
+        setShowPremiumModal(true);
+        return;
+      }
+      // Check if it's a rate limit error
+      if (error?.code === 'RATE_LIMIT_EXCEEDED' || error?.status === 429) {
+        setIsRateLimited(true);
+      }
       setSuggestionsError(error instanceof Error ? error.message : 'Error al cargar sugerencias de IA');
     } finally {
       setIsLoadingAISuggestions(false);
@@ -110,14 +133,15 @@ export function Step6Achievements() {
     updateResumeData({ achievements });
     markStepCompleted(6);
     setCurrentStep(7);
-    navigate('/wizard/manual/step-7');
+    navigateToStep(7);
   };
 
   const handleBack = () => {
-    navigate('/wizard/manual/step-5');
+    navigateToStep(5);
   };
 
-  const isFormValid = achievements.length > 0 && achievements.every(achievement => 
+  // Validation: achievements are optional, but if added, each achievement needs title and description
+  const isFormValid = achievements.length === 0 || achievements.every(achievement => 
     achievement.title.trim() !== '' && achievement.description.trim() !== ''
   );
 
@@ -131,6 +155,33 @@ export function Step6Achievements() {
         <p className="text-gray-600">
           {t('wizard.steps.achievements.ui.headerSubtitle')}
         </p>
+        {/* Achievements optional indicator */}
+        <div className={`mt-4 inline-block px-4 py-2 rounded-lg ${
+          achievements.length === 0
+            ? 'bg-blue-50 border border-blue-200'
+            : isFormValid 
+            ? 'bg-green-50 border border-green-200' 
+            : 'bg-yellow-50 border border-yellow-200'
+        }`}>
+          <p className={`text-sm font-medium ${
+            achievements.length === 0
+              ? 'text-blue-800'
+              : isFormValid ? 'text-green-800' : 'text-yellow-800'
+          }`}>
+            {achievements.length === 0
+              ? t('wizard.validation.achievements.optional')
+              : isFormValid 
+              ? t('wizard.validation.achievements.requirementMet', { 
+                  count: achievements.length, 
+                  plural: achievements.length > 1 ? 's' : ''
+                })
+              : t('wizard.validation.achievements.requirement', { 
+                  count: achievements.length, 
+                  plural: achievements.length !== 1 ? 's' : ''
+                })
+            }
+          </p>
+        </div>
       </div>
 
       {/* Tips Section */}
@@ -140,11 +191,13 @@ export function Step6Achievements() {
           <div className="flex items-center space-x-2">
             <button
               onClick={loadAISuggestions}
-              disabled={isLoadingAISuggestions || !resumeData.profession || !resumeData.projects?.length}
+              disabled={isLoadingAISuggestions || !resumeData.profession}
               className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 ${
-                isLoadingAISuggestions || !resumeData.profession || !resumeData.projects?.length
+                isLoadingAISuggestions || !resumeData.profession
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 shadow-sm hover:shadow-md'
+                  : canUseAIFeatures
+                  ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 shadow-sm hover:shadow-md'
+                  : 'bg-gradient-to-r from-amber-500 to-yellow-600 text-white hover:from-amber-600 hover:to-yellow-700 shadow-sm hover:shadow-md'
               }`}
             >
               {isLoadingAISuggestions ? (
@@ -152,8 +205,8 @@ export function Step6Achievements() {
               ) : (
                 <Sparkles className="w-4 h-4 mr-1" />
               )}
-              <span>{t('wizard.steps.achievements.ui.ai.suggestionsButton')}</span>
-              {aiSuggestions.length > 0 && !isLoadingAISuggestions && (
+              <span>{canUseAIFeatures ? t('wizard.steps.achievements.ui.ai.suggestionsButton') : t('dashboard.premiumAction.aiSuggestions.cta')}</span>
+              {aiSuggestions.length > 0 && !isLoadingAISuggestions && canUseAIFeatures && (
                 <span className="ml-2 px-2 py-0.5 bg-white/20 rounded-full text-xs">
                   {aiSuggestions.length}
                 </span>
@@ -191,6 +244,19 @@ export function Step6Achievements() {
             ) : suggestionsError ? (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <p className="text-red-800 text-sm">{suggestionsError || t('wizard.steps.achievements.ui.ai.errorLoading')}</p>
+                {isRateLimited && (
+                  <button
+                    onClick={() => {
+                      setIsRateLimited(false);
+                      setSuggestionsError(null);
+                      navigate('/premium');
+                    }}
+                    className="mt-2 inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all shadow-sm hover:shadow-md"
+                  >
+                    <Crown className="w-4 h-4 mr-1" />
+                    {t('wizard.rateLimit.upgradeCta')}
+                  </button>
+                )}
               </div>
             ) : aiSuggestions.length > 0 ? (
               <div className="space-y-3">
@@ -254,9 +320,10 @@ export function Step6Achievements() {
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('wizard.steps.achievements.ui.list.labels.title')}
-                </label>
+                <MandatoryFieldLabel
+                  label={t('wizard.steps.achievements.ui.list.labels.title')}
+                  required={false}
+                />
                 <input
                   type="text"
                   value={achievement.title}
@@ -267,9 +334,10 @@ export function Step6Achievements() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('wizard.steps.achievements.ui.list.labels.description')}
-                </label>
+                <MandatoryFieldLabel
+                  label={t('wizard.steps.achievements.ui.list.labels.description')}
+                  required={false}
+                />
                 <textarea
                   value={achievement.description}
                   onChange={(e) => updateAchievement(achievement.id, 'description', e.target.value)}
@@ -309,20 +377,6 @@ export function Step6Achievements() {
         </button>
       </div>
 
-      {/* Skip Option */}
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6">
-        <div className="text-center">
-          <p className="text-gray-600 mb-4">
-            {t('wizard.steps.achievements.ui.skip.message')}
-          </p>
-          <button
-            onClick={handleNext}
-            className="text-gray-600 hover:text-gray-800 underline"
-          >
-            {t('wizard.steps.achievements.ui.skip.continue')}
-          </button>
-        </div>
-      </div>
 
       {/* Motivational Message */}
       <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
@@ -340,17 +394,20 @@ export function Step6Achievements() {
         </button>
         <button 
           onClick={handleNext} 
-          disabled={!isFormValid && achievements.length > 0}
-          className={`flex items-center ${
-            isFormValid || achievements.length === 0 
-              ? 'btn-primary' 
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-          }`}
+          className="btn-primary flex items-center"
+          title={!isFormValid && achievements.length > 0 ? t('wizard.validation.achievements.tooltip') : ''}
         >
           {t('common.next')}
           <ArrowRight className="w-4 h-4 ml-2" />
         </button>
       </div>
+
+      {/* Premium Action Modal for AI features */}
+      <PremiumActionModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        feature="aiSuggestions"
+      />
     </div>
   );
 }

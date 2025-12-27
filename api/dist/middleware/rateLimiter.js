@@ -4,6 +4,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkRateLimit = checkRateLimit;
+exports.refundRateLimit = refundRateLimit;
 exports.logSuspiciousActivity = logSuspiciousActivity;
 const client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
 const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
@@ -95,6 +96,37 @@ async function checkRateLimit(userId, endpoint, maxRequests = 5, windowMs = 6000
         console.error('Rate limit check failed:', error);
         // En caso de error, permitir la request pero loggear
         return { allowed: true, remaining: maxRequests, resetTime: now + windowMs };
+    }
+}
+/**
+ * Refund a rate limit credit when a request fails with a server error (500)
+ * This ensures users aren't penalized for server-side failures
+ */
+async function refundRateLimit(userId, endpoint) {
+    if (!userId || !endpoint)
+        return;
+    const key = `${userId}-${endpoint}`;
+    try {
+        const { Item } = await ddbDocClient.send(new lib_dynamodb_1.GetCommand({
+            TableName: RATE_LIMITS_TABLE,
+            Key: { key }
+        }));
+        if (Item && Item.requestCount > 0) {
+            await ddbDocClient.send(new lib_dynamodb_1.UpdateCommand({
+                TableName: RATE_LIMITS_TABLE,
+                Key: { key },
+                UpdateExpression: 'SET requestCount = requestCount - :dec',
+                ConditionExpression: 'requestCount > :zero',
+                ExpressionAttributeValues: {
+                    ':dec': 1,
+                    ':zero': 0
+                }
+            }));
+            console.log(`Rate limit refunded for ${userId} on ${endpoint}`);
+        }
+    }
+    catch (error) {
+        console.error('Rate limit refund failed:', error);
     }
 }
 async function logSuspiciousActivity(userId, endpoint, reason, input) {

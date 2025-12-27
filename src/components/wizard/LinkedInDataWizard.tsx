@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuthStore } from '@/stores/authStore';
 import { 
   ArrowLeft, 
   ArrowRight, 
@@ -35,6 +36,8 @@ interface LinkedInDataWizardProps {
 export function LinkedInDataWizard({ onBack }: LinkedInDataWizardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useAuthStore();
+  const isPremium = user?.isPremium ?? false;
   const [wizardState, setWizardState] = useState<LinkedInWizardState>({
     profession: '',
     about: '',
@@ -399,6 +402,13 @@ export function LinkedInDataWizard({ onBack }: LinkedInDataWizardProps) {
   });
 
   const handleComplete = async () => {
+    // Check premium status before processing
+    if (!isPremium) {
+      toast.error(t('wizard.linkedinImportPage.errors.premiumRequired') || 'LinkedIn import is a premium feature. Please upgrade to access this functionality.');
+      navigate('/premium');
+      return;
+    }
+
     // Validar que los pasos requeridos estén completados
     const missingRequired = requiredSteps.filter(step => {
       const stepConfigItem = stepConfig.find(s => s.id === step);

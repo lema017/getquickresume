@@ -124,6 +124,42 @@ export async function checkRateLimit(
   }
 }
 
+/**
+ * Refund a rate limit credit when a request fails with a server error (500)
+ * This ensures users aren't penalized for server-side failures
+ */
+export async function refundRateLimit(
+  userId: string,
+  endpoint: string
+): Promise<void> {
+  if (!userId || !endpoint) return;
+
+  const key = `${userId}-${endpoint}`;
+  
+  try {
+    const { Item } = await ddbDocClient.send(new GetCommand({
+      TableName: RATE_LIMITS_TABLE,
+      Key: { key }
+    }));
+
+    if (Item && Item.requestCount > 0) {
+      await ddbDocClient.send(new UpdateCommand({
+        TableName: RATE_LIMITS_TABLE,
+        Key: { key },
+        UpdateExpression: 'SET requestCount = requestCount - :dec',
+        ConditionExpression: 'requestCount > :zero',
+        ExpressionAttributeValues: {
+          ':dec': 1,
+          ':zero': 0
+        }
+      }));
+      console.log(`Rate limit refunded for ${userId} on ${endpoint}`);
+    }
+  } catch (error) {
+    console.error('Rate limit refund failed:', error);
+  }
+}
+
 export async function logSuspiciousActivity(
   userId: string,
   endpoint: string,

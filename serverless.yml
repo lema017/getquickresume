@@ -1,0 +1,167 @@
+service: getquickresume-frontend
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+
+custom:
+  stages:
+    dev:
+      API_URL: "http://localhost:3001/dev"
+      bucketName: getquickresume-frontend-dev
+      frontendUrl: "http://localhost:3000"
+    prod:
+      API_URL: "https://api.getquickresume.com"
+      bucketName: getquickresume.com
+      frontendUrl: "https://getquickresume.com"
+  
+  hostedZoneId: Z01701462KOX9LVOTWQC1  # Route 53 hosted zone for getquickresume.com
+  certificateArn: arn:aws:acm:us-east-1:408034543529:certificate/91e492ba-21e0-4dd6-a972-f1e553774107
+  
+  s3Sync:
+    - bucketName: ${self:custom.stages.${self:provider.stage}.bucketName}
+      localDir: dist
+      deleteRemoved: true
+      defaultContentType: text/html
+
+plugins:
+  - serverless-s3-sync
+
+resources:
+  Resources:
+    # S3 Bucket - Private (CloudFront accesses via OAC)
+    WebsiteBucket:
+      Type: AWS::S3::Bucket
+      DeletionPolicy: Retain
+      Properties:
+        BucketName: ${self:custom.stages.${self:provider.stage}.bucketName}
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+        Tags:
+          - Key: Environment
+            Value: ${self:provider.stage}
+          - Key: Project
+            Value: getquickresume
+
+    # Bucket Policy - Allow CloudFront OAC access only
+    WebsiteBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Condition: IsProd
+      Properties:
+        Bucket: !Ref WebsiteBucket
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Sid: AllowCloudFrontServicePrincipal
+              Effect: Allow
+              Principal:
+                Service: cloudfront.amazonaws.com
+              Action: s3:GetObject
+              Resource: !Sub "${WebsiteBucket.Arn}/*"
+              Condition:
+                StringEquals:
+                  AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}"
+
+    # Origin Access Control for CloudFront
+    CloudFrontOriginAccessControl:
+      Type: AWS::CloudFront::OriginAccessControl
+      Condition: IsProd
+      Properties:
+        OriginAccessControlConfig:
+          Name: ${self:service}-${self:provider.stage}-oac
+          OriginAccessControlOriginType: s3
+          SigningBehavior: always
+          SigningProtocol: sigv4
+
+    # CloudFront Distribution
+    CloudFrontDistribution:
+      Type: AWS::CloudFront::Distribution
+      Condition: IsProd
+      Properties:
+        DistributionConfig:
+          Enabled: true
+          Comment: ${self:service} - ${self:provider.stage}
+          DefaultRootObject: index.html
+          HttpVersion: http2and3
+          PriceClass: PriceClass_100  # US, Canada, Europe (cheapest)
+          
+          Aliases:
+            - getquickresume.com
+          
+          ViewerCertificate:
+            AcmCertificateArn: ${self:custom.certificateArn}
+            SslSupportMethod: sni-only
+            MinimumProtocolVersion: TLSv1.2_2021
+          
+          Origins:
+            - Id: S3Origin
+              DomainName: !GetAtt WebsiteBucket.RegionalDomainName
+              OriginAccessControlId: !Ref CloudFrontOriginAccessControl
+              S3OriginConfig:
+                OriginAccessIdentity: ""
+          
+          DefaultCacheBehavior:
+            TargetOriginId: S3Origin
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+            CachedMethods:
+              - GET
+              - HEAD
+            Compress: true
+            CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6  # CachingOptimized
+            OriginRequestPolicyId: 88a5eaf4-2fd4-4709-b370-b4c650ea3fcf  # CORS-S3Origin
+          
+          # Handle SPA routing - return index.html for 403/404
+          CustomErrorResponses:
+            - ErrorCode: 403
+              ResponseCode: 200
+              ResponsePagePath: /index.html
+              ErrorCachingMinTTL: 10
+            - ErrorCode: 404
+              ResponseCode: 200
+              ResponsePagePath: /index.html
+              ErrorCachingMinTTL: 10
+
+    # Route 53 DNS Record - Points to CloudFront
+    WebsiteDNSRecord:
+      Type: AWS::Route53::RecordSet
+      Condition: IsProd
+      Properties:
+        HostedZoneId: ${self:custom.hostedZoneId}
+        Name: getquickresume.com.
+        Type: A
+        AliasTarget:
+          DNSName: !GetAtt CloudFrontDistribution.DomainName
+          HostedZoneId: Z2FDTNDATAQYW2  # CloudFront hosted zone ID (global)
+          EvaluateTargetHealth: false
+
+  Conditions:
+    IsProd:
+      !Equals
+        - "${self:provider.stage}"
+        - "prod"
+
+  Outputs:
+    WebsiteBucketName:
+      Value: !Ref WebsiteBucket
+      Description: Name of the S3 bucket hosting the website
+    CloudFrontDistributionId:
+      Condition: IsProd
+      Value: !Ref CloudFrontDistribution
+      Description: CloudFront distribution ID
+    CloudFrontDomainName:
+      Condition: IsProd
+      Value: !GetAtt CloudFrontDistribution.DomainName
+      Description: CloudFront distribution domain name
+    WebsiteURL:
+      Condition: IsProd
+      Value: https://getquickresume.com
+      Description: Production website URL (HTTPS)

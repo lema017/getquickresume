@@ -69,6 +69,15 @@ export function Header() {
                 >
                   {t('nav.premium')}
                 </Link>
+                
+                <Link
+                  to="/support"
+                  className={`text-sm font-medium transition-colors ${
+                    isActive('/support') ? 'text-primary' : 'text-gray-700 hover:text-primary'
+                  }`}
+                >
+                  {t('nav.support')}
+                </Link>
               </>
             ) : (
               /* Navigation for non-authenticated users */
@@ -214,6 +223,14 @@ export function Header() {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {t('nav.premium')}
+                  </Link>
+                  
+                  <Link
+                    to="/support"
+                    className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {t('nav.support')}
                   </Link>
                 </>
               ) : (

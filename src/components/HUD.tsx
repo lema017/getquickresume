@@ -2,12 +2,13 @@ import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
 import { useAuthStore } from '@/stores/authStore';
 import { CheckCircle, AlertCircle, Info, Crown, Zap, Circle, ChevronDown, ChevronRight } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useEffect, useState, useMemo } from 'react';
+import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 
 export function HUD() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const { navigateToStep } = useWizardNavigation();
   const { resumeData, wizardState, calculateCharacters, setCurrentStep } = useResumeStore();
   const { user } = useAuthStore();
   const [isBreakdownExpanded, setIsBreakdownExpanded] = useState(false);
@@ -59,7 +60,7 @@ export function HUD() {
   const handleStepClick = (stepNumber: number) => {
     if (stepNumber !== wizardState.currentStep) {
       setCurrentStep(stepNumber);
-      navigate(`/wizard/manual/step-${stepNumber}`);
+      navigateToStep(stepNumber);
     }
   };
 

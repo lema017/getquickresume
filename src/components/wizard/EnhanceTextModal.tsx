@@ -2,13 +2,16 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Check, XCircle, Loader2, Sparkles, ArrowRight } from 'lucide-react';
 import { experienceAchievementService } from '@/services/experienceAchievementService';
+import { RateLimitWarning } from '@/components/RateLimitWarning';
 
 interface EnhanceTextModalProps {
   isOpen: boolean;
   onClose: () => void;
   originalText: string;
   jobTitle?: string;
+  language?: 'es' | 'en';
   onApprove: (enhancedText: string) => void;
+  resumeId?: string; // Optional resume ID for AI cost tracking
 }
 
 export function EnhanceTextModal({
@@ -16,29 +19,41 @@ export function EnhanceTextModal({
   onClose,
   originalText,
   jobTitle,
-  onApprove
+  language = 'es',
+  onApprove,
+  resumeId
 }: EnhanceTextModalProps) {
   const { t } = useTranslation();
   const [enhancedText, setEnhancedText] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isRateLimited, setIsRateLimited] = useState(false);
 
   const handleEnhance = async () => {
     if (!originalText.trim()) return;
 
     setIsLoading(true);
     setError(null);
+    setIsRateLimited(false);
     
     try {
       const result = await experienceAchievementService.enhanceAchievement(
         originalText,
-        jobTitle
+        jobTitle,
+        language,
+        resumeId
       );
       setEnhancedText(result);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : t('enhanceText.error');
+    } catch (err: any) {
       console.error('Error enhancing text:', err);
-      setError(errorMessage);
+      // Check if it's a rate limit error
+      if (err?.code === 'RATE_LIMIT_EXCEEDED' || err?.status === 429) {
+        setIsRateLimited(true);
+        setError(err.message);
+      } else {
+        const errorMessage = err instanceof Error ? err.message : t('enhanceText.error');
+        setError(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -52,7 +67,14 @@ export function EnhanceTextModal({
   const handleClose = () => {
     setEnhancedText('');
     setError(null);
+    setIsRateLimited(false);
     onClose();
+  };
+
+  const handleRetry = () => {
+    setIsRateLimited(false);
+    setError(null);
+    handleEnhance();
   };
 
   // Auto-enhance when modal opens
@@ -102,8 +124,16 @@ export function EnhanceTextModal({
             </div>
           )}
 
-          {/* Error State */}
-          {error && (
+          {/* Rate Limit Error State */}
+          {isRateLimited && error && (
+            <RateLimitWarning 
+              message={error} 
+              onRetry={handleRetry}
+            />
+          )}
+
+          {/* Generic Error State */}
+          {error && !isRateLimited && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
               <p className="text-red-800 text-sm">{error}</p>
               <button

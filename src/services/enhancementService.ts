@@ -12,6 +12,7 @@ export interface GenerateQuestionsRequest {
   recommendation: string;
   originalText: string;
   language: 'es' | 'en';
+  resumeId?: string; // Optional resume ID for AI cost tracking
 }
 
 export interface GenerateQuestionsResponse {
@@ -34,6 +35,7 @@ export interface EnhanceWithContextRequest {
     questionId: string;
     answer: string;
   }>;
+  resumeId?: string; // Optional resume ID for AI cost tracking
 }
 
 export interface EnhanceWithContextResponse {
@@ -52,6 +54,7 @@ export interface GenerateAnswerSuggestionRequest {
   recommendation: string;
   sectionType: 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language';
   language: 'es' | 'en';
+  resumeId?: string; // Optional resume ID for AI cost tracking
 }
 
 export interface GenerateAnswerSuggestionResponse {
@@ -127,6 +130,18 @@ class EnhancementService {
   ): Promise<string> {
     try {
       const token = await this.getAuthToken();
+      const requestBody: Record<string, unknown> = {
+        sectionType: request.sectionType,
+        originalText: request.originalText,
+        userInstructions: request.userInstructions,
+        language: request.language,
+        gatheredContext: request.gatheredContext,
+      };
+
+      if (request.resumeId) {
+        requestBody.resumeId = request.resumeId;
+      }
+
       const response = await fetch(
         `${API_BASE_URL}/api/ai/improve-section`,
         {
@@ -135,13 +150,7 @@ class EnhancementService {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            sectionType: request.sectionType,
-            originalText: request.originalText,
-            userInstructions: request.userInstructions,
-            language: request.language,
-            gatheredContext: request.gatheredContext,
-          }),
+          body: JSON.stringify(requestBody),
         }
       );
 

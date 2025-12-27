@@ -1,0 +1,1128 @@
+service: getquickresume-api
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  apiGateway:
+    disableDefaultEndpoint: true
+  environment:
+    STAGE: ${self:provider.stage}
+    REGION: ${self:provider.region}
+    GOOGLE_CLIENT_ID: ${ssm:/getquickresume/${self:provider.stage}/google-client-id}
+    GOOGLE_CLIENT_SECRET: ${ssm:/getquickresume/${self:provider.stage}/google-client-secret}
+    LINKEDIN_CLIENT_ID: ${ssm:/getquickresume/${self:provider.stage}/linkedin-client-id}
+    LINKEDIN_CLIENT_SECRET: ${ssm:/getquickresume/${self:provider.stage}/linkedin-client-secret}
+    JWT_SECRET: ${ssm:/getquickresume/${self:provider.stage}/jwt-secret}
+    DYNAMODB_TABLE: ${self:service}-users-${self:provider.stage}
+    DYNAMODB_ENDPOINT: ${self:custom.stages.${self:provider.stage}.DYNAMODB_ENDPOINT, ''}
+    JOB_TITLE_ACHIEVEMENTS_TABLE: ${self:service}-job-title-achievements-${self:provider.stage}
+    RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+    TEMPLATES_TABLE: ${self:service}-templates-${self:provider.stage}
+    TEMPLATES_BUCKET: ${self:service}-templates-${self:provider.stage}
+    SUPPORT_TICKETS_TABLE: ${self:service}-support-tickets-${self:provider.stage}
+    AI_USAGE_LOGS_TABLE: ${self:service}-ai-usage-logs-${self:provider.stage}
+    RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+    RESUME_VIEWS_TABLE: ${self:service}-resume-views-${self:provider.stage}
+    PROFESSION_SUGGESTIONS_TABLE: ${self:service}-profession-suggestions-${self:provider.stage}
+    OPENAI_API_KEY: ${ssm:/getquickresume/${self:provider.stage}/openai-api-key}
+    GROQ_API_KEY: ${ssm:/getquickresume/${self:provider.stage}/groq-api-key}
+    PADDLE_API_KEY: ${ssm:/getquickresume/${self:provider.stage}/paddle-api-key}
+    PADDLE_WEBHOOK_SECRET: ${ssm:/getquickresume/${self:provider.stage}/paddle-webhook-secret}
+    PADDLE_ENVIRONMENT: ${ssm:/getquickresume/${self:provider.stage}/paddle-environment}
+    PADDLE_MONTHLY_PRICE_ID: ${ssm:/getquickresume/${self:provider.stage}/paddle-monthly-price-id}
+    PADDLE_YEARLY_PRICE_ID: ${ssm:/getquickresume/${self:provider.stage}/paddle-yearly-price-id}
+    SES_FROM_EMAIL: ${env:SES_FROM_EMAIL, 'noreply@getquickresume.com'}
+    FRONTEND_URL: ${self:custom.stages.${self:provider.stage}.FRONTEND_URL}
+    API_URL: ${self:custom.stages.${self:provider.stage}.API_URL}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}/index/*"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-resumes-${self:provider.stage}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-resumes-${self:provider.stage}/index/*"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-profession-suggestions-${self:provider.stage}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-profession-suggestions-${self:provider.stage}/index/*"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-job-title-achievements-${self:provider.stage}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-job-title-achievements-${self:provider.stage}/index/*"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-rate-limits-${self:provider.stage}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-rate-limits-${self:provider.stage}/index/*"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-templates-${self:provider.stage}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-templates-${self:provider.stage}/index/*"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-support-tickets-${self:provider.stage}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-support-tickets-${self:provider.stage}/index/*"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-resume-views-${self:provider.stage}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-resume-views-${self:provider.stage}/index/*"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-ai-usage-logs-${self:provider.stage}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-ai-usage-logs-${self:provider.stage}/index/*"
+    - Effect: Allow
+      Action:
+        - s3:GetObject
+        - s3:PutObject
+      Resource:
+        - "arn:aws:s3:::${self:provider.environment.TEMPLATES_BUCKET}/*"
+    - Effect: Allow
+      Action:
+        - ses:SendEmail
+        - ses:SendRawEmail
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - ssm:GetParameter
+        - ssm:GetParameters
+      Resource:
+        - "arn:aws:ssm:${self:provider.region}:*:parameter/getquickresume/${self:provider.stage}/*"
+
+functions:
+  googleAuth:
+    handler: dist/handlers/auth.googleAuth
+    timeout: 30
+    events:
+      - http:
+          path: api/auth/google
+          method: post
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
+
+  linkedinAuth:
+    handler: dist/handlers/auth.linkedinAuth
+    timeout: 30
+    events:
+      - http:
+          path: api/auth/linkedin
+          method: post
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
+
+  validateToken:
+    handler: dist/handlers/auth.validateToken
+    timeout: 30
+    events:
+      - http:
+          path: api/auth/validate
+          method: get
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
+
+  getMe:
+    handler: dist/handlers/auth.getMe
+    timeout: 30
+    events:
+      - http:
+          path: api/user/me
+          method: get
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Custom Lambda Authorizer
+  authorize:
+    handler: dist/handlers/authorizer.authorize
+    timeout: 10
+    
+  # Resume generation endpoint
+  generateResume:
+    handler: dist/handlers/resume.generateResume
+    timeout: 120
+    environment:
+      AI_PROVIDER: openai
+      AI_MODEL: gpt-4o
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+    events:
+      - http:
+          path: api/resume/generate
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0  # Cache authorization for 5 minutes
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Resume CRUD endpoints
+  listResumes:
+    handler: dist/handlers/resume.listResumes
+    timeout: 30
+    environment:
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+    events:
+      - http:
+          path: api/resumes
+          method: get
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  getResume:
+    handler: dist/handlers/resume.getResume
+    timeout: 30
+    environment:
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+    events:
+      - http:
+          path: api/resumes/{id}
+          method: get
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  createResume:
+    handler: dist/handlers/resume.createResumeHandler
+    timeout: 30
+    environment:
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+    events:
+      - http:
+          path: api/resumes
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  updateResume:
+    handler: dist/handlers/resume.updateResumeHandler
+    timeout: 30
+    environment:
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+    events:
+      - http:
+          path: api/resumes/{id}
+          method: put
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  translateResume:
+    handler: dist/handlers/resumeTranslation.translateResume
+    timeout: 120
+    environment:
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+      OPENAI_API_KEY: ${self:provider.environment.OPENAI_API_KEY}
+      AI_MODEL: ${self:provider.environment.AI_MODEL, 'gpt-4o'}
+    events:
+      - http:
+          path: api/resumes/{id}/translate
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  deleteResume:
+    handler: dist/handlers/resume.deleteResumeHandler
+    timeout: 30
+    environment:
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+    events:
+      - http:
+          path: api/resumes/{id}
+          method: delete
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Resume sharing endpoints
+  enableResumeSharing:
+    handler: dist/handlers/resumeSharing.enableSharing
+    timeout: 30
+    environment:
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+      FRONTEND_URL: ${self:provider.environment.FRONTEND_URL}
+    events:
+      - http:
+          path: api/resumes/{id}/share
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  disableResumeSharing:
+    handler: dist/handlers/resumeSharing.disableSharing
+    timeout: 30
+    environment:
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+    events:
+      - http:
+          path: api/resumes/{id}/share
+          method: delete
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  getSharingAnalytics:
+    handler: dist/handlers/resumeSharing.getSharingAnalytics
+    timeout: 30
+    environment:
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+      RESUME_VIEWS_TABLE: ${self:service}-resume-views-${self:provider.stage}
+    events:
+      - http:
+          path: api/resumes/{id}/share/analytics
+          method: get
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Public resume endpoints (no authentication required)
+  getPublicResume:
+    handler: dist/handlers/publicResume.getPublicResume
+    timeout: 30
+    environment:
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+      RESUME_VIEWS_TABLE: ${self:service}-resume-views-${self:provider.stage}
+    events:
+      - http:
+          path: api/public/resume/{shareToken}
+          method: get
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+            allowCredentials: false
+
+  recordPublicView:
+    handler: dist/handlers/publicResume.recordPublicView
+    timeout: 30
+    environment:
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+      RESUME_VIEWS_TABLE: ${self:service}-resume-views-${self:provider.stage}
+    events:
+      - http:
+          path: api/public/resume/{shareToken}/view
+          method: post
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+            allowCredentials: false
+
+  # Resume scoring endpoints
+  scoreResume:
+    handler: dist/handlers/resumeScoring.scoreResume
+    timeout: 60  # 60 seconds for scoring
+    environment:
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+      OPENAI_API_KEY: ${self:provider.environment.OPENAI_API_KEY}
+      GROQ_API_KEY: ${self:provider.environment.GROQ_API_KEY}
+      AI_MODEL: ${env:AI_MODEL, 'gpt-4o'}
+    events:
+      - http:
+          path: api/resumes/{id}/score
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  getResumeScore:
+    handler: dist/handlers/resumeScoring.getScore
+    timeout: 30  # 30 seconds for retrieving score
+    environment:
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+    events:
+      - http:
+          path: api/resumes/{id}/score
+          method: get
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Profession suggestions endpoint
+  getSuggestions:
+    handler: dist/handlers/suggestions.getSuggestions
+    timeout: 60
+    environment:
+      PROFESSION_SUGGESTIONS_TABLE: ${self:service}-profession-suggestions-${self:provider.stage}
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+      AI_PROVIDER: openai
+      AI_MODEL: gpt-4o
+    events:
+      - http:
+          path: api/suggestions/{profession}
+          method: get
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Achievement suggestions endpoint
+  generateAchievementSuggestions:
+    handler: dist/handlers/achievementSuggestions.generateSuggestions
+    timeout: 60
+    environment:
+      AI_PROVIDER: openai
+      AI_MODEL: gpt-4o
+    events:
+      - http:
+          path: api/achievements/suggestions
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Summary suggestions endpoint
+  generateSummarySuggestions:
+    handler: dist/handlers/summarySuggestions.generateSuggestions
+    timeout: 60
+    environment:
+      AI_PROVIDER: openai
+      AI_MODEL: gpt-4o-mini
+    events:
+      - http:
+          path: api/summary/suggestions
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Templates endpoint
+  listTemplates:
+    handler: dist/handlers/templates.listTemplates
+    timeout: 30
+    environment:
+      TEMPLATES_TABLE: ${self:service}-templates-${self:provider.stage}
+      TEMPLATES_BUCKET: ${self:service}-templates-${self:provider.stage}
+    events:
+      - http:
+          path: api/templates
+          method: get
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Create template endpoint (public for local use)
+  createTemplate:
+    handler: dist/handlers/templates.createTemplate
+    timeout: 30
+    environment:
+      TEMPLATES_TABLE: ${self:service}-templates-${self:provider.stage}
+      TEMPLATES_BUCKET: ${self:service}-templates-${self:provider.stage}
+    events:
+      - http:
+          path: api/templates
+          method: post
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+            allowCredentials: false
+
+  # Job title achievement suggestions endpoint
+  getJobTitleAchievements:
+    handler: dist/handlers/experienceAchievements.getJobTitleAchievements
+    timeout: 60
+    environment:
+      JOB_TITLE_ACHIEVEMENTS_TABLE: ${self:service}-job-title-achievements-${self:provider.stage}
+      AI_PROVIDER: openai
+      AI_MODEL: gpt-4o
+    events:
+      - http:
+          path: api/experience-achievements/suggestions
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # AI text enhancement endpoint
+  enhanceTextWithAI:
+    handler: dist/handlers/aiEnhance.enhanceTextWithAI
+    timeout: 60
+    environment:
+      AI_PROVIDER: openai
+      AI_MODEL: gpt-4o
+    events:
+      - http:
+          path: api/ai/enhance
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # AI Section Improvement endpoint
+  improveSectionWithAI:
+    handler: dist/handlers/aiSectionImprovement.improveSectionWithAI
+    timeout: 60
+    environment:
+      AI_PROVIDER: openai
+      AI_MODEL: gpt-4o
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+    events:
+      - http:
+          path: api/ai/improve-section
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # AI Enhancement Questions endpoint (Premium only)
+  generateEnhancementQuestions:
+    handler: dist/handlers/aiEnhancementQuestions.generateEnhancementQuestions
+    timeout: 30
+    environment:
+      AI_PROVIDER: openai
+      AI_MODEL: gpt-4o
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+    events:
+      - http:
+          path: api/ai/generate-enhancement-questions
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # AI Answer Suggestion endpoint (Premium only)
+  generateAnswerSuggestion:
+    handler: dist/handlers/aiAnswerSuggestion.generateAnswerSuggestion
+    timeout: 30
+    environment:
+      AI_PROVIDER: openai
+      AI_MODEL: gpt-4o
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+    events:
+      - http:
+          path: api/ai/generate-answer-suggestion
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # LinkedIn Data Processing Function
+  linkedInDataParser:
+    handler: dist/handlers/linkedInData.parseLinkedInData
+    timeout: 120
+    environment:
+      AI_PROVIDER: openai
+      AI_MODEL: gpt-4o
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+    events:
+      - http:
+          path: api/linkedInData
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: true
+
+  # Download Tracking Function
+  trackDownload:
+    handler: dist/handlers/downloadTracking.trackResumeDownload
+    timeout: 30
+    environment:
+      DYNAMODB_TABLE: ${self:service}-users-${self:provider.stage}
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+    events:
+      - http:
+          path: api/resumes/{id}/download/track
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Support Tickets endpoints
+  createSupportTicket:
+    handler: dist/handlers/support.createSupportTicketHandler
+    timeout: 30
+    environment:
+      SUPPORT_TICKETS_TABLE: ${self:service}-support-tickets-${self:provider.stage}
+    events:
+      - http:
+          path: api/support/tickets
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  listUserTickets:
+    handler: dist/handlers/support.listUserTicketsHandler
+    timeout: 30
+    environment:
+      SUPPORT_TICKETS_TABLE: ${self:service}-support-tickets-${self:provider.stage}
+    events:
+      - http:
+          path: api/support/tickets
+          method: get
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  getSupportTicket:
+    handler: dist/handlers/support.getTicketHandler
+    timeout: 30
+    environment:
+      SUPPORT_TICKETS_TABLE: ${self:service}-support-tickets-${self:provider.stage}
+    events:
+      - http:
+          path: api/support/tickets/{ticketId}
+          method: get
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Paddle Checkout endpoint
+  createCheckoutTransaction:
+    handler: dist/handlers/paddleCheckout.createCheckoutTransaction
+    timeout: 30
+    environment:
+      PADDLE_API_KEY: ${self:provider.environment.PADDLE_API_KEY}
+      PADDLE_MONTHLY_PRICE_ID: ${self:provider.environment.PADDLE_MONTHLY_PRICE_ID}
+      PADDLE_YEARLY_PRICE_ID: ${self:provider.environment.PADDLE_YEARLY_PRICE_ID}
+      PADDLE_ENVIRONMENT: ${self:provider.environment.PADDLE_ENVIRONMENT}
+      FRONTEND_URL: ${self:provider.environment.FRONTEND_URL}
+    events:
+      - http:
+          path: api/checkout/create-transaction
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Paddle Webhook endpoint (no authentication required - uses signature verification)
+  handlePaddleWebhook:
+    handler: dist/handlers/paddleWebhook.handlePaddleWebhook
+    timeout: 30
+    environment:
+      PADDLE_WEBHOOK_SECRET: ${self:provider.environment.PADDLE_WEBHOOK_SECRET}
+      PADDLE_ENVIRONMENT: ${self:provider.environment.PADDLE_ENVIRONMENT}
+      PADDLE_MONTHLY_PRICE_ID: ${self:provider.environment.PADDLE_MONTHLY_PRICE_ID}
+      PADDLE_YEARLY_PRICE_ID: ${self:provider.environment.PADDLE_YEARLY_PRICE_ID}
+      SES_FROM_EMAIL: ${self:provider.environment.SES_FROM_EMAIL}
+      FRONTEND_URL: ${self:provider.environment.FRONTEND_URL}
+      DYNAMODB_TABLE: ${self:provider.environment.DYNAMODB_TABLE}
+    events:
+      - http:
+          path: api/webhooks/paddle
+          method: post
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Paddle-Signature
+            allowCredentials: false
+
+resources:
+  Resources:
+    # Gateway Responses for CORS on errors (authorizer failures, etc.)
+    GatewayResponseDefault4XX:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,Authorization'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: ApiGatewayRestApi
+
+    GatewayResponseDefault5XX:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,Authorization'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        ResponseType: DEFAULT_5XX
+        RestApiId:
+          Ref: ApiGatewayRestApi
+
+    GatewayResponseAccessDenied:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,Authorization'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        ResponseType: ACCESS_DENIED
+        RestApiId:
+          Ref: ApiGatewayRestApi
+
+    GatewayResponseUnauthorized:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,Authorization'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        ResponseType: UNAUTHORIZED
+        RestApiId:
+          Ref: ApiGatewayRestApi
+
+    TemplatesBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.TEMPLATES_BUCKET}
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+        VersioningConfiguration:
+          Status: Enabled
+        LifecycleConfiguration:
+          Rules:
+            - Id: DeleteOldVersions
+              Status: Enabled
+              NoncurrentVersionExpirationInDays: 30
+
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: email-index
+            KeySchema:
+              - AttributeName: email
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+
+    ResumesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-resumes-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: resumeId
+            AttributeType: S
+          - AttributeName: shareToken
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: resumeId
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: resumeId-index
+            KeySchema:
+              - AttributeName: resumeId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: shareToken-index
+            KeySchema:
+              - AttributeName: shareToken
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+
+    ProfessionSuggestionsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-profession-suggestions-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: profession
+            AttributeType: S
+        KeySchema:
+          - AttributeName: profession
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    JobTitleAchievementsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-job-title-achievements-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: jobTitle
+            AttributeType: S
+        KeySchema:
+          - AttributeName: jobTitle
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    RateLimitsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-rate-limits-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: key
+            AttributeType: S
+        KeySchema:
+          - AttributeName: key
+            KeyType: HASH
+        TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true
+        BillingMode: PAY_PER_REQUEST
+
+    TemplatesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-templates-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    ResumeViewsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-resume-views-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: shareToken
+            AttributeType: S
+          - AttributeName: viewedAt
+            AttributeType: S
+        KeySchema:
+          - AttributeName: shareToken
+            KeyType: HASH
+          - AttributeName: viewedAt
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+
+    SupportTicketsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-support-tickets-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: ticketId
+            AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ticketId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: userId-index
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+
+    AIUsageLogsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-ai-usage-logs-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: resumeId
+            AttributeType: S
+          - AttributeName: timestamp
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: userId-index
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: timestamp
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: resumeId-index
+            KeySchema:
+              - AttributeName: resumeId
+                KeyType: HASH
+              - AttributeName: timestamp
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true
+        BillingMode: PAY_PER_REQUEST
+
+plugins:
+  - serverless-offline
+  - serverless-domain-manager
+
+custom:
+  stages:
+    dev:
+      DYNAMODB_ENDPOINT: "http://localhost:8000"
+      FRONTEND_URL: "http://localhost:3000"
+      API_URL: "http://localhost:3001/dev"
+    prod:
+      DYNAMODB_ENDPOINT: ""
+      FRONTEND_URL: "https://getquickresume.com"
+      API_URL: "https://api.getquickresume.com"
+  serverless-offline:
+    httpPort: 3001
+    host: 0.0.0.0
+    lambdaPort: 3002
+  serverless-plugin-typescript:
+    tsConfigFileLocation: './tsconfig.json'
+  customDomain:
+    domainName: api.getquickresume.com
+    stage: prod
+    basePath: ''
+    certificateArn: arn:aws:acm:us-east-1:408034543529:certificate/91e492ba-21e0-4dd6-a972-f1e553774107
+    createRoute53Record: true
+    endpointType: regional
+    securityPolicy: tls_1_2
+    apiType: rest
+    autoDomain: false

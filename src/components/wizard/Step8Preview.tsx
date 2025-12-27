@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
+import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { ArrowRight, ArrowLeft, Edit3, CheckCircle, Linkedin, RefreshCw } from 'lucide-react';
 import { FloatingTips } from '@/components/FloatingTips';
 import { TipsButton } from '@/components/TipsButton';
@@ -10,13 +11,16 @@ import { countries } from '@/utils/countries';
 import { resumeService } from '@/services/resumeService';
 import { ResumeGenerationProgress } from './ResumeGenerationProgress';
 import { GeneratedResumeView } from './GeneratedResumeView';
+import { PremiumActionModal } from '@/components/PremiumActionModal';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '@/stores/authStore';
+import { formatName, formatProfession } from '@/utils/textFormatting';
 
 export function Step8Preview() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, setGeneratedResume, setIsGenerating, generatedResume, isGenerating, currentResumeId, setCurrentResumeId, hasLoadedExistingResume, pollForScore } = useResumeStore();
+  const { navigateToStep } = useWizardNavigation();
+  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, setGeneratedResume, setIsGenerating, generatedResume, isGenerating, currentResumeId, setCurrentResumeId, hasLoadedExistingResume, setScore } = useResumeStore();
   const { user } = useAuthStore();
   const { areTipsClosed, closeTips, showTips } = useTips();  
   const [editingSection, setEditingSection] = useState<string | null>(null);
@@ -28,6 +32,21 @@ export function Step8Preview() {
   // Flag to prevent multiple generation attempts
   const [hasAttemptedGeneration, setHasAttemptedGeneration] = useState(false);
   const [limitReached, setLimitReached] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [premiumFeature, setPremiumFeature] = useState<'regenerate' | 'aiSuggestions'>('regenerate');
+
+  // Check if we have minimum required data to generate a resume
+  const hasMinimumResumeData = () => {
+    return (
+      resumeData.firstName?.trim() &&
+      resumeData.lastName?.trim() &&
+      resumeData.profession?.trim() &&
+      (resumeData.experience.length > 0 || resumeData.education.length > 0)
+    );
+  };
+
+  // Check if user can use AI features (premium OR free user who hasn't used their quota)
+  const canUseAIFeatures = user?.isPremium || !user?.freeResumeUsed;
 
   useEffect(() => {
     const generateCV = async () => {
@@ -42,6 +61,21 @@ export function Step8Preview() {
         return;
       }
       
+      // Skip if we don't have minimum required data
+      if (!hasMinimumResumeData()) {
+        console.log('🔍 Skipping auto-generation - insufficient resume data');
+        return;
+      }
+      
+      // Check if free user has used their quota - show CTA instead of making API call
+      if (!canUseAIFeatures && !generatedResume && !hasAttemptedGeneration) {
+        console.log('🔍 Free user quota exhausted - showing premium CTA');
+        setHasAttemptedGeneration(true);
+        setPremiumFeature('regenerate');
+        setShowPremiumModal(true);
+        return;
+      }
+      
       // Only auto-generate for new resumes without existing generated content
       if (!generatedResume && !isGenerating && !isGeneratingCV && !hasLoadedExistingResume && !hasAttemptedGeneration) {
         setIsGeneratingCV(true);
@@ -52,6 +86,7 @@ export function Step8Preview() {
         
         try {
           // Generar el CV (API will check limits)
+          // Note: The API now includes scoring synchronously, so this takes ~10-15 seconds
           console.log('🔍 Generando CV con currentResumeId:', currentResumeId);
           const response = await resumeService.generateResume(resumeData, currentResumeId || undefined);
           
@@ -59,7 +94,6 @@ export function Step8Preview() {
           setGeneratedResume(response.data!);
           
           // Si no tenemos resumeId, guardarlo del response (esto solo pasa en la primera generación)
-          const finalResumeId = response.resumeId || currentResumeId;
           if (!currentResumeId && response.resumeId) {
             console.log('🔍 Guardando nuevo resumeId:', response.resumeId);
             setCurrentResumeId(response.resumeId);
@@ -67,18 +101,13 @@ export function Step8Preview() {
             console.log('🔍 Ya tenemos currentResumeId, no actualizando:', currentResumeId);
           }
           
-          // Start polling for score after generation (auto-scoring happens in background)
-          if (finalResumeId) {
-            const { pollForScore } = useResumeStore.getState();
-            // Wait a bit for auto-scoring to start, then poll
-            setTimeout(() => {
-              pollForScore(finalResumeId, 10, 2000).catch(err => {
-                console.error('Error polling for score:', err);
-              });
-            }, 2000); // Wait 2 seconds before starting to poll
+          // Use the score from the response if available (scoring is now synchronous)
+          if (response.score) {
+            console.log('🔍 Score received from API:', response.score.totalScore);
+            setScore(response.score);
           }
           
-          toast.success('¡CV generado exitosamente!');
+          toast.success('¡CV generado y analizado exitosamente!');
         } catch (error: any) {
           console.error('Error generating CV:', error);
           // Check for limit errors
@@ -91,7 +120,8 @@ export function Step8Preview() {
             const errorMessage = error instanceof Error ? error.message : 'Error al generar el CV';
             setGenerationError(errorMessage);
             toast.error(errorMessage);
-            setHasAttemptedGeneration(false); // Allow retry on non-limit errors
+            // Keep hasAttemptedGeneration true to prevent infinite loop
+            // User can manually retry via the "Intentar de nuevo" button
           }
         } finally {
           setIsGeneratingCV(false);
@@ -110,11 +140,11 @@ export function Step8Preview() {
     }
     markStepCompleted(8);
     setCurrentStep(9);
-    navigate('/wizard/manual/step-9');
+    navigateToStep(9);
   };
 
   const handleBack = () => {
-    navigate('/wizard/manual/step-7');
+    navigateToStep(7);
   };
 
   const handleEdit = (section: string) => {
@@ -130,6 +160,13 @@ export function Step8Preview() {
   };
 
   const handleRegenerateCV = async () => {
+    // Check if user can use AI features - show CTA if not
+    if (!canUseAIFeatures) {
+      setPremiumFeature('regenerate');
+      setShowPremiumModal(true);
+      return;
+    }
+    
     // Reset flags to allow manual regeneration
     setHasAttemptedGeneration(false);
     setLimitReached(false);
@@ -144,23 +181,19 @@ export function Step8Preview() {
     
     try {
       // Generar el CV (API will check limits)
+      // Note: The API now includes scoring synchronously, so this takes ~10-15 seconds
       const response = await resumeService.generateResume(resumeData, currentResumeId || undefined);
       
       // Guardar en el store
       setGeneratedResume(response.data!);
       
-      // Start polling for score after regeneration (auto-scoring happens in background)
-      const finalResumeId = response.resumeId || currentResumeId;
-      if (finalResumeId) {
-        // Wait a bit for auto-scoring to start, then poll
-        setTimeout(() => {
-          pollForScore(finalResumeId, 10, 2000).catch(err => {
-            console.error('Error polling for score:', err);
-          });
-        }, 2000); // Wait 2 seconds before starting to poll
+      // Use the score from the response if available (scoring is now synchronous)
+      if (response.score) {
+        console.log('🔍 Score received from API (regenerate):', response.score.totalScore);
+        setScore(response.score);
       }
       
-      toast.success('¡CV regenerado exitosamente!');
+      toast.success('¡CV regenerado y analizado exitosamente!');
     } catch (error: any) {
       console.error('Error regenerating CV:', error);
       // Check for limit errors
@@ -183,6 +216,46 @@ export function Step8Preview() {
   const handleFieldChange = (field: string, value: any) => {
     updateResumeData({ [field]: value });
   };
+
+  // Show missing data message if we don't have minimum required data and no resumeId
+  if (!currentResumeId && !hasMinimumResumeData()) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-8">
+          <div className="text-center">
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-4">
+              <svg className="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              {t('wizard.steps.preview.missingData.title', { defaultValue: 'Resume data not found' })}
+            </h2>
+            <p className="text-gray-600 mb-6">
+              {t('wizard.steps.preview.missingData.description', { 
+                defaultValue: 'You need to complete the previous steps before generating your resume. Please start from the beginning or go to your dashboard to continue an existing resume.' 
+              })}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={() => navigateToStep(1)}
+                className="btn-primary flex items-center justify-center"
+              >
+                <ArrowRight className="w-4 h-4 mr-2" />
+                {t('wizard.steps.preview.missingData.startFromBeginning', { defaultValue: 'Start from beginning' })}
+              </button>
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="btn-outline flex items-center justify-center"
+              >
+                {t('wizard.steps.preview.missingData.goToDashboard', { defaultValue: 'Go to Dashboard' })}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto relative">
@@ -239,15 +312,17 @@ export function Step8Preview() {
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-red-800">Error al generar CV</h3>
                 <p className="mt-1 text-sm text-red-700">{generationError}</p>
-                <div className="mt-3">
-                  <button
-                    onClick={handleRegenerateCV}
-                    disabled={isGeneratingCV}
-                    className="text-sm font-medium text-red-600 hover:text-red-500 disabled:opacity-50"
-                  >
-                    Intentar de nuevo
-                  </button>
-                </div>
+                {canUseAIFeatures && (
+                  <div className="mt-3">
+                    <button
+                      onClick={handleRegenerateCV}
+                      disabled={isGeneratingCV}
+                      className="text-sm font-medium text-red-600 hover:text-red-500 disabled:opacity-50"
+                    >
+                      Intentar de nuevo
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -282,10 +357,14 @@ export function Step8Preview() {
             <button
               onClick={handleRegenerateCV}
               disabled={isGeneratingCV || !!backendError}
-              className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className={`inline-flex items-center px-3 py-2 rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 ${
+                canUseAIFeatures
+                  ? 'border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-blue-500'
+                  : 'bg-gradient-to-r from-amber-500 to-yellow-600 text-white hover:from-amber-600 hover:to-yellow-700 focus:ring-amber-500'
+              }`}
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${isGeneratingCV ? 'animate-spin' : ''}`} />
-              {backendError ? 'Servidor no disponible' : 'Regenerar CV'}
+              {backendError ? 'Servidor no disponible' : canUseAIFeatures ? t('wizard.steps.preview.ui.regenerate') : t('dashboard.premiumAction.regenerate.cta')}
             </button>
           )}
         </div>
@@ -301,8 +380,8 @@ export function Step8Preview() {
         ) : generatedResume ? (
             <GeneratedResumeView 
             resume={generatedResume}
-            onEdit={(section) => {
-              toast(`Editar ${section} próximamente`);
+            onUpdateResume={(updatedResume) => {
+              setGeneratedResume(updatedResume);
             }}
           />
         ) : (
@@ -313,11 +392,11 @@ export function Step8Preview() {
                 <div className="text-center flex-1">
                   <h1 className="text-2xl font-bold text-gray-900 mb-2">
                     {resumeData.firstName && resumeData.lastName 
-                      ? `${resumeData.firstName} ${resumeData.lastName}` 
-                      : user?.fullName || 'Tu Nombre'
+                      ? formatName(`${resumeData.firstName} ${resumeData.lastName}`)
+                      : formatName(user?.fullName || 'Tu Nombre')
                     }
                   </h1>
-                  <p className="text-gray-600 mb-2">{resumeData.profession}</p>
+                  <p className="text-gray-600 mb-2">{resumeData.profession ? formatProfession(resumeData.profession) : ''}</p>
                   <div className="flex flex-col sm:flex-row justify-center items-center gap-2 text-sm text-gray-500">
                     <span>{resumeData.email || user?.email}</span>
                     {resumeData.phone && (
@@ -467,6 +546,13 @@ export function Step8Preview() {
           <ArrowRight className="w-4 h-4 ml-2" />
         </button>
       </div>
+
+      {/* Premium Action Modal for AI features */}
+      <PremiumActionModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        feature={premiumFeature}
+      />
     </div>
   );
 }

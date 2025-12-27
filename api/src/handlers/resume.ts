@@ -180,7 +180,15 @@ export const generateResume = async (
     }
 
     // Generar el CV usando IA (provider seleccionado según tipo de usuario)
-    const generatedResume = await aiService.generateResume(requestBody.resumeData, user.isPremium);
+    const generatedResume = await aiService.generateResume(
+      requestBody.resumeData, 
+      user.isPremium,
+      {
+        userId,
+        resumeId: savedResume.id,
+        isPremium: user.isPremium
+      }
+    );
 
     // Actualizar tracking de generación de resumes
     if (!user.isPremium) {
@@ -195,22 +203,27 @@ export const generateResume = async (
     // Actualizar el resume con el contenido generado
     const updatedResume = await updateResumeWithGenerated(userId, savedResume.id, generatedResume);
 
-    // Auto-score asynchronously (fire and forget - don't block response)
-    // This happens for both free and premium users
-    setTimeout(async () => {
-      try {
-        const score = await resumeScoringService.scoreResume(
-          generatedResume,
-          requestBody.resumeData,
-          user.isPremium
-        );
-        await updateResumeWithScore(userId, savedResume.id, score);
-        console.log(`Auto-scoring completed for resume ${savedResume.id}, score: ${score.totalScore}`);
-      } catch (error) {
-        console.error('Auto-scoring failed:', error);
-        // Don't fail the request if scoring fails
-      }
-    }, 0);
+    // Score the resume synchronously (setTimeout doesn't work in Lambda - function terminates before callback runs)
+    // This adds ~5-10 seconds to the response time but ensures scoring actually happens
+    let resumeScore = null;
+    try {
+      console.log(`Starting synchronous scoring for resume ${savedResume.id}...`);
+      resumeScore = await resumeScoringService.scoreResume(
+        generatedResume,
+        requestBody.resumeData,
+        user.isPremium,
+        {
+          userId,
+          resumeId: savedResume.id,
+          isPremium: user.isPremium
+        }
+      );
+      await updateResumeWithScore(userId, savedResume.id, resumeScore);
+      console.log(`Scoring completed for resume ${savedResume.id}, score: ${resumeScore.totalScore}`);
+    } catch (error) {
+      console.error('Scoring failed (non-blocking):', error);
+      // Don't fail the request if scoring fails - resume is still generated successfully
+    }
 
     const response: GenerateResumeResponse = {
       success: true,
@@ -218,7 +231,8 @@ export const generateResume = async (
       message: 'Resume generated successfully',
       resumeId: savedResume.id,
       remainingRequests: rateLimitResult.remaining,
-      resetTime: rateLimitResult.resetTime
+      resetTime: rateLimitResult.resetTime,
+      score: resumeScore || undefined
     };
 
     return {

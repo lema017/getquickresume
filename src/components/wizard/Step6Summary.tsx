@@ -2,17 +2,22 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
+import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { useAuthStore } from '@/stores/authStore';
-import { ArrowRight, ArrowLeft, CheckCircle, Sparkles, Lightbulb, Loader2, Plus, X } from 'lucide-react';
+import { ArrowRight, ArrowLeft, CheckCircle, Sparkles, Lightbulb, Loader2, Plus, X, Crown } from 'lucide-react';
 import { FloatingTips } from '@/components/FloatingTips';
 import { TipsButton } from '@/components/TipsButton';
+import { MandatoryFieldLabel } from '@/components/MandatoryFieldLabel';
+import { PremiumActionModal } from '@/components/PremiumActionModal';
+import { validateSummary } from '@/utils/validation';
 import { useTips } from '@/hooks/useTips';
 import { summarySuggestionService } from '@/services/summarySuggestionService';
 
 export function Step7Summary() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, calculateCharacters } = useResumeStore();
+  const { navigateToStep } = useWizardNavigation();
+  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, calculateCharacters, currentResumeId } = useResumeStore();
   const { user } = useAuthStore();
   const { areTipsClosed, closeTips, showTips } = useTips();  
   const [summary, setSummary] = useState(resumeData.summary);
@@ -23,6 +28,19 @@ export function Step7Summary() {
     setSummary(resumeData.summary);
     setJobDescription(resumeData.jobDescription);
   }, [resumeData.summary, resumeData.jobDescription]);
+
+  // Clear used suggestions when textarea is emptied (allows re-selection)
+  useEffect(() => {
+    if (summary.trim() === '') {
+      setUsedExperienceSuggestions(new Set());
+    }
+  }, [summary]);
+
+  useEffect(() => {
+    if (jobDescription.trim() === '') {
+      setUsedDifferentiatorsSuggestions(new Set());
+    }
+  }, [jobDescription]);
 
   // Estados para sugerencias de experiencia
   const [experienceSuggestions, setExperienceSuggestions] = useState<string[]>([]);
@@ -36,45 +54,90 @@ export function Step7Summary() {
   const [showDifferentiatorsSuggestions, setShowDifferentiatorsSuggestions] = useState(false);
   const [usedDifferentiatorsSuggestions, setUsedDifferentiatorsSuggestions] = useState<Set<string>>(new Set());
 
-  // Estado de error
-  const [suggestionsError, setSuggestionsError] = useState<string | null>(null);
+  // Estado de error - separado por sección
+  const [experienceError, setExperienceError] = useState<string | null>(null);
+  const [isExperienceRateLimited, setIsExperienceRateLimited] = useState(false);
+  const [differentiatorsError, setDifferentiatorsError] = useState<string | null>(null);
+  const [isDifferentiatorsRateLimited, setIsDifferentiatorsRateLimited] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
+
+  // Check if user can use AI features (premium OR free user who hasn't used their quota)
+  const canUseAIFeatures = user?.isPremium || !user?.freeResumeUsed;
+
+  // Validation: summary min 50 chars, jobDescription min 30 chars
+  const validationErrors = validateSummary(summary || '', jobDescription || '');
+  const isFormValid = Object.keys(validationErrors).length === 0;
 
   const handleNext = () => {
+    setHasAttemptedSubmit(true);
+    // Validate before proceeding
+    const errors = validateSummary(summary || '', jobDescription || '');
+    if (Object.keys(errors).length > 0) {
+      const errorMessages = Object.values(errors).map(e => e.message).join(', ');
+      alert(t('wizard.validation.summary.alertComplete', { errors: errorMessages }));
+      return;
+    }
+    
     updateResumeData({ summary, jobDescription });
     markStepCompleted(7);
     setCurrentStep(8);
-    navigate('/wizard/manual/step-8');
+    navigateToStep(8);
   };
 
   const handleBack = () => {
-    navigate('/wizard/manual/step-6');
+    navigateToStep(6);
   };
 
   // Función para cargar sugerencias de experiencia
   const loadExperienceSuggestions = async () => {
+    // Check if user can use AI features - show CTA if not
+    if (!canUseAIFeatures) {
+      setShowPremiumModal(true);
+      return;
+    }
+
     if (!resumeData.profession || resumeData.profession.trim() === '') {
-      setSuggestionsError('No hay profesión definida. Completa el paso anterior primero.');
+      setExperienceError('No hay profesión definida. Completa el paso anterior primero.');
       return;
     }
 
     if (experienceSuggestions.length > 0) return; // Already loaded
 
+    // Clear any previous error state before starting a new load attempt
+    setExperienceError(null);
+    setIsExperienceRateLimited(false);
+
     try {
       setIsLoadingExperience(true);
-      setSuggestionsError(null);
       
       const achievements = resumeData.achievements.map(ach => ach.description);
       const suggestions = await summarySuggestionService.getExperienceSuggestions(
         resumeData.profession,
         achievements,
         resumeData.projects,
-        resumeData.language
+        resumeData.language,
+        currentResumeId || undefined
       );
       setExperienceSuggestions(suggestions);
-    } catch (error) {
+      setShowExperienceSuggestions(true); // Automatically show suggestions section on success
+      setExperienceError(null); // Clear any previous errors
+      setIsExperienceRateLimited(false); // Clear rate limit flag on success
+    } catch (error: any) {
       console.error('Error loading experience suggestions:', error);
-      const errorMessage = error instanceof Error ? error.message : 'No se pudieron cargar las sugerencias de experiencia.';
-      setSuggestionsError(errorMessage);
+      // Check if it's a premium required error from API
+      if (error?.code === 'PREMIUM_REQUIRED' || error?.status === 403) {
+        setShowPremiumModal(true);
+        return;
+      }
+      // Check if it's a rate limit error - use translated message
+      if (error?.code === 'RATE_LIMIT_EXCEEDED' || error?.status === 429) {
+        setIsExperienceRateLimited(true);
+        setExperienceError(t('wizard.rateLimit.defaultMessage'));
+      } else {
+        const errorMessage = error instanceof Error ? error.message : t('wizard.steps.summary.ui.ai.errorLoading');
+        setExperienceError(errorMessage);
+      }
     } finally {
       setIsLoadingExperience(false);
     }
@@ -82,29 +145,53 @@ export function Step7Summary() {
 
   // Función para cargar sugerencias de diferenciadores
   const loadDifferentiatorsSuggestions = async () => {
+    // Check if user can use AI features - show CTA if not
+    if (!canUseAIFeatures) {
+      setShowPremiumModal(true);
+      return;
+    }
+
     if (!resumeData.profession || resumeData.profession.trim() === '') {
-      setSuggestionsError('No hay profesión definida. Completa el paso anterior primero.');
+      setDifferentiatorsError('No hay profesión definida. Completa el paso anterior primero.');
       return;
     }
 
     if (differentiatorsSuggestions.length > 0) return; // Already loaded
 
+    // Clear any previous error state before starting a new load attempt
+    setDifferentiatorsError(null);
+    setIsDifferentiatorsRateLimited(false);
+
     try {
       setIsLoadingDifferentiators(true);
-      setSuggestionsError(null);
       
       const achievements = resumeData.achievements.map(ach => ach.description);
       const suggestions = await summarySuggestionService.getDifferentiatorsSuggestions(
         resumeData.profession,
         achievements,
         resumeData.projects,
-        resumeData.language
+        resumeData.language,
+        currentResumeId || undefined
       );
       setDifferentiatorsSuggestions(suggestions);
-    } catch (error) {
+      setShowDifferentiatorsSuggestions(true); // Automatically show suggestions section on success
+      setDifferentiatorsError(null); // Clear any previous errors
+      setIsDifferentiatorsRateLimited(false); // Clear rate limit flag on success
+    } catch (error: any) {
       console.error('Error loading differentiators suggestions:', error);
-      const errorMessage = error instanceof Error ? error.message : 'No se pudieron cargar las sugerencias de diferenciadores.';
-      setSuggestionsError(errorMessage);
+      // Check if it's a premium required error from API
+      if (error?.code === 'PREMIUM_REQUIRED' || error?.status === 403) {
+        setShowPremiumModal(true);
+        return;
+      }
+      // Check if it's a rate limit error - use translated message
+      if (error?.code === 'RATE_LIMIT_EXCEEDED' || error?.status === 429) {
+        setIsDifferentiatorsRateLimited(true);
+        setDifferentiatorsError(t('wizard.rateLimit.defaultMessage'));
+      } else {
+        const errorMessage = error instanceof Error ? error.message : t('wizard.steps.summary.ui.ai.errorLoading');
+        setDifferentiatorsError(errorMessage);
+      }
     } finally {
       setIsLoadingDifferentiators(false);
     }
@@ -126,7 +213,7 @@ export function Step7Summary() {
         totalCharacters: newTotalCharacters 
       });
       
-      // Marcar como usada
+      // Mark suggestion as used
       setUsedExperienceSuggestions(prev => new Set([...prev, suggestion]));
     }
   };
@@ -147,7 +234,7 @@ export function Step7Summary() {
         totalCharacters: newTotalCharacters 
       });
       
-      // Marcar como usada
+      // Mark suggestion as used
       setUsedDifferentiatorsSuggestions(prev => new Set([...prev, suggestion]));
     }
   };
@@ -179,6 +266,24 @@ export function Step7Summary() {
         <p className="text-gray-600">
           {t('wizard.steps.summary.description')}
         </p>
+        {/* Summary requirement indicator */}
+        <div className={`mt-4 inline-block px-4 py-2 rounded-lg ${
+          isFormValid 
+            ? 'bg-green-50 border border-green-200' 
+            : 'bg-yellow-50 border border-yellow-200'
+        }`}>
+          <p className={`text-sm font-medium ${
+            isFormValid ? 'text-green-800' : 'text-yellow-800'
+          }`}>
+            {isFormValid 
+              ? t('wizard.validation.summary.requirementMet')
+              : t('wizard.validation.summary.requirement', { 
+                  current: summary.length, 
+                  jobCurrent: jobDescription.length
+                })
+            }
+          </p>
+        </div>
       </div>
 
       {/* Floating Tips */}
@@ -197,22 +302,28 @@ export function Step7Summary() {
         <div className="space-y-4">
           <div>
             <div className="flex items-center justify-between mb-2">
-              <p className="text-blue-800 font-medium">
-                {t('wizard.steps.summary.questions.summary')}
-              </p>
+              <MandatoryFieldLabel
+                label={t('wizard.steps.summary.questions.summary')}
+                required={true}
+                className="text-blue-800"
+              />
               {resumeData.profession && resumeData.profession.trim() !== '' ? (
                 <button
                   onClick={handleLoadExperienceSuggestions}
                   disabled={isLoadingExperience}
-                  className="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-medium rounded-lg hover:from-purple-600 hover:to-blue-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+                  className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md ${
+                    canUseAIFeatures
+                      ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600'
+                      : 'bg-gradient-to-r from-amber-500 to-yellow-600 text-white hover:from-amber-600 hover:to-yellow-700'
+                  }`}
                 >
                   {isLoadingExperience ? (
                     <Loader2 className="w-4 h-4 animate-spin mr-1" />
                   ) : (
                     <Sparkles className="w-4 h-4 mr-1" />
                   )}
-                  <span>Sugerencias con IA</span>
-                  {experienceSuggestions.length > 0 && (
+                  <span>{canUseAIFeatures ? t('wizard.steps.summary.ui.ai.suggestionsButton') : t('dashboard.premiumAction.aiSuggestions.cta')}</span>
+                  {experienceSuggestions.length > 0 && canUseAIFeatures && (
                     <span className="ml-2 px-2 py-0.5 bg-white/20 rounded-full text-xs">
                       {experienceSuggestions.length}
                     </span>
@@ -232,10 +343,42 @@ export function Step7Summary() {
               placeholder="Describe tu experiencia profesional en 3-4 líneas..."
             />
             <div className="flex justify-between items-center mt-2">
-              <span className="text-sm text-gray-500">
-                {summary.length} caracteres
+              <span className={`text-sm ${
+                summary.length >= 50 
+                  ? 'text-green-600 font-medium' 
+                  : summary.length > 0 
+                    ? 'text-yellow-600' 
+                    : 'text-gray-500'
+              }`}>
+                {t('wizard.validation.summary.characters', { 
+                  count: summary.length, 
+                  min: 50
+                })} {summary.length >= 50 ? '✓' : t('wizard.validation.summary.minimumRequired')}
               </span>
             </div>
+            {hasAttemptedSubmit && validationErrors.summary && (
+              <p className="text-red-600 text-sm mt-1">{validationErrors.summary.message}</p>
+            )}
+            
+            {/* Show API errors (including rate limit) for Experience section */}
+            {experienceError && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3 mt-3">
+                <p className="text-yellow-800 text-sm">{experienceError}</p>
+                {isExperienceRateLimited && (
+                  <button
+                    onClick={() => {
+                      setIsExperienceRateLimited(false);
+                      setExperienceError(null);
+                      navigate('/premium');
+                    }}
+                    className="mt-2 inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all shadow-sm hover:shadow-md"
+                  >
+                    <Crown className="w-4 h-4 mr-1" />
+                    {t('wizard.rateLimit.upgradeCta')}
+                  </button>
+                )}
+              </div>
+            )}
             
             {/* Sección de Sugerencias de Experiencia - Colapsable */}
             {showExperienceSuggestions && (
@@ -260,16 +403,11 @@ export function Step7Summary() {
                   </div>
                 )}
                 
-                {suggestionsError && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3">
-                    <p className="text-yellow-800 text-sm">{suggestionsError}</p>
-                  </div>
-                )}
-                
                 {experienceSuggestions.length > 0 && !isLoadingExperience && (
                   <div className="space-y-2">
                     {experienceSuggestions.map((suggestion, index) => {
-                      const isUsed = usedExperienceSuggestions.has(suggestion);
+                      // Disabled if marked as used AND textarea is not empty (clears all when empty)
+                      const isUsed = usedExperienceSuggestions.has(suggestion) && summary.trim().length > 0;
                       return (
                         <button
                           key={index}
@@ -306,22 +444,28 @@ export function Step7Summary() {
           
           <div>
             <div className="flex items-center justify-between mb-2">
-              <p className="text-blue-800 font-medium">
-                {t('wizard.steps.summary.questions.achievements')}
-              </p>
+              <MandatoryFieldLabel
+                label={t('wizard.steps.summary.questions.achievements')}
+                required={true}
+                className="text-blue-800"
+              />
               {resumeData.profession && resumeData.profession.trim() !== '' ? (
                 <button
                   onClick={handleLoadDifferentiatorsSuggestions}
                   disabled={isLoadingDifferentiators}
-                  className="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-medium rounded-lg hover:from-purple-600 hover:to-blue-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+                  className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md ${
+                    canUseAIFeatures
+                      ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600'
+                      : 'bg-gradient-to-r from-amber-500 to-yellow-600 text-white hover:from-amber-600 hover:to-yellow-700'
+                  }`}
                 >
                   {isLoadingDifferentiators ? (
                     <Loader2 className="w-4 h-4 animate-spin mr-1" />
                   ) : (
                     <Sparkles className="w-4 h-4 mr-1" />
                   )}
-                  <span>Sugerencias con IA</span>
-                  {differentiatorsSuggestions.length > 0 && (
+                  <span>{canUseAIFeatures ? t('wizard.steps.summary.ui.ai.suggestionsButton') : t('dashboard.premiumAction.aiSuggestions.cta')}</span>
+                  {differentiatorsSuggestions.length > 0 && canUseAIFeatures && (
                     <span className="ml-2 px-2 py-0.5 bg-white/20 rounded-full text-xs">
                       {differentiatorsSuggestions.length}
                     </span>
@@ -341,10 +485,42 @@ export function Step7Summary() {
               placeholder="¿Qué te diferencia de otros profesionales en tu área?"
             />
             <div className="flex justify-between items-center mt-2">
-              <span className="text-sm text-gray-500">
-                {jobDescription.length} caracteres
+              <span className={`text-sm ${
+                jobDescription.length >= 30 
+                  ? 'text-green-600 font-medium' 
+                  : jobDescription.length > 0 
+                    ? 'text-yellow-600' 
+                    : 'text-gray-500'
+              }`}>
+                {t('wizard.validation.summary.characters', { 
+                  count: jobDescription.length, 
+                  min: 30
+                })} {jobDescription.length >= 30 ? '✓' : t('wizard.validation.summary.minimumRequired')}
               </span>
             </div>
+            {hasAttemptedSubmit && validationErrors.jobDescription && (
+              <p className="text-red-600 text-sm mt-1">{validationErrors.jobDescription.message}</p>
+            )}
+            
+            {/* Show API errors (including rate limit) for Differentiators section */}
+            {differentiatorsError && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3 mt-3">
+                <p className="text-yellow-800 text-sm">{differentiatorsError}</p>
+                {isDifferentiatorsRateLimited && (
+                  <button
+                    onClick={() => {
+                      setIsDifferentiatorsRateLimited(false);
+                      setDifferentiatorsError(null);
+                      navigate('/premium');
+                    }}
+                    className="mt-2 inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all shadow-sm hover:shadow-md"
+                  >
+                    <Crown className="w-4 h-4 mr-1" />
+                    {t('wizard.rateLimit.upgradeCta')}
+                  </button>
+                )}
+              </div>
+            )}
             
             {/* Sección de Sugerencias de Diferenciadores - Colapsable */}
             {showDifferentiatorsSuggestions && (
@@ -369,16 +545,11 @@ export function Step7Summary() {
                   </div>
                 )}
                 
-                {suggestionsError && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3">
-                    <p className="text-yellow-800 text-sm">{suggestionsError}</p>
-                  </div>
-                )}
-                
                 {differentiatorsSuggestions.length > 0 && !isLoadingDifferentiators && (
                   <div className="space-y-2">
                     {differentiatorsSuggestions.map((suggestion, index) => {
-                      const isUsed = usedDifferentiatorsSuggestions.has(suggestion);
+                      // Disabled if marked as used AND textarea is not empty (clears all when empty)
+                      const isUsed = usedDifferentiatorsSuggestions.has(suggestion) && jobDescription.trim().length > 0;
                       return (
                         <button
                           key={index}
@@ -453,11 +624,25 @@ export function Step7Summary() {
           <ArrowLeft className="w-4 h-4 mr-2" />
           {t('common.back')}
         </button>
-        <button onClick={handleNext} className="btn-primary flex items-center">
+        <button 
+          onClick={handleNext} 
+          className={`btn-primary flex items-center ${
+            !isFormValid ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+          disabled={!isFormValid}
+          title={!isFormValid ? t('wizard.validation.summary.tooltip') : ''}
+        >
           {t('common.next')}
           <ArrowRight className="w-4 h-4 ml-2" />
         </button>
       </div>
+
+      {/* Premium Action Modal for AI features */}
+      <PremiumActionModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        feature="aiSuggestions"
+      />
     </div>
   );
 }

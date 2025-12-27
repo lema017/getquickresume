@@ -4,6 +4,8 @@ exports.improveSectionWithAIOptions = exports.improveSectionWithAI = void 0;
 const aiService_1 = require("../services/aiService");
 const rateLimiter_1 = require("../middleware/rateLimiter");
 const inputSanitizer_1 = require("../utils/inputSanitizer");
+const dynamodb_1 = require("../services/dynamodb");
+const resumeService_1 = require("../services/resumeService");
 const improveSectionWithAI = async (event) => {
     try {
         // 1. Validar autenticación
@@ -25,8 +27,45 @@ const improveSectionWithAI = async (event) => {
         }
         const userId = event.requestContext.authorizer.userId;
         const endpoint = 'improve-section';
-        // 2. Rate limiting
-        const rateLimitResult = await (0, rateLimiter_1.checkRateLimit)(userId, endpoint, 5, 60000);
+        // Check user premium status and free resume usage
+        const user = await (0, dynamodb_1.getUserById)(userId);
+        if (!user) {
+            return {
+                statusCode: 404,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+                    'Access-Control-Allow-Methods': 'POST,OPTIONS',
+                },
+                body: JSON.stringify({
+                    success: false,
+                    error: 'User not found',
+                    message: 'User account not found'
+                })
+            };
+        }
+        // Premium check: AI suggestions are only available for premium users or free users who haven't used their quota
+        if (!user.isPremium && user.freeResumeUsed) {
+            return {
+                statusCode: 403,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+                    'Access-Control-Allow-Methods': 'POST,OPTIONS',
+                },
+                body: JSON.stringify({
+                    success: false,
+                    error: 'Premium feature required',
+                    message: 'AI suggestions are only available for premium users or free users who haven\'t used their free resume quota.',
+                    code: 'PREMIUM_REQUIRED'
+                })
+            };
+        }
+        // 2. Rate limiting: 1 request/minute for free users, 10 requests/minute for premium users
+        const maxRequests = user.isPremium ? 10 : 1;
+        const rateLimitResult = await (0, rateLimiter_1.checkRateLimit)(userId, endpoint, maxRequests, 60000);
         if (!rateLimitResult.allowed) {
             return {
                 statusCode: 429,
@@ -146,9 +185,33 @@ const improveSectionWithAI = async (event) => {
                 answer: (0, inputSanitizer_1.sanitizeUserInput)(ctx.answer || '')
             })).filter(ctx => ctx.questionId && ctx.answer);
         }
+        // 7.5 Validate resume ownership if resumeId is provided (for AI cost tracking)
+        if (requestData.resumeId) {
+            const isOwner = await (0, resumeService_1.verifyResumeOwnership)(userId, requestData.resumeId);
+            if (!isOwner) {
+                return {
+                    statusCode: 403,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+                        'Access-Control-Allow-Methods': 'POST,OPTIONS',
+                    },
+                    body: JSON.stringify({
+                        success: false,
+                        error: 'Access denied',
+                        message: 'Resume not found or access denied'
+                    })
+                };
+            }
+        }
         // 8. Llamar AI service con inputs sanitizados
         try {
-            const improvedText = await aiService_1.aiService.improveSectionWithUserInstructions(sanitizedSectionType, requestData.originalText, sanitizedInstructions, sanitizedLanguage, sanitizedGatheredContext);
+            const improvedText = await aiService_1.aiService.improveSectionWithUserInstructions(sanitizedSectionType, requestData.originalText, sanitizedInstructions, sanitizedLanguage, sanitizedGatheredContext, {
+                userId,
+                resumeId: requestData.resumeId,
+                isPremium: user.isPremium
+            });
             const response = {
                 success: true,
                 data: improvedText,
@@ -193,6 +256,11 @@ const improveSectionWithAI = async (event) => {
     }
     catch (error) {
         console.error('Error in improveSectionWithAI handler:', error);
+        // Refund rate limit on server error - user shouldn't be penalized
+        const userId = event.requestContext.authorizer?.userId;
+        if (userId) {
+            await (0, rateLimiter_1.refundRateLimit)(userId, 'improve-section');
+        }
         const errorResponse = {
             success: false,
             error: 'Internal server error',

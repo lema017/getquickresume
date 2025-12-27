@@ -2,6 +2,28 @@
 
 # Start script for template generator application
 
+# Parse environment argument (default to dev)
+ENV=${1:-dev}
+
+# Validate environment argument
+if [ "$ENV" != "dev" ] && [ "$ENV" != "prod" ]; then
+  echo "ERROR: Invalid environment argument. Use 'dev' or 'prod'"
+  echo "Usage: ./start.sh [dev|prod]"
+  exit 1
+fi
+
+# Set API base URL based on environment
+if [ "$ENV" = "dev" ]; then
+  VITE_API_BASE_URL="http://localhost:3001/dev"
+  echo "Environment: DEV (using local API)"
+else
+  VITE_API_BASE_URL="https://api.getquickresume.com"
+  echo "Environment: PROD (using production API)"
+fi
+
+# Export the variable so it's available to child processes
+export VITE_API_BASE_URL
+
 echo "Starting Template Generator Application..."
 
 # First, stop any existing processes
@@ -76,8 +98,9 @@ fi
 
 # Start frontend in background on port 5173
 echo "Starting frontend on port 5173..."
+echo "API Base URL: $VITE_API_BASE_URL"
 cd frontend
-npm run dev > ../frontend.log 2>&1 &
+VITE_API_BASE_URL=$VITE_API_BASE_URL npm run dev > ../frontend.log 2>&1 &
 FRONTEND_PID=$!
 cd ..
 

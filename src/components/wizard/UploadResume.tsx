@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { 
   Upload, 
   FileText, 
@@ -18,6 +19,7 @@ import toast from 'react-hot-toast';
 export function UploadResume() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { navigateToStep } = useWizardNavigation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -113,7 +115,7 @@ export function UploadResume() {
   const handleContinue = () => {
     if (extractedData) {
       // Navigate to manual wizard with pre-filled data
-      navigate('/wizard/manual/step-1', { 
+      navigateToStep(1, { 
         state: { 
           preFilledData: extractedData,
           fromUpload: true 

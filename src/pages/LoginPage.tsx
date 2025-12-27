@@ -1,12 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/stores/authStore';
 import { useGoogleAuth } from '@/hooks/useGoogleAuth';
-import { useLinkedInAuth } from '@/hooks/useLinkedInAuth';
 import { GoogleLogin } from '@react-oauth/google';
-import { Facebook, Linkedin } from 'lucide-react';
-import { SocialButton } from '@/components/SocialButton';
+import { Facebook } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 // Google icon component
@@ -31,57 +29,14 @@ const GoogleIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-// LinkedIn icon component
-const LinkedInIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" width="20" height="20">
-    <path
-      fill="#0077B5"
-      d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
-    />
-  </svg>
-);
-
 export function LoginPage() {
   const { t } = useTranslation();
   const { login, setLoading } = useAuthStore();
   const { handleGoogleLogin, handleError, isLoading: googleLoading } = useGoogleAuth();
-  const { handleLinkedInLogin, handleLinkedInCallback, isLoading: linkedInLoading } = useLinkedInAuth();
   const navigate = useNavigate();
-  // const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
 
-  // const from = location.state?.from?.pathname || '/dashboard';
-
-  // Handle LinkedIn OAuth callback
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-    const state = urlParams.get('state');
-    const error = urlParams.get('error');
-
-    console.log('Current URL:', window.location.href);
-    console.log('URL params:', { code, state, error });
-    console.log('Code verifier in localStorage:', localStorage.getItem('linkedin_code_verifier'));
-
-    // Only process callback if we have LinkedIn OAuth parameters
-    if (code && state) {
-      console.log('Processing LinkedIn OAuth callback...');
-      handleLinkedInCallback(code, state);
-    } else if (error) {
-      console.error('LinkedIn OAuth error:', error);
-      toast.error('Error al autorizar con LinkedIn');
-    }
-    // If no LinkedIn parameters, do nothing (normal page load)
-  }, []); // Remove handleLinkedInCallback from dependencies to prevent double execution
-
-  // LinkedIn login is now handled by the PKCE hook
-
-  const handleSocialLogin = async (provider: 'google' | 'facebook' | 'linkedin') => {
-    if (provider === 'linkedin') {
-      handleLinkedInLogin();
-      return;
-    }
-    
+  const handleSocialLogin = async (provider: 'google' | 'facebook') => {
     setIsLoading(true);
     setLoading(true);
 
@@ -120,13 +75,6 @@ export function LoginPage() {
 
   const socialProviders = [
     {
-      id: 'linkedin',
-      name: t('auth.providers.linkedin'),
-      icon: Linkedin,
-      color: 'bg-blue-700 hover:bg-blue-800',
-      onClick: () => handleSocialLogin('linkedin'),
-    },
-    {
       id: 'facebook',
       name: t('auth.providers.facebook'),
       icon: Facebook,
@@ -148,7 +96,7 @@ export function LoginPage() {
 
       <div className="space-y-3">
         {/* Google Login Button - using GoogleLogin component */}
-        <div className="w-full">
+        <div className="w-full flex justify-center">
           <GoogleLogin
             onSuccess={handleGoogleLogin}
             onError={handleError}
@@ -162,19 +110,9 @@ export function LoginPage() {
             cancel_on_tap_outside={false}
           />
         </div>
-
-        {/* LinkedIn Login Button - same visual standard */}
-        <SocialButton
-          label={t('auth.providers.linkedin')}
-          icon={LinkedInIcon}
-          onClick={() => handleSocialLogin('linkedin')}
-          colorClass="bg-white hover:bg-gray-50 border border-gray-300 text-gray-700"
-          disabled={isLoading || linkedInLoading}
-          dataTestId="btn-linkedin-login"
-        />
       </div>
 
-      {(isLoading || googleLoading || linkedInLoading) && (
+      {(isLoading || googleLoading) && (
         <div className="mt-6 text-center">
           <div className="inline-flex items-center space-x-2 text-gray-600">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>

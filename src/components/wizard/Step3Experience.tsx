@@ -1,21 +1,25 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
+import { useWizardNavigation } from '@/hooks/useWizardNavigation';
+import { useAuthStore } from '@/stores/authStore';
 import { ArrowRight, ArrowLeft, Plus, X, CheckCircle, Lightbulb, Sparkles, Wand2 } from 'lucide-react';
 import { WorkExperience } from '@/types';
 import { FloatingTips } from '@/components/FloatingTips';
 import { TipsButton } from '@/components/TipsButton';
 import { MonthYearPicker } from '@/components/MonthYearPicker';
+import { MandatoryFieldLabel } from '@/components/MandatoryFieldLabel';
 import { AchievementSuggestionsModal } from './AchievementSuggestionsModal';
 import { EnhanceTextModal } from './EnhanceTextModal';
+import { PremiumActionModal } from '@/components/PremiumActionModal';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { useTips } from '@/hooks/useTips';
 
 export function Step3Experience() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, addWorkExperience } = useResumeStore();
+  const { navigateToStep } = useWizardNavigation();
+  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, addWorkExperience, currentResumeId } = useResumeStore();
+  const { user } = useAuthStore();
   const { areTipsClosed, closeTips, showTips } = useTips();
   const [experiences, setExperiences] = useState(resumeData.experience);
 
@@ -38,6 +42,11 @@ export function Step3Experience() {
     achIndex: number;
     jobTitle: string;
   }>({ isOpen: false, originalText: '', expId: '', achIndex: -1, jobTitle: '' });
+
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+
+  // Check if user can use AI features (premium OR free user who hasn't used their quota)
+  const canUseAIFeatures = user?.isPremium || !user?.freeResumeUsed;
 
   const addExperience = () => {
     const newExp: WorkExperience = {
@@ -104,12 +113,18 @@ export function Step3Experience() {
 
   // AI Functions
   const openSuggestionsModal = useCallback((expId: string, jobTitle: string) => {
+    // Check if user can use AI features - show CTA if not
+    if (!canUseAIFeatures) {
+      setShowPremiumModal(true);
+      return;
+    }
+
     if (!jobTitle.trim()) {
       alert('Por favor, ingresa el título del puesto para obtener sugerencias de IA');
       return;
     }
     setSuggestionsModal({ isOpen: true, jobTitle: jobTitle.trim(), expId });
-  }, []);
+  }, [canUseAIFeatures]);
 
   const handleSuggestionsSelect = useCallback((suggestions: string[]) => {
     setExperiences(prevExperiences => {
@@ -124,6 +139,12 @@ export function Step3Experience() {
   }, [suggestionsModal.expId]);
 
   const openEnhanceModal = useCallback((expId: string, achIndex: number, text: string, jobTitle: string) => {
+    // Check if user can use AI features - show CTA if not
+    if (!canUseAIFeatures) {
+      setShowPremiumModal(true);
+      return;
+    }
+
     if (!text.trim()) {
       alert('Por favor, ingresa un logro para mejorar con IA');
       return;
@@ -135,7 +156,7 @@ export function Step3Experience() {
       achIndex, 
       jobTitle: jobTitle.trim() 
     });
-  }, []);
+  }, [canUseAIFeatures]);
 
   const handleEnhanceApprove = useCallback((enhancedText: string) => {
     setExperiences(prevExperiences => {
@@ -168,21 +189,41 @@ export function Step3Experience() {
     return experiences.every(validateExperienceDates);
   };
 
+  // Validation: at least 1 experience required, all dates valid
+  const isFormValid = experiences.length > 0 && areAllDatesValid() && 
+    experiences.every(exp => exp.title.trim() && exp.company.trim() && exp.startDate);
+
   const handleNext = () => {
+    // Validate that at least one experience exists
+    if (experiences.length === 0) {
+      alert(t('wizard.validation.experience.alertAdd'));
+      return;
+    }
+    
     // Validate dates before proceeding
     if (!areAllDatesValid()) {
-      alert('Por favor, verifica que la fecha de fin sea posterior a la fecha de inicio en todas las experiencias.');
+      alert(t('wizard.steps.experience.ui.alerts.invalidDatesMessage'));
+      return;
+    }
+    
+    // Validate that all experiences have required fields
+    const incompleteExperiences = experiences.filter(exp => 
+      !exp.title.trim() || !exp.company.trim() || !exp.startDate
+    );
+    
+    if (incompleteExperiences.length > 0) {
+      alert(t('wizard.validation.experience.alertComplete'));
       return;
     }
     
     updateResumeData({ experience: experiences });
     markStepCompleted(3);
     setCurrentStep(4);
-    navigate('/wizard/manual/step-4');
+    navigateToStep(4);
   };
 
   const handleBack = () => {
-    navigate('/wizard/manual/step-2');
+    navigateToStep(2);
   };
 
   return (
@@ -194,6 +235,24 @@ export function Step3Experience() {
         <p className="text-gray-600">
           {t('wizard.steps.experience.description')}
         </p>
+        {/* Experience requirement indicator */}
+        <div className={`mt-4 inline-block px-4 py-2 rounded-lg ${
+          experiences.length > 0 
+            ? 'bg-green-50 border border-green-200' 
+            : 'bg-yellow-50 border border-yellow-200'
+        }`}>
+          <p className={`text-sm font-medium ${
+            experiences.length > 0 ? 'text-green-800' : 'text-yellow-800'
+          }`}>
+            {experiences.length > 0 
+              ? t('wizard.validation.experience.requirementMet', { 
+                  count: experiences.length, 
+                  plural: experiences.length > 1 ? 's' : ''
+                })
+              : t('wizard.validation.experience.requirement')
+            }
+          </p>
+        </div>
       </div>
 
       {/* Validation Error Alert */}
@@ -267,9 +326,10 @@ export function Step3Experience() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('wizard.steps.experience.ui.form.position')}
-                </label>
+                <MandatoryFieldLabel
+                  label={t('wizard.steps.experience.ui.form.position')}
+                  required={true}
+                />
                 <input
                   type="text"
                   value={exp.title}
@@ -279,9 +339,10 @@ export function Step3Experience() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('wizard.steps.experience.ui.form.company')}
-                </label>
+                <MandatoryFieldLabel
+                  label={t('wizard.steps.experience.ui.form.company')}
+                  required={true}
+                />
                 <input
                   type="text"
                   value={exp.company}
@@ -291,9 +352,10 @@ export function Step3Experience() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('wizard.steps.experience.ui.form.startDate')}
-                </label>
+                <MandatoryFieldLabel
+                  label={t('wizard.steps.experience.ui.form.startDate')}
+                  required={true}
+                />
                 <MonthYearPicker
                   value={exp.startDate || ''}
                   onChange={(value: string) => updateExperience(exp.id, 'startDate', value)}
@@ -337,10 +399,14 @@ export function Step3Experience() {
                 </label>
                 <button
                   onClick={() => openSuggestionsModal(exp.id, exp.title)}
-                  className="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-medium rounded-lg hover:from-purple-600 hover:to-blue-600 transition-all duration-200 shadow-sm hover:shadow-md"
+                  className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md ${
+                    canUseAIFeatures
+                      ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600'
+                      : 'bg-gradient-to-r from-amber-500 to-yellow-600 text-white hover:from-amber-600 hover:to-yellow-700'
+                  }`}
                 >
                   <Sparkles className="w-4 h-4 mr-1" />
-                  <span>{t('wizard.steps.experience.ui.ai.suggestionsButton')}</span>
+                  <span>{canUseAIFeatures ? t('wizard.steps.experience.ui.ai.suggestionsButton') : t('dashboard.premiumAction.aiSuggestions.cta')}</span>
                 </button>
               </div>
               {exp.achievements.map((achievement, achIndex) => (
@@ -411,11 +477,12 @@ export function Step3Experience() {
         <button 
           onClick={handleNext} 
           className={`flex items-center ${
-            areAllDatesValid() 
+            isFormValid 
               ? 'btn-primary' 
-              : 'bg-gray-400 cursor-not-allowed text-white'
+              : 'opacity-50 cursor-not-allowed'
           }`}
-          disabled={!areAllDatesValid()}
+          disabled={!isFormValid}
+          title={!isFormValid ? t('wizard.validation.experience.tooltip') : ''}
         >
           {t('common.next')}
           <ArrowRight className="w-4 h-4 ml-2" />
@@ -427,7 +494,9 @@ export function Step3Experience() {
         isOpen={suggestionsModal.isOpen}
         onClose={() => setSuggestionsModal({ isOpen: false, jobTitle: '', expId: '' })}
         jobTitle={suggestionsModal.jobTitle}
+        language={resumeData.language}
         onSelect={handleSuggestionsSelect}
+        resumeId={currentResumeId || undefined}
       />
 
       <EnhanceTextModal
@@ -435,7 +504,16 @@ export function Step3Experience() {
         onClose={() => setEnhanceModal({ isOpen: false, originalText: '', expId: '', achIndex: -1, jobTitle: '' })}
         originalText={enhanceModal.originalText}
         jobTitle={enhanceModal.jobTitle}
+        language={resumeData.language}
         onApprove={handleEnhanceApprove}
+        resumeId={currentResumeId || undefined}
+      />
+
+      {/* Premium Action Modal for AI features */}
+      <PremiumActionModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        feature="aiSuggestions"
       />
     </div>
   );

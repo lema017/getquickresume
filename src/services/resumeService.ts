@@ -1,4 +1,5 @@
 import { ResumeData, GenerateResumeRequest, GenerateResumeResponse, GeneratedResume, Resume, ApiResponse } from '@/types';
+import { handleAuthError } from '@/utils/authErrorHandler';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/dev';
 
@@ -28,6 +29,15 @@ class ResumeService {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
+      
+      // Handle authentication errors (401/403) - but check if it's a premium required error first
+      if (response.status === 401 || response.status === 403) {
+        // Only handle as auth error if it's not a premium required error
+        if (errorData.code !== 'PREMIUM_REQUIRED') {
+          handleAuthError();
+        }
+      }
+      
       throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
     }
 

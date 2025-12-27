@@ -3,20 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/stores/authStore';
 import { useDashboardStore } from '@/stores/dashboardStore';
-import { Resume, JobInterest } from '@/types';
-import { StatsCard } from '@/components/dashboard/StatsCard';
+import { Resume } from '@/types';
+import { ResumeTranslationModal } from '@/components/ResumeTranslationModal';
+import { ShareResumeModal } from '@/components/ShareResumeModal';
+import { PremiumActionModal } from '@/components/PremiumActionModal';
 import { ResumeList } from '@/components/dashboard/ResumeList';
-import { JobInterestsList } from '@/components/dashboard/JobInterestsList';
-import { OptimizeResumeModal } from '@/components/dashboard/OptimizeResumeModal';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import { useConfirmation } from '@/hooks/useConfirmation';
+import { resumeScoringService } from '@/services/resumeScoringService';
+import toast from 'react-hot-toast';
 import { 
   FileText, 
-  Briefcase, 
   Mail, 
   Search, 
   Plus,
-  AlertCircle,
   CheckCircle,
   TrendingUp
 } from 'lucide-react';
@@ -27,19 +27,20 @@ export function DashboardPage() {
   const { user, isAuthenticated } = useAuthStore();
   const {
     resumes,
-    jobInterests,
     stats,
     isLoading,
     loadDashboard,
     deleteResume,
-    deleteJobInterest,
-    optimizeResumeForJob,
-    refreshStats
   } = useDashboardStore();
 
-  const [selectedJobForOptimization, setSelectedJobForOptimization] = useState<JobInterest | null>(null);
-  const [isOptimizeModalOpen, setIsOptimizeModalOpen] = useState(false);
   const confirmation = useConfirmation();
+  const [showTranslationModal, setShowTranslationModal] = useState(false);
+  const [selectedResumeForTranslation, setSelectedResumeForTranslation] = useState<Resume | null>(null);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [selectedResumeForSharing, setSelectedResumeForSharing] = useState<Resume | null>(null);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [premiumFeature, setPremiumFeature] = useState<'enhance' | 'rescore' | 'edit'>('enhance');
+  const [rescoringResumeId, setRescoringResumeId] = useState<string | null>(null);
 
   const { refreshUserPremiumStatus } = useAuthStore();
 
@@ -71,21 +72,106 @@ export function DashboardPage() {
   };
 
   const handleDownloadResume = async (resume: Resume) => {
+    if (!resume.generatedResume) {
+      toast.error(t('dashboard.actions.resumeNotGenerated'));
+      return;
+    }
+    
+    // Navigate to resume view page where download functionality is available
+    navigate(`/resume/${resume.id}`);
+  };
+
+  const handleTranslateResume = (resume: Resume) => {
+    if (resume.generatedResume) {
+      setSelectedResumeForTranslation(resume);
+      setShowTranslationModal(true);
+    }
+  };
+
+  const handleShareResume = (resume: Resume) => {
+    if (resume.generatedResume) {
+      setSelectedResumeForSharing(resume);
+      setShowShareModal(true);
+    }
+  };
+
+  const handleSharingChanged = () => {
+    // Reload dashboard to refresh resume data
+    loadDashboard();
+  };
+
+  const handleEnhanceResume = (resume: Resume) => {
+    if (!resume.generatedResume) {
+      toast.error(t('dashboard.actions.resumeNotGenerated'));
+      return;
+    }
+
+    if (!user?.isPremium) {
+      setPremiumFeature('enhance');
+      setShowPremiumModal(true);
+      return;
+    }
+
+    // Navigate to resume view where enhancement options are available
+    navigate(`/resume/${resume.id}`);
+  };
+
+  const handleRescoreResume = async (resume: Resume) => {
+    if (!resume.generatedResume) {
+      toast.error(t('dashboard.actions.resumeNotGenerated'));
+      return;
+    }
+
+    if (!user?.isPremium) {
+      setPremiumFeature('rescore');
+      setShowPremiumModal(true);
+      return;
+    }
+
     try {
-      // TODO: Implement download functionality
-      console.log('Download resume:', resume);
+      setRescoringResumeId(resume.id);
+      toast.loading(t('dashboard.actions.rescoring'), { id: 'rescore' });
+      
+      const score = await resumeScoringService.scoreResume(resume.id);
+      
+      toast.success(t('dashboard.actions.rescoreSuccess'), { id: 'rescore' });
+      
+      // Reload dashboard to refresh resume data with new score
+      await loadDashboard();
     } catch (error) {
-      console.error('Error downloading resume:', error);
+      console.error('Error rescoring resume:', error);
+      if (error instanceof Error) {
+        if (error.message.includes('Premium') || error.message.includes('premium')) {
+          setPremiumFeature('rescore');
+          setShowPremiumModal(true);
+        } else {
+          toast.error(error.message || t('dashboard.actions.rescoreError'), { id: 'rescore' });
+        }
+      } else {
+        toast.error(t('dashboard.actions.rescoreError'), { id: 'rescore' });
+      }
+    } finally {
+      setRescoringResumeId(null);
     }
   };
 
   const handleDeleteResume = async (resume: Resume) => {
+    // Check if this is a free user deleting their AI-generated resume
+    const isFreeUserDeletingGeneratedResume = 
+      !user?.isPremium && 
+      user?.freeResumeUsed && 
+      (resume.generatedResume || resume.status === 'generated');
+
     const confirmed = await confirmation.confirm({
-      title: t('dashboard.actions.deleteResumeTitle') || 'Eliminar CV',
-      message: t('dashboard.actions.deleteResume'),
+      title: isFreeUserDeletingGeneratedResume
+        ? t('dashboard.actions.deleteFreeResumeTitle') || 'Delete CV - Important Warning'
+        : t('dashboard.actions.deleteResumeTitle') || 'Eliminar CV',
+      message: isFreeUserDeletingGeneratedResume
+        ? t('dashboard.actions.deleteFreeResumeWarning') || 'This is your only free AI-generated CV. If you delete it, you will NOT be able to create another free CV. Your free CV quota has already been used and will not be restored. Are you sure you want to continue?'
+        : t('dashboard.actions.deleteResume'),
       confirmText: t('dashboard.actions.delete') || 'Eliminar',
       cancelText: t('common.cancel') || 'Cancelar',
-      variant: 'danger',
+      variant: isFreeUserDeletingGeneratedResume ? 'warning' : 'danger',
     });
 
     if (confirmed) {
@@ -97,44 +183,6 @@ export function DashboardPage() {
     }
   };
 
-  const handleViewJobInterest = (jobInterest: JobInterest) => {
-    // Open job details modal or navigate to details page
-    console.log('View job interest:', jobInterest);
-    // TODO: Implement job details view
-  };
-
-  const handleOptimizeResume = (jobInterest: JobInterest) => {
-    setSelectedJobForOptimization(jobInterest);
-    setIsOptimizeModalOpen(true);
-  };
-
-  const handleDeleteJobInterest = async (jobInterest: JobInterest) => {
-    const confirmed = await confirmation.confirm({
-      title: t('dashboard.actions.deleteJobInterestTitle') || 'Eliminar interés laboral',
-      message: t('dashboard.actions.deleteJobInterest'),
-      confirmText: t('dashboard.actions.delete') || 'Eliminar',
-      cancelText: t('common.cancel') || 'Cancelar',
-      variant: 'danger',
-    });
-
-    if (confirmed) {
-      try {
-        await deleteJobInterest(jobInterest.id);
-      } catch (error) {
-        console.error('Error deleting job interest:', error);
-      }
-    }
-  };
-
-  const handleOptimizeConfirm = async (jobId: string, resumeId: string) => {
-    try {
-      await optimizeResumeForJob(jobId, resumeId);
-      await refreshStats(); // Refresh token count
-    } catch (error) {
-      console.error('Error optimizing resume:', error);
-      throw error;
-    }
-  };
 
   if (!isAuthenticated || !user) {
     return null;
@@ -263,31 +311,6 @@ export function DashboardPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <StatsCard
-            icon="star"
-            value={user?.isPremium ? 'Premium' : 'Free'}
-            label={user?.isPremium ? 'Premium Plan' : 'Free Plan'}
-            description={user?.isPremium ? '40 resumes per month' : '1 resume lifetime'}
-            className="bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-200"
-          />
-          <StatsCard
-            icon="file-text"
-            value={stats.totalResumes}
-            label={t('dashboard.stats.resumesCreated')}
-            description={t('dashboard.stats.resumesDescription')}
-            className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200"
-          />
-          <StatsCard
-            icon="briefcase"
-            value={stats.totalJobInterests}
-            label={t('dashboard.stats.jobsSaved')}
-            description={t('dashboard.stats.jobsDescription')}
-            className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200"
-          />
-        </div>
-
         {/* Main Sections */}
         <div className="space-y-12">
           {/* Resumes Section */}
@@ -297,20 +320,12 @@ export function DashboardPage() {
             onView={handleViewResume}
             onEdit={handleEditResume}
             onDownload={handleDownloadResume}
+            onTranslate={handleTranslateResume}
+            onShare={handleShareResume}
+            onEnhance={handleEnhanceResume}
+            onRescore={handleRescoreResume}
             onDelete={handleDeleteResume}
-          />
-
-          {/* Job Interests Section */}
-          <JobInterestsList
-            jobInterests={jobInterests}
-            isLoading={isLoading}
-            onView={handleViewJobInterest}
-            onOptimize={handleOptimizeResume}
-            onDelete={handleDeleteJobInterest}
-            onCreate={async (jobData) => {
-              // This will be handled by the JobInterestsList component
-              console.log('Create job interest:', jobData);
-            }}
+            rescoringResumeId={rescoringResumeId || undefined}
           />
 
           {/* Coming Soon Sections */}
@@ -368,17 +383,6 @@ export function DashboardPage() {
         </div>
       </div>
 
-      {/* Optimize Resume Modal */}
-      <OptimizeResumeModal
-        isOpen={isOptimizeModalOpen}
-        onClose={() => {
-          setIsOptimizeModalOpen(false);
-          setSelectedJobForOptimization(null);
-        }}
-        jobInterest={selectedJobForOptimization}
-        onOptimize={handleOptimizeConfirm}
-      />
-
       {/* Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={confirmation.isOpen}
@@ -389,6 +393,36 @@ export function DashboardPage() {
         variant={confirmation.variant}
         onConfirm={confirmation.onConfirm}
         onCancel={confirmation.onCancel}
+      />
+      {selectedResumeForSharing && selectedResumeForSharing.generatedResume && (
+        <ShareResumeModal
+          isOpen={showShareModal}
+          onClose={() => {
+            setShowShareModal(false);
+            setSelectedResumeForSharing(null);
+          }}
+          resumeId={selectedResumeForSharing.id}
+          shareToken={selectedResumeForSharing.shareToken}
+          isPubliclyShared={selectedResumeForSharing.isPubliclyShared}
+          onSharingChanged={handleSharingChanged}
+        />
+      )}
+      {selectedResumeForTranslation && selectedResumeForTranslation.generatedResume && (
+        <ResumeTranslationModal
+          isOpen={showTranslationModal}
+          onClose={() => {
+            setShowTranslationModal(false);
+            setSelectedResumeForTranslation(null);
+          }}
+          resumeId={selectedResumeForTranslation.id}
+          currentLanguage={selectedResumeForTranslation.resumeData.language || 'es'}
+          resumeTitle={selectedResumeForTranslation.title}
+        />
+      )}
+      <PremiumActionModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        feature={premiumFeature}
       />
     </div>
   );

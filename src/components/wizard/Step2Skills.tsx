@@ -2,19 +2,24 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
-import { ArrowRight, ArrowLeft, Plus, X, CheckCircle, Lightbulb, Loader2, Sparkles } from 'lucide-react';
+import { useWizardNavigation } from '@/hooks/useWizardNavigation';
+import { useAuthStore } from '@/stores/authStore';
+import { ArrowRight, ArrowLeft, Plus, X, CheckCircle, Lightbulb, Loader2, Sparkles, Crown } from 'lucide-react';
 import { validateSkills, FieldValidation } from '@/utils/validation';
 import { ValidationError } from '@/components/ValidationError';
 import { SanitizedInput } from '@/components/SanitizedInput';
 import { FloatingTips } from '@/components/FloatingTips';
 import { TipsButton } from '@/components/TipsButton';
+import { PremiumActionModal } from '@/components/PremiumActionModal';
 import { useTips } from '@/hooks/useTips';
 import { suggestionService } from '@/services/suggestionService';
 
 export function Step2Skills() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, calculateCharacters } = useResumeStore();
+  const { navigateToStep } = useWizardNavigation();
+  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, calculateCharacters, currentResumeId } = useResumeStore();
+  const { user } = useAuthStore();
   const { areTipsClosed, closeTips, showTips } = useTips();
   const [errors, setErrors] = useState<FieldValidation>({});
   const [skills, setSkills] = useState(resumeData.skillsRaw || []);
@@ -25,6 +30,11 @@ export function Step2Skills() {
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [suggestionsError, setSuggestionsError] = useState<string | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [isRateLimited, setIsRateLimited] = useState(false);
+
+  // Check if user can use AI features (premium OR free user who hasn't used their quota)
+  const canUseAIFeatures = user?.isPremium || !user?.freeResumeUsed;
 
   // Sync local state when resumeData changes (for edit mode)
   useEffect(() => {
@@ -91,10 +101,21 @@ export function Step2Skills() {
       setSuggestionsError(null);
       
       // Get suggestions from API (will combine skills and tools)
-      const allSuggestions = await suggestionService.getSkillsSuggestions(resumeData.profession);
+      // Use resume language instead of UI language
+      // Pass currentResumeId for AI cost tracking
+      const allSuggestions = await suggestionService.getSkillsSuggestions(resumeData.profession, resumeData.language, currentResumeId || undefined);
       setSuggestions(allSuggestions);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading suggestions:', error);
+      // Check if it's a premium required error from API
+      if (error?.code === 'PREMIUM_REQUIRED' || error?.status === 403) {
+        setShowPremiumModal(true);
+        return;
+      }
+      // Check if it's a rate limit error
+      if (error?.code === 'RATE_LIMIT_EXCEEDED' || error?.status === 429) {
+        setIsRateLimited(true);
+      }
       const errorMessage = error instanceof Error ? error.message : 'No se pudieron cargar las sugerencias de habilidades.';
       setSuggestionsError(errorMessage);
     } finally {
@@ -130,8 +151,46 @@ export function Step2Skills() {
     }
   };
 
+  // Función para agregar todas las sugerencias que no estén ya agregadas
+  const addAllSuggestions = () => {
+    const skillsToAdd = suggestions.filter(skill => !skills.includes(skill));
+    
+    if (skillsToAdd.length === 0) {
+      return; // No hay habilidades nuevas para agregar
+    }
+
+    const newSkills = [...skills, ...skillsToAdd];
+    setSkills(newSkills);
+    
+    // Actualizar el contador de caracteres (sumar todos los caracteres de las nuevas habilidades)
+    const currentCharacters = calculateCharacters();
+    const totalNewCharacters = skillsToAdd.reduce((sum, skill) => sum + skill.length, 0);
+    const newTotalCharacters = currentCharacters + totalNewCharacters;
+    
+    // Actualizar el store con el nuevo total de caracteres
+    updateResumeData({ 
+      skillsRaw: newSkills,
+      totalCharacters: newTotalCharacters 
+    });
+    
+    // Limpiar error de habilidades si existe
+    if (errors.skills) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.skills;
+        return newErrors;
+      });
+    }
+  };
+
   // Handler para controlar la visibilidad de las sugerencias
   const handleLoadSuggestions = async () => {
+    // Check if user can use AI features - show CTA if not
+    if (!canUseAIFeatures) {
+      setShowPremiumModal(true);
+      return;
+    }
+
     if (suggestions.length === 0 && !isLoadingSuggestions) {
       await loadSuggestions();
     }
@@ -151,12 +210,17 @@ export function Step2Skills() {
     updateResumeData({ skillsRaw: skills });
     markStepCompleted(2);
     setCurrentStep(3);
-    navigate('/wizard/manual/step-3');
+    navigateToStep(3);
   };
 
   const handleBack = () => {
-    navigate('/wizard/manual/step-1');
+    navigateToStep(1);
   };
+
+  // Validation: minimum 5 skills required
+  const isFormValid = skills.length >= 5;
+  const skillsCount = skills.length;
+  const minSkillsRequired = 5;
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -167,6 +231,25 @@ export function Step2Skills() {
         <p className="text-gray-600">
           {t('wizard.steps.skills.description')}
         </p>
+        {/* Skills requirement indicator */}
+        <div className={`mt-4 inline-block px-4 py-2 rounded-lg ${
+          isFormValid 
+            ? 'bg-green-50 border border-green-200' 
+            : 'bg-yellow-50 border border-yellow-200'
+        }`}>
+          <p className={`text-sm font-medium ${
+            isFormValid ? 'text-green-800' : 'text-yellow-800'
+          }`}>
+            {isFormValid 
+              ? t('wizard.validation.skills.requirementMet', { count: skillsCount })
+              : t('wizard.validation.skills.requirement', { 
+                  count: skillsCount, 
+                  min: minSkillsRequired, 
+                  remaining: minSkillsRequired - skillsCount
+                })
+            }
+          </p>
+        </div>
       </div>
 
       {/* Tips Section */}
@@ -204,15 +287,19 @@ export function Step2Skills() {
                 <button
                   onClick={handleLoadSuggestions}
                   disabled={isLoadingSuggestions}
-                  className="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-medium rounded-lg hover:from-purple-600 hover:to-blue-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+                  className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md ${
+                    canUseAIFeatures
+                      ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600'
+                      : 'bg-gradient-to-r from-amber-500 to-yellow-600 text-white hover:from-amber-600 hover:to-yellow-700'
+                  }`}
                 >
                   {isLoadingSuggestions ? (
                     <Loader2 className="w-4 h-4 animate-spin mr-1" />
                   ) : (
                     <Sparkles className="w-4 h-4 mr-1" />
                   )}
-                  <span>{t('wizard.steps.skills.ui.ai.suggestionsButton')}</span>
-                  {suggestions.length > 0 && (
+                  <span>{canUseAIFeatures ? t('wizard.steps.skills.ui.ai.suggestionsButton') : t('dashboard.premiumAction.aiSuggestions.cta')}</span>
+                  {suggestions.length > 0 && canUseAIFeatures && (
                     <span className="ml-2 px-2 py-0.5 bg-white/20 rounded-full text-xs">
                       {suggestions.length}
                     </span>
@@ -265,12 +352,28 @@ export function Step2Skills() {
                     <Sparkles className="w-4 h-4 mr-2" />
                     {t('wizard.steps.skills.ui.suggestions.titleSkills')}
                   </h4>
-                  <button
-                    onClick={() => setShowSuggestions(false)}
-                    className="text-purple-600 hover:text-purple-800 transition-colors"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {suggestions.length > 0 && !isLoadingSuggestions && (
+                      <button
+                        onClick={addAllSuggestions}
+                        disabled={suggestions.every(skill => skills.includes(skill))}
+                        className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+                          suggestions.every(skill => skills.includes(skill))
+                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                            : 'bg-purple-600 text-white hover:bg-purple-700 shadow-sm hover:shadow-md'
+                        }`}
+                      >
+                        <Plus className="w-4 h-4 mr-1" />
+                        {t('wizard.steps.skills.ui.suggestions.addAll')} ({suggestions.filter(s => !skills.includes(s)).length})
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setShowSuggestions(false)}
+                      className="text-purple-600 hover:text-purple-800 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
                 
                 {isLoadingSuggestions && (
@@ -283,6 +386,19 @@ export function Step2Skills() {
                 {suggestionsError && (
                   <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3">
                     <p className="text-yellow-800 text-sm">{suggestionsError}</p>
+                    {isRateLimited && (
+                      <button
+                        onClick={() => {
+                          setIsRateLimited(false);
+                          setSuggestionsError(null);
+                          navigate('/premium');
+                        }}
+                        className="mt-2 inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all shadow-sm hover:shadow-md"
+                      >
+                        <Crown className="w-4 h-4 mr-1" />
+                        {t('wizard.rateLimit.upgradeCta')}
+                      </button>
+                    )}
                   </div>
                 )}
                 
@@ -341,11 +457,39 @@ export function Step2Skills() {
           <ArrowLeft className="w-4 h-4 mr-2" />
           {t('common.back')}
         </button>
-        <button onClick={handleNext} className="btn-primary flex items-center">
+        <button 
+          onClick={handleNext} 
+          className={`btn-primary flex items-center ${
+            !isFormValid ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+          disabled={!isFormValid}
+          title={!isFormValid ? t('wizard.validation.skills.tooltip', { min: minSkillsRequired }) : ''}
+        >
           {t('common.next')}
           <ArrowRight className="w-4 h-4 ml-2" />
         </button>
       </div>
+      
+      {/* Show validation errors if user tried to proceed */}
+      {Object.keys(errors).length > 0 && (
+        <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-800 font-medium mb-2">
+            {t('wizard.validation.pleaseComplete')}
+          </p>
+          <ul className="list-disc list-inside text-red-700 space-y-1">
+            {Object.entries(errors).map(([field, error]) => (
+              <li key={field}>{error.message}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Premium Action Modal for AI features */}
+      <PremiumActionModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        feature="aiSuggestions"
+      />
     </div>
   );
 }

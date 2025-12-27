@@ -4,6 +4,7 @@ import { aiService } from '../services/aiService';
 import { createResume } from '../services/resumeService';
 import { sanitizeUserInput, validateInput, sanitizeUserMultiline, validateInputLarge } from '../utils/inputSanitizer';
 import { checkRateLimit } from '../middleware/rateLimiter';
+import { getUserById } from '../services/dynamodb';
 
 export const parseLinkedInData = async (
   event: APIGatewayProxyEvent
@@ -30,6 +31,42 @@ export const parseLinkedInData = async (
     }
 
     const userId = event.requestContext.authorizer.userId;
+
+    // Check if user is premium
+    const user = await getUserById(userId);
+    if (!user) {
+      return {
+        statusCode: 404,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+          'Access-Control-Allow-Methods': 'POST,OPTIONS'
+        },
+        body: JSON.stringify({
+          success: false,
+          error: 'User not found',
+          message: 'User account not found'
+        } as LinkedInDataResponse)
+      };
+    }
+
+    if (!user.isPremium) {
+      return {
+        statusCode: 403,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+          'Access-Control-Allow-Methods': 'POST,OPTIONS'
+        },
+        body: JSON.stringify({
+          success: false,
+          error: 'Premium subscription required',
+          message: 'LinkedIn import is a premium feature. Please upgrade to access this functionality.'
+        } as LinkedInDataResponse)
+      };
+    }
 
     // Rate limiting: 5 requests por minuto
     const rateLimitResult = await checkRateLimit(userId, 'linkedin-data-parsing', 5, 60000);

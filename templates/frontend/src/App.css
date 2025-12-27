@@ -1011,3 +1011,176 @@
   background: #7b1fa2;
 }
 
+/* Font Modification Section */
+.font-modification-section {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.font-modification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.font-modification-header h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.font-modification-description {
+  color: #666;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.close-font-picker-button {
+  padding: 0.5rem 1rem;
+  background: #f5f5f5;
+  color: #333;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s ease;
+}
+
+.close-font-picker-button:hover {
+  background: #e0e0e0;
+}
+
+.font-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.font-picker-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  background: #fafafa;
+}
+
+.font-picker-label {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+}
+
+.font-search-container {
+  margin-bottom: 0.75rem;
+}
+
+.font-search-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.font-search-input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.font-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: white;
+  cursor: pointer;
+  margin-bottom: 0.75rem;
+}
+
+.font-select:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.font-preview {
+  padding: 0.75rem;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  color: #333;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.font-extracted-info {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.font-extracted-info h3 {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 0.75rem;
+}
+
+.font-extracted-info ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.font-extracted-info li {
+  padding: 0.5rem 0;
+  color: #666;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.font-extracted-info li:last-child {
+  border-bottom: none;
+}
+
+.font-extracted-info strong {
+  color: #333;
+}
+
+.font-modification-actions {
+  display: flex;
+  justify-content: center;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.reset-fonts-button {
+  padding: 0.75rem 1.5rem;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s ease;
+}
+
+.reset-fonts-button:hover {
+  background: #d32f2f;
+}
+
+.modify-fonts-button {
+  background: #2196f3;
+  color: white;
+}
+
+.modify-fonts-button:hover:not(:disabled) {
+  background: #1976d2;
+}
+

@@ -20,8 +20,10 @@ export const es = {
     skip: 'Omitir',
     required: 'Requerido',
     optional: 'Opcional',
+    premium: 'Premium',
     showTips: 'Mostrar Tips',
     closeTips: 'Cerrar tips',
+    preview: 'Ver',
   },
 
   // Navigation
@@ -35,17 +37,22 @@ export const es = {
     about: 'Acerca de',
     privacy: 'Privacidad',
     terms: 'Términos',
+    support: 'Soporte',
   },
 
   // Landing Page
   landing: {
     hero: {
       title: 'Crea tu CV Profesional con IA',
-      subtitle: 'Comienza Gratis • Créditos Premium Incluidos',
+      subtitle: 'Creación de CV Gratis',
       description: 'Accede a funcionalidades profesionales de IA para crear un CV que destaque.',
-      badge: '✨ Incluye Créditos Premium',
+      badge: '✨ Prueba Gratis',
       ctaPrimary: 'Comenzar Gratis',
       ctaSecondary: 'Explorar Funcionalidades',
+      trustIndicators: {
+        noCardRequired: 'Sin tarjeta requerida',
+        dataSecure: 'Datos seguros',
+      },
     },
     benefits: {
       title: 'Todo lo que Necesitas para Destacar',
@@ -53,8 +60,8 @@ export const es = {
       items: [
         {
           icon: 'gift',
-          title: 'Créditos Premium de Bienvenida',
-          description: 'Comienza con créditos incluidos para probar funcionalidades profesionales',
+          title: '1 CV Gratis para Empezar',
+          description: 'Crea tu primer CV profesional completamente gratis, sin tarjeta de crédito',
         },
         {
           icon: 'brain',
@@ -89,39 +96,39 @@ export const es = {
       viewPricing: 'Ver Planes y Precios →',
       features: [
         {
-          icon: 'download',
-          title: 'Descarga Profesional',
-          description: 'PDF y DOCX sin marca de agua',
-          badge: 'Premium',
-        },
-        {
-          icon: 'file-text',
-          title: 'Carta de Presentación IA',
-          description: 'Generada automáticamente según tu CV',
+          icon: 'brain',
+          title: 'Mejora con IA',
+          description: 'Optimización inteligente de secciones y contenido profesional',
           badge: 'Premium',
         },
         {
           icon: 'award',
-          title: 'Revisión IA con Puntuación',
-          description: 'Análisis detallado y sugerencias de mejora',
+          title: 'Puntuación y Análisis IA',
+          description: 'Análisis detallado y sugerencias de mejora con puntuación por sección',
           badge: 'Premium',
         },
         {
-          icon: 'target',
-          title: 'Optimización ATS',
-          description: 'Optimiza tu CV para sistemas de seguimiento de candidatos (ATS) que usan las empresas para filtrar CVs automáticamente',
+          icon: 'globe',
+          title: 'Traducción Multi-idioma',
+          description: 'Traduce tu CV a los 10 idiomas más usados del mundo',
+          badge: 'Premium',
+        },
+        {
+          icon: 'share-2',
+          title: 'Compartir con QR',
+          description: 'Comparte tu CV con código QR y analiza quién lo ve',
           badge: 'Premium',
         },
         {
           icon: 'bar-chart-2',
           title: 'Analíticas Avanzadas',
-          description: 'Estadísticas de visualización de tu CV',
+          description: 'Estadísticas de visualización, dispositivos y ubicaciones',
           badge: 'Premium',
         },
         {
-          icon: 'globe',
-          title: 'Hosting Profesional',
-          description: 'URL personalizada para tu CV online',
+          icon: 'target',
+          title: 'Optimización ATS',
+          description: 'Optimiza tu CV para sistemas de seguimiento de candidatos (ATS)',
           badge: 'Premium',
         },
       ],
@@ -145,29 +152,8 @@ export const es = {
         {
           number: '03',
           title: 'Desbloquea Premium',
-          description: 'Usa tus créditos para funcionalidades profesionales',
+          description: 'Actualiza a Premium para CVs ilimitados y todas las funciones',
           icon: 'zap',
-        },
-      ],
-    },
-    creditsExplainer: {
-      title: 'Sistema de Créditos Premium',
-      subtitle: 'Simple, flexible y transparente',
-      features: [
-        {
-          icon: 'gift',
-          title: 'Recibe Créditos',
-          description: 'Al registrarte gratis obtienes créditos de bienvenida',
-        },
-        {
-          icon: 'zap',
-          title: 'Usa Funcionalidades',
-          description: 'Cada función premium consume créditos según su valor',
-        },
-        {
-          icon: 'credit-card',
-          title: 'Compra Más',
-          description: 'Adquiere paquetes cuando lo necesites, sin suscripciones',
         },
       ],
     },
@@ -176,21 +162,22 @@ export const es = {
       items: [
         {
           question: '¿Es realmente gratis comenzar?',
-          answer: 'Sí, crear tu cuenta y usar el creador de CV es completamente gratis. Incluye créditos premium de bienvenida para probar funcionalidades avanzadas.',
+          answer: 'Sí, crear tu cuenta y generar tu primer CV es completamente gratis. Sin tarjeta de crédito requerida.',
         },
         {
           question: '¿Necesito tarjeta de crédito?',
-          answer: 'No. Puedes registrarte y comenzar sin proporcionar información de pago.',
+          answer: 'No. Puedes registrarte y crear tu primer CV gratis sin proporcionar información de pago.',
         },
         {
-          question: '¿Qué son los créditos premium?',
-          answer: 'Son unidades que te permiten acceder a funcionalidades profesionales como descarga sin marca, revisión IA, analíticas y más. Recibes créditos al registrarte y puedes comprar más cuando los necesites.',
+          question: '¿Qué incluye Premium?',
+          answer: 'Con Premium obtienes CVs ilimitados, traducción a múltiples idiomas, compartir con QR y analíticas, mejora con IA, puntuación avanzada, y edición ilimitada de tus CVs.',
         },
         {
-          question: '¿Cómo funcionan los precios?',
-          answer: 'Ofrecemos paquetes de créditos flexibles. Sin suscripciones, solo pagas por lo que necesitas. Ver página de precios para más detalles.',
+          question: '¿Cómo funcionan los planes?',
+          answer: 'Ofrecemos planes mensuales y anuales. El plan gratuito incluye 1 CV de por vida. Premium incluye todas las funciones avanzadas. Ver página de precios para más detalles.',
         },
       ],
+      viewPricingDetails: 'Ver detalles de precios y planes',
     },
     atsExplainer: {
       title: '¿Qué es la Optimización ATS?',
@@ -218,7 +205,7 @@ export const es = {
     cta: {
       title: 'Comienza Gratis Ahora',
       subtitle: 'Crea tu CV profesional en minutos',
-      description: 'Incluye créditos premium de bienvenida • Sin tarjeta requerida',
+      description: '1 CV gratis de por vida • Sin tarjeta requerida',
       ctaPrimary: 'Crear Mi CV Gratis',
       ctaSecondary: 'Ver Planes →',
     },
@@ -235,7 +222,7 @@ export const es = {
         {
           name: 'Carlos Rodríguez',
           role: 'Desarrollador Full Stack',
-          content: 'Invertí en el pack professional y valió cada centavo. La optimización ATS y el hosting profesional me diferenciaron de otros candidatos.',
+          content: 'Actualicé a Premium y valió cada centavo. La optimización ATS y el compartir con QR me diferenciaron de otros candidatos.',
           rating: 5,
         },
         {
@@ -245,6 +232,53 @@ export const es = {
           rating: 5,
         },
       ],
+    },
+    plans: {
+      title: 'Elige Tu Plan',
+      subtitle: 'Planes flexibles para cada necesidad',
+      free: {
+        name: 'Gratis',
+        price: '$0',
+        period: 'de por vida',
+        features: [
+          '1 CV gratis',
+          'Generación con IA',
+          'Plantillas básicas',
+          'Descarga en PDF',
+          'Soporte por email',
+        ],
+        cta: 'Comenzar Gratis',
+      },
+      monthly: {
+        name: 'Premium Mensual',
+        price: '$9.99',
+        period: 'mes',
+        features: [
+          'CVs ilimitados',
+          'Mejora con IA',
+          'Puntuación y análisis',
+          'Traducción a 10 idiomas',
+          'Compartir con QR',
+          'Analíticas avanzadas',
+          'Edición ilimitada',
+          'Plantillas premium',
+        ],
+        cta: 'Actualizar a Premium',
+      },
+      yearly: {
+        name: 'Premium Anual',
+        price: '$4.99',
+        period: 'mes',
+        savings: 'Ahorra 50% • Facturado $59.88/año',
+        badge: 'Mejor Valor',
+        features: [
+          'Todo lo de Premium Mensual',
+          'Ahorro del 50%',
+          'Facturación anual',
+          'Soporte prioritario',
+        ],
+        cta: 'Actualizar a Premium',
+      },
     },
   },
 
@@ -394,10 +428,6 @@ export const es = {
       cta: {
         startImport: 'Comenzar Importación'
       },
-      success: {
-        title: '¡Información procesada exitosamente!',
-        description: 'Hemos procesado la información de tu perfil de LinkedIn. Revisa los datos y continúa para crear tu CV.'
-      },
       data: {
         title: 'Datos procesados:',
         name: 'Nombre:',
@@ -534,9 +564,21 @@ export const es = {
       errors: {
         completeRequiredSteps: 'Por favor completa los pasos requeridos antes de continuar',
         processingError: 'Error al procesar la información',
-        linkedInProcessingError: 'Error al procesar la información de LinkedIn'
+        linkedInProcessingError: 'Error al procesar la información de LinkedIn',
+        premiumRequired: 'La importación de LinkedIn es una función premium. Por favor actualiza para acceder a esta funcionalidad.'
+      },
+      premiumRequired: {
+        title: 'Función Premium Requerida',
+        description: 'La importación de LinkedIn es una función premium. Actualiza para acceder a esta funcionalidad e importar los datos de tu perfil de LinkedIn.',
+        benefitsTitle: 'Beneficios Premium',
+        benefit1: 'Importar desde perfil de LinkedIn',
+        benefit2: '40 CVs por mes',
+        benefit3: 'Optimización avanzada con IA',
+        upgradeButton: 'Actualizar a Premium'
       },
       success: {
+        title: '¡Información procesada exitosamente!',
+        description: 'Hemos procesado la información de tu perfil de LinkedIn. Revisa los datos y continúa para crear tu CV.',
         linkedInProcessed: '¡Información de LinkedIn procesada exitosamente!'
       },
       wizard: {
@@ -613,6 +655,7 @@ export const es = {
         description: {
           loggedIn: 'Importa automáticamente tu información desde tu perfil de LinkedIn con el que iniciaste sesión.',
           publicUrl: 'Importa tu información desde tu perfil público de LinkedIn. Solo necesitas pegar la URL de tu perfil.',
+          premiumRequired: 'La importación de LinkedIn es una función premium. Actualiza para acceder a esta funcionalidad.',
         },
         features: {
           automaticImport: 'Importación automática',
@@ -622,6 +665,8 @@ export const es = {
           experienceEducation: 'Experiencia y educación',
         },
         cta: 'Importar',
+        upgradeCta: 'Actualizar a Premium',
+        premiumBadge: 'Premium',
         timeEstimate: 'Tiempo estimado: 1–3 minutos',
       },
     },
@@ -714,6 +759,7 @@ export const es = {
           },
           suggestions: {
             titleSkills: 'Sugerencias de IA para Habilidades',
+            addAll: 'Agregar Todas',
           }
         },
         questions: {
@@ -1011,7 +1057,8 @@ export const es = {
             suggestionsButton: 'Sugerencias con IA',
             expPanelTitle: 'Sugerencias de IA para Experiencia',
             diffPanelTitle: 'Sugerencias de IA para Diferenciadores',
-            generating: 'Generando sugerencias...'
+            generating: 'Generando sugerencias...',
+            noneForProfession: 'No hay sugerencias disponibles para esta profesión.'
           },
           placeholders: {
             summary: 'Describe tu experiencia profesional en 3-4 líneas...',
@@ -1059,6 +1106,7 @@ export const es = {
             generatingTitle: 'Generando tu CV con IA',
             generatingSubtitle: 'Esto puede tomar unos momentos...'
           },
+          regenerate: 'Regenerar CV',
           editor: {
             generatedTitle: 'CV Generado con IA',
             viewTitle: 'Tu CV - Haz clic en cualquier sección para editar',
@@ -1251,6 +1299,54 @@ export const es = {
         generic: 'Error al importar el perfil de LinkedIn'
       }
     },
+    validation: {
+      pleaseComplete: 'Por favor, completa los siguientes campos:',
+      skills: {
+        requirement: 'Requerido: {{count}}/{{min}} habilidades (agrega {{remaining}} más)',
+        requirementMet: '✓ {{count}} habilidades agregadas (requisito mínimo cumplido)',
+        tooltip: 'Por favor, agrega al menos {{min}} habilidades para continuar',
+      },
+      experience: {
+        requirement: 'Requerido: Agrega al menos 1 experiencia laboral',
+        requirementMet: '✓ {{count}} experiencia{{plural}} agregada{{plural}}',
+        tooltip: 'Por favor, agrega al menos una experiencia con todos los campos requeridos (Posición, Empresa, Fecha de Inicio)',
+        alertAdd: 'Por favor, agrega al menos una experiencia laboral para continuar.',
+        alertComplete: 'Por favor, completa todos los campos requeridos (Posición, Empresa, Fecha de Inicio) para todas las experiencias.',
+      },
+      projects: {
+        optional: 'Opcional: Agrega proyectos para destacar tu trabajo',
+        requirement: 'Requerido: {{count}} proyecto{{plural}} (agrega al menos 1 con Nombre y Descripción)',
+        requirementMet: '✓ {{count}} proyecto{{plural}} agregado{{plural}} (requisito mínimo cumplido)',
+        tooltip: 'Por favor, agrega al menos un proyecto con Nombre y Descripción para continuar',
+        alertAdd: 'Por favor, agrega al menos un proyecto para continuar.',
+        alertComplete: 'Por favor, completa todos los campos requeridos (Nombre, Descripción) para todos los proyectos.',
+      },
+      achievements: {
+        optional: 'Opcional: Agrega logros para destacar tus éxitos',
+        requirement: 'Requerido: {{count}} logro{{plural}} (agrega al menos 1 con Título y Descripción)',
+        requirementMet: '✓ {{count}} logro{{plural}} agregado{{plural}} (requisito mínimo cumplido)',
+        tooltip: 'Por favor, agrega al menos un logro con Título y Descripción para continuar',
+      },
+      summary: {
+        requirement: 'Requerido: Resumen ({{current}}/50 caracteres), Descripción del Puesto ({{jobCurrent}}/30 caracteres)',
+        requirementMet: '✓ Todos los requisitos cumplidos',
+        tooltip: 'Por favor, completa el Resumen (mín. 50 caracteres) y la Descripción del Puesto (mín. 30 caracteres) para continuar',
+        characters: '{{count}}/{{min}} caracteres',
+        minimumRequired: '(mínimo requerido)',
+        alertComplete: 'Por favor, completa lo siguiente: {{errors}}',
+      },
+    },
+    rateLimit: {
+      title: 'Límite de uso alcanzado',
+      defaultMessage: 'Has realizado demasiadas solicitudes. Por favor, espera antes de intentar de nuevo.',
+      freeUserMessage: 'Los usuarios gratuitos tienen un uso limitado de las funciones de IA.',
+      waitMessage: 'Por favor, espera 1 minuto antes de intentar de nuevo.',
+      waitCountdown: 'Podrás intentar de nuevo en {{time}}',
+      canRetryNow: '¡Ya puedes intentar de nuevo!',
+      upgradeCta: 'Actualizar a Premium',
+      premiumBenefit: 'Obtén 10x más sugerencias de IA por minuto',
+      retryButton: 'Intentar de nuevo',
+    },
   },
 
   // HUD
@@ -1284,8 +1380,8 @@ export const es = {
   // Premium
   premium: {
     title: 'Desbloquea Funcionalidades Profesionales con IA',
-    subtitle: 'Tokens para mejorar tu CV y acelerar tu búsqueda laboral',
-    currentTokens: 'Tokens disponibles',
+    subtitle: 'CVs ilimitados y todas las funciones premium',
+    premiumUser: 'Usuario Premium',
     
     tokenSystem: {
       title: 'Sistema de Tokens',
@@ -1483,13 +1579,97 @@ export const es = {
     title: 'Contáctanos',
     subtitle: '¿Tienes preguntas? Estamos aquí para ayudarte',
     form: {
+      title: 'Envíanos un mensaje',
       name: 'Nombre',
       email: 'Email',
       message: 'Mensaje',
       send: 'Enviar mensaje',
+      placeholders: {
+        name: 'Tu nombre completo',
+        email: 'tu@email.com',
+        message: 'Cuéntanos cómo podemos ayudarte...',
+      },
+    },
+    toast: {
+      success: 'Mensaje enviado correctamente',
+    },
+    info: {
+      title: 'Información de Contacto',
+      emailLabel: 'Email',
+      supportLabel: 'Soporte',
+    },
+    faq: {
+      title: 'Preguntas Frecuentes',
+      items: [
+        {
+          question: '¿Cuánto tiempo toma crear un CV?',
+          answer: 'Con nuestro wizard guiado, puedes crear un CV profesional en menos de 10 minutos.',
+        },
+        {
+          question: '¿Es realmente gratuito?',
+          answer: 'Sí, la versión básica es completamente gratuita. Solo pagas por funciones Premium opcionales.',
+        },
+        {
+          question: '¿Mis datos están seguros?',
+          answer: 'Absolutamente. Usamos encriptación de extremo a extremo y cumplimos con las regulaciones de privacidad.',
+        },
+      ],
     },
     social: {
       title: 'Síguenos en redes sociales',
+    },
+  },
+
+  // Support
+  support: {
+    title: 'Centro de Soporte',
+    subtitle: 'Solicita ayuda, reporta problemas o sugiere nuevas funcionalidades',
+    form: {
+      title: 'Crear Nuevo Ticket',
+      type: 'Tipo de Solicitud',
+      subject: 'Asunto',
+      message: 'Mensaje',
+      submit: 'Enviar Ticket',
+      placeholders: {
+        subject: 'Describe brevemente tu solicitud...',
+        message: 'Proporciona más detalles sobre tu solicitud...',
+      },
+    },
+    types: {
+      help: 'Solicitar Ayuda',
+      complaint: 'Reportar Problema',
+      comment: 'Dejar Comentario',
+      feature: 'Solicitar Funcionalidad',
+    },
+    status: {
+      open: 'Abierto',
+      'in-progress': 'En Progreso',
+      resolved: 'Resuelto',
+      closed: 'Cerrado',
+    },
+    list: {
+      title: 'Mis Tickets',
+      empty: 'No tienes tickets de soporte aún',
+      emptyDescription: 'Crea tu primer ticket para solicitar ayuda, reportar un problema o sugerir una funcionalidad',
+      createdAt: 'Creado',
+      updatedAt: 'Actualizado',
+      viewDetails: 'Ver Detalles',
+      noTickets: 'No hay tickets para mostrar',
+    },
+    messages: {
+      createSuccess: 'Ticket creado exitosamente',
+      createError: 'Error al crear el ticket',
+      loadError: 'Error al cargar los tickets',
+      loadTicketError: 'Error al cargar el ticket',
+    },
+    details: {
+      title: 'Detalles del Ticket',
+      back: 'Volver a la Lista',
+      ticketId: 'ID del Ticket',
+      type: 'Tipo',
+      status: 'Estado',
+      createdAt: 'Fecha de Creación',
+      updatedAt: 'Última Actualización',
     },
   },
 
@@ -1499,6 +1679,36 @@ export const es = {
     mission: 'Nuestra misión es ayudar a profesionales de todas las áreas a destacar con currículums claros, optimizados y multilingües.',
     ourMission: 'Nuestra Misión',
     missionDescription: 'Creemos que cada profesional merece tener un currículum que realmente represente su potencial. Nuestra plataforma democratiza el acceso a herramientas de creación de CV de nivel empresarial, utilizando inteligencia artificial para optimizar y personalizar cada documento.',
+    values: {
+      accessibility: {
+        title: 'Accesibilidad',
+        description: 'Herramientas profesionales disponibles para todos, sin importar su nivel de experiencia o recursos.',
+      },
+      precision: {
+        title: 'Precisión',
+        description: 'Utilizamos IA avanzada para optimizar cada CV según las mejores prácticas de reclutamiento.',
+      },
+      efficiency: {
+        title: 'Eficiencia',
+        description: 'Proceso rápido y guiado que te permite crear un CV profesional en minutos, no horas.',
+      },
+    },
+    story: {
+      title: 'Nuestra Historia',
+      paragraphs: [
+        'GetQuickResume nació de una necesidad personal. Como profesionales en el sector tecnológico, nos dimos cuenta de que crear un currículum efectivo era más difícil de lo que debería ser. Las herramientas existentes eran costosas, complicadas o simplemente no estaban optimizadas para los sistemas de reclutamiento modernos.',
+        'Decidimos crear una solución que combinara la simplicidad de uso con la potencia de la inteligencia artificial. Nuestro objetivo era hacer que cualquier persona, independientemente de su experiencia técnica, pudiera crear un currículum que realmente destacara.',
+        'Hoy, miles de profesionales confían en GetQuickResume para crear currículums que les abren puertas a nuevas oportunidades. Estamos orgullosos de ser parte de su éxito profesional.',
+      ],
+    },
+    impact: {
+      title: 'Nuestro Impacto',
+      stats: {
+        cvsCreated: 'CVs creados',
+        satisfactionRate: 'Tasa de satisfacción',
+        countriesServed: 'Países atendidos',
+      },
+    },
   },
 
   // Legal
@@ -1533,33 +1743,114 @@ export const es = {
     welcome: 'Bienvenido, {{name}}',
     welcomeNoExclamation: 'Bienvenido, {{name}}',
     subtitle: 'Gestiona tus CVs y optimízalos para puestos específicos',
+    createNewCV: 'Crear Nuevo CV',
     stats: {
       tokens: 'Tokens Disponibles',
       tokensAvailable: 'Tokens Disponibles',
       resumes: 'CVs Creados',
       resumesCreated: 'CVs Creados',
-      jobs: 'Puestos Guardados',
-      jobsSaved: 'Puestos Guardados',
-      tokensDescription: 'Para generar y optimizar CVs',
       resumesDescription: 'Total de CVs en tu cuenta',
-      jobsDescription: 'Puestos de interés guardados',
+      freeResumeSubtitle: '{{count}} de {{total}} CV gratuito',
+      premiumResumeSubtitle: '{{count}} / {{total}} este mes',
+      freeDescription: '1 CV de por vida',
+      premiumDescription: '40 CVs por mes',
+      upgradeToPremium: 'Actualizar a Premium',
+      planType: {
+        monthly: 'Suscripción Mensual',
+        yearly: 'Suscripción Anual',
+      },
+      expiresOn: 'Expira: {{date}}',
     },
     sections: {
       resumes: 'Mis CVs',
-      jobInterests: 'Puestos de Interés',
       coverLetters: 'Cartas de Presentación',
       applyJobs: 'Aplicar a Empleos',
     },
     actions: {
       createResume: 'Crear Nuevo CV',
-      addJob: 'Agregar Puesto',
       buyTokens: 'Comprar Tokens',
       view: 'Ver',
       delete: 'Eliminar',
       deleteResumeTitle: 'Eliminar CV',
       deleteResume: '¿Estás seguro de que deseas eliminar este CV? Esta acción no se puede deshacer.',
-      deleteJobInterestTitle: 'Eliminar puesto de interés',
-      deleteJobInterest: '¿Estás seguro de que deseas eliminar este puesto de interés? Esta acción no se puede deshacer.',
+      deleteFreeResumeTitle: 'Eliminar CV - Advertencia Importante',
+      deleteFreeResumeWarning: '⚠️ Este es tu único CV gratuito generado con IA. Si lo eliminas, NO podrás crear otro CV gratuito. Tu cuota de CV gratuito ya ha sido utilizada y no se restablecerá. ¿Estás seguro de que deseas continuar?',
+      resumeNotGenerated: 'El CV debe estar generado antes de usar esta función',
+      rescoring: 'Re-evaluando CV...',
+      rescoreSuccess: '¡CV re-evaluado exitosamente!',
+      rescoreError: 'Error al re-evaluar el CV. Por favor, intenta de nuevo.',
+    },
+    premiumAction: {
+      upgradeButton: 'Actualizar a Premium',
+      benefits: {
+        title: 'Beneficios Premium',
+      },
+      enhance: {
+        title: 'Función Premium: Mejora con IA',
+        description: 'Mejora tu CV con optimizaciones impulsadas por IA. Obtén sugerencias personalizadas y optimiza cada sección de tu CV.',
+        benefits: {
+          aiEnhancement: 'Mejora de secciones con IA',
+          sectionOptimization: 'Optimiza cada sección individualmente',
+          guidedQuestions: 'Preguntas guiadas para mejores resultados',
+        },
+      },
+      rescore: {
+        title: 'Función Premium: Re-evaluar CV',
+        description: 'Obtén una puntuación actualizada de tu CV con retroalimentación detallada y recomendaciones de mejora.',
+        benefits: {
+          onDemandScoring: 'Re-evalúa tu CV en cualquier momento',
+          detailedFeedback: 'Retroalimentación detallada en cada sección',
+          improvementTracking: 'Rastrea mejoras a lo largo del tiempo',
+        },
+      },
+      edit: {
+        title: 'Función Premium: Edición Ilimitada de CV',
+        description: 'Has usado tu generación gratuita de CV. Actualiza a Premium para editar tu CV y crear CVs ilimitados.',
+        benefits: {
+          unlimitedEdits: 'Edita tu CV ilimitadas veces',
+          multipleResumes: 'Crea CVs ilimitados',
+          allFeatures: 'Accede a todas las funciones premium',
+        },
+      },
+      aiSuggestions: {
+        title: 'Sugerencias con IA - Función Premium',
+        description: 'Obtén sugerencias impulsadas por IA para mejorar las secciones de tu CV. Actualiza a Premium para desbloquear esta función y mejorar tu CV.',
+        cta: 'Premium para IA',
+        benefits: {
+          smartSuggestions: 'Sugerencias inteligentes de mejora con IA',
+          sectionOptimization: 'Optimiza cualquier sección de tu CV',
+          unlimitedUse: 'Sugerencias con IA ilimitadas',
+        },
+      },
+      regenerate: {
+        title: 'Regenerar CV - Función Premium',
+        description: 'Ya has utilizado tu CV generado con IA gratis. Actualiza a Premium para regenerar tu CV con IA.',
+        cta: 'Actualizar para Regenerar',
+        benefits: {
+          unlimitedRegeneration: 'Regenera tu CV ilimitadamente',
+          aiOptimization: 'Optimización con IA en cada regeneración',
+          multipleVersions: 'Crea múltiples versiones de tu CV',
+        },
+      },
+      createResume: {
+        title: 'Crear Nuevo CV - Función Premium',
+        description: 'Ya has creado tu CV generado con IA gratis. Actualiza a Premium para crear CVs adicionales.',
+        cta: 'Actualizar para Crear',
+        benefits: {
+          unlimitedResumes: 'Crea CVs ilimitados',
+          aiGeneration: 'Generación de CV con IA',
+          allFeatures: 'Accede a todas las funciones premium',
+        },
+      },
+      premiumTemplate: {
+        title: 'Plantilla Premium',
+        description: 'Este diseño de plantilla es exclusivo para usuarios Premium. Actualiza para desbloquear todas las plantillas y diseños premium.',
+        benefits: {
+          exclusiveDesigns: 'Acceso a diseños premium exclusivos',
+          allTemplates: 'Desbloquea todos los diseños de plantillas',
+          professionalLook: 'Destaca con plantillas profesionales',
+        },
+      },
     },
     comingSoon: {
       coverLetters: 'Cartas de Presentación',
@@ -1578,11 +1869,6 @@ export const es = {
         title: 'Aún no has creado ningún CV',
         description: 'Crea tu primer CV profesional con nuestra herramienta de IA. Te guiaremos paso a paso para crear un CV que destaque.',
         cta: 'Crear Mi Primer CV',
-      },
-      jobs: {
-        title: 'No tienes puestos de interés guardados',
-        description: 'Guarda puestos de trabajo que te interesen para optimizar tu CV específicamente para cada uno y aumentar tus posibilidades de éxito.',
-        cta: 'Agregar Mi Primer Puesto',
       },
     },
     emptyState: {
@@ -1618,77 +1904,6 @@ export const es = {
       quickActions: {
         view: 'Ver CV',
         edit: 'Editar',
-      },
-    },
-    jobInterest: {
-      status: {
-        active: 'Activo',
-        applied: 'Aplicado',
-        closed: 'Cerrado',
-      },
-      originalOffer: 'Ver oferta original',
-      optimizedAvailable: 'CV optimizado disponible',
-      quickActions: {
-        viewDetails: 'Ver Detalles',
-        optimize: 'Optimizar CV',
-      },
-    },
-    modals: {
-      addJob: {
-        title: 'Agregar Puesto de Interés',
-        subtitle: 'Guarda un puesto para optimizar tu CV',
-        fields: {
-          jobTitle: 'Título del Puesto',
-          company: 'Empresa',
-          jobUrl: 'URL de la Oferta (Opcional)',
-          jobDescription: 'Descripción del Puesto',
-        },
-        placeholders: {
-          jobTitle: 'Ej: Senior Frontend Developer',
-          company: 'Ej: Google, Microsoft, Startup XYZ',
-          jobUrl: 'https://linkedin.com/jobs/view/...',
-          jobDescription: 'Pega aquí la descripción completa del puesto de trabajo...',
-        },
-        help: {
-          description: 'Incluye requisitos, responsabilidades y cualquier información relevante',
-          optimization: {
-            title: '¿Cómo funciona la optimización?',
-            description: 'Una vez guardado, podrás optimizar cualquiera de tus CVs para este puesto específico. Nuestra IA analizará la descripción y adaptará tu CV para maximizar las coincidencias.',
-          },
-        },
-        actions: {
-          cancel: 'Cancelar',
-          save: 'Guardar Puesto',
-          saving: 'Guardando...',
-        },
-      },
-      optimize: {
-        title: 'Optimizar CV para Puesto',
-        subtitle: 'Adapta tu CV para este puesto específico',
-        selectedJob: 'Puesto Seleccionado',
-        selectResume: 'Selecciona el CV a optimizar',
-        noResumes: {
-          title: 'No hay CVs disponibles',
-          description: 'Necesitas generar al menos un CV antes de optimizarlo',
-        },
-        cost: {
-          title: 'Costo de Optimización',
-          description: 'Esta optimización consumirá 5 tokens de tu cuenta. La IA analizará la descripción del puesto y adaptará tu CV para maximizar las coincidencias.',
-        },
-        benefits: {
-          title: '¿Qué incluye la optimización?',
-          items: [
-            'Análisis de keywords relevantes del puesto',
-            'Adaptación del resumen profesional',
-            'Reorganización de experiencias por relevancia',
-            'Optimización de habilidades destacadas',
-          ],
-        },
-        actions: {
-          cancel: 'Cancelar',
-          optimize: 'Optimizar CV (5 tokens)',
-          optimizing: 'Optimizando...',
-        },
       },
     },
   },
@@ -1793,6 +2008,10 @@ export const es = {
     actions: {
       view: 'Ver',
       edit: 'Editar',
+      translate: 'Traducir',
+      share: 'Compartir',
+      enhance: 'Mejorar con IA',
+      rescore: 'Re-evaluar',
       download: 'Descargar',
       delete: 'Eliminar',
       viewResume: 'Ver CV',
@@ -1804,6 +2023,9 @@ export const es = {
       experience: 'Experiencia:',
       experiences: 'Experiencias:',
       aiOptimized: 'Optimizado con IA',
+      aiEnhanced: 'Mejorado con IA',
+      publiclyShared: 'Compartido Públicamente',
+      score: 'Puntuación del CV',
       updated: 'Actualizado:',
     },
   },
@@ -1826,6 +2048,8 @@ export const es = {
       back: 'Volver',
       backToDashboard: 'Volver al Dashboard',
       edit: 'Editar CV',
+      translate: 'Traducir',
+      share: 'Compartir',
       download: 'Descargar PDF',
       login: 'Iniciar Sesión',
       viewCertificate: 'Ver Certificado',
@@ -1916,11 +2140,114 @@ export const es = {
       },
     },
   },
+  resumeTranslation: {
+    title: 'Traducir CV',
+    selectLanguage: 'Selecciona el idioma de destino',
+    translateButton: 'Traducir',
+    translating: 'Traduciendo...',
+    success: '¡CV traducido exitosamente!',
+    error: 'Error al traducir el CV',
+    confirmation: 'Se creará un nuevo CV en {{language}}',
+    premiumRequired: {
+      title: 'Función Premium',
+      description: 'La traducción de CVs es una función exclusiva para usuarios premium. Actualiza tu plan para acceder a esta funcionalidad.',
+      upgradeButton: 'Actualizar a Premium',
+    },
+    cta: {
+      title: 'Traduce tu CV a otros idiomas',
+      description: 'Amplía tus oportunidades laborales traduciendo tu CV a los 10 idiomas más hablados del mundo.',
+      button: 'Traducir CV',
+    },
+  },
+  resumeSharing: {
+    title: 'Compartir CV',
+    premiumRequired: 'Esta función solo está disponible para usuarios premium',
+    premiumFeature: {
+      title: 'Función Premium',
+      description: 'Comparte tu CV mediante código QR y rastrea quién lo visualiza. Actualiza a Premium para desbloquear esta función y obtener analíticas detalladas.',
+      upgradeButton: 'Actualizar a Premium',
+    },
+    publicSharing: 'Compartir Públicamente',
+    sharingEnabled: 'Tu CV es accesible públicamente mediante código QR',
+    sharingDisabled: 'Tu CV no está compartido públicamente',
+    enable: 'Habilitar Compartir',
+    disable: 'Deshabilitar Compartir',
+    enabled: 'Compartir habilitado exitosamente',
+    disabled: 'Compartir deshabilitado exitosamente',
+    shareLink: 'Enlace de Compartir',
+    copy: 'Copiar',
+    copied: '¡Copiado!',
+    share: 'Compartir',
+    shareTitle: 'Mi CV Profesional',
+    shareText: 'Revisa mi CV generado con IA',
+    scanQRCode: 'Escanear Código QR',
+    qrCodeDescription: 'Escanea este código QR con tu teléfono para ver el CV',
+    linkCopied: 'Enlace copiado al portapapeles',
+    errors: {
+      enableFailed: 'Error al habilitar compartir',
+      disableFailed: 'Error al deshabilitar compartir',
+      copyFailed: 'Error al copiar enlace',
+    },
+    analytics: {
+      title: 'Analíticas',
+      totalViews: 'Vistas Totales',
+      uniqueViews: 'Vistas Únicas',
+      devices: 'Dispositivos',
+      mobile: 'Móvil',
+      desktop: 'Escritorio',
+      tablet: 'Tablet',
+      browsers: 'Navegadores',
+      locations: 'Ubicaciones',
+      viewsOverTime: 'Vistas en el Tiempo',
+    },
+  },
+  publicResume: {
+    loading: 'Cargando CV...',
+    poweredBy: 'Desarrollado por',
+    errors: {
+      title: 'CV No Encontrado',
+      missingToken: 'Se requiere el token de compartir',
+      notFound: 'CV no encontrado o ya no está compartido públicamente',
+      generic: 'Ocurrió un error al cargar el CV',
+    },
+  },
   footer: {
     quickLinks: 'Enlaces Rápidos',
     legal: 'Legal',
     copyright: '© 2024 GetQuickResume. Todos los derechos reservados.',
     madeWith: 'Hecho con',
     inCostaRica: 'en Costa Rica',
+  },
+
+  // Checkout
+  checkout: {
+    authenticationRequired: 'Por favor inicia sesión para actualizar a premium',
+    alreadyPremium: 'Ya eres un suscriptor premium',
+    processing: 'Procesando...',
+    error: 'Ocurrió un error al procesar tu pago. Por favor intenta de nuevo.',
+  },
+
+  // Thank You Page
+  thankYou: {
+    title: '¡Gracias por Tu Compra!',
+    subtitle: 'Tu suscripción premium está siendo activada',
+    verifying: 'Verificando Tu Compra',
+    verifyingMessage: 'Por favor espera mientras confirmamos tu pago...',
+    transactionId: 'ID de Transacción',
+    premiumActive: 'Premium Activo',
+    welcomePremium: '¡Bienvenido a Premium!',
+    premiumDescription: 'Tu suscripción premium ha sido activada exitosamente. Ahora tienes acceso a todas las funciones premium.',
+    whatsNext: '¿Qué Sigue?',
+    nextStep1: 'Crea CVs profesionales ilimitados con IA',
+    nextStep2: 'Traduce tu CV a múltiples idiomas',
+    nextStep3: 'Comparte tu CV con códigos QR y rastrea analíticas',
+    nextStep4: 'Usa funciones avanzadas de IA para mejorar tu CV',
+    goToDashboard: 'Ir al Panel',
+    createResume: 'Crear CV',
+    processing: 'Procesando Tu Pago',
+    processingMessage: 'Tu pago está siendo procesado. Tu suscripción premium será activada en breve.',
+    processingNote: 'Recibirás un correo de confirmación una vez que tu suscripción esté activa.',
+    needHelp: '¿Necesitas ayuda?',
+    contactSupport: 'Contactar Soporte',
   },
 };

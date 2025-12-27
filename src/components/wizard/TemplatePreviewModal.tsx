@@ -1,4 +1,4 @@
-import { X, Code, Copy, Check } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { ResumeTemplate } from '@/services/templatesService';
 import { GeneratedResume, ResumeData } from '@/types';
@@ -9,8 +9,8 @@ import { convertResumeDataToTemplateFormat, filterDataForPage, TemplateDataForma
 import { calculatePagination } from '@/services/paginationService';
 import { calculateAndAssignPageNumbers, extractPaginationFields } from './Step9Preview';
 import { modifyTemplateCodeForMultiPageDisplay } from '@/utils/templateCodeModifier';
-import { useNavigate } from 'react-router-dom';
 import { useResumeStore } from '@/stores/resumeStore';
+import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 
 interface TemplatePreviewModalProps {
   template: ResumeTemplate;
@@ -172,15 +172,13 @@ export function TemplatePreviewModal({
   onClose,
   onSelect,
 }: TemplatePreviewModalProps) {
-  const navigate = useNavigate();
+  const { navigateToStep } = useWizardNavigation();
   const { setSelectedTemplate, updateResumeData, resumeData: storeResumeData } = useResumeStore();
   const containerRef = useRef<HTMLDivElement>(null);
   const templateWrapperRef = useRef<HTMLDivElement>(null);
   const lastCalculatedTemplateRef = useRef<string | null>(null);
   const [scale, setScale] = useState(0.7);
   const [modifiedJsCode, setModifiedJsCode] = useState(template.jsCode);
-  const [showCode, setShowCode] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [calculatingPagination, setCalculatingPagination] = useState(false);
   const [templateData, setTemplateData] = useState<TemplateDataFormat | null>(null);
   const [totalPages, setTotalPages] = useState(1);
@@ -398,7 +396,7 @@ export function TemplatePreviewModal({
     setSelectedTemplate(template.id, template.category);
     
     // Navigate to Step 11 (Final Download)
-    navigate('/wizard/manual/step-11');
+    navigateToStep(11);
     
     // Call optional callback
     if (onSelect) {
@@ -411,23 +409,11 @@ export function TemplatePreviewModal({
 
   if (!isOpen) return null;
 
-  const language = 'en'; // Default language for templates
+  const language = (storeResumeData?.language as 'en' | 'es') || 'en'; // Use user's selected language
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
-    }
-  };
-
-  const handleCopyCode = async () => {
-    try {
-      await navigator.clipboard.writeText(template.jsCode);
-      setCopied(true);
-      toast.success('Código copiado al portapapeles');
-      setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
-      console.error('Error copying code:', error);
-      toast.error('Error al copiar el código');
     }
   };
 
@@ -453,42 +439,13 @@ export function TemplatePreviewModal({
               <p className="text-gray-600 mt-1">{template.description}</p>
             )}
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowCode(!showCode)}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm font-medium text-gray-700"
-              aria-label={showCode ? 'Ocultar código' : 'Ver código'}
-            >
-              <Code className="w-4 h-4" />
-              {showCode ? 'Ocultar Código' : 'Ver Código'}
-            </button>
-            {showCode && (
-              <button
-                onClick={handleCopyCode}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
-                aria-label="Copiar código"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-4 h-4" />
-                    Copiado
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4" />
-                    Copiar
-                  </>
-                )}
-              </button>
-            )}
           <button
             onClick={onClose}
-              className="ml-2 p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             aria-label="Cerrar modal"
           >
             <X className="w-6 h-6 text-gray-500" />
           </button>
-          </div>
         </div>
 
         {/* Action Buttons */}
@@ -518,40 +475,6 @@ export function TemplatePreviewModal({
               <div className="text-center">
                 <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                 <p className="text-gray-600">Calculando paginación...</p>
-              </div>
-            </div>
-          ) : showCode ? (
-            /* Code View */
-            <div className="max-w-7xl mx-auto">
-              <div className="bg-gray-900 rounded-lg shadow-lg overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-3 bg-gray-800 border-b border-gray-700">
-                  <div className="flex items-center gap-2">
-                    <Code className="w-5 h-5 text-gray-400" />
-                    <span className="text-sm font-medium text-gray-300">Código del Template</span>
-                    <span className="text-xs text-gray-500">({template.jsCode.length} caracteres)</span>
-                  </div>
-                  <button
-                    onClick={handleCopyCode}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium transition-colors"
-                  >
-                    {copied ? (
-                      <>
-                        <Check className="w-4 h-4" />
-                        Copiado
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-4 h-4" />
-                        Copiar
-                      </>
-                    )}
-                  </button>
-                </div>
-                <div className="overflow-auto max-h-[calc(95vh-200px)]">
-                  <pre className="p-4 text-sm text-gray-100 font-mono leading-relaxed">
-                    <code>{template.jsCode}</code>
-                  </pre>
-                </div>
               </div>
             </div>
           ) : (

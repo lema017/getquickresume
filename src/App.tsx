@@ -18,15 +18,24 @@ import { PricingPage } from '@/pages/PricingPage';
 import { AccountPage } from '@/pages/AccountPage';
 import { ContactPage } from '@/pages/ContactPage';
 import { AboutPage } from '@/pages/AboutPage';
+import { SupportPage } from '@/pages/SupportPage';
 import { PrivacyPage } from '@/pages/PrivacyPage';
 import { TermsPage } from '@/pages/TermsPage';
 import { ResumeViewPage } from '@/pages/ResumeViewPage';
+import { PublicResumePage } from '@/pages/PublicResumePage';
+import { ThankYouPage } from '@/pages/ThankYouPage';
 
 // Components
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 
+// Hooks
+import { useAuthInit } from '@/hooks/useAuthInit';
+
 function App() {
   const { i18n } = useTranslation();
+  
+  // Validate session on app mount
+  useAuthInit();
 
   return (
     <>
@@ -116,12 +125,34 @@ function App() {
             </ProtectedRoute>
           } />
           
+          <Route path="/support" element={
+            <ProtectedRoute>
+              <MainLayout>
+                <SupportPage />
+              </MainLayout>
+            </ProtectedRoute>
+          } />
+          
           <Route path="/resume/:id" element={
             <ProtectedRoute>
               <MainLayout>
                 <ResumeViewPage />
               </MainLayout>
             </ProtectedRoute>
+          } />
+
+          {/* Public Resume Route (no authentication required) */}
+          <Route path="/share/:shareToken" element={
+            <MainLayout>
+              <PublicResumePage />
+            </MainLayout>
+          } />
+
+          {/* Thank You Page (after payment) */}
+          <Route path="/thank-you" element={
+            <MainLayout>
+              <ThankYouPage />
+            </MainLayout>
           } />
         </Routes>
       </div>

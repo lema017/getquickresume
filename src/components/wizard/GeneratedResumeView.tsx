@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { GeneratedResume } from '@/types';
 import { SectionImprovementModal } from './SectionImprovementModal';
+import { PremiumActionModal } from '@/components/PremiumActionModal';
 import { useResumeStore } from '@/stores/resumeStore';
+import { useAuthStore } from '@/stores/authStore';
 import { 
   FileText,      // Resumen
   Briefcase,     // Experiencia
@@ -23,7 +25,11 @@ interface GeneratedResumeViewProps {
 }
 
 export function GeneratedResumeView({ resume, onEdit }: GeneratedResumeViewProps) {
-  const { updateResumeSection, setGeneratedResume } = useResumeStore();
+  const { updateResumeSection, setGeneratedResume, currentResumeId } = useResumeStore();
+  const { user } = useAuthStore();
+  
+  // Check if user can use AI features (premium OR free user who hasn't used their quota)
+  const canUseAIFeatures = user?.isPremium || !user?.freeResumeUsed;
   const [improvementModal, setImprovementModal] = useState<{
     isOpen: boolean;
     sectionType: 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language';
@@ -80,10 +86,10 @@ export function GeneratedResumeView({ resume, onEdit }: GeneratedResumeViewProps
       <ContactInfoSection contactInfo={resume.contactInfo} onEdit={onEdit} />
       
       {/* Professional Summary */}
-      <SummarySection summary={resume.professionalSummary} onEdit={onEdit} />
+      <SummarySection summary={resume.professionalSummary} onEdit={onEdit} canUseAIFeatures={canUseAIFeatures} resumeId={currentResumeId} />
       
       {/* Experience - COMPLETA */}
-      <ExperienceSection experiences={resume.experience} onEdit={onEdit} />
+      <ExperienceSection experiences={resume.experience} onEdit={onEdit} canUseAIFeatures={canUseAIFeatures} resumeId={currentResumeId} />
       
       {/* Skills - COMPLETAS (technical, soft, tools) */}
       <SkillsSection skills={resume.skills} onEdit={onEdit} />
@@ -118,6 +124,7 @@ export function GeneratedResumeView({ resume, onEdit }: GeneratedResumeViewProps
         sectionType={improvementModal.sectionType}
         originalText={improvementModal.originalText}
         onApprove={handleApproveImprovement}
+        resumeId={currentResumeId || undefined}
       />
     </div>
   );
@@ -172,10 +179,15 @@ function ContactInfoSection({ contactInfo, onEdit }: { contactInfo: GeneratedRes
 }
 
 // Professional Summary Section
-function SummarySection({ summary, onEdit }: { summary: string; onEdit?: (section: string) => void }) {
+function SummarySection({ summary, onEdit, canUseAIFeatures, resumeId }: { summary: string; onEdit?: (section: string) => void; canUseAIFeatures?: boolean; resumeId?: string | null }) {
   const [improvementModal, setImprovementModal] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   const handleImproveSection = () => {
+    if (!canUseAIFeatures) {
+      setShowPremiumModal(true);
+      return;
+    }
     setImprovementModal(true);
   };
 
@@ -220,13 +232,20 @@ function SummarySection({ summary, onEdit }: { summary: string; onEdit?: (sectio
         sectionType="summary"
         originalText={summary}
         onApprove={handleApproveImprovement}
+        resumeId={resumeId || undefined}
+      />
+
+      <PremiumActionModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        feature="aiSuggestions"
       />
     </>
   );
 }
 
 // Experience Section - MEJORADA
-function ExperienceSection({ experiences, onEdit }: { experiences: GeneratedResume['experience']; onEdit?: (section: string) => void }) {
+function ExperienceSection({ experiences, onEdit, canUseAIFeatures, resumeId }: { experiences: GeneratedResume['experience']; onEdit?: (section: string) => void; canUseAIFeatures?: boolean; resumeId?: string | null }) {
   const [improvementModal, setImprovementModal] = useState<{
     isOpen: boolean;
     experienceIndex: number;
@@ -236,10 +255,15 @@ function ExperienceSection({ experiences, onEdit }: { experiences: GeneratedResu
     experienceIndex: -1,
     originalText: ''
   });
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   if (experiences.length === 0) return null;
 
   const handleImproveExperience = (index: number, description: string) => {
+    if (!canUseAIFeatures) {
+      setShowPremiumModal(true);
+      return;
+    }
     setImprovementModal({
       isOpen: true,
       experienceIndex: index,
@@ -333,6 +357,13 @@ function ExperienceSection({ experiences, onEdit }: { experiences: GeneratedResu
       sectionType="experience"
       originalText={improvementModal.originalText}
       onApprove={handleApproveImprovement}
+      resumeId={resumeId || undefined}
+    />
+
+    <PremiumActionModal
+      isOpen={showPremiumModal}
+      onClose={() => setShowPremiumModal(false)}
+      feature="aiSuggestions"
     />
   </>
   );

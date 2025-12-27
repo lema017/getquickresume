@@ -29,6 +29,20 @@ export const createResume = async (userId: string, resumeData: ResumeData, title
       title: title || `${resumeData.firstName} ${resumeData.lastName} - CV`,
       resumeData,
       status: 'draft',
+      isPubliclyShared: false,
+      aiCost: {
+        totalInputTokens: 0,
+        totalOutputTokens: 0,
+        totalCostUSD: 0,
+        callBreakdown: {
+          generation: 0,
+          scoring: 0,
+          suggestions: 0,
+          enhancements: 0,
+          linkedInParsing: 0,
+          translation: 0,
+        },
+      },
       createdAt: now,
       updatedAt: now,
     };
@@ -100,6 +114,26 @@ export const getResumeById = async (userId: string, resumeId: string): Promise<R
   } catch (error) {
     console.error('Error getting resume by ID:', error);
     throw new Error('Database error');
+  }
+};
+
+/**
+ * Verifies that a resume exists and belongs to the specified user.
+ * Used for ownership validation before tracking AI costs to a resume.
+ * @param userId - The user ID from the JWT token
+ * @param resumeId - The resume ID to verify
+ * @returns true if the resume exists and belongs to the user, false otherwise
+ */
+export const verifyResumeOwnership = async (
+  userId: string, 
+  resumeId: string
+): Promise<boolean> => {
+  try {
+    const resume = await getResumeById(userId, resumeId);
+    return resume !== null;
+  } catch (error) {
+    console.error('Error verifying resume ownership:', error);
+    return false;
   }
 };
 
@@ -258,5 +292,36 @@ export const getResumeScore = async (
   } catch (error: any) {
     console.error('Error getting resume score:', error);
     throw error;
+  }
+};
+
+export const getResumeByShareToken = async (shareToken: string): Promise<Resume | null> => {
+  try {
+    // Use GSI to query by shareToken
+    const command = new QueryCommand({
+      TableName: tableName,
+      IndexName: 'shareToken-index',
+      KeyConditionExpression: 'shareToken = :shareToken',
+      FilterExpression: 'isPubliclyShared = :isPubliclyShared',
+      ExpressionAttributeValues: {
+        ':shareToken': shareToken,
+        ':isPubliclyShared': true,
+      },
+    });
+
+    const result = await dynamodb.send(command);
+    
+    if (result.Items && result.Items.length > 0) {
+      const item = result.Items[0] as any;
+      return {
+        ...item,
+        id: item.resumeId,
+      } as Resume;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error getting resume by share token:', error);
+    throw new Error('Database error');
   }
 };

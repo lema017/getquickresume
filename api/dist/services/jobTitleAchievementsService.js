@@ -14,7 +14,7 @@ class JobTitleAchievementsService {
         this.docClient = lib_dynamodb_1.DynamoDBDocumentClient.from(client);
         this.tableName = process.env.JOB_TITLE_ACHIEVEMENTS_TABLE || 'getquickresume-api-job-title-achievements-dev';
     }
-    async getAchievementsByJobTitle(jobTitle, language, requestContext) {
+    async getAchievementsByJobTitle(jobTitle, language, requestContext, resumeId) {
         try {
             // Normalizar jobTitle
             const normalizedJobTitle = this.normalizeJobTitle(jobTitle);
@@ -27,7 +27,7 @@ class JobTitleAchievementsService {
             const isPremium = user.isPremium;
             // Premium users: Skip cache, always generate fresh suggestions
             if (isPremium) {
-                const aiSuggestions = await aiService_1.aiService.generateJobTitleAchievements(normalizedJobTitle, language, requestContext);
+                const aiSuggestions = await aiService_1.aiService.generateJobTitleAchievements(normalizedJobTitle, language, requestContext, resumeId);
                 // Guardar en DynamoDB para cache (for future free users)
                 await this.saveSuggestionsToCache(normalizedJobTitle, aiSuggestions, language);
                 // Retornar 3 sugerencias aleatorias
@@ -48,7 +48,7 @@ class JobTitleAchievementsService {
                 };
             }
             // Si no existe en cache, generar con AI
-            const aiSuggestions = await aiService_1.aiService.generateJobTitleAchievements(normalizedJobTitle, language, requestContext);
+            const aiSuggestions = await aiService_1.aiService.generateJobTitleAchievements(normalizedJobTitle, language, requestContext, resumeId);
             // Guardar en DynamoDB para cache
             await this.saveSuggestionsToCache(normalizedJobTitle, aiSuggestions, language);
             // Retornar 3 sugerencias aleatorias

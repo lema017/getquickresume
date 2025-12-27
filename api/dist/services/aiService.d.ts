@@ -1,14 +1,19 @@
 import { ResumeData, GeneratedResume, LinkedInDataRequest } from '../types';
+export interface AITrackingContext {
+    userId: string;
+    resumeId?: string;
+    isPremium: boolean;
+}
 declare class AIService {
     private config;
     constructor();
-    generateResume(resumeData: ResumeData, isPremium?: boolean): Promise<GeneratedResume>;
+    generateResume(resumeData: ResumeData, isPremium?: boolean, trackingContext?: AITrackingContext): Promise<GeneratedResume>;
     private buildPrompt;
     generateProfessionSuggestions(profession: string, requestContext: {
         authorizer: {
             userId: string;
         };
-    }): Promise<{
+    }, resumeId?: string): Promise<{
         es: {
             skills: string[];
         };
@@ -26,7 +31,7 @@ declare class AIService {
         authorizer: {
             userId: string;
         };
-    }): Promise<Array<{
+    }, resumeId?: string): Promise<Array<{
         title: string;
         description: string;
     }>>;
@@ -36,28 +41,28 @@ declare class AIService {
         authorizer: {
             userId: string;
         };
-    }): Promise<string[]>;
+    }, resumeId?: string): Promise<string[]>;
     private buildSummarySuggestionsPrompt;
     private parseSummarySuggestionsResponse;
     generateJobTitleAchievements(jobTitle: string, language: 'es' | 'en', requestContext: {
         authorizer: {
             userId: string;
         };
-    }): Promise<string[]>;
+    }, resumeId?: string): Promise<string[]>;
     private buildJobTitleAchievementsPrompt;
     private parseJobTitleAchievementsResponse;
     enhanceText(context: 'achievement' | 'summary' | 'project' | 'responsibility', text: string, language: 'es' | 'en', requestContext: {
         authorizer: {
             userId: string;
         };
-    }, jobTitle?: string): Promise<string>;
+    }, jobTitle?: string, resumeId?: string): Promise<string>;
     private buildEnhanceTextPrompt;
     private parseEnhanceTextResponse;
     private parseAIResponse;
     improveSectionWithUserInstructions(sectionType: 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language', originalText: string, userInstructions: string, language: 'es' | 'en', gatheredContext?: Array<{
         questionId: string;
         answer: string;
-    }>): Promise<string>;
+    }>, trackingContext?: AITrackingContext): Promise<string>;
     /**
      * Generate contextual questions based on a recommendation for enhancing a resume section
      * Premium-only feature - uses OpenAI
@@ -66,7 +71,7 @@ declare class AIService {
         authorizer: {
             userId: string;
         };
-    }): Promise<Array<{
+    }, resumeId?: string): Promise<Array<{
         id: string;
         question: string;
         category: string;
@@ -82,21 +87,25 @@ declare class AIService {
         authorizer: {
             userId: string;
         };
-    }): Promise<string>;
+    }, resumeId?: string): Promise<string>;
     private buildAnswerSuggestionPrompt;
     private parseAnswerSuggestionResponse;
     private buildSecureSectionImprovementPrompt;
     private buildContextAwareSectionImprovementPrompt;
     private requiresMaxCompletionTokens;
+    private getOpenAIModelLimit;
     private hasRestrictedParameters;
     private callOpenAI;
+    private callOpenAIWithUsage;
     private callAnthropic;
+    private callAnthropicWithUsage;
     private callGroq;
+    private callGroqWithUsage;
     parseLinkedInTextToResumeData(linkedInData: LinkedInDataRequest, requestContext: {
         authorizer: {
             userId: string;
         };
-    }): Promise<Partial<ResumeData>>;
+    }, resumeId?: string): Promise<Partial<ResumeData>>;
     private buildLinkedInParsingPrompt;
     private parseLinkedInResponse;
     private generateDefaultJobDescription;

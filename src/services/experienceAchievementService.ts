@@ -35,8 +35,28 @@ class ExperienceAchievementService {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      }
+      
+      // Handle premium required error (403)
+      if (response.status === 403 && errorData.code === 'PREMIUM_REQUIRED') {
+        const error = new Error(errorData.message || 'Premium feature required');
+        (error as any).code = 'PREMIUM_REQUIRED';
+        (error as any).status = 403;
+        throw error;
+      }
+      
+      if (response.status === 403) {
+        throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      }
+      
+      // Handle rate limit exceeded error (429)
+      if (response.status === 429) {
+        const error = new Error(errorData.message || 'Too many requests. Please wait before trying again.');
+        (error as any).code = 'RATE_LIMIT_EXCEEDED';
+        (error as any).status = 429;
+        throw error;
       }
       
       throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
@@ -46,18 +66,22 @@ class ExperienceAchievementService {
   }
 
   async getAchievementsByJobTitle(
-    jobTitle: string
+    jobTitle: string,
+    language: 'es' | 'en' = 'es',
+    resumeId?: string
   ): Promise<{ suggestions: string[]; fromCache: boolean }> {
     if (!jobTitle || jobTitle.trim() === '') {
       throw new Error('El título del puesto es requerido para generar sugerencias de logros.');
     }
 
-    const language = this.getCurrentLanguage();
-
-    const requestBody: JobTitleAchievementsRequest = {
+    const requestBody: JobTitleAchievementsRequest & { resumeId?: string } = {
       jobTitle: jobTitle.trim(),
       language
     };
+
+    if (resumeId) {
+      requestBody.resumeId = resumeId;
+    }
 
     try {
       const response = await this.makeRequest<JobTitleAchievementsResponse>(
@@ -84,20 +108,24 @@ class ExperienceAchievementService {
 
   async enhanceAchievement(
     text: string,
-    jobTitle?: string
+    jobTitle?: string,
+    language: 'es' | 'en' = 'es',
+    resumeId?: string
   ): Promise<string> {
     if (!text || text.trim() === '') {
       throw new Error('El texto es requerido para mejorar con IA.');
     }
 
-    const language = this.getCurrentLanguage();
-
-    const requestBody: EnhanceTextRequest = {
+    const requestBody: EnhanceTextRequest & { resumeId?: string } = {
       context: 'achievement',
       text: text.trim(),
       language,
       jobTitle
     };
+
+    if (resumeId) {
+      requestBody.resumeId = resumeId;
+    }
 
     try {
       const response = await this.makeRequest<EnhanceTextResponse>(
@@ -121,20 +149,24 @@ class ExperienceAchievementService {
 
   async enhanceProjectDescription(
     text: string,
-    projectName?: string
+    projectName?: string,
+    language: 'es' | 'en' = 'es',
+    resumeId?: string
   ): Promise<string> {
     if (!text || text.trim() === '') {
       throw new Error('El texto es requerido para mejorar con IA.');
     }
 
-    const language = this.getCurrentLanguage();
-
-    const requestBody: EnhanceTextRequest = {
+    const requestBody: EnhanceTextRequest & { resumeId?: string } = {
       context: 'project',
       text: text.trim(),
       language,
       jobTitle: projectName // Using jobTitle field for project name context
     };
+
+    if (resumeId) {
+      requestBody.resumeId = resumeId;
+    }
 
     try {
       const response = await this.makeRequest<EnhanceTextResponse>(
@@ -156,6 +188,9 @@ class ExperienceAchievementService {
     }
   }
 
+  /**
+   * @deprecated Use resume language instead. This method is kept for backward compatibility only.
+   */
   private getCurrentLanguage(): 'es' | 'en' {
     const storedLanguage = localStorage.getItem('i18nextLng');
     return (storedLanguage === 'en' || storedLanguage === 'es') ? storedLanguage : 'es';

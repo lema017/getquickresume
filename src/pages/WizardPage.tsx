@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
+import { useAuthStore } from '@/stores/authStore';
 import { resumeService } from '@/services/resumeService';
 import toast from 'react-hot-toast';
 
@@ -37,6 +38,7 @@ function ManualWizardStep({ stepComponent: StepComponent }: ManualWizardStepProp
   const navigate = useNavigate();
   const location = useLocation();
   const { loadResumeData, setCurrentResumeId, currentResumeId, resetResume, setGeneratedResume, setHasLoadedExistingResume, resumeData, wizardState } = useResumeStore();
+  const { user } = useAuthStore();
   
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
   const [isLoadingResume, setIsLoadingResume] = useState(false);

@@ -50,11 +50,11 @@ class SuggestionService {
     /**
      * Genera sugerencias usando AI (ambos idiomas) y las guarda en la base de datos
      */
-    async generateAndSaveSuggestions(profession, requestContext) {
+    async generateAndSaveSuggestions(profession, requestContext, resumeId) {
         try {
             const normalizedProfession = this.normalizeProfession(profession);
             // Generar sugerencias con AI (ambos idiomas) - ya vienen unificadas como skills
-            const aiSuggestions = await aiService_1.aiService.generateProfessionSuggestions(profession, requestContext);
+            const aiSuggestions = await aiService_1.aiService.generateProfessionSuggestions(profession, requestContext, resumeId);
             // Guardar en la base de datos
             await this.saveBilingualSuggestions(normalizedProfession, aiSuggestions);
             // Crear objeto para retornar
@@ -154,7 +154,7 @@ class SuggestionService {
      * Retorna solo skills (unificado)
      * Premium users always get fresh suggestions (bypass cache)
      */
-    async getSuggestions(profession, language, requestContext) {
+    async getSuggestions(profession, language, requestContext, resumeId) {
         try {
             // Validar idioma
             if (!['es', 'en'].includes(language)) {
@@ -169,7 +169,7 @@ class SuggestionService {
             const isPremium = user.isPremium;
             // Premium users: Skip cache, always generate fresh suggestions
             if (isPremium) {
-                const newSuggestions = await this.generateAndSaveSuggestions(profession, requestContext);
+                const newSuggestions = await this.generateAndSaveSuggestions(profession, requestContext, resumeId);
                 // Validar que la respuesta del AI tenga la estructura esperada
                 if (!newSuggestions || !newSuggestions.suggestions) {
                     throw new Error('AI service returned invalid response structure');
@@ -211,7 +211,7 @@ class SuggestionService {
                 };
             }
             // Si no existe en cache, generar con AI (ambos idiomas) y guardar
-            const newSuggestions = await this.generateAndSaveSuggestions(profession, requestContext);
+            const newSuggestions = await this.generateAndSaveSuggestions(profession, requestContext, resumeId);
             // Validar que la respuesta del AI tenga la estructura esperada
             if (!newSuggestions || !newSuggestions.suggestions) {
                 throw new Error('AI service returned invalid response structure');

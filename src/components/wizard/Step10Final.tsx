@@ -2,8 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
+import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { useAuthStore } from '@/stores/authStore';
-import { ArrowLeft, Download, Share2, Eye, CheckCircle, Sparkles, RefreshCw, Linkedin, FileText, Zap, Edit3 } from 'lucide-react';
+import { ArrowLeft, Download, Share2, Eye, CheckCircle, Sparkles, RefreshCw, Linkedin, FileText, Zap, Edit3, Globe } from 'lucide-react';
 import { countries } from '@/utils/countries';
 import { ResumeEditModal } from './ResumeEditModal';
 import { FloatingTips } from '@/components/FloatingTips';
@@ -18,17 +19,31 @@ import { generateResumePDFFromPages } from '@/utils/pdfGenerator';
 import { calculatePagination } from '@/services/paginationService';
 import { calculateAndAssignPageNumbers, extractPaginationFields } from './Step9Preview';
 import { modifyTemplateCodeForMultiPageDisplay } from '@/utils/templateCodeModifier';
+import { downloadService } from '@/services/downloadService';
+import { PremiumDownloadModal } from '@/components/PremiumDownloadModal';
+import { PremiumActionModal } from '@/components/PremiumActionModal';
+import { ResumeTranslationModal } from '@/components/ResumeTranslationModal';
+import { ShareResumeModal } from '@/components/ShareResumeModal';
 import toast from 'react-hot-toast';
 import { A4_DIMENSIONS } from '@/utils/a4Dimensions';
 
 export function Step10Final() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { resumeData: storeResumeData, markStepCompleted, generatedResume, isGenerating, isEditingResume, startEditingResume, selectedTemplateId, updateResumeData } = useResumeStore();
+  const { navigateToStep } = useWizardNavigation();
+  const { resumeData: storeResumeData, markStepCompleted, generatedResume, isGenerating, isEditingResume, startEditingResume, selectedTemplateId, updateResumeData, currentResumeId } = useResumeStore();
   const { areTipsClosed, closeTips, showTips } = useTips();
   const { user } = useAuthStore();
   const [isGenerated, setIsGenerated] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [showRegeneratePremiumModal, setShowRegeneratePremiumModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showTranslationModal, setShowTranslationModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+
+  // Check if user can use AI features (premium OR free user who hasn't used their quota)
+  const canUseAIFeatures = user?.isPremium || !user?.freeResumeUsed;
+  const [resumeShareData, setResumeShareData] = useState<{ shareToken?: string; isPubliclyShared?: boolean } | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<ResumeTemplate | null>(null);
   const [loadingTemplate, setLoadingTemplate] = useState(false);
   const [generatingPDF, setGeneratingPDF] = useState(false);
@@ -186,12 +201,18 @@ export function Step10Final() {
   }, [selectedTemplate, generatedResume]);
 
   const handleBack = () => {
-    navigate('/wizard/manual/step-10');
+    navigateToStep(10);
   };
 
   const handleRegenerateCV = async () => {
+    // Check if user can use AI features - show CTA if not
+    if (!canUseAIFeatures) {
+      setShowRegeneratePremiumModal(true);
+      return;
+    }
+
     // Navigate back to step 8 to regenerate
-    navigate('/wizard/manual/step-8');
+    navigateToStep(8);
   };
 
   const handleEditCV = () => {
@@ -212,6 +233,39 @@ export function Step10Final() {
     if (!selectedTemplate) {
       toast.error('No hay template seleccionado');
       return;
+    }
+
+    // Check download limits before generating PDF
+    // Only check if resume is already saved (has an ID)
+    if (currentResumeId) {
+      try {
+        const downloadResult = await downloadService.trackDownload(currentResumeId);
+        
+        if (!downloadResult.allowed) {
+          // Show premium modal and return early
+          setShowPremiumModal(true);
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking download limits:', error);
+        if (error instanceof Error) {
+          if (error.message.includes('Unauthorized')) {
+            toast.error('Please log in again');
+            navigate('/login');
+            return;
+          }
+          if (error.message.includes('not found')) {
+            toast.error('Resume not found');
+            return;
+          }
+        }
+        toast.error('Error checking download limits. Please try again.');
+        return;
+      }
+    } else {
+      // Resume not saved yet - this shouldn't happen in Step10Final
+      // but if it does, we'll allow the download without tracking
+      console.warn('Download attempted without resume ID - skipping download tracking');
     }
 
     setGeneratingPDF(true);
@@ -290,17 +344,24 @@ export function Step10Final() {
     }
   };
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: 'Mi CV Profesional',
-        text: 'Revisa mi CV generado con IA',
-        url: window.location.href
+  const handleShare = async () => {
+    if (!currentResumeId) {
+      toast.error(t('wizard.steps.final.errors.noResumeId'));
+      return;
+    }
+
+    // Fetch resume to get sharing data
+    try {
+      const { resumeService } = await import('@/services/resumeService');
+      const resume = await resumeService.getResume(currentResumeId);
+      setResumeShareData({
+        shareToken: resume.shareToken,
+        isPubliclyShared: resume.isPubliclyShared,
       });
-    } else {
-      // Fallback para navegadores que no soportan Web Share API
-      navigator.clipboard.writeText(window.location.href);
-      alert('Enlace copiado al portapapeles');
+      setShowShareModal(true);
+    } catch (error) {
+      console.error('Error loading resume for sharing:', error);
+      toast.error(t('wizard.steps.final.errors.loadResumeFailed'));
     }
   };
 
@@ -450,7 +511,7 @@ export function Step10Final() {
                       tagName={selectedTemplate.tagName}
                       jsCode={modifiedJsCode}
                       data={pageData as any}
-                      language="en"
+                      language={(storeResumeData?.language as 'en' | 'es') || 'en'}
                       className="template-preview-multi-page"
                       style={{ 
                         width: `${A4_DIMENSIONS.contentWidth}px`, 
@@ -471,7 +532,7 @@ export function Step10Final() {
                     tagName={selectedTemplate.tagName}
                     jsCode={modifiedJsCode}
                     data={templateData as any}
-                    language="en"
+                    language={(storeResumeData?.language as 'en' | 'es') || 'en'}
                     className="template-preview-multi-page"
                     style={{ 
                       width: `${A4_DIMENSIONS.contentWidth}px`, 
@@ -492,7 +553,7 @@ export function Step10Final() {
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No hay template seleccionado</h3>
             <p className="text-gray-600 mb-4">Por favor, selecciona un template en el paso anterior</p>
             <button
-              onClick={() => navigate('/wizard/manual/step-10')}
+              onClick={() => navigateToStep(10)}
               className="btn-primary"
             >
               Volver a Seleccionar Template
@@ -551,13 +612,48 @@ export function Step10Final() {
           
           <button
             onClick={handleRegenerateCV}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center"
+            className={`font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center ${
+              canUseAIFeatures
+                ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                : 'bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white'
+            }`}
           >
             <Sparkles className="w-5 h-5 mr-2" />
-            {t('wizard.steps.final.actions.regenerate')}
+            {canUseAIFeatures ? t('wizard.steps.final.actions.regenerate') : t('dashboard.premiumAction.regenerate.cta')}
           </button>
         </div>
       </div>
+
+      {/* Translation CTA Section */}
+      {generatedResume && currentResumeId && (
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6 mb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <div className="flex items-center mb-2">
+                <Globe className="w-6 h-6 text-blue-600 mr-2" />
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {t('resumeTranslation.cta.title')}
+                </h3>
+                {!user?.isPremium && (
+                  <span className="ml-2 px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded">
+                    {t('common.premium')}
+                  </span>
+                )}
+              </div>
+              <p className="text-gray-600 text-sm mb-4">
+                {t('resumeTranslation.cta.description')}
+              </p>
+              <button
+                onClick={() => setShowTranslationModal(true)}
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+              >
+                <Globe className="w-4 h-4 mr-2" />
+                {t('resumeTranslation.cta.button')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Next Steps */}
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6 mb-8">
@@ -599,6 +695,51 @@ export function Step10Final() {
       <ResumeEditModal 
         isOpen={showEditModal} 
         onClose={handleCloseEditModal} 
+      />
+      <PremiumDownloadModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+      />
+      {currentResumeId && (
+        <>
+          <ResumeTranslationModal
+            isOpen={showTranslationModal}
+            onClose={() => setShowTranslationModal(false)}
+            resumeId={currentResumeId}
+            currentLanguage={storeResumeData.language || 'es'}
+            resumeTitle={generatedResume ? `${storeResumeData.firstName} ${storeResumeData.lastName} - CV` : undefined}
+          />
+          <ShareResumeModal
+            isOpen={showShareModal}
+            onClose={() => {
+              setShowShareModal(false);
+              setResumeShareData(null);
+            }}
+            resumeId={currentResumeId}
+            shareToken={resumeShareData?.shareToken}
+            isPubliclyShared={resumeShareData?.isPubliclyShared}
+            onSharingChanged={async () => {
+              // Reload resume data
+              try {
+                const { resumeService } = await import('@/services/resumeService');
+                const resume = await resumeService.getResume(currentResumeId);
+                setResumeShareData({
+                  shareToken: resume.shareToken,
+                  isPubliclyShared: resume.isPubliclyShared,
+                });
+              } catch (error) {
+                console.error('Error reloading resume:', error);
+              }
+            }}
+          />
+        </>
+      )}
+
+      {/* Premium Action Modal for regenerate */}
+      <PremiumActionModal
+        isOpen={showRegeneratePremiumModal}
+        onClose={() => setShowRegeneratePremiumModal(false)}
+        feature="regenerate"
       />
     </div>
   );

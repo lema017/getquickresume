@@ -26,8 +26,25 @@ class SectionImprovementService {
     });
     
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Error al mejorar sección');
+      const errorData = await response.json().catch(() => ({}));
+      
+      if (response.status === 401) {
+        throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      }
+      
+      // Handle premium required error (403)
+      if (response.status === 403 && errorData.code === 'PREMIUM_REQUIRED') {
+        const error = new Error(errorData.message || 'Premium feature required');
+        (error as any).code = 'PREMIUM_REQUIRED';
+        (error as any).status = 403;
+        throw error;
+      }
+      
+      if (response.status === 403) {
+        throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      }
+      
+      throw new Error(errorData.message || 'Error al mejorar sección');
     }
     
     return response.json();

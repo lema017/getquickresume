@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
+import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { useAuthStore } from '@/stores/authStore';
 import { 
   FileText, 
@@ -12,12 +13,14 @@ import {
   Clock,
   Zap,
   ArrowLeft,
-  Linkedin
+  Linkedin,
+  Crown
 } from 'lucide-react';
 
 export function ResumeCreationMode() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { navigateToStep, navigateToWizardPath } = useWizardNavigation();
   const { resetResume } = useResumeStore();
   const { user } = useAuthStore();
 
@@ -29,16 +32,24 @@ export function ResumeCreationMode() {
   }, [resetResume]);
 
   const handleManualCreation = () => {
-    navigate('/wizard/manual/step-1');
+    navigateToStep(1);
   };
 
   const handleUploadResume = () => {
-    navigate('/wizard/upload');
+    navigateToWizardPath('/wizard/upload');
   };
 
   const handleLinkedInImport = () => {
-    navigate('/wizard/linkedin');
+    // Check if user is premium
+    if (!user?.isPremium) {
+      // Show upgrade prompt or navigate to premium page
+      navigate('/premium');
+      return;
+    }
+    navigateToWizardPath('/wizard/linkedin');
   };
+
+  const isPremium = user?.isPremium ?? false;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -178,10 +189,18 @@ export function ResumeCreationMode() {
           </div>
 
           {/* LinkedIn Import */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 group cursor-pointer h-full flex flex-col" onClick={handleLinkedInImport}>
+          <div className={`bg-white rounded-2xl shadow-lg border ${!isPremium ? 'border-amber-300' : 'border-gray-200'} p-6 ${isPremium ? 'hover:shadow-xl transition-all duration-300 group cursor-pointer' : 'opacity-90'} h-full flex flex-col ${isPremium ? '' : 'relative'}`} onClick={isPremium ? handleLinkedInImport : undefined}>
+            {/* Premium Badge for Free Users */}
+            {!isPremium && (
+              <div className="absolute top-4 right-4 bg-gradient-to-r from-amber-500 to-yellow-600 text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1">
+                <Crown className="w-3 h-3" />
+                <span>{t('wizard.creationMode.linkedin.premiumBadge') || 'Premium'}</span>
+              </div>
+            )}
+            
             <div className="text-center flex-1 flex flex-col">
               {/* Icon */}
-              <div className="mx-auto w-16 h-16 bg-gradient-to-br from-orange-500 to-blue-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+              <div className={`mx-auto w-16 h-16 bg-gradient-to-br ${isPremium ? 'from-orange-500 to-blue-600' : 'from-gray-400 to-gray-500'} rounded-full flex items-center justify-center mb-4 ${isPremium ? 'group-hover:scale-110 transition-transform duration-300' : ''}`}>
                 <Linkedin className="w-8 h-8 text-white" />
               </div>
               
@@ -192,9 +211,11 @@ export function ResumeCreationMode() {
               
               {/* Description */}
               <p className="text-gray-600 mb-4 leading-relaxed text-sm">
-                {user?.provider === 'linkedin' 
-                  ? t('wizard.creationMode.linkedin.description.loggedIn')
-                  : t('wizard.creationMode.linkedin.description.publicUrl')
+                {!isPremium 
+                  ? t('wizard.creationMode.linkedin.description.premiumRequired') || 'LinkedIn import is a premium feature. Upgrade to access this functionality.'
+                  : user?.provider === 'linkedin' 
+                    ? t('wizard.creationMode.linkedin.description.loggedIn')
+                    : t('wizard.creationMode.linkedin.description.publicUrl')
                 }
               </p>
 
@@ -220,9 +241,16 @@ export function ResumeCreationMode() {
             </div>
 
             {/* CTA Button */}
-            <button className="w-full bg-gradient-to-r from-orange-600 to-blue-600 text-white py-3 px-4 rounded-lg font-semibold text-sm hover:from-orange-700 hover:to-blue-700 transition-all duration-200 flex items-center justify-center gap-2 group-hover:shadow-lg">
-              <span>{t('wizard.creationMode.linkedin.cta')}</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+            <button 
+              onClick={isPremium ? handleLinkedInImport : () => navigate('/premium')}
+              className={`w-full ${isPremium ? 'bg-gradient-to-r from-orange-600 to-blue-600 hover:from-orange-700 hover:to-blue-700' : 'bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700'} text-white py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 ${isPremium ? 'group-hover:shadow-lg' : ''}`}
+            >
+              <span>{isPremium ? t('wizard.creationMode.linkedin.cta') : t('wizard.creationMode.linkedin.upgradeCta') || 'Upgrade to Premium'}</span>
+              {isPremium ? (
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+              ) : (
+                <Crown className="w-4 h-4" />
+              )}
             </button>
 
             {/* Time estimate */}

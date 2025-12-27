@@ -1,20 +1,22 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
+import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { ArrowRight, ArrowLeft, Plus, X, CheckCircle, Wand2 } from 'lucide-react';
 import { FloatingTips } from '@/components/FloatingTips';
 import { TipsButton } from '@/components/TipsButton';
 import { MonthYearPicker } from '@/components/MonthYearPicker';
+import { MandatoryFieldLabel } from '@/components/MandatoryFieldLabel';
 import { EnhanceProjectModal } from './EnhanceProjectModal';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { useTips } from '@/hooks/useTips';
+import { ErrorModal } from '@/components/ErrorModal';
 import { Project, Language } from '@/types';
 
 export function Step5Projects() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep } = useResumeStore();
+  const { navigateToStep } = useWizardNavigation();
+  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, currentResumeId } = useResumeStore();
   const { areTipsClosed, closeTips, showTips } = useTips();
   const [projects, setProjects] = useState(resumeData.projects);
   const [languages, setLanguages] = useState(resumeData.languages);
@@ -32,6 +34,10 @@ export function Step5Projects() {
     projectId: string;
     projectName: string;
   }>({ isOpen: false, originalText: '', projectId: '', projectName: '' });
+
+  // Error Modal state
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const addProject = () => {
     const newProject: Project = {
@@ -61,7 +67,8 @@ export function Step5Projects() {
   // AI Functions
   const openEnhanceModal = useCallback((projectId: string, description: string, projectName: string) => {
     if (!description.trim()) {
-      alert('Por favor, ingresa una descripción del proyecto para mejorar con IA');
+      setErrorMessage('Por favor, ingresa una descripción del proyecto para mejorar con IA');
+      setShowErrorModal(true);
       return;
     }
     setEnhanceModal({ 
@@ -84,15 +91,30 @@ export function Step5Projects() {
     setEnhanceModal({ isOpen: false, originalText: '', projectId: '', projectName: '' });
   }, [enhanceModal.projectId]);
 
+  // Validation: projects are optional, but if added, each project needs name and description
+  const isFormValid = projects.length === 0 || 
+    projects.every(project => project.name.trim() && project.description.trim());
+
   const handleNext = () => {
+    // Projects are optional, but if any are added, they must be complete
+    const incompleteProjects = projects.filter(project => 
+      !project.name.trim() || !project.description.trim()
+    );
+    
+    if (incompleteProjects.length > 0) {
+      setErrorMessage(t('wizard.validation.projects.alertComplete'));
+      setShowErrorModal(true);
+      return;
+    }
+    
     updateResumeData({ projects, languages });
     markStepCompleted(5);
     setCurrentStep(6);
-    navigate('/wizard/manual/step-6');
+    navigateToStep(6);
   };
 
   const handleBack = () => {
-    navigate('/wizard/manual/step-4');
+    navigateToStep(4);
   };
 
   return (
@@ -104,6 +126,33 @@ export function Step5Projects() {
         <p className="text-gray-600">
           {t('wizard.steps.projects.description')}
         </p>
+        {/* Projects optional indicator */}
+        <div className={`mt-4 inline-block px-4 py-2 rounded-lg ${
+          projects.length === 0
+            ? 'bg-blue-50 border border-blue-200'
+            : isFormValid 
+            ? 'bg-green-50 border border-green-200' 
+            : 'bg-yellow-50 border border-yellow-200'
+        }`}>
+          <p className={`text-sm font-medium ${
+            projects.length === 0
+              ? 'text-blue-800'
+              : isFormValid ? 'text-green-800' : 'text-yellow-800'
+          }`}>
+            {projects.length === 0
+              ? t('wizard.validation.projects.optional')
+              : isFormValid 
+              ? t('wizard.validation.projects.requirementMet', { 
+                  count: projects.length, 
+                  plural: projects.length > 1 ? 's' : ''
+                })
+              : t('wizard.validation.projects.requirement', { 
+                  count: projects.length, 
+                  plural: projects.length !== 1 ? 's' : ''
+                })
+            }
+          </p>
+        </div>
       </div>
 
       {/* Tips Section */}
@@ -140,9 +189,10 @@ export function Step5Projects() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('wizard.steps.projects.ui.projects.labels.name')}
-                </label>
+                <MandatoryFieldLabel
+                  label={t('wizard.steps.projects.ui.projects.labels.name')}
+                  required={false}
+                />
                 <input
                   type="text"
                   value={project.name}
@@ -165,9 +215,10 @@ export function Step5Projects() {
               </div>
               <div className="md:col-span-2">
                 <div className="flex items-center justify-between mb-1">
-                  <label className="block text-sm font-medium text-gray-700">
-                    {t('wizard.steps.projects.ui.projects.labels.description')}
-                  </label>
+                  <MandatoryFieldLabel
+                    label={t('wizard.steps.projects.ui.projects.labels.description')}
+                    required={false}
+                  />
                   {project.description.trim() && (
                     <Tooltip 
                       content={t('wizard.steps.projects.ai.enhance.tooltip')}
@@ -300,7 +351,11 @@ export function Step5Projects() {
           <ArrowLeft className="w-4 h-4 mr-2" />
           {t('common.back')}
         </button>
-        <button onClick={handleNext} className="btn-primary flex items-center">
+        <button 
+          onClick={handleNext} 
+          className="btn-primary flex items-center"
+          title={!isFormValid && projects.length > 0 ? t('wizard.validation.projects.tooltip') : ''}
+        >
           {t('common.next')}
           <ArrowRight className="w-4 h-4 ml-2" />
         </button>
@@ -312,7 +367,16 @@ export function Step5Projects() {
         onClose={() => setEnhanceModal({ isOpen: false, originalText: '', projectId: '', projectName: '' })}
         originalText={enhanceModal.originalText}
         projectName={enhanceModal.projectName}
+        language={resumeData.language}
         onApprove={handleEnhanceApprove}
+        resumeId={currentResumeId || undefined}
+      />
+
+      {/* Error Modal */}
+      <ErrorModal
+        isOpen={showErrorModal}
+        message={errorMessage}
+        onClose={() => setShowErrorModal(false)}
       />
     </div>
   );

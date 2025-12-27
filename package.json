@@ -6,9 +6,15 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:dev": "VITE_API_URL=http://localhost:3001/dev VITE_PADDLE_ENVIRONMENT=sandbox vite build",
+    "build:prod": "VITE_API_URL=https://api.getquickresume.com VITE_GOOGLE_CLIENT_ID=639420865993-5j49j494dv0dr5paeddjpl18aq2latlb.apps.googleusercontent.com VITE_LINKEDIN_CLIENT_ID=78gy4pl3ps34f0 VITE_PADDLE_CLIENT_TOKEN=test_75ba2c2324dac1b9203f659ffcd VITE_PADDLE_ENVIRONMENT=sandbox vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "deploy:frontend": "npm run build:prod && serverless deploy --stage prod",
+    "deploy:frontend:dev": "npm run build:dev && serverless deploy --stage dev",
+    "deploy:api": "cd api && serverless deploy --stage prod",
+    "deploy:api:dev": "cd api && serverless deploy --stage dev"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
@@ -23,6 +29,7 @@
     "lucide-react": "^0.294.0",
     "node-fetch": "^3.3.2",
     "oauth4webapi": "^3.8.2",
+    "qrcode.react": "^4.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-frame-component": "^5.2.7",
@@ -49,6 +56,8 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "postcss": "^8.4.32",
+    "serverless": "^3.40.0",
+    "serverless-s3-sync": "^3.5.0",
     "tailwindcss": "^3.3.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.2.2",

@@ -132,13 +132,17 @@ export const useAuthStore = create<AuthStore>()(
         if (!token) return;
 
         try {
-          const user = await authService.getUserFromToken(token);
+          // Fetch fresh user data from backend (not from stale JWT)
+          const user = await authService.getCurrentUser(token);
           if (user) {
-            console.log('[AuthStore] Premium status refreshed:', {
+            console.log('[AuthStore] Premium status refreshed from backend:', {
               userId: user.id,
               isPremium: user.isPremium
             });
-            set({ user });
+            set({ user, isAuthenticated: true });
+          } else {
+            // If getCurrentUser returns null, token might be invalid
+            console.warn('[AuthStore] Failed to refresh premium status - user not found');
           }
         } catch (error) {
           console.error('Error refreshing premium status:', error);

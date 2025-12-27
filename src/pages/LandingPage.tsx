@@ -8,11 +8,12 @@ import {
   Star,
   Shield,
   HelpCircle,
-  Target
+  Target,
+  Check,
+  Crown
 } from 'lucide-react';
 import { IconWrapper } from '@/components/IconWrapper';
 import { FeatureCard } from '@/components/FeatureCard';
-import { CreditsExplainer } from '@/components/CreditsExplainer';
 
 export function LandingPage() {
   const { t } = useTranslation();
@@ -72,11 +73,11 @@ export function LandingPage() {
             <div className="mt-12 flex items-center justify-center gap-8 text-slate-400 text-sm">
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-green-400" />
-                <span>Sin tarjeta requerida</span>
+                <span>{t('landing.hero.trustIndicators.noCardRequired')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Shield className="w-5 h-5 text-blue-400" />
-                <span>Datos seguros</span>
+                <span>{t('landing.hero.trustIndicators.dataSecure')}</span>
               </div>
             </div>
           </div>
@@ -132,13 +133,13 @@ export function LandingPage() {
             <p className="text-xl text-slate-600 mb-6">
               {t('landing.premiumFeatures.subtitle')}
             </p>
-            <Link 
-              to="/pricing" 
+            <a 
+              href="#pricing" 
               className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold text-lg group"
             >
               {t('landing.premiumFeatures.viewPricing')}
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
+            </a>
           </div>
           
           {/* Grid de Funcionalidades */}
@@ -152,6 +153,120 @@ export function LandingPage() {
                 badge={feature.badge}
               />
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Premium Plans Section */}
+      <section id="pricing" className="py-20 lg:py-28 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-4">
+              {t('landing.plans.title')}
+            </h2>
+            <p className="text-xl text-slate-600">
+              {t('landing.plans.subtitle')}
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {/* Free Plan */}
+            <div className="relative p-8 rounded-3xl bg-white border-2 border-slate-200 shadow-lg flex flex-col h-full">
+              <h3 className="text-2xl font-bold text-slate-900 mb-4">
+                {t('landing.plans.free.name')}
+              </h3>
+              <div className="mb-6">
+                <p className="text-5xl font-extrabold text-slate-900 mb-2">
+                  {t('landing.plans.free.price')}
+                </p>
+                <p className="text-sm text-slate-500">
+                  {t('landing.plans.free.period')}
+                </p>
+              </div>
+              
+              <ul className="space-y-4 flex-grow mb-8">
+                {(t('landing.plans.free.features', { returnObjects: true }) as unknown as string[]).map((feature, i) => (
+                  <li key={i} className="flex items-start">
+                    <Check className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-700">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              
+              <Link
+                to="/login"
+                className="mt-auto w-full py-3 rounded-lg font-semibold text-center transition-all duration-300 bg-slate-900 text-white hover:bg-slate-800"
+              >
+                {t('landing.plans.free.cta')}
+              </Link>
+            </div>
+
+            {/* Premium Monthly */}
+            <div className="relative p-8 rounded-3xl bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 shadow-xl flex flex-col h-full">
+              <h3 className="text-2xl font-bold text-slate-900 mb-4">
+                {t('landing.plans.monthly.name')}
+              </h3>
+              <div className="mb-6">
+                <p className="text-5xl font-extrabold text-blue-600 mb-2">
+                  {t('landing.plans.monthly.price')}
+                  <span className="text-2xl">/{t('landing.plans.monthly.period')}</span>
+                </p>
+              </div>
+              
+              <ul className="space-y-4 flex-grow mb-8">
+                {(t('landing.plans.monthly.features', { returnObjects: true }) as unknown as string[]).map((feature, i) => (
+                  <li key={i} className="flex items-start">
+                    <Check className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-700">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              
+              <Link
+                to="/premium"
+                className="mt-auto w-full py-3 rounded-lg font-semibold text-center transition-all duration-300 bg-blue-600 text-white hover:bg-blue-700 flex items-center justify-center gap-2"
+              >
+                <Crown className="w-4 h-4" />
+                {t('landing.plans.monthly.cta')}
+              </Link>
+            </div>
+
+            {/* Premium Yearly - Best Value */}
+            <div className="relative p-8 rounded-3xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-2xl transform scale-105 border-4 border-amber-400 flex flex-col h-full">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-900 text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
+                {t('landing.plans.yearly.badge')}
+              </div>
+              
+              <h3 className="text-2xl font-bold text-white mb-4">
+                {t('landing.plans.yearly.name')}
+              </h3>
+              <div className="mb-6">
+                <p className="text-5xl font-extrabold text-white mb-2">
+                  {t('landing.plans.yearly.price')}
+                  <span className="text-2xl">/{t('landing.plans.yearly.period')}</span>
+                </p>
+                <p className="text-sm text-blue-100">
+                  {t('landing.plans.yearly.savings')}
+                </p>
+              </div>
+              
+              <ul className="space-y-4 flex-grow mb-8">
+                {(t('landing.plans.yearly.features', { returnObjects: true }) as unknown as string[]).map((feature, i) => (
+                  <li key={i} className="flex items-start">
+                    <Check className="w-5 h-5 text-amber-400 mr-3 flex-shrink-0 mt-0.5" />
+                    <span className="text-blue-100">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              
+              <Link
+                to="/premium"
+                className="mt-auto w-full py-3 rounded-lg font-semibold text-center transition-all duration-300 bg-white text-blue-700 hover:bg-blue-50 flex items-center justify-center gap-2"
+              >
+                <Crown className="w-4 h-4" />
+                {t('landing.plans.yearly.cta')}
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -237,22 +352,6 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Credits Explainer Section */}
-      <section className="py-20 lg:py-28 bg-gradient-to-b from-blue-50 to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-4">
-              {t('landing.creditsExplainer.title')}
-            </h2>
-            <p className="text-xl text-slate-600">
-              {t('landing.creditsExplainer.subtitle')}
-            </p>
-          </div>
-          
-          <CreditsExplainer features={t('landing.creditsExplainer.features', { returnObjects: true }) as unknown as { icon: string; title: string; description: string }[]} />
-        </div>
-      </section>
-
       {/* FAQ Section */}
       <section className="py-20 lg:py-28 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -283,13 +382,13 @@ export function LandingPage() {
           
           {/* Link a más info */}
           <div className="mt-8 text-center">
-            <Link 
-              to="/pricing" 
+            <a 
+              href="#pricing" 
               className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold"
             >
-              Ver detalles de precios y planes
+              {t('landing.faq.viewPricingDetails')}
               <ArrowRight className="w-5 h-5" />
-            </Link>
+            </a>
           </div>
         </div>
       </section>
@@ -318,12 +417,12 @@ export function LandingPage() {
               {t('landing.cta.ctaPrimary')}
             </Link>
             
-            <Link 
-              to="/pricing" 
+            <a 
+              href="#pricing" 
               className="px-8 py-4 border-2 border-white text-white rounded-xl font-semibold text-lg backdrop-blur-sm hover:bg-white/10 transition-all duration-300 flex items-center justify-center gap-2"
             >
               {t('landing.cta.ctaSecondary')}
-            </Link>
+            </a>
           </div>
         </div>
       </section>

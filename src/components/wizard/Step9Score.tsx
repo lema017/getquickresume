@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
+import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { ResumeScoreCard } from '@/components/resume/ResumeScoreCard';
 import { FloatingTips } from '@/components/FloatingTips';
@@ -9,10 +9,11 @@ import { TipsButton } from '@/components/TipsButton';
 import { useTips } from '@/hooks/useTips';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '@/stores/authStore';
+import { resumeService } from '@/services/resumeService';
 
 export function Step9Score() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const { navigateToStep } = useWizardNavigation();
   const { 
     markStepCompleted, 
     setCurrentStep, 
@@ -24,7 +25,9 @@ export function Step9Score() {
     isPollingScore,
     fetchResumeScore,
     scoreResume,
-    pollForScore
+    pollForScore,
+    updateResumeSection,
+    setGeneratedResume
   } = useResumeStore();
   const { user } = useAuthStore();
   const { areTipsClosed, closeTips, showTips } = useTips();
@@ -68,20 +71,39 @@ export function Step9Score() {
     }
   };
 
-  const handleEnhancementComplete = (sectionType: string, enhancedText: string) => {
-    // Enhancement is handled in GeneratedResumeView, but we might want to trigger re-scoring
-    // For now, just show a success message
-    toast.success('Section enhanced successfully!');
+  const handleEnhancementComplete = async (sectionType: string, enhancedText: string) => {
+    try {
+      // Update the resume section in the store
+      const updatedResume = updateResumeSection(sectionType, enhancedText);
+      if (updatedResume) {
+        setGeneratedResume(updatedResume);
+        
+        // Save the enhanced resume to the database
+        if (currentResumeId) {
+          await resumeService.updateResume(currentResumeId, {
+            generatedResume: updatedResume
+          });
+          toast.success('Section enhanced and saved successfully!');
+        } else {
+          toast.success('Section enhanced successfully!');
+        }
+      } else {
+        toast.error('Failed to update resume section');
+      }
+    } catch (error) {
+      console.error('Error saving enhanced resume:', error);
+      toast.error('Failed to save enhanced resume. Please try again.');
+    }
   };
 
   const handleNext = () => {
     markStepCompleted(9);
     setCurrentStep(10);
-    navigate('/wizard/manual/step-10');
+    navigateToStep(10);
   };
 
   const handleBack = () => {
-    navigate('/wizard/manual/step-8');
+    navigateToStep(8);
   };
 
   if (!generatedResume) {

@@ -30,8 +30,28 @@ class AchievementSuggestionService {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      }
+      
+      // Handle premium required error (403)
+      if (response.status === 403 && errorData.code === 'PREMIUM_REQUIRED') {
+        const error = new Error(errorData.message || 'Premium feature required');
+        (error as any).code = 'PREMIUM_REQUIRED';
+        (error as any).status = 403;
+        throw error;
+      }
+      
+      if (response.status === 403) {
+        throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      }
+      
+      // Handle rate limit exceeded error (429)
+      if (response.status === 429) {
+        const error = new Error(errorData.message || 'Too many requests. Please wait before trying again.');
+        (error as any).code = 'RATE_LIMIT_EXCEEDED';
+        (error as any).status = 429;
+        throw error;
       }
       
       throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
@@ -42,27 +62,32 @@ class AchievementSuggestionService {
 
   async getAchievementSuggestions(
     profession: string,
-    projects: Project[]
+    projects: Project[],
+    language: 'es' | 'en' = 'es',
+    resumeId?: string
   ): Promise<AchievementSuggestion[]> {
     if (!profession || profession.trim() === '') {
       throw new Error('La profesión es requerida para generar sugerencias de logros.');
     }
 
-    if (!projects || projects.length === 0) {
-      throw new Error('Se requiere al menos un proyecto para generar sugerencias de logros.');
-    }
-
-    const language = this.getCurrentLanguage();
-
-    const requestBody = {
+    const requestBody: {
+      profession: string;
+      projects: Array<{ name: string; description: string; technologies: string[] }>;
+      language: 'es' | 'en';
+      resumeId?: string;
+    } = {
       profession: profession.trim(),
-      projects: projects.map(project => ({
+      projects: (projects || []).map(project => ({
         name: project.name,
         description: project.description,
         technologies: project.technologies
       })),
       language
     };
+
+    if (resumeId) {
+      requestBody.resumeId = resumeId;
+    }
 
     try {
       const response = await this.makeRequest<AchievementSuggestionResponse>(
@@ -84,6 +109,9 @@ class AchievementSuggestionService {
     }
   }
 
+  /**
+   * @deprecated Use resume language instead. This method is kept for backward compatibility only.
+   */
   private getCurrentLanguage(): string {
     return localStorage.getItem('i18nextLng') || 'es';
   }

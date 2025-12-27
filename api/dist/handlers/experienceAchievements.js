@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getJobTitleAchievementsOptions = exports.getJobTitleAchievements = void 0;
 const jobTitleAchievementsService_1 = require("../services/jobTitleAchievementsService");
 const rateLimiter_1 = require("../middleware/rateLimiter");
+const dynamodb_1 = require("../services/dynamodb");
+const resumeService_1 = require("../services/resumeService");
 const getJobTitleAchievements = async (event) => {
     try {
         // Verificar autenticación
@@ -23,8 +25,46 @@ const getJobTitleAchievements = async (event) => {
             };
         }
         const userId = event.requestContext.authorizer.userId;
-        // Rate limiting: 5 requests por minuto
-        const rateLimitResult = await (0, rateLimiter_1.checkRateLimit)(userId, 'experience-achievements', 5, 60000);
+        // Check user premium status and free resume usage
+        const user = await (0, dynamodb_1.getUserById)(userId);
+        if (!user) {
+            return {
+                statusCode: 404,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+                    'Access-Control-Allow-Methods': 'POST,OPTIONS',
+                },
+                body: JSON.stringify({
+                    success: false,
+                    error: 'User not found',
+                    message: 'User account not found'
+                })
+            };
+        }
+        // Premium check: AI suggestions are only available for premium users or free users who haven't used their quota
+        if (!user.isPremium && user.freeResumeUsed) {
+            return {
+                statusCode: 403,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+                    'Access-Control-Allow-Methods': 'POST,OPTIONS',
+                },
+                body: JSON.stringify({
+                    success: false,
+                    error: 'Premium feature required',
+                    message: 'AI suggestions are only available for premium users or free users who haven\'t used their free resume quota.',
+                    code: 'PREMIUM_REQUIRED',
+                    fromCache: false
+                })
+            };
+        }
+        // Rate limiting: 1 request/minute for free users, 10 requests/minute for premium users
+        const maxRequests = user.isPremium ? 10 : 1;
+        const rateLimitResult = await (0, rateLimiter_1.checkRateLimit)(userId, 'experience-achievements', maxRequests, 60000);
         if (!rateLimitResult.allowed) {
             return {
                 statusCode: 429,
@@ -114,13 +154,34 @@ const getJobTitleAchievements = async (event) => {
                 })
             };
         }
+        // Validate resume ownership if resumeId is provided (for AI cost tracking)
+        if (requestData.resumeId) {
+            const isOwner = await (0, resumeService_1.verifyResumeOwnership)(userId, requestData.resumeId);
+            if (!isOwner) {
+                return {
+                    statusCode: 403,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+                        'Access-Control-Allow-Methods': 'POST,OPTIONS',
+                    },
+                    body: JSON.stringify({
+                        success: false,
+                        error: 'Access denied',
+                        message: 'Resume not found or access denied',
+                        fromCache: false
+                    })
+                };
+            }
+        }
         // Extract requestContext to pass to service (contains userId from JWT token)
         // Cast to match the expected type structure
         const requestContext = {
             authorizer: event.requestContext.authorizer
         };
         // Get achievement suggestions
-        const result = await jobTitleAchievementsService_1.jobTitleAchievementsService.getAchievementsByJobTitle(requestData.jobTitle.trim(), language, requestContext);
+        const result = await jobTitleAchievementsService_1.jobTitleAchievementsService.getAchievementsByJobTitle(requestData.jobTitle.trim(), language, requestContext, requestData.resumeId);
         const response = {
             success: true,
             data: result.suggestions,
@@ -142,6 +203,11 @@ const getJobTitleAchievements = async (event) => {
     }
     catch (error) {
         console.error('Error in getJobTitleAchievements handler:', error);
+        // Refund rate limit on server error - user shouldn't be penalized
+        const userId = event.requestContext.authorizer?.userId;
+        if (userId) {
+            await (0, rateLimiter_1.refundRateLimit)(userId, 'experience-achievements');
+        }
         const errorResponse = {
             success: false,
             fromCache: false,

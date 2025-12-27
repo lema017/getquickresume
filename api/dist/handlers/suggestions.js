@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getSuggestionsOptions = exports.getSuggestions = void 0;
 const suggestionService_1 = require("../services/suggestionService");
 const rateLimiter_1 = require("../middleware/rateLimiter");
+const dynamodb_1 = require("../services/dynamodb");
+const resumeService_1 = require("../services/resumeService");
 const getSuggestions = async (event) => {
     try {
         // Verificar autenticación
@@ -23,8 +25,46 @@ const getSuggestions = async (event) => {
             };
         }
         const userId = event.requestContext.authorizer.userId;
-        // Rate limiting: 5 requests por minuto
-        const rateLimitResult = await (0, rateLimiter_1.checkRateLimit)(userId, 'profession-suggestions', 5, 60000);
+        // Check user premium status and free resume usage
+        const user = await (0, dynamodb_1.getUserById)(userId);
+        if (!user) {
+            return {
+                statusCode: 404,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+                    'Access-Control-Allow-Methods': 'GET,OPTIONS',
+                },
+                body: JSON.stringify({
+                    success: false,
+                    error: 'User not found',
+                    message: 'User account not found'
+                })
+            };
+        }
+        // Premium check: AI suggestions are only available for premium users or free users who haven't used their quota
+        if (!user.isPremium && user.freeResumeUsed) {
+            return {
+                statusCode: 403,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+                    'Access-Control-Allow-Methods': 'GET,OPTIONS',
+                },
+                body: JSON.stringify({
+                    success: false,
+                    error: 'Premium feature required',
+                    message: 'AI suggestions are only available for premium users or free users who haven\'t used their free resume quota.',
+                    code: 'PREMIUM_REQUIRED',
+                    fromCache: false
+                })
+            };
+        }
+        // Rate limiting: 1 request/minute for free users, 10 requests/minute for premium users
+        const maxRequests = user.isPremium ? 10 : 1;
+        const rateLimitResult = await (0, rateLimiter_1.checkRateLimit)(userId, 'profession-suggestions', maxRequests, 60000);
         if (!rateLimitResult.allowed) {
             return {
                 statusCode: 429,
@@ -38,7 +78,9 @@ const getSuggestions = async (event) => {
                     success: false,
                     error: 'Rate limit exceeded',
                     message: 'Too many suggestion requests. Please wait before trying again.',
-                    resetTime: rateLimitResult.resetTime
+                    resetTime: rateLimitResult.resetTime,
+                    code: 'RATE_LIMIT_EXCEEDED',
+                    fromCache: false
                 })
             };
         }
@@ -78,6 +120,29 @@ const getSuggestions = async (event) => {
                 })
             };
         }
+        // Get optional resumeId for AI cost tracking
+        const resumeId = event.queryStringParameters?.resumeId;
+        // Validate resume ownership if resumeId is provided
+        if (resumeId) {
+            const isOwner = await (0, resumeService_1.verifyResumeOwnership)(userId, resumeId);
+            if (!isOwner) {
+                return {
+                    statusCode: 403,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+                        'Access-Control-Allow-Methods': 'GET,OPTIONS',
+                    },
+                    body: JSON.stringify({
+                        success: false,
+                        error: 'Access denied',
+                        message: 'Resume not found or access denied',
+                        fromCache: false
+                    })
+                };
+            }
+        }
         // Decodificar la profesión (puede venir URL encoded)
         const decodedProfession = decodeURIComponent(profession);
         // Extract requestContext to pass to service (contains userId from JWT token)
@@ -86,7 +151,7 @@ const getSuggestions = async (event) => {
             authorizer: event.requestContext.authorizer
         };
         // Obtener sugerencias para el idioma especificado (solo skills unificado)
-        const suggestions = await suggestionService_1.suggestionService.getSuggestions(decodedProfession, language, requestContext);
+        const suggestions = await suggestionService_1.suggestionService.getSuggestions(decodedProfession, language, requestContext, resumeId);
         const response = {
             success: true,
             data: {
@@ -112,6 +177,11 @@ const getSuggestions = async (event) => {
     }
     catch (error) {
         console.error('Error in getSuggestions handler:', error);
+        // Refund rate limit on server error - user shouldn't be penalized
+        const userId = event.requestContext.authorizer?.userId;
+        if (userId) {
+            await (0, rateLimiter_1.refundRateLimit)(userId, 'profession-suggestions');
+        }
         const errorResponse = {
             success: false,
             error: 'Internal server error',

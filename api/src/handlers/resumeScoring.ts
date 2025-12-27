@@ -2,8 +2,69 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { AuthorizedEvent, ScoreResumeResponse } from '../types';
 import { resumeScoringService } from '../services/resumeScoringService';
 import { getUserById } from '../services/dynamodb';
-import { getResumeById, updateResumeWithScore, getResumeScore } from '../services/resumeService';
-import { checkRateLimit } from '../middleware/rateLimiter';
+import { getResumeById, updateResumeWithScore, getResumeScore, updateResumeWithGenerated } from '../services/resumeService';
+import { aiService } from '../services/aiService';
+import { checkRateLimit, refundRateLimit } from '../middleware/rateLimiter';
+import { ResumeData, GeneratedResume } from '../types';
+
+/**
+ * Check if resumeData has changed in ways that would affect scoring
+ * Compares key fields that impact the generated resume content
+ */
+function hasResumeDataChanged(resumeData: ResumeData, generatedResume: GeneratedResume): boolean {
+  // Check languages
+  const currentLanguagesCount = resumeData.languages?.length || 0;
+  const generatedLanguagesCount = generatedResume.languages?.length || 0;
+  if (currentLanguagesCount !== generatedLanguagesCount) {
+    return true;
+  }
+
+  // Check achievements
+  const currentAchievementsCount = resumeData.achievements?.length || 0;
+  const generatedAchievementsCount = generatedResume.achievements?.length || 0;
+  if (currentAchievementsCount !== generatedAchievementsCount) {
+    return true;
+  }
+
+  // Check projects (only count projects with name and description)
+  const currentProjectsCount = resumeData.projects?.filter(p => p.name && p.description).length || 0;
+  const generatedProjectsCount = generatedResume.projects?.length || 0;
+  if (currentProjectsCount !== generatedProjectsCount) {
+    return true;
+  }
+
+  // Check education
+  const currentEducationCount = resumeData.education?.length || 0;
+  const generatedEducationCount = generatedResume.education?.length || 0;
+  if (currentEducationCount !== generatedEducationCount) {
+    return true;
+  }
+
+  // Check experience count (major scoring factor)
+  const currentExperienceCount = resumeData.experience?.length || 0;
+  const generatedExperienceCount = generatedResume.experience?.length || 0;
+  if (currentExperienceCount !== generatedExperienceCount) {
+    return true;
+  }
+
+  // Check LinkedIn (affects contact score)
+  const currentLinkedIn = resumeData.linkedin || '';
+  const generatedLinkedIn = generatedResume.contactInfo?.linkedin || '';
+  if (currentLinkedIn !== generatedLinkedIn) {
+    return true;
+  }
+
+  // Check summary (if it was manually updated significantly)
+  const currentSummary = resumeData.summary || '';
+  const generatedSummary = generatedResume.professionalSummary || '';
+  // Only check if summary length changed significantly (more than 20% difference)
+  if (currentSummary.length > 0 && generatedSummary.length > 0 && 
+      Math.abs(currentSummary.length - generatedSummary.length) > generatedSummary.length * 0.2) {
+    return true;
+  }
+
+  return false;
+}
 
 /**
  * POST /api/resumes/{id}/score
@@ -143,36 +204,27 @@ export const scoreResume = async (
       };
     }
 
-    // Check if score already exists and is recent (within 24 hours)
-    if (resume.score && resume.scoreGeneratedAt) {
-      const scoreAge = Date.now() - new Date(resume.scoreGeneratedAt).getTime();
-      const twentyFourHours = 24 * 60 * 60 * 1000;
+    // For on-demand rescoring (manual user action), check if resumeData has changed
+    // If changed, regenerate the resume first to ensure scoring uses the latest data
+    let resumeToScore = resume;
+    if (hasResumeDataChanged(resume.resumeData, resume.generatedResume)) {
+      console.log('Resume data has changed, regenerating resume before scoring...');
       
-      if (scoreAge < twentyFourHours) {
-        // Return cached score
-        return {
-          statusCode: 200,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-            'Access-Control-Allow-Methods': 'POST,OPTIONS'
-          },
-          body: JSON.stringify({
-            success: true,
-            data: resume.score,
-            message: 'Score retrieved from cache',
-            remainingRequests: rateLimitResult.remaining,
-            resetTime: rateLimitResult.resetTime
-          } as ScoreResumeResponse)
-        };
-      }
+      // Regenerate the resume with updated resumeData
+      const regeneratedResume = await aiService.generateResume(resume.resumeData, user.isPremium);
+      
+      // Update the resume with the newly generated content
+      const updatedResume = await updateResumeWithGenerated(userId, resumeId, regeneratedResume);
+      
+      // Use the updated resume for scoring
+      resumeToScore = updatedResume;
+      console.log('Resume regenerated successfully, proceeding to score...');
     }
 
-    // Score the resume
+    // Score the resume (using either existing or newly generated resume)
     const score = await resumeScoringService.scoreResume(
-      resume.generatedResume,
-      resume.resumeData,
+      resumeToScore.generatedResume!,
+      resumeToScore.resumeData,
       user.isPremium
     );
 
@@ -198,6 +250,13 @@ export const scoreResume = async (
 
   } catch (error) {
     console.error('Error scoring resume:', error);
+    
+    // Refund rate limit on server error - user shouldn't be penalized
+    const userId = event.requestContext.authorizer?.userId;
+    if (userId) {
+      await refundRateLimit(userId, 'score-resume');
+    }
+    
     return {
       statusCode: 500,
       headers: {

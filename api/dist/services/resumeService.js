@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getResumeScore = exports.updateResumeWithScore = exports.updateResumeWithGenerated = exports.deleteResume = exports.updateResume = exports.getResumeById = exports.getResumesByUserId = exports.createResume = void 0;
+exports.getResumeByShareToken = exports.getResumeScore = exports.updateResumeWithScore = exports.updateResumeWithGenerated = exports.deleteResume = exports.updateResume = exports.verifyResumeOwnership = exports.getResumeById = exports.getResumesByUserId = exports.createResume = void 0;
 const client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
 const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
 // Configuración para desarrollo local y producción
@@ -27,6 +27,20 @@ const createResume = async (userId, resumeData, title) => {
             title: title || `${resumeData.firstName} ${resumeData.lastName} - CV`,
             resumeData,
             status: 'draft',
+            isPubliclyShared: false,
+            aiCost: {
+                totalInputTokens: 0,
+                totalOutputTokens: 0,
+                totalCostUSD: 0,
+                callBreakdown: {
+                    generation: 0,
+                    scoring: 0,
+                    suggestions: 0,
+                    enhancements: 0,
+                    linkedInParsing: 0,
+                    translation: 0,
+                },
+            },
             createdAt: now,
             updatedAt: now,
         };
@@ -96,6 +110,24 @@ const getResumeById = async (userId, resumeId) => {
     }
 };
 exports.getResumeById = getResumeById;
+/**
+ * Verifies that a resume exists and belongs to the specified user.
+ * Used for ownership validation before tracking AI costs to a resume.
+ * @param userId - The user ID from the JWT token
+ * @param resumeId - The resume ID to verify
+ * @returns true if the resume exists and belongs to the user, false otherwise
+ */
+const verifyResumeOwnership = async (userId, resumeId) => {
+    try {
+        const resume = await (0, exports.getResumeById)(userId, resumeId);
+        return resume !== null;
+    }
+    catch (error) {
+        console.error('Error verifying resume ownership:', error);
+        return false;
+    }
+};
+exports.verifyResumeOwnership = verifyResumeOwnership;
 const updateResume = async (userId, resumeId, updates) => {
     try {
         const now = new Date().toISOString();
@@ -238,4 +270,33 @@ const getResumeScore = async (userId, resumeId) => {
     }
 };
 exports.getResumeScore = getResumeScore;
+const getResumeByShareToken = async (shareToken) => {
+    try {
+        // Use GSI to query by shareToken
+        const command = new lib_dynamodb_1.QueryCommand({
+            TableName: tableName,
+            IndexName: 'shareToken-index',
+            KeyConditionExpression: 'shareToken = :shareToken',
+            FilterExpression: 'isPubliclyShared = :isPubliclyShared',
+            ExpressionAttributeValues: {
+                ':shareToken': shareToken,
+                ':isPubliclyShared': true,
+            },
+        });
+        const result = await dynamodb.send(command);
+        if (result.Items && result.Items.length > 0) {
+            const item = result.Items[0];
+            return {
+                ...item,
+                id: item.resumeId,
+            };
+        }
+        return null;
+    }
+    catch (error) {
+        console.error('Error getting resume by share token:', error);
+        throw new Error('Database error');
+    }
+};
+exports.getResumeByShareToken = getResumeByShareToken;
 //# sourceMappingURL=resumeService.js.map

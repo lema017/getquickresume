@@ -33,8 +33,28 @@ class SuggestionService {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      }
+      
+      // Handle premium required error (403)
+      if (response.status === 403 && errorData.code === 'PREMIUM_REQUIRED') {
+        const error = new Error(errorData.message || 'Premium feature required');
+        (error as any).code = 'PREMIUM_REQUIRED';
+        (error as any).status = 403;
+        throw error;
+      }
+      
+      if (response.status === 403) {
+        throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      }
+      
+      // Handle rate limit exceeded error (429)
+      if (response.status === 429) {
+        const error = new Error(errorData.message || 'Too many requests. Please wait before trying again.');
+        (error as any).code = 'RATE_LIMIT_EXCEEDED';
+        (error as any).status = 429;
+        throw error;
       }
       
       throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
@@ -109,10 +129,12 @@ class SuggestionService {
   /**
    * Obtiene sugerencias de habilidades para una profesión específica
    * La API ya retorna solo skills unificado
+   * @param profession - La profesión para la cual obtener sugerencias
+   * @param language - El idioma del currículum ('es' | 'en'), por defecto 'es'
+   * @param resumeId - Optional resume ID for AI cost tracking
    */
-  async getSkillsSuggestions(profession: string): Promise<string[]> {
+  async getSkillsSuggestions(profession: string, language: 'es' | 'en' = 'es', resumeId?: string): Promise<string[]> {
     const normalizedProfession = profession.toLowerCase().trim();
-    const language = this.getCurrentLanguage();
     
     // Verificar cache específico para habilidades con idioma
     const cacheKey = `${normalizedProfession}-${language}-skills`;
@@ -130,9 +152,11 @@ class SuggestionService {
     try {
       const encodedProfession = encodeURIComponent(profession);
       // Obtener sugerencias de la API (solo skills)
-      const response = await this.makeRequest<SuggestionsResponse>(
-        `api/suggestions/${encodedProfession}?language=${language}`
-      );
+      let url = `api/suggestions/${encodedProfession}?language=${language}`;
+      if (resumeId) {
+        url += `&resumeId=${encodeURIComponent(resumeId)}`;
+      }
+      const response = await this.makeRequest<SuggestionsResponse>(url);
 
       if (!response.success || !response.data?.skills) {
         throw new Error(response.error || 'Failed to fetch suggestions');
@@ -170,10 +194,11 @@ class SuggestionService {
 
   /**
    * Verifica si las habilidades están siendo cargadas para una profesión
+   * @param profession - La profesión a verificar
+   * @param language - El idioma del currículum ('es' | 'en'), por defecto 'es'
    */
-  isLoadingSkills(profession: string): boolean {
+  isLoadingSkills(profession: string, language: 'es' | 'en' = 'es'): boolean {
     const normalizedProfession = profession.toLowerCase().trim();
-    const language = this.getCurrentLanguage();
     return this.loadingStates.get(`${normalizedProfession}-${language}-skills`) || false;
   }
 
@@ -187,7 +212,8 @@ class SuggestionService {
   }
 
   /**
-   * Obtiene el idioma actual del usuario
+   * Obtiene el idioma actual del usuario (UI language)
+   * @deprecated Use resume language instead. This method is kept for backward compatibility only.
    */
   private getCurrentLanguage(): string {
     // Get language from i18next

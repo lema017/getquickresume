@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUser = exports.incrementPremiumResumeCount = exports.markFreeResumeUsed = exports.getUserById = exports.createUser = exports.getUserByEmail = void 0;
+exports.upgradeUserToPremium = exports.updateUser = exports.incrementPremiumResumeCount = exports.markFreeResumeUsed = exports.getUserById = exports.createUser = exports.getUserByEmail = void 0;
 const client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
 const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
 // Configuración para desarrollo local y producción
@@ -62,6 +62,8 @@ const createUser = async (userData) => {
             freeResumeUsed: false,
             premiumResumeCount: 0,
             premiumResumeMonth: currentMonth,
+            freeDownloadUsed: false,
+            totalDownloads: 0,
             createdAt: now,
             updatedAt: now,
         };
@@ -201,4 +203,54 @@ const updateUser = async (id, updates) => {
     }
 };
 exports.updateUser = updateUser;
+/**
+ * Upgrade user to premium status
+ * Sets isPremium to true and stores subscription details
+ */
+const upgradeUserToPremium = async (userId, planType, paddleCustomerId, paddleSubscriptionId, paddleTransactionId) => {
+    try {
+        const now = new Date().toISOString();
+        const startDate = now;
+        // Calculate expiration date based on plan type
+        const expirationDate = new Date(startDate);
+        if (planType === 'monthly') {
+            expirationDate.setMonth(expirationDate.getMonth() + 1);
+        }
+        else {
+            expirationDate.setFullYear(expirationDate.getFullYear() + 1);
+        }
+        const command = new lib_dynamodb_1.UpdateCommand({
+            TableName: tableName,
+            Key: { id: userId },
+            UpdateExpression: `
+        SET isPremium = :isPremium,
+            planType = :planType,
+            subscriptionStartDate = :startDate,
+            subscriptionExpiration = :expiration,
+            paddleCustomerId = :customerId,
+            paddleSubscriptionId = :subscriptionId,
+            paddleTransactionId = :transactionId,
+            updatedAt = :updatedAt
+      `,
+            ExpressionAttributeValues: {
+                ':isPremium': true,
+                ':planType': planType,
+                ':startDate': startDate,
+                ':expiration': expirationDate.toISOString(),
+                ':customerId': paddleCustomerId,
+                ':subscriptionId': paddleSubscriptionId || null,
+                ':transactionId': paddleTransactionId || null,
+                ':updatedAt': now,
+            },
+            ReturnValues: 'ALL_NEW',
+        });
+        const result = await dynamodb.send(command);
+        return result.Attributes;
+    }
+    catch (error) {
+        console.error('Error upgrading user to premium:', error);
+        throw new Error('Database error');
+    }
+};
+exports.upgradeUserToPremium = upgradeUserToPremium;
 //# sourceMappingURL=dynamodb.js.map

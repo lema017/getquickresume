@@ -58,13 +58,14 @@ class SuggestionService {
    */
   async generateAndSaveSuggestions(
     profession: string,
-    requestContext: { authorizer: { userId: string } }
+    requestContext: { authorizer: { userId: string } },
+    resumeId?: string
   ): Promise<ProfessionSuggestion> {
     try {
       const normalizedProfession = this.normalizeProfession(profession);
       
       // Generar sugerencias con AI (ambos idiomas) - ya vienen unificadas como skills
-      const aiSuggestions = await aiService.generateProfessionSuggestions(profession, requestContext);
+      const aiSuggestions = await aiService.generateProfessionSuggestions(profession, requestContext, resumeId);
       
       // Guardar en la base de datos
       await this.saveBilingualSuggestions(normalizedProfession, aiSuggestions);
@@ -180,7 +181,8 @@ class SuggestionService {
   async getSuggestions(
     profession: string,
     language: string,
-    requestContext: { authorizer: { userId: string } }
+    requestContext: { authorizer: { userId: string } },
+    resumeId?: string
   ): Promise<{ skills: string[]; fromCache: boolean }> {
     try {
       // Validar idioma
@@ -199,7 +201,7 @@ class SuggestionService {
 
       // Premium users: Skip cache, always generate fresh suggestions
       if (isPremium) {
-        const newSuggestions = await this.generateAndSaveSuggestions(profession, requestContext);
+        const newSuggestions = await this.generateAndSaveSuggestions(profession, requestContext, resumeId);
         
         // Validar que la respuesta del AI tenga la estructura esperada
         if (!newSuggestions || !newSuggestions.suggestions) {
@@ -252,7 +254,7 @@ class SuggestionService {
       }
 
       // Si no existe en cache, generar con AI (ambos idiomas) y guardar
-      const newSuggestions = await this.generateAndSaveSuggestions(profession, requestContext);
+      const newSuggestions = await this.generateAndSaveSuggestions(profession, requestContext, resumeId);
       
       // Validar que la respuesta del AI tenga la estructura esperada
       if (!newSuggestions || !newSuggestions.suggestions) {

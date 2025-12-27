@@ -1,3 +1,17 @@
+export interface AIUsageStats {
+    totalInputTokens: number;
+    totalOutputTokens: number;
+    totalCostUSD: number;
+    totalAICalls: number;
+    lastAICallAt: string;
+    monthlyStats: {
+        month: string;
+        inputTokens: number;
+        outputTokens: number;
+        costUSD: number;
+        callCount: number;
+    };
+}
 export interface User {
     id: string;
     email: string;
@@ -16,6 +30,15 @@ export interface User {
     freeResumeUsed: boolean;
     premiumResumeCount: number;
     premiumResumeMonth: string;
+    freeDownloadUsed: boolean;
+    totalDownloads: number;
+    subscriptionExpiration?: string;
+    planType?: 'monthly' | 'yearly';
+    subscriptionStartDate?: string;
+    paddleCustomerId?: string;
+    paddleSubscriptionId?: string;
+    paddleTransactionId?: string;
+    aiUsageStats?: AIUsageStats;
     createdAt: string;
     updatedAt: string;
 }
@@ -247,6 +270,19 @@ export interface ScoreResumeResponse {
     remainingRequests?: number;
     resetTime?: number;
 }
+export interface ResumeAICost {
+    totalInputTokens: number;
+    totalOutputTokens: number;
+    totalCostUSD: number;
+    callBreakdown: {
+        generation: number;
+        scoring: number;
+        suggestions: number;
+        enhancements: number;
+        linkedInParsing: number;
+        translation: number;
+    };
+}
 export interface Resume {
     id: string;
     userId: string;
@@ -257,25 +293,12 @@ export interface Resume {
     scoreGeneratedAt?: string;
     scoreVersion?: string;
     status: 'draft' | 'generated' | 'optimized';
+    shareToken?: string;
+    isPubliclyShared: boolean;
+    shareCreatedAt?: string;
+    aiCost?: ResumeAICost;
     createdAt: string;
     updatedAt: string;
-}
-export interface JobInterest {
-    id: string;
-    userId: string;
-    jobTitle: string;
-    company: string;
-    jobDescription: string;
-    jobUrl?: string;
-    optimizedResumeId?: string;
-    status: 'active' | 'applied' | 'closed';
-    createdAt: string;
-}
-export interface JobInterestData {
-    jobTitle: string;
-    company: string;
-    jobDescription: string;
-    jobUrl?: string;
 }
 export interface GenerateResumeResponse {
     success: boolean;
@@ -286,6 +309,7 @@ export interface GenerateResumeResponse {
     resumeId?: string;
     remainingRequests?: number;
     resetTime?: number;
+    score?: ResumeScore;
 }
 export interface ResumeListResponse {
     success: boolean;
@@ -298,19 +322,6 @@ export interface ResumeResponse {
     data?: Resume;
     error?: string;
     message?: string;
-}
-export interface JobInterestListResponse {
-    success: boolean;
-    data?: JobInterest[];
-    error?: string;
-    message?: string;
-}
-export interface JobInterestResponse {
-    success: boolean;
-    data?: JobInterest;
-    error?: string;
-    message?: string;
-    tokensUsed?: number;
 }
 export interface ProfessionSuggestion {
     profession: string;
@@ -345,6 +356,7 @@ export interface AchievementSuggestionRequest {
         technologies: string[];
     }>;
     language: 'es' | 'en';
+    resumeId?: string;
 }
 export interface AchievementSuggestionResponse {
     success: boolean;
@@ -363,6 +375,7 @@ export interface SummarySuggestionRequest {
     projectDescriptions: string[];
     language: 'es' | 'en';
     type: 'experience' | 'differentiators';
+    resumeId?: string;
 }
 export interface SummarySuggestionResponse {
     success: boolean;
@@ -382,6 +395,7 @@ export interface JobTitleAchievementSuggestion {
 export interface JobTitleAchievementsRequest {
     jobTitle: string;
     language: 'es' | 'en';
+    resumeId?: string;
 }
 export interface JobTitleAchievementsResponse {
     success: boolean;
@@ -397,6 +411,7 @@ export interface EnhanceTextRequest {
     text: string;
     language: 'es' | 'en';
     jobTitle?: string;
+    resumeId?: string;
 }
 export interface EnhanceTextResponse {
     success: boolean;
@@ -411,6 +426,7 @@ export interface ImproveSectionRequest {
     originalText: string;
     userInstructions: string;
     language: 'es' | 'en';
+    resumeId?: string;
     gatheredContext?: Array<{
         questionId: string;
         answer: string;
@@ -450,5 +466,31 @@ export interface LinkedInDataResponse {
     error?: string;
     remainingRequests?: number;
     resetTime?: number;
+}
+export interface CreateCheckoutRequest {
+    planType: 'monthly' | 'yearly';
+}
+export interface CreateCheckoutResponse {
+    success: boolean;
+    checkoutUrl?: string;
+    transactionId?: string;
+    error?: string;
+    message?: string;
+}
+export interface PaddleWebhookPayload {
+    event_id: string;
+    event_type: string;
+    occurred_at: string;
+    data: {
+        id: string;
+        status: string;
+        customer_id: string;
+        subscription_id?: string;
+        items: Array<{
+            price_id: string;
+            quantity: number;
+        }>;
+        custom_data?: Record<string, string>;
+    };
 }
 //# sourceMappingURL=types.d.ts.map

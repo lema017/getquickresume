@@ -1,16 +1,29 @@
 import React from 'react';
-import { Calendar, FileText, Download, Edit, Trash2, Eye, MoreVertical } from 'lucide-react';
+import { Calendar, FileText, Download, Edit, Trash2, Eye, MoreVertical, Globe, Share2, Target, Sparkles, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Resume } from '@/types';
 import { IconWrapper } from '../IconWrapper';
+
+// Helper function to get score color based on value
+const getScoreColor = (score: number): string => {
+  if (score >= 8) return 'text-green-600 bg-green-50 border-green-200';
+  if (score >= 6) return 'text-blue-600 bg-blue-50 border-blue-200';
+  if (score >= 4) return 'text-amber-600 bg-amber-50 border-amber-200';
+  return 'text-red-600 bg-red-50 border-red-200';
+};
 
 interface ResumeCardProps {
   resume: Resume;
   onView: (resume: Resume) => void;
   onEdit: (resume: Resume) => void;
   onDownload: (resume: Resume) => void;
+  onTranslate?: (resume: Resume) => void;
+  onShare?: (resume: Resume) => void;
+  onEnhance?: (resume: Resume) => void;
+  onRescore?: (resume: Resume) => void;
   onDelete: (resume: Resume) => void;
   isLoading?: boolean;
+  isRescoring?: boolean;
 }
 
 export function ResumeCard({ 
@@ -18,8 +31,13 @@ export function ResumeCard({
   onView, 
   onEdit, 
   onDownload, 
+  onTranslate,
+  onShare,
+  onEnhance,
+  onRescore,
   onDelete, 
-  isLoading = false 
+  isLoading = false,
+  isRescoring = false
 }: ResumeCardProps) {
   const { t } = useTranslation();
   const formatDate = (date: Date | string) => {
@@ -111,6 +129,7 @@ export function ResumeCard({
                 {t('resumeCard.actions.edit')}
               </button>
               {resume.generatedResume && (
+                <>
                 <button
                   onClick={() => onDownload(resume)}
                   className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
@@ -118,6 +137,44 @@ export function ResumeCard({
                   <Download className="w-4 h-4" />
                   {t('resumeCard.actions.download')}
                 </button>
+                  {onTranslate && (
+                    <button
+                      onClick={() => onTranslate(resume)}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                    >
+                      <Globe className="w-4 h-4" />
+                      {t('resumeCard.actions.translate')}
+                    </button>
+                  )}
+                  {onShare && (
+                    <button
+                      onClick={() => onShare(resume)}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                    >
+                      <Share2 className="w-4 h-4" />
+                      {t('resumeCard.actions.share')}
+                    </button>
+                  )}
+                  {onEnhance && (
+                    <button
+                      onClick={() => onEnhance(resume)}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      {t('resumeCard.actions.enhance')}
+                    </button>
+                  )}
+                  {onRescore && (
+                    <button
+                      onClick={() => onRescore(resume)}
+                      disabled={isRescoring}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <RefreshCw className={`w-4 h-4 ${isRescoring ? 'animate-spin' : ''}`} />
+                      {t('resumeCard.actions.rescore')}
+                    </button>
+                  )}
+                </>
               )}
               <hr className="my-1" />
               <button
@@ -167,6 +224,36 @@ export function ResumeCard({
           <div className="flex items-center gap-2 text-xs text-blue-600 bg-blue-50 px-3 py-2 rounded-lg">
             <IconWrapper name="sparkles" className="w-4 h-4" />
             <span>{t('resumeCard.info.aiOptimized')}</span>
+          </div>
+        )}
+
+        {/* AI Enhanced Indicator */}
+        {resume.status === 'optimized' && (
+          <div className="flex items-center gap-2 text-xs text-purple-600 bg-purple-50 px-3 py-2 rounded-lg border border-purple-200">
+            <Sparkles className="w-4 h-4" />
+            <span>{t('resumeCard.info.aiEnhanced')}</span>
+          </div>
+        )}
+
+        {/* Publicly Shared Indicator */}
+        {resume.isPubliclyShared && (
+          <div className="flex items-center gap-2 text-xs text-green-600 bg-green-50 px-3 py-2 rounded-lg">
+            <Share2 className="w-4 h-4" />
+            <span>{t('resumeCard.info.publiclyShared')}</span>
+          </div>
+        )}
+
+        {/* Resume Score */}
+        {resume.score && (
+          <div className={`flex items-center justify-between px-3 py-2 rounded-lg border ${getScoreColor(resume.score.totalScore)}`}>
+            <div className="flex items-center gap-2">
+              <Target className="w-4 h-4" />
+              <span className="text-xs font-medium">{t('resumeCard.info.score')}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-lg font-bold">{resume.score.totalScore.toFixed(1)}</span>
+              <span className="text-xs opacity-70">/10</span>
+            </div>
           </div>
         )}
 

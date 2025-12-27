@@ -30,8 +30,28 @@ class SummarySuggestionService {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      }
+      
+      // Handle premium required error (403)
+      if (response.status === 403 && errorData.code === 'PREMIUM_REQUIRED') {
+        const error = new Error(errorData.message || 'Premium feature required');
+        (error as any).code = 'PREMIUM_REQUIRED';
+        (error as any).status = 403;
+        throw error;
+      }
+      
+      if (response.status === 403) {
+        throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      }
+      
+      // Handle rate limit exceeded error (429)
+      if (response.status === 429) {
+        const error = new Error(errorData.message || 'Too many requests. Please wait before trying again.');
+        (error as any).code = 'RATE_LIMIT_EXCEEDED';
+        (error as any).status = 429;
+        throw error;
       }
       
       throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
@@ -43,25 +63,31 @@ class SummarySuggestionService {
   /**
    * Obtiene sugerencias de resumen profesional personalizadas
    * No usa caché ya que las sugerencias son específicas del usuario
+   * @param resumeId - Optional resume ID for AI cost tracking
    */
   async getSummarySuggestions(
     profession: string,
     achievements: string[],
     projects: Array<{ name: string; description: string; technologies: string[] }>,
     type: 'experience' | 'differentiators',
-    language: 'es' | 'en' = 'es'
+    language: 'es' | 'en' = 'es',
+    resumeId?: string
   ): Promise<string[]> {
     try {
       // Extraer solo las descripciones de los proyectos
       const projectDescriptions = projects.map(project => project.description);
 
-      const requestData: SummarySuggestionRequest = {
+      const requestData: SummarySuggestionRequest & { resumeId?: string } = {
         profession,
         achievements,
         projectDescriptions,
         language,
         type
       };
+
+      if (resumeId) {
+        requestData.resumeId = resumeId;
+      }
 
       const response = await this.makeRequest<SummarySuggestionResponse>(
         'api/summary/suggestions',
@@ -84,26 +110,30 @@ class SummarySuggestionService {
 
   /**
    * Obtiene sugerencias de experiencia profesional
+   * @param resumeId - Optional resume ID for AI cost tracking
    */
   async getExperienceSuggestions(
     profession: string,
     achievements: string[],
     projects: Array<{ name: string; description: string; technologies: string[] }>,
-    language: 'es' | 'en' = 'es'
+    language: 'es' | 'en' = 'es',
+    resumeId?: string
   ): Promise<string[]> {
-    return this.getSummarySuggestions(profession, achievements, projects, 'experience', language);
+    return this.getSummarySuggestions(profession, achievements, projects, 'experience', language, resumeId);
   }
 
   /**
    * Obtiene sugerencias de diferenciadores profesionales
+   * @param resumeId - Optional resume ID for AI cost tracking
    */
   async getDifferentiatorsSuggestions(
     profession: string,
     achievements: string[],
     projects: Array<{ name: string; description: string; technologies: string[] }>,
-    language: 'es' | 'en' = 'es'
+    language: 'es' | 'en' = 'es',
+    resumeId?: string
   ): Promise<string[]> {
-    return this.getSummarySuggestions(profession, achievements, projects, 'differentiators', language);
+    return this.getSummarySuggestions(profession, achievements, projects, 'differentiators', language, resumeId);
   }
 
   /**

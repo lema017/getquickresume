@@ -1,4 +1,20 @@
 // User and Authentication Types for API
+// AI Usage Statistics for tracking costs
+export interface AIUsageStats {
+  totalInputTokens: number;
+  totalOutputTokens: number;
+  totalCostUSD: number;
+  totalAICalls: number;
+  lastAICallAt: string;
+  monthlyStats: {
+    month: string;  // YYYY-MM
+    inputTokens: number;
+    outputTokens: number;
+    costUSD: number;
+    callCount: number;
+  };
+}
+
 export interface User {
   id: string;
   email: string;
@@ -17,6 +33,15 @@ export interface User {
   freeResumeUsed: boolean;
   premiumResumeCount: number;
   premiumResumeMonth: string; // YYYY-MM format
+  freeDownloadUsed: boolean; // Tracks if free user used their 1 free download
+  totalDownloads: number; // Tracks total downloads for analytics
+  subscriptionExpiration?: string; // ISO date
+  planType?: 'monthly' | 'yearly';
+  subscriptionStartDate?: string; // ISO date
+  paddleCustomerId?: string;
+  paddleSubscriptionId?: string;
+  paddleTransactionId?: string;
+  aiUsageStats?: AIUsageStats; // AI usage tracking for cost analysis
   createdAt: string;
   updatedAt: string;
 }
@@ -291,6 +316,21 @@ export interface ScoreResumeResponse {
   resetTime?: number;
 }
 
+// Resume AI Cost tracking for analytics
+export interface ResumeAICost {
+  totalInputTokens: number;
+  totalOutputTokens: number;
+  totalCostUSD: number;
+  callBreakdown: {
+    generation: number;
+    scoring: number;
+    suggestions: number;
+    enhancements: number;
+    linkedInParsing: number;
+    translation: number;
+  };
+}
+
 // Resume Management Types
 export interface Resume {
   id: string;
@@ -302,28 +342,14 @@ export interface Resume {
   scoreGeneratedAt?: string;  // ISO timestamp
   scoreVersion?: string;  // Version of scoring algorithm
   status: 'draft' | 'generated' | 'optimized';
+  shareToken?: string;        // Unique public share token
+  isPubliclyShared: boolean;  // Toggle for public visibility
+  shareCreatedAt?: string;    // When sharing was enabled
+  aiCost?: ResumeAICost;      // AI usage cost tracking for this resume
   createdAt: string;
   updatedAt: string;
 }
 
-export interface JobInterest {
-  id: string;
-  userId: string;
-  jobTitle: string;
-  company: string;
-  jobDescription: string;
-  jobUrl?: string;
-  optimizedResumeId?: string;
-  status: 'active' | 'applied' | 'closed';
-  createdAt: string;
-}
-
-export interface JobInterestData {
-  jobTitle: string;
-  company: string;
-  jobDescription: string;
-  jobUrl?: string;
-}
 
 // API Response Types
 export interface GenerateResumeResponse {
@@ -335,6 +361,7 @@ export interface GenerateResumeResponse {
   resumeId?: string;
   remainingRequests?: number;
   resetTime?: number;
+  score?: ResumeScore;  // Score is now included synchronously
 }
 
 export interface ResumeListResponse {
@@ -351,20 +378,6 @@ export interface ResumeResponse {
   message?: string;
 }
 
-export interface JobInterestListResponse {
-  success: boolean;
-  data?: JobInterest[];
-  error?: string;
-  message?: string;
-}
-
-export interface JobInterestResponse {
-  success: boolean;
-  data?: JobInterest;
-  error?: string;
-  message?: string;
-  tokensUsed?: number;
-}
 
 // Profession Suggestions Types
 export interface ProfessionSuggestion {
@@ -403,6 +416,7 @@ export interface AchievementSuggestionRequest {
     technologies: string[];
   }>;
   language: 'es' | 'en';
+  resumeId?: string; // Optional resume ID for AI usage tracking
 }
 
 export interface AchievementSuggestionResponse {
@@ -424,6 +438,7 @@ export interface SummarySuggestionRequest {
   projectDescriptions: string[]; // Descripciones de proyectos
   language: 'es' | 'en';
   type: 'experience' | 'differentiators'; // Tipo de sugerencia
+  resumeId?: string; // Optional resume ID for AI usage tracking
 }
 
 export interface SummarySuggestionResponse {
@@ -447,6 +462,7 @@ export interface JobTitleAchievementSuggestion {
 export interface JobTitleAchievementsRequest {
   jobTitle: string;
   language: 'es' | 'en';
+  resumeId?: string; // Optional resume ID for AI usage tracking
 }
 
 export interface JobTitleAchievementsResponse {
@@ -465,6 +481,7 @@ export interface EnhanceTextRequest {
   text: string;
   language: 'es' | 'en';
   jobTitle?: string;
+  resumeId?: string; // Optional resume ID for AI usage tracking
 }
 
 export interface EnhanceTextResponse {
@@ -482,6 +499,7 @@ export interface ImproveSectionRequest {
   originalText: string;
   userInstructions: string;
   language: 'es' | 'en';
+  resumeId?: string; // Optional resume ID for AI usage tracking
   gatheredContext?: Array<{
     questionId: string;
     answer: string;
@@ -528,4 +546,34 @@ export interface LinkedInDataResponse {
   error?: string;
   remainingRequests?: number;
   resetTime?: number;
+}
+
+// Paddle Payment Types
+export interface CreateCheckoutRequest {
+  planType: 'monthly' | 'yearly';
+}
+
+export interface CreateCheckoutResponse {
+  success: boolean;
+  checkoutUrl?: string;
+  transactionId?: string;
+  error?: string;
+  message?: string;
+}
+
+export interface PaddleWebhookPayload {
+  event_id: string;
+  event_type: string;
+  occurred_at: string;
+  data: {
+    id: string;
+    status: string;
+    customer_id: string;
+    subscription_id?: string;
+    items: Array<{
+      price_id: string;
+      quantity: number;
+    }>;
+    custom_data?: Record<string, string>;
+  };
 }

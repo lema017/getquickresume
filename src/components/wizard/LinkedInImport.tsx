@@ -1,29 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/stores/authStore';
+import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { LinkedInDataWizard } from './LinkedInDataWizard';
 import { 
   ArrowLeft, 
   Linkedin, 
   CheckCircle,
-  Home
+  Home,
+  Crown,
+  Lock
 } from 'lucide-react';
 
 export function LinkedInImport() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { navigateToStep } = useWizardNavigation();
   const { user, isAuthenticated } = useAuthStore();
   const [showWizard, setShowWizard] = useState(false);
   const [importedData, setImportedData] = useState<any>(null);
 
   const isLinkedInUser = user?.provider === 'linkedin';
+  const isPremium = user?.isPremium ?? false;
+
+  // Check premium status on mount
+  useEffect(() => {
+    if (isAuthenticated && !isPremium) {
+      // User is not premium, but don't redirect immediately - show upgrade prompt instead
+      // The component will show premium required message
+    }
+  }, [isAuthenticated, isPremium]);
 
   const handleBack = () => {
     navigate('/wizard');
   };
 
   const handleStartWizard = () => {
+    // Check premium status before starting wizard
+    if (!isPremium) {
+      navigate('/premium');
+      return;
+    }
     setShowWizard(true);
   };
 
@@ -39,7 +57,7 @@ export function LinkedInImport() {
   const handleContinue = () => {
     if (importedData) {
       // Navigate to manual wizard with pre-filled data
-      navigate('/wizard/manual/step-1', { 
+      navigateToStep(1, { 
         state: { 
           preFilledData: importedData,
           fromLinkedIn: true 
@@ -90,7 +108,51 @@ export function LinkedInImport() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
-          {!importedData ? (
+          {!isPremium ? (
+            // Premium Required Message
+            <div className="max-w-2xl mx-auto text-center">
+              <div className="mx-auto w-20 h-20 bg-gradient-to-br from-amber-500 to-yellow-600 rounded-full flex items-center justify-center mb-6">
+                <Lock className="w-10 h-10 text-white" />
+              </div>
+              
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                {t('wizard.linkedinImportPage.premiumRequired.title') || 'Premium Feature Required'}
+              </h2>
+              
+              <p className="text-gray-600 mb-6">
+                {t('wizard.linkedinImportPage.premiumRequired.description') || 'LinkedIn import is a premium feature. Upgrade to access this functionality and import your LinkedIn profile data.'}
+              </p>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-8">
+                <h3 className="text-lg font-semibold text-amber-900 mb-2 flex items-center justify-center gap-2">
+                  <Crown className="w-5 h-5" />
+                  {t('wizard.linkedinImportPage.premiumRequired.benefitsTitle') || 'Premium Benefits'}
+                </h3>
+                <ul className="text-left space-y-2 text-sm text-amber-800">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                    <span>{t('wizard.linkedinImportPage.premiumRequired.benefit1') || 'Import from LinkedIn profile'}</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                    <span>{t('wizard.linkedinImportPage.premiumRequired.benefit2') || '40 resumes per month'}</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                    <span>{t('wizard.linkedinImportPage.premiumRequired.benefit3') || 'Advanced AI optimization'}</span>
+                  </li>
+                </ul>
+              </div>
+
+              <button
+                onClick={() => navigate('/premium')}
+                className="w-full bg-gradient-to-r from-amber-500 to-yellow-600 text-white py-4 px-6 rounded-xl font-semibold text-lg hover:from-amber-600 hover:to-yellow-700 transition-all duration-200 flex items-center justify-center gap-3"
+              >
+                <Crown className="w-5 h-5" />
+                <span>{t('wizard.linkedinImportPage.premiumRequired.upgradeButton') || 'Upgrade to Premium'}</span>
+              </button>
+            </div>
+          ) : !importedData ? (
             <div className="max-w-2xl mx-auto text-center">
               <div className="mx-auto w-20 h-20 bg-gradient-to-br from-orange-500 to-blue-600 rounded-full flex items-center justify-center mb-6">
                 <Linkedin className="w-10 h-10 text-white" />

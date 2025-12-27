@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { resumeService } from '@/services/resumeService';
+import { downloadService } from '@/services/downloadService';
 import { Resume, ResumeData } from '@/types';
 import { ResumeHeader } from '@/components/resume-view/ResumeHeader';
 import { ContactSection } from '@/components/resume-view/ContactSection';
@@ -18,7 +19,12 @@ import { LanguagesSection } from '@/components/resume-view/LanguagesSection';
 import { AchievementsSection } from '@/components/resume-view/AchievementsSection';
 import { ResumeMetadata } from '@/components/resume-view/ResumeMetadata';
 import { TemplateSelectionModal } from '@/components/resume-view/TemplateSelectionModal';
+import { PremiumDownloadModal } from '@/components/PremiumDownloadModal';
+import { PremiumActionModal } from '@/components/PremiumActionModal';
+import { ResumeTranslationModal } from '@/components/ResumeTranslationModal';
+import { ShareResumeModal } from '@/components/ShareResumeModal';
 import { ResumeTemplate } from '@/services/templatesService';
+import { useAuthStore } from '@/stores/authStore';
 import { convertGeneratedResumeToResumeData } from '@/components/wizard/TemplatePreviewModal';
 import { calculatePagination } from '@/services/paginationService';
 import { calculateAndAssignPageNumbers } from '@/components/wizard/Step9Preview';
@@ -48,6 +54,14 @@ export function ResumeViewPage() {
   const [paginatedPages, setPaginatedPages] = useState<TemplateDataFormat[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [modifiedJsCode, setModifiedJsCode] = useState<string>('');
+
+  // Premium modal state
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [showPremiumActionModal, setShowPremiumActionModal] = useState(false);
+  const [premiumFeature, setPremiumFeature] = useState<'enhance' | 'rescore' | 'edit'>('edit');
+  const [showTranslationModal, setShowTranslationModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const { user } = useAuthStore();
 
   // Refs
   const templateContainerRef = useRef<HTMLDivElement>(null);
@@ -92,12 +106,12 @@ export function ResumeViewPage() {
   };
 
   const handleEdit = () => {
-    if (resume) {
-      // Clear localStorage before editing resume
-      localStorage.removeItem('resume_wizard_v1');
-      localStorage.removeItem('generated-resume');
-      navigate(`/wizard/manual/step-1?resumeId=${resume.id}`);
-    }
+    if (!resume) return;
+
+    // Clear localStorage before editing resume
+    localStorage.removeItem('resume_wizard_v1');
+    localStorage.removeItem('generated-resume');
+    navigate(`/wizard/manual/step-1?resumeId=${resume.id}`);
   };
 
   const handleDownload = () => {
@@ -119,6 +133,32 @@ export function ResumeViewPage() {
   const handleGeneratePDF = async (template: ResumeTemplate) => {
     if (!resume) {
       toast.error(t('resumeView.download.errors.noResume'));
+      return;
+    }
+
+    // Check download limits before generating PDF
+    try {
+      const downloadResult = await downloadService.trackDownload(resume.id);
+      
+      if (!downloadResult.allowed) {
+        // Show premium modal and return early
+        setShowPremiumModal(true);
+        return;
+      }
+    } catch (error) {
+      console.error('Error checking download limits:', error);
+      if (error instanceof Error) {
+        if (error.message.includes('Unauthorized')) {
+          toast.error('Please log in again');
+          navigate('/login');
+          return;
+        }
+        if (error.message.includes('not found')) {
+          toast.error('Resume not found');
+          return;
+        }
+      }
+      toast.error('Error checking download limits. Please try again.');
       return;
     }
 
@@ -298,6 +338,8 @@ export function ResumeViewPage() {
           resume={resume}
           onEdit={handleEdit}
           onDownload={handleDownload}
+          onTranslate={resume.generatedResume ? () => setShowTranslationModal(true) : undefined}
+          onShare={resume.generatedResume ? () => setShowShareModal(true) : undefined}
           isGeneratingPDF={isGeneratingPDF}
         />
 
@@ -317,6 +359,37 @@ export function ResumeViewPage() {
 
         {/* Metadata Footer */}
         <ResumeMetadata resume={resume} />
+
+        {/* Share Modal */}
+        {resume && resume.generatedResume && (
+          <ShareResumeModal
+            isOpen={showShareModal}
+            onClose={() => setShowShareModal(false)}
+            resumeId={resume.id}
+            shareToken={resume.shareToken}
+            isPubliclyShared={resume.isPubliclyShared}
+            onSharingChanged={async () => {
+              // Reload resume to get updated sharing status
+              try {
+                const updatedResume = await resumeService.getResume(resume.id);
+                setResume(updatedResume);
+              } catch (error) {
+                console.error('Error reloading resume:', error);
+              }
+            }}
+          />
+        )}
+
+        {/* Translation Modal */}
+        {resume && resume.generatedResume && (
+          <ResumeTranslationModal
+            isOpen={showTranslationModal}
+            onClose={() => setShowTranslationModal(false)}
+            resumeId={resume.id}
+            currentLanguage={resume.resumeData.language || 'es'}
+            resumeTitle={resume.title}
+          />
+        )}
 
         {/* Progress Indicator */}
         {isGeneratingPDF && (
@@ -398,6 +471,24 @@ export function ResumeViewPage() {
           onSelectTemplate={handleTemplateSelect}
           selectedTemplateId={selectedTemplateForDownload?.id}
         />
+      <PremiumDownloadModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+      />
+      <PremiumActionModal
+        isOpen={showPremiumActionModal}
+        onClose={() => setShowPremiumActionModal(false)}
+        feature={premiumFeature}
+      />
+      {resume && resume.generatedResume && (
+        <ResumeTranslationModal
+          isOpen={showTranslationModal}
+          onClose={() => setShowTranslationModal(false)}
+          resumeId={resume.id}
+          currentLanguage={resume.resumeData.language || 'es'}
+          resumeTitle={resume.title}
+        />
+      )}
       </div>
     </div>
   );

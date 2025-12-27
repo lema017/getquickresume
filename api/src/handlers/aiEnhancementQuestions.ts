@@ -1,14 +1,16 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { aiService } from '../services/aiService';
-import { checkRateLimit, logSuspiciousActivity } from '../middleware/rateLimiter';
+import { checkRateLimit, logSuspiciousActivity, refundRateLimit } from '../middleware/rateLimiter';
 import { sanitizeUserInput, sanitizeSectionType, sanitizeLanguage } from '../utils/inputSanitizer';
 import { getUserById } from '../services/dynamodb';
+import { verifyResumeOwnership } from '../services/resumeService';
 
 export interface GenerateQuestionsRequest {
   sectionType: 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language';
   recommendation: string;
   originalText: string;
   language: 'es' | 'en';
+  resumeId?: string; // Optional resume ID for AI usage tracking
 }
 
 export interface Question {
@@ -207,6 +209,27 @@ export const generateEnhancementQuestions = async (
       };
     }
 
+    // 6.5 Validate resume ownership if resumeId is provided (for AI cost tracking)
+    if (requestData.resumeId) {
+      const isOwner = await verifyResumeOwnership(userId, requestData.resumeId);
+      if (!isOwner) {
+        return {
+          statusCode: 403,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+            'Access-Control-Allow-Methods': 'POST,OPTIONS',
+          },
+          body: JSON.stringify({
+            success: false,
+            error: 'Access denied',
+            message: 'Resume not found or access denied'
+          } as GenerateQuestionsResponse)
+        };
+      }
+    }
+
     // 7. Generate questions using AI service
     try {
       const questions = await aiService.generateEnhancementQuestions(
@@ -214,7 +237,8 @@ export const generateEnhancementQuestions = async (
         sanitizedRecommendation,
         sanitizedOriginalText,
         sanitizedLanguage,
-        { authorizer: { userId } }
+        { authorizer: { userId } },
+        requestData.resumeId
       );
 
       const response: GenerateQuestionsResponse = {
@@ -241,6 +265,9 @@ export const generateEnhancementQuestions = async (
     } catch (aiError: any) {
       console.error('AI service error:', aiError);
       
+      // Refund rate limit on server error - user shouldn't be penalized
+      await refundRateLimit(userId, endpoint);
+      
       return {
         statusCode: 500,
         headers: {
@@ -259,6 +286,12 @@ export const generateEnhancementQuestions = async (
 
   } catch (error) {
     console.error('Error in generateEnhancementQuestions handler:', error);
+    
+    // Refund rate limit on server error - user shouldn't be penalized
+    const userId = event.requestContext.authorizer?.userId;
+    if (userId) {
+      await refundRateLimit(userId, 'generate-enhancement-questions');
+    }
     
     const errorResponse: GenerateQuestionsResponse = {
       success: false,

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
+import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { ArrowRight, ArrowLeft, Plus, X, CheckCircle } from 'lucide-react';
 import { FloatingTips } from '@/components/FloatingTips';
 import { TipsButton } from '@/components/TipsButton';
@@ -11,7 +11,7 @@ import { Education, Certification } from '@/types';
 
 export function Step4Education() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const { navigateToStep } = useWizardNavigation();
   const { resumeData, updateResumeData, markStepCompleted, setCurrentStep } = useResumeStore();
   const { areTipsClosed, closeTips, showTips } = useTips();
   const [education, setEducation] = useState(resumeData.education);
@@ -56,18 +56,18 @@ export function Step4Education() {
     setIsSkipped(true);
     markStepCompleted(4);
     setCurrentStep(5);
-    navigate('/wizard/manual/step-5');
+    navigateToStep(5);
   };
 
   const handleNext = () => {
     updateResumeData({ education, certifications });
     markStepCompleted(4);
     setCurrentStep(5);
-    navigate('/wizard/manual/step-5');
+    navigateToStep(5);
   };
 
   const handleBack = () => {
-    navigate('/wizard/manual/step-3');
+    navigateToStep(3);
   };
 
   return (

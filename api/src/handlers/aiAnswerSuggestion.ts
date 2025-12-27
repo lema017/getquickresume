@@ -1,8 +1,9 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { aiService } from '../services/aiService';
-import { checkRateLimit, logSuspiciousActivity } from '../middleware/rateLimiter';
+import { checkRateLimit, logSuspiciousActivity, refundRateLimit } from '../middleware/rateLimiter';
 import { sanitizeUserInput, sanitizeSectionType, sanitizeLanguage } from '../utils/inputSanitizer';
 import { getUserById } from '../services/dynamodb';
+import { verifyResumeOwnership } from '../services/resumeService';
 
 export interface GenerateAnswerSuggestionRequest {
   question: string;
@@ -11,6 +12,7 @@ export interface GenerateAnswerSuggestionRequest {
   recommendation: string;
   sectionType: 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language';
   language: 'es' | 'en';
+  resumeId?: string; // Optional resume ID for AI usage tracking
 }
 
 export interface GenerateAnswerSuggestionResponse {
@@ -187,6 +189,27 @@ export const generateAnswerSuggestion = async (
       };
     }
 
+    // 6.5 Validate resume ownership if resumeId is provided (for AI cost tracking)
+    if (requestData.resumeId) {
+      const isOwner = await verifyResumeOwnership(userId, requestData.resumeId);
+      if (!isOwner) {
+        return {
+          statusCode: 403,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+            'Access-Control-Allow-Methods': 'POST,OPTIONS',
+          },
+          body: JSON.stringify({
+            success: false,
+            error: 'Access denied',
+            message: 'Resume not found or access denied'
+          } as GenerateAnswerSuggestionResponse)
+        };
+      }
+    }
+
     // 7. Generate answer suggestion using AI service
     try {
       const suggestion = await aiService.generateAnswerSuggestion(
@@ -196,7 +219,8 @@ export const generateAnswerSuggestion = async (
         sanitizedRecommendation,
         sanitizedSectionType as 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language',
         sanitizedLanguage,
-        { authorizer: { userId } }
+        { authorizer: { userId } },
+        requestData.resumeId
       );
 
       const response: GenerateAnswerSuggestionResponse = {
@@ -223,6 +247,9 @@ export const generateAnswerSuggestion = async (
     } catch (aiError: any) {
       console.error('AI service error:', aiError);
       
+      // Refund rate limit on server error - user shouldn't be penalized
+      await refundRateLimit(userId, endpoint);
+      
       return {
         statusCode: 500,
         headers: {
@@ -241,6 +268,12 @@ export const generateAnswerSuggestion = async (
 
   } catch (error) {
     console.error('Error in generateAnswerSuggestion handler:', error);
+    
+    // Refund rate limit on server error - user shouldn't be penalized
+    const userId = event.requestContext.authorizer?.userId;
+    if (userId) {
+      await refundRateLimit(userId, 'generate-answer-suggestion');
+    }
     
     const errorResponse: GenerateAnswerSuggestionResponse = {
       success: false,

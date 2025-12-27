@@ -17,6 +17,11 @@ export interface User {
   freeResumeUsed?: boolean;
   premiumResumeCount?: number;
   premiumResumeMonth?: string; // YYYY-MM format
+  freeDownloadUsed?: boolean; // Tracks if free user used their 1 free download
+  totalDownloads?: number; // Tracks total downloads for analytics
+  subscriptionExpiration?: string; // ISO date
+  planType?: 'monthly' | 'yearly';
+  subscriptionStartDate?: string; // ISO date
   createdAt: Date;
   updatedAt: Date;
 }
@@ -343,6 +348,7 @@ export interface GenerateResumeResponse {
   message?: string;
   tokensUsed?: number;
   resumeId?: string;
+  score?: ResumeScore;  // Score is now included synchronously from the API
 }
 
 // Resume Scoring Types
@@ -395,35 +401,15 @@ export interface Resume {
   updatedAt: Date;
 }
 
-export interface JobInterest {
-  id: string;
-  userId: string;
-  jobTitle: string;
-  company: string;
-  jobDescription: string;
-  jobUrl?: string;
-  optimizedResumeId?: string;
-  status: 'active' | 'applied' | 'closed';
-  createdAt: Date;
-}
-
-export interface JobInterestData {
-  jobTitle: string;
-  company: string;
-  jobDescription: string;
-  jobUrl?: string;
-}
 
 // Dashboard Types
 export interface DashboardStats {
   totalResumes: number;
-  totalJobInterests: number;
   tokensAvailable: number;
 }
 
 export interface DashboardState {
   resumes: Resume[];
-  jobInterests: JobInterest[];
   stats: DashboardStats;
   isLoading: boolean;
 }
@@ -513,6 +499,7 @@ export interface ImproveSectionRequest {
   originalText: string;
   userInstructions: string;
   language: 'es' | 'en';
+  resumeId?: string; // Optional resume ID for AI usage tracking
 }
 
 export interface ImproveSectionResponse {
