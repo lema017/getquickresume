@@ -19,6 +19,10 @@ export interface User {
   premiumResumeMonth?: string; // YYYY-MM format
   freeDownloadUsed?: boolean; // Tracks if free user used their 1 free download
   totalDownloads?: number; // Tracks total downloads for analytics
+  // Cover letter tracking
+  freeCoverLetterUsed?: boolean; // Free user lifetime limit (1 cover letter)
+  premiumCoverLetterCount?: number; // Monthly count for premium users
+  premiumCoverLetterMonth?: string; // YYYY-MM format for monthly reset
   subscriptionExpiration?: string; // ISO date
   planType?: 'monthly' | 'yearly';
   subscriptionStartDate?: string; // ISO date

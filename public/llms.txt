@@ -1,0 +1,46 @@
+# GetQuickResume
+
+> AI-powered resume builder that helps job seekers create professional, ATS-optimized resumes in minutes.
+
+## About
+
+GetQuickResume is a free online resume builder that uses artificial intelligence to help users create professional resumes. The platform is designed to be user-friendly, accessible, and effective at helping job seekers land interviews.
+
+Website: https://getquickresume.com
+
+## Key Features
+
+- **AI-Powered Content**: Generate professional summary statements and achievement bullets using AI
+- **ATS Optimization**: All templates are designed to pass Applicant Tracking Systems
+- **Multiple Templates**: Choose from various professional designs (free and premium)
+- **Multi-Language Support**: Create resumes in English or Spanish
+- **Real-Time Preview**: See changes instantly as you build your resume
+- **PDF Export**: Download high-quality PDF files ready for applications
+- **Resume Scoring**: Get AI-powered feedback on resume quality
+
+## Pricing
+
+- **Free Plan**: Create 1 resume with basic features and free templates
+- **Premium Monthly**: $9.99/month - Unlimited resumes, all templates, AI enhancements
+- **Premium Yearly**: $59.99/year - Best value, save 50%
+
+## Common Use Cases
+
+1. First-time job seekers creating their first professional resume
+2. Career changers updating resumes for new industries
+3. Professionals wanting ATS-optimized resumes
+4. Multilingual job seekers needing resumes in multiple languages
+
+## Pages
+
+- `/` - Homepage with features and pricing overview
+- `/blog` - Career advice and resume tips
+- `/pricing` - Detailed pricing plans
+- `/about` - Company mission and values
+- `/contact` - Contact information and support
+
+## Contact
+
+Email: contacto@getquickresume.com
+Support: soporte@getquickresume.com
+

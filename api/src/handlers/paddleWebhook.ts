@@ -116,12 +116,15 @@ export const handlePaddleWebhook = async (
   // Mark event as processed (in production, use DynamoDB for persistence)
   processedEvents.add(webhookData.event_id);
 
-  // Return 200 immediately, process async
-  // This prevents Paddle from retrying due to timeouts
-  processWebhookEvent(webhookData).catch((error) => {
+  // Process webhook event synchronously before returning
+  // This ensures the processing completes before Lambda terminates
+  try {
+    await processWebhookEvent(webhookData);
+  } catch (error) {
     console.error('Error processing webhook event:', error);
-    // In production, you might want to send this to a dead letter queue
-  });
+    // Still return 200 to prevent Paddle retries for handled events
+    // The error is logged for investigation
+  }
 
   return {
     statusCode: 200,
@@ -130,7 +133,7 @@ export const handlePaddleWebhook = async (
     },
     body: JSON.stringify({
       success: true,
-      message: 'Webhook received',
+      message: 'Webhook processed',
     }),
   };
 };

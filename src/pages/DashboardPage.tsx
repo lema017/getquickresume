@@ -8,10 +8,12 @@ import { ResumeTranslationModal } from '@/components/ResumeTranslationModal';
 import { ShareResumeModal } from '@/components/ShareResumeModal';
 import { PremiumActionModal } from '@/components/PremiumActionModal';
 import { ResumeList } from '@/components/dashboard/ResumeList';
+import { CoverLetterList } from '@/components/dashboard/CoverLetterList';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { resumeScoringService } from '@/services/resumeScoringService';
 import toast from 'react-hot-toast';
+import { formatName } from '@/utils/textFormatting';
 import { 
   FileText, 
   Mail, 
@@ -198,7 +200,7 @@ export function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">
-                  {t('dashboard.welcome', { name: user.firstName })}
+                  {t('dashboard.welcome', { name: formatName(user.firstName || user.fullName?.split(' ')[0] || '') })}
                 </h1>
                 <p className="text-gray-600 mt-1">
                   {t('dashboard.emptyState.subtitle')}
@@ -288,7 +290,7 @@ export function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                {t('dashboard.welcomeNoExclamation', { name: user.firstName })}
+                {t('dashboard.welcomeNoExclamation', { name: formatName(user.firstName || user.fullName?.split(' ')[0] || '') })}
               </h1>
               <p className="text-gray-600 mt-1">
                 {t('dashboard.subtitle')}
@@ -328,33 +330,11 @@ export function DashboardPage() {
             rescoringResumeId={rescoringResumeId || undefined}
           />
 
+          {/* Cover Letters Section */}
+          <CoverLetterList />
+
           {/* Coming Soon Sections */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Cover Letters */}
-            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
-                  <Mail className="w-6 h-6 text-purple-600" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900">{t('dashboard.comingSoon.coverLetters')}</h3>
-                  <p className="text-gray-600">{t('dashboard.comingSoon.coverLettersDesc')}</p>
-                </div>
-              </div>
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Mail className="w-8 h-8 text-gray-400" />
-                </div>
-                <p className="text-gray-500 mb-4">{t('dashboard.comingSoon.availableSoon')}</p>
-                <button
-                  disabled
-                  className="px-4 py-2 bg-gray-100 text-gray-400 rounded-lg cursor-not-allowed"
-                >
-                  {t('dashboard.comingSoon.availableSoon')}
-                </button>
-              </div>
-            </div>
-
             {/* Job Application Assistant */}
             <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
               <div className="flex items-center gap-4 mb-6">

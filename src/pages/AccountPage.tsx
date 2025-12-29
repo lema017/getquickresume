@@ -4,6 +4,7 @@ import { User, Crown, Download, Settings, LogOut, Globe, RefreshCw } from 'lucid
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Avatar } from '@/components/Avatar';
+import { formatName } from '@/utils/textFormatting';
 
 export function AccountPage() {
   const { t } = useTranslation();
@@ -49,8 +50,8 @@ export function AccountPage() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
                 {user.firstName && user.lastName 
-                  ? `${user.firstName} ${user.lastName}` 
-                  : user.fullName || 'Usuario'
+                  ? formatName(`${user.firstName} ${user.lastName}`)
+                  : formatName(user.fullName || 'Usuario')
                 }
               </h1>
               <p className="text-gray-600">{user.email}</p>

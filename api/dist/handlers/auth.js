@@ -6,6 +6,7 @@ const googleAuth_1 = require("../services/googleAuth");
 const linkedinAuth_1 = require("../services/linkedinAuth");
 const dynamodb_1 = require("../services/dynamodb");
 const jwt_1 = require("../services/jwt");
+const textFormatting_1 = require("../utils/textFormatting");
 // Configuración simplificada para desarrollo local
 const client = new google_auth_library_1.OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
@@ -57,10 +58,15 @@ const googleAuth = async (event) => {
         console.log('Token received:', token.substring(0, 20) + '...');
         // Verificar el token de Google
         const googleUser = await (0, googleAuth_1.verifyGoogleToken)(token);
-        // Parsear nombre completo
-        const firstName = googleUser.given_name || googleUser.name.split(' ')[0] || '';
-        const lastName = googleUser.family_name || googleUser.name.split(' ').slice(1).join(' ') || '';
-        const fullName = googleUser.name;
+        // Parsear nombre completo y aplicar formato Title Case
+        const rawFirstName = googleUser.given_name || googleUser.name.split(' ')[0] || '';
+        const rawLastName = googleUser.family_name || googleUser.name.split(' ').slice(1).join(' ') || '';
+        const rawFullName = googleUser.name;
+        console.log('[Google Auth] Raw names from Google:', { rawFirstName, rawLastName, rawFullName });
+        const firstName = (0, textFormatting_1.formatName)(rawFirstName);
+        const lastName = (0, textFormatting_1.formatName)(rawLastName);
+        const fullName = (0, textFormatting_1.formatName)(rawFullName);
+        console.log('[Google Auth] Formatted names:', { firstName, lastName, fullName });
         // Validar y limpiar avatarUrl
         let avatarUrl = googleUser.picture;
         if (avatarUrl && !isValidUrl(avatarUrl)) {
@@ -272,7 +278,22 @@ const linkedinAuth = async (event) => {
             const linkedinProfile = await (0, linkedinAuth_1.verifyLinkedInToken)(accessToken);
             console.log('LinkedIn profile received:', JSON.stringify(linkedinProfile, null, 2));
             // Parsear datos del perfil de LinkedIn usando la nueva función
-            const { email, firstName, lastName, fullName, avatarUrl, city, country, linkedinUrl } = (0, linkedinAuth_1.parseLinkedInProfile)(linkedinProfile);
+            const parsedProfile = (0, linkedinAuth_1.parseLinkedInProfile)(linkedinProfile);
+            console.log('[LinkedIn Auth] Raw names from LinkedIn:', {
+                firstName: parsedProfile.firstName,
+                lastName: parsedProfile.lastName,
+                fullName: parsedProfile.fullName
+            });
+            // Aplicar formato Title Case a los nombres
+            const email = parsedProfile.email;
+            const firstName = (0, textFormatting_1.formatName)(parsedProfile.firstName);
+            const lastName = (0, textFormatting_1.formatName)(parsedProfile.lastName);
+            const fullName = (0, textFormatting_1.formatName)(parsedProfile.fullName);
+            const avatarUrl = parsedProfile.avatarUrl;
+            const city = parsedProfile.city;
+            const country = parsedProfile.country;
+            const linkedinUrl = parsedProfile.linkedinUrl;
+            console.log('[LinkedIn Auth] Formatted names:', { firstName, lastName, fullName });
             // Buscar usuario existente por email
             if (!email) {
                 throw new Error('LinkedIn profile does not include email address');
@@ -423,6 +444,10 @@ const getMe = async (event) => {
                 })
             };
         }
+        // Format names to Title Case (safety measure for existing users with lowercase names)
+        const formattedFirstName = (0, textFormatting_1.formatName)(user.firstName || '');
+        const formattedLastName = (0, textFormatting_1.formatName)(user.lastName || '');
+        const formattedFullName = (0, textFormatting_1.formatName)(user.fullName || '');
         // Return user data (excluding sensitive fields if needed)
         return {
             statusCode: 200,
@@ -437,9 +462,9 @@ const getMe = async (event) => {
                 user: {
                     id: user.id,
                     email: user.email,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    fullName: user.fullName,
+                    firstName: formattedFirstName,
+                    lastName: formattedLastName,
+                    fullName: formattedFullName,
                     avatarUrl: user.avatarUrl,
                     city: user.city,
                     country: user.country,

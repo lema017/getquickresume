@@ -58,3 +58,122 @@
     display: none;
   }
 }
+
+/* ============================================================================
+   Cover Letter Template Styles - Print-Ready A4 Format
+   ============================================================================ */
+
+/* Font stacks for different template styles */
+.font-classic {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+.font-modern {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.font-minimal {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: 300;
+}
+
+.font-creative {
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* A4 Paper simulation for screen preview */
+.cover-letter-paper {
+  width: 210mm;
+  min-height: 297mm;
+  max-width: 100%;
+  margin: 0 auto;
+  background: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Template-specific accent colors */
+.accent-classic {
+  color: #1e3a5f;
+}
+
+.accent-modern {
+  color: #6366f1;
+}
+
+.accent-minimal {
+  color: #374151;
+}
+
+.bg-accent-classic {
+  background-color: #1e3a5f;
+}
+
+.bg-accent-modern {
+  background-color: #6366f1;
+}
+
+.border-accent-classic {
+  border-color: #1e3a5f;
+}
+
+.border-accent-modern {
+  border-color: #6366f1;
+}
+
+/* Print styles for A4 format */
+@media print {
+  @page {
+    size: A4;
+    margin: 20mm 25mm;
+  }
+  
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    background: white !important;
+  }
+  
+  /* Hide non-printable elements */
+  .no-print,
+  header,
+  nav,
+  footer,
+  .template-selector,
+  .preview-actions,
+  button {
+    display: none !important;
+  }
+  
+  /* Show only the cover letter content */
+  .cover-letter-paper {
+    width: 100%;
+    min-height: auto;
+    box-shadow: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Ensure proper font sizes for print */
+  .cover-letter-body {
+    font-size: 11pt;
+    line-height: 1.6;
+  }
+  
+  .cover-letter-heading {
+    font-size: 16pt;
+  }
+  
+  .cover-letter-subheading {
+    font-size: 10pt;
+  }
+  
+  /* Prevent page breaks inside paragraphs */
+  .cover-letter-paragraph {
+    page-break-inside: avoid;
+  }
+  
+  /* Print gradient backgrounds as solid colors */
+  .print-gradient-fallback {
+    background: #6366f1 !important;
+  }
+}

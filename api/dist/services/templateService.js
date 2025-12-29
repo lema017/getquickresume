@@ -88,5 +88,54 @@ exports.templateService = {
         }));
         return templateRecord;
     },
+    /**
+     * Update an existing template's code in S3 and update hash in DynamoDB
+     */
+    async updateTemplate(data) {
+        if (!TEMPLATES_BUCKET)
+            throw new Error('TEMPLATES_BUCKET is not configured');
+        // Verify template exists
+        const existing = await ddb.send(new lib_dynamodb_1.GetCommand({
+            TableName: TEMPLATES_TABLE,
+            Key: { id: data.id },
+        }));
+        if (!existing.Item) {
+            throw new Error(`Template with id "${data.id}" does not exist`);
+        }
+        const templateRecord = existing.Item;
+        const s3Key = templateRecord.s3Key;
+        // Generate new hash
+        const hash = data.hash || generateHash(data.jsCode);
+        // Upload updated code to S3
+        await s3.send(new client_s3_1.PutObjectCommand({
+            Bucket: TEMPLATES_BUCKET,
+            Key: s3Key,
+            Body: data.jsCode,
+            ContentType: 'application/javascript',
+        }));
+        // Update hash in DynamoDB
+        const updatedRecord = {
+            ...templateRecord,
+            hash,
+        };
+        await ddb.send(new lib_dynamodb_1.PutCommand({
+            TableName: TEMPLATES_TABLE,
+            Item: updatedRecord,
+        }));
+        return updatedRecord;
+    },
+    /**
+     * Get a template by ID
+     */
+    async getById(id) {
+        const result = await ddb.send(new lib_dynamodb_1.GetCommand({
+            TableName: TEMPLATES_TABLE,
+            Key: { id },
+        }));
+        if (!result.Item) {
+            return null;
+        }
+        return result.Item;
+    },
 };
 //# sourceMappingURL=templateService.js.map

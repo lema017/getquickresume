@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { Facebook, Instagram, Mail, Send } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { getPageSEO, BASE_URL } from '@/utils/seoConfig';
 
 export function ContactPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language as 'en' | 'es';
+  const seo = getPageSEO('contact', lang);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -26,6 +30,47 @@ export function ContactPage() {
   };
 
   return (
+    <>
+      <Helmet>
+        <title>{seo.title}</title>
+        <meta name="description" content={seo.description} />
+        <link rel="canonical" href={`${BASE_URL}/contact`} />
+        
+        {/* hreflang */}
+        <link rel="alternate" hreflang="en" href={`${BASE_URL}/contact`} />
+        <link rel="alternate" hreflang="es" href={`${BASE_URL}/contact?lang=es`} />
+        <link rel="alternate" hreflang="x-default" href={`${BASE_URL}/contact`} />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={seo.title} />
+        <meta property="og:description" content={seo.description} />
+        <meta property="og:url" content={`${BASE_URL}/contact`} />
+        <meta property="og:site_name" content="GetQuickResume" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content={seo.title} />
+        <meta name="twitter:description" content={seo.description} />
+        
+        {/* ContactPage structured data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ContactPage",
+            "name": "Contact GetQuickResume",
+            "description": seo.description,
+            "url": `${BASE_URL}/contact`,
+            "mainEntity": {
+              "@type": "Organization",
+              "name": "GetQuickResume",
+              "email": "contacto@getquickresume.com",
+              "url": BASE_URL
+            }
+          })}
+        </script>
+      </Helmet>
+
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
@@ -191,5 +236,6 @@ export function ContactPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

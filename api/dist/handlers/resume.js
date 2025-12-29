@@ -6,6 +6,7 @@ const dynamodb_1 = require("../services/dynamodb");
 const resumeService_1 = require("../services/resumeService");
 const rateLimiter_1 = require("../middleware/rateLimiter");
 const resumeScoringService_1 = require("../services/resumeScoringService");
+const textFormatting_1 = require("../utils/textFormatting");
 const generateResume = async (event) => {
     console.log('Generate Resume request received:', JSON.stringify(event, null, 2));
     try {
@@ -82,6 +83,10 @@ const generateResume = async (event) => {
             };
         }
         const requestBody = JSON.parse(event.body);
+        // Format profession field to Title Case
+        if (requestBody.resumeData?.profession) {
+            requestBody.resumeData.profession = (0, textFormatting_1.formatProfession)(requestBody.resumeData.profession);
+        }
         if (!requestBody.resumeData) {
             return {
                 statusCode: 400,
@@ -389,6 +394,10 @@ const createResumeHandler = async (event) => {
         }
         const requestBody = JSON.parse(event.body);
         const { resumeData, title } = requestBody;
+        // Format profession field to Title Case
+        if (resumeData?.profession) {
+            resumeData.profession = (0, textFormatting_1.formatProfession)(resumeData.profession);
+        }
         if (!resumeData) {
             return {
                 statusCode: 400,
@@ -477,6 +486,14 @@ const updateResumeHandler = async (event) => {
             };
         }
         const updates = JSON.parse(event.body);
+        // Format profession field to Title Case if present
+        if (updates.profession) {
+            updates.profession = (0, textFormatting_1.formatProfession)(updates.profession);
+        }
+        // Also format profession in nested resumeData if present
+        if (updates.resumeData?.profession) {
+            updates.resumeData.profession = (0, textFormatting_1.formatProfession)(updates.resumeData.profession);
+        }
         const resume = await (0, resumeService_1.updateResume)(userId, resumeId, updates);
         const response = {
             success: true,

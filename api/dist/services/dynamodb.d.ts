@@ -32,6 +32,9 @@ export interface User {
     premiumResumeMonth: string;
     freeDownloadUsed: boolean;
     totalDownloads: number;
+    freeCoverLetterUsed: boolean;
+    premiumCoverLetterCount: number;
+    premiumCoverLetterMonth: string;
     subscriptionExpiration?: string;
     planType?: 'monthly' | 'yearly';
     subscriptionStartDate?: string;
@@ -47,6 +50,8 @@ export declare const createUser: (userData: Partial<User>) => Promise<User>;
 export declare const getUserById: (id: string) => Promise<User | null>;
 export declare const markFreeResumeUsed: (userId: string) => Promise<User>;
 export declare const incrementPremiumResumeCount: (userId: string) => Promise<User>;
+export declare const markFreeCoverLetterUsed: (userId: string) => Promise<User>;
+export declare const incrementPremiumCoverLetterCount: (userId: string) => Promise<User>;
 export declare const updateUser: (id: string, updates: Partial<User>) => Promise<User>;
 /**
  * Upgrade user to premium status

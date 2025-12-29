@@ -53,6 +53,10 @@ export interface User {
   premiumResumeMonth: string; // YYYY-MM format
   freeDownloadUsed: boolean; // Tracks if free user used their 1 free download
   totalDownloads: number; // Tracks total downloads for analytics
+  // Cover letter tracking
+  freeCoverLetterUsed: boolean; // Free user lifetime limit (1 cover letter)
+  premiumCoverLetterCount: number; // Monthly count for premium users
+  premiumCoverLetterMonth: string; // YYYY-MM format for monthly reset
   subscriptionExpiration?: string; // ISO date
   planType?: 'monthly' | 'yearly';
   subscriptionStartDate?: string; // ISO date
@@ -115,6 +119,10 @@ export const createUser = async (userData: Partial<User>): Promise<User> => {
       premiumResumeMonth: currentMonth,
       freeDownloadUsed: false,
       totalDownloads: 0,
+      // Cover letter tracking - initialize
+      freeCoverLetterUsed: false,
+      premiumCoverLetterCount: 0,
+      premiumCoverLetterMonth: currentMonth,
       createdAt: now,
       updatedAt: now,
     };
@@ -220,6 +228,78 @@ export const incrementPremiumResumeCount = async (userId: string): Promise<User>
     }
   } catch (error) {
     console.error('Error incrementing premium resume count:', error);
+    throw new Error('Database error');
+  }
+};
+
+// Mark free cover letter as used (lifetime limit for free users)
+export const markFreeCoverLetterUsed = async (userId: string): Promise<User> => {
+  try {
+    const now = new Date().toISOString();
+    
+    const command = new UpdateCommand({
+      TableName: tableName,
+      Key: { id: userId },
+      UpdateExpression: 'SET freeCoverLetterUsed = :freeCoverLetterUsed, updatedAt = :updatedAt',
+      ExpressionAttributeValues: {
+        ':freeCoverLetterUsed': true,
+        ':updatedAt': now,
+      },
+      ReturnValues: 'ALL_NEW',
+    });
+
+    const result = await dynamodb.send(command);
+    return result.Attributes as User;
+  } catch (error) {
+    console.error('Error marking free cover letter as used:', error);
+    throw new Error('Database error');
+  }
+};
+
+// Update premium cover letter count for current month
+export const incrementPremiumCoverLetterCount = async (userId: string): Promise<User> => {
+  try {
+    const now = new Date().toISOString();
+    const currentMonth = now.slice(0, 7); // YYYY-MM format
+    
+    // First, get the user to check current month
+    const user = await getUserById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    
+    // If it's a new month, reset the count
+    if (user.premiumCoverLetterMonth !== currentMonth) {
+      const command = new UpdateCommand({
+        TableName: tableName,
+        Key: { id: userId },
+        UpdateExpression: 'SET premiumCoverLetterCount = :count, premiumCoverLetterMonth = :month, updatedAt = :updatedAt',
+        ExpressionAttributeValues: {
+          ':count': 1,
+          ':month': currentMonth,
+          ':updatedAt': now,
+        },
+        ReturnValues: 'ALL_NEW',
+      });
+      const result = await dynamodb.send(command);
+      return result.Attributes as User;
+    } else {
+      // Increment existing count
+      const command = new UpdateCommand({
+        TableName: tableName,
+        Key: { id: userId },
+        UpdateExpression: 'SET premiumCoverLetterCount = premiumCoverLetterCount + :inc, updatedAt = :updatedAt',
+        ExpressionAttributeValues: {
+          ':inc': 1,
+          ':updatedAt': now,
+        },
+        ReturnValues: 'ALL_NEW',
+      });
+      const result = await dynamodb.send(command);
+      return result.Attributes as User;
+    }
+  } catch (error) {
+    console.error('Error incrementing premium cover letter count:', error);
     throw new Error('Database error');
   }
 };

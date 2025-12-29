@@ -1,13 +1,18 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { useState } from 'react';
 import { Check, ArrowRight, Crown, Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { checkoutService } from '@/services/checkoutService';
 import toast from 'react-hot-toast';
+import { getPageSEO, generateFAQSchema, commonFAQs, BASE_URL } from '@/utils/seoConfig';
 
 export function PricingPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language as 'en' | 'es';
+  const seo = getPageSEO('pricing', lang);
+  const faqSchema = generateFAQSchema(commonFAQs[lang]);
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuthStore();
   const [loadingPlan, setLoadingPlan] = useState<'monthly' | 'yearly' | null>(null);
@@ -42,6 +47,70 @@ export function PricingPage() {
   };
 
   return (
+    <>
+      <Helmet>
+        <title>{seo.title}</title>
+        <meta name="description" content={seo.description} />
+        <link rel="canonical" href={`${BASE_URL}/pricing`} />
+        
+        {/* hreflang */}
+        <link rel="alternate" hreflang="en" href={`${BASE_URL}/pricing`} />
+        <link rel="alternate" hreflang="es" href={`${BASE_URL}/pricing?lang=es`} />
+        <link rel="alternate" hreflang="x-default" href={`${BASE_URL}/pricing`} />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={seo.title} />
+        <meta property="og:description" content={seo.description} />
+        <meta property="og:url" content={`${BASE_URL}/pricing`} />
+        <meta property="og:site_name" content="GetQuickResume" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={seo.title} />
+        <meta name="twitter:description" content={seo.description} />
+        
+        {/* Product structured data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": "GetQuickResume Premium",
+            "description": "AI-powered resume builder with unlimited templates and features",
+            "brand": {
+              "@type": "Brand",
+              "name": "GetQuickResume"
+            },
+            "offers": [
+              {
+                "@type": "Offer",
+                "name": "Free Plan",
+                "price": "0",
+                "priceCurrency": "USD",
+                "availability": "https://schema.org/InStock"
+              },
+              {
+                "@type": "Offer",
+                "name": "Premium Monthly",
+                "price": "9.99",
+                "priceCurrency": "USD",
+                "availability": "https://schema.org/InStock"
+              },
+              {
+                "@type": "Offer",
+                "name": "Premium Yearly",
+                "price": "59.99",
+                "priceCurrency": "USD",
+                "availability": "https://schema.org/InStock"
+              }
+            ]
+          })}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify(faqSchema)}
+        </script>
+      </Helmet>
+
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Hero Section */}
       <section className="py-20 lg:py-32 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
@@ -234,5 +303,6 @@ export function PricingPage() {
         </div>
       </section>
     </div>
+    </>
   );
 }

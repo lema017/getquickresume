@@ -50,6 +50,12 @@ export interface CreateTemplateData {
   hash?: string;
 }
 
+export interface UpdateTemplateData {
+  id: string;
+  jsCode: string;
+  hash?: string;
+}
+
 export const templateService = {
   async listAll(): Promise<TemplateRecord[]> {
     const result = await ddb.send(new ScanCommand({ TableName: TEMPLATES_TABLE }));
@@ -124,6 +130,74 @@ export const templateService = {
     );
 
     return templateRecord;
+  },
+
+  /**
+   * Update an existing template's code in S3 and update hash in DynamoDB
+   */
+  async updateTemplate(data: UpdateTemplateData): Promise<TemplateRecord> {
+    if (!TEMPLATES_BUCKET) throw new Error('TEMPLATES_BUCKET is not configured');
+
+    // Verify template exists
+    const existing = await ddb.send(
+      new GetCommand({
+        TableName: TEMPLATES_TABLE,
+        Key: { id: data.id },
+      })
+    );
+
+    if (!existing.Item) {
+      throw new Error(`Template with id "${data.id}" does not exist`);
+    }
+
+    const templateRecord = existing.Item as TemplateRecord;
+    const s3Key = templateRecord.s3Key;
+
+    // Generate new hash
+    const hash = data.hash || generateHash(data.jsCode);
+
+    // Upload updated code to S3
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: TEMPLATES_BUCKET,
+        Key: s3Key,
+        Body: data.jsCode,
+        ContentType: 'application/javascript',
+      })
+    );
+
+    // Update hash in DynamoDB
+    const updatedRecord: TemplateRecord = {
+      ...templateRecord,
+      hash,
+    };
+
+    await ddb.send(
+      new PutCommand({
+        TableName: TEMPLATES_TABLE,
+        Item: updatedRecord,
+      })
+    );
+
+    return updatedRecord;
+  },
+
+  /**
+   * Get a template by ID
+   */
+  async getById(id: string): Promise<TemplateRecord | null> {
+    const result = await ddb.send(
+      new GetCommand({
+        TableName: TEMPLATES_TABLE,
+        Key: { id },
+      })
+    );
+
+    if (!result.Item) {
+      return null;
+    }
+
+    return result.Item as TemplateRecord;
   },
 };
 

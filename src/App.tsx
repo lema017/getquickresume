@@ -1,7 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
-import { useEffect } from 'react';
 
 // Layouts
 import { MainLayout } from '@/layouts/MainLayout';
@@ -12,6 +11,7 @@ import { LandingPage } from '@/pages/LandingPage';
 import { LoginPage } from '@/pages/LoginPage';
 // LinkedInCallback removed - handled by PKCE hook
 import { DashboardPage } from '@/pages/DashboardPage';
+import { CoverLetterPage } from '@/pages/CoverLetterPage';
 import { WizardPage } from '@/pages/WizardPage';
 import { PremiumPage } from '@/pages/PremiumPage';
 import { PricingPage } from '@/pages/PricingPage';
@@ -21,9 +21,13 @@ import { AboutPage } from '@/pages/AboutPage';
 import { SupportPage } from '@/pages/SupportPage';
 import { PrivacyPage } from '@/pages/PrivacyPage';
 import { TermsPage } from '@/pages/TermsPage';
+import { RefundPolicyPage } from '@/pages/RefundPolicyPage';
 import { ResumeViewPage } from '@/pages/ResumeViewPage';
 import { PublicResumePage } from '@/pages/PublicResumePage';
 import { ThankYouPage } from '@/pages/ThankYouPage';
+import { BlogPage } from '@/pages/BlogPage';
+import { HowToMakeGoodResume } from '@/pages/articles/HowToMakeGoodResume';
+import { WhatIsATS } from '@/pages/articles/WhatIsATS';
 
 // Components
 import { ProtectedRoute } from '@/components/ProtectedRoute';
@@ -31,18 +35,45 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 // Hooks
 import { useAuthInit } from '@/hooks/useAuthInit';
 
+// SEO
+import { BASE_URL } from '@/utils/seoConfig';
+
 function App() {
   const { i18n } = useTranslation();
+  const lang = i18n.language as 'en' | 'es';
   
   // Validate session on app mount
   useAuthInit();
 
+  // Default SEO based on language
+  const defaultTitle = lang === 'es' 
+    ? 'GetQuickResume - Creador de CV con IA Gratis'
+    : 'GetQuickResume - Free AI Resume Builder';
+  
+  const defaultDescription = lang === 'es'
+    ? 'Crea tu currículum profesional en minutos. Gratuito, optimizado para ATS y con asistencia de IA.'
+    : 'Create your professional resume in minutes. Free, ATS-optimized, and powered by AI.';
+
   return (
     <>
       <Helmet>
-        <html lang={i18n.language} />
-        <title>GetQuickResume - CV Profesional con IA</title>
-        <meta name="description" content="Crea tu currículum profesional en minutos. Gratuito, optimizado y traducible con IA." />
+        <html lang={lang} />
+        <title>{defaultTitle}</title>
+        <meta name="description" content={defaultDescription} />
+        
+        {/* Default hreflang tags */}
+        <link rel="alternate" hreflang="en" href={BASE_URL} />
+        <link rel="alternate" hreflang="es" href={`${BASE_URL}?lang=es`} />
+        <link rel="alternate" hreflang="x-default" href={BASE_URL} />
+        
+        {/* Viewport and mobile optimization */}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        
+        {/* Theme color */}
+        <meta name="theme-color" content="#2563eb" />
+        
+        {/* Robots default */}
+        <meta name="robots" content="index, follow" />
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -85,6 +116,31 @@ function App() {
               <TermsPage />
             </MainLayout>
           } />
+          
+          <Route path="/legal/refund" element={
+            <MainLayout>
+              <RefundPolicyPage />
+            </MainLayout>
+          } />
+
+          {/* Blog Routes */}
+          <Route path="/blog" element={
+            <MainLayout>
+              <BlogPage />
+            </MainLayout>
+          } />
+          
+          <Route path="/blog/how-to-make-good-resume" element={
+            <MainLayout>
+              <HowToMakeGoodResume />
+            </MainLayout>
+          } />
+          
+          <Route path="/blog/what-is-ats-system" element={
+            <MainLayout>
+              <WhatIsATS />
+            </MainLayout>
+          } />
 
           {/* Protected Routes */}
           <Route path="/dashboard" element={
@@ -92,6 +148,12 @@ function App() {
               <MainLayout>
                 <DashboardPage />
               </MainLayout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/cover-letter/:id?" element={
+            <ProtectedRoute>
+              <CoverLetterPage />
             </ProtectedRoute>
           } />
           

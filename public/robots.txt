@@ -1,0 +1,27 @@
+# Robots.txt for GetQuickResume
+# https://getquickresume.com
+
+User-agent: *
+Allow: /
+
+# Disallow private/authenticated pages
+Disallow: /dashboard
+Disallow: /wizard
+Disallow: /account
+Disallow: /resume/
+Disallow: /support
+Disallow: /thank-you
+
+# Allow search engines to crawl public pages
+Allow: /blog
+Allow: /pricing
+Allow: /about
+Allow: /contact
+Allow: /legal/
+
+# Sitemap location
+Sitemap: https://getquickresume.com/sitemap.xml
+
+# Crawl-delay for politeness (optional)
+Crawl-delay: 1
+

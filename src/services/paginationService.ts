@@ -100,6 +100,9 @@ export async function calculatePagination(
     })),
   });
 
+  // Clean up measurement container after pagination is complete
+  cleanupMeasurementContainer();
+
   return result;
 }
 
@@ -117,7 +120,7 @@ async function calculateSingleColumnPagination(
   const maxPageHeight = A4_DIMENSIONS.contentHeight; // 1083px
   console.log('📄 [SINGLE-COLUMN] Max page height:', maxPageHeight, 'px');
 
-  // Order for single-column: Header, Summary, Experience, Projects, Skills, Education, Languages, Achievements, Certifications
+  // Order for single-column: Header, Summary, Experience, Projects, Skills, Education, Achievements, Certifications, Languages
   const sections: Array<{ type: string; data: any; measure: () => Promise<number> }> = [];
   console.log('📄 [SINGLE-COLUMN] Building sections list...');
 
@@ -175,15 +178,6 @@ async function calculateSingleColumnPagination(
     });
   });
 
-  // Languages
-  resumeData.languages.forEach((lang) => {
-    sections.push({
-      type: 'language',
-      data: lang,
-      measure: async () => await measureLanguageItem(lang, template),
-    });
-  });
-
   // Achievements
   resumeData.achievements.forEach((ach) => {
     sections.push({
@@ -199,6 +193,15 @@ async function calculateSingleColumnPagination(
       type: 'certification',
       data: cert,
       measure: async () => await measureCertificationItem(cert, template),
+    });
+  });
+
+  // Languages (always last section)
+  resumeData.languages.forEach((lang) => {
+    sections.push({
+      type: 'language',
+      data: lang,
+      measure: async () => await measureLanguageItem(lang, template),
     });
   });
 
@@ -439,7 +442,7 @@ async function calculateTwoColumnPagination(
 ): Promise<PaginationInfo> {
   console.log('📄 [TWO-COLUMN] Starting two-column pagination');
   // Two-column layout:
-  // Left: Skills, Languages, Education, Certifications
+  // Left: Skills, Education, Certifications, Languages
   // Right: Header, Summary, Experience, Projects, Achievements
 
   const pages: PageContent[] = [];
@@ -458,14 +461,6 @@ async function calculateTwoColumnPagination(
     });
   }
 
-  resumeData.languages.forEach((lang) => {
-    leftSections.push({
-      type: 'language',
-      data: lang,
-      measure: async () => await measureLanguageItem(lang, template, true),
-    });
-  });
-
   resumeData.education.forEach((edu) => {
     leftSections.push({
       type: 'education',
@@ -479,6 +474,15 @@ async function calculateTwoColumnPagination(
       type: 'certification',
       data: cert,
       measure: async () => await measureCertificationItem(cert, template, true),
+    });
+  });
+
+  // Languages always last in sidebar
+  resumeData.languages.forEach((lang) => {
+    leftSections.push({
+      type: 'language',
+      data: lang,
+      measure: async () => await measureLanguageItem(lang, template, true),
     });
   });
 
@@ -683,6 +687,72 @@ async function calculateTwoColumnPagination(
 
 // Measurement functions - these render elements temporarily to measure their height
 
+// Singleton measurement container to avoid repeated DOM creation/destruction
+let measurementContainer: HTMLDivElement | null = null;
+
+/**
+ * Creates or returns an existing hidden measurement container for accurate DOM-based height calculations.
+ * The container mimics template styling for skills rendering.
+ */
+function getOrCreateMeasurementContainer(): HTMLDivElement {
+  if (measurementContainer && document.body.contains(measurementContainer)) {
+    return measurementContainer;
+  }
+
+  measurementContainer = document.createElement('div');
+  measurementContainer.id = 'pagination-measurement-container';
+  measurementContainer.style.cssText = `
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: -1;
+  `;
+
+  // Add styles for skills measurement
+  const styleElement = document.createElement('style');
+  styleElement.textContent = `
+    #pagination-measurement-container .skills-measure-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+    #pagination-measurement-container .skills-measure-container.main-column {
+      width: ${A4_DIMENSIONS.contentWidth}px; /* 754px */
+    }
+    #pagination-measurement-container .skills-measure-container.sidebar-column {
+      width: 200px; /* Typical sidebar width */
+    }
+    #pagination-measurement-container .skill-measure-badge {
+      padding: 4px 12px;
+      background: #f0f0f0;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.4;
+      white-space: nowrap;
+      box-sizing: border-box;
+    }
+  `;
+
+  measurementContainer.appendChild(styleElement);
+  document.body.appendChild(measurementContainer);
+
+  return measurementContainer;
+}
+
+/**
+ * Cleans up the measurement container from DOM
+ */
+function cleanupMeasurementContainer(): void {
+  if (measurementContainer && document.body.contains(measurementContainer)) {
+    document.body.removeChild(measurementContainer);
+    measurementContainer = null;
+  }
+}
+
 async function measureHeader(resumeData: ResumeData, template: ResumeTemplate): Promise<number> {
   // Estimate: header is typically 80-120px
   const height = 100;
@@ -747,12 +817,54 @@ async function measureCertificationItem(cert: any, template: ResumeTemplate, isS
 }
 
 async function measureSkills(skills: string[], template: ResumeTemplate, isSidebar: boolean = false): Promise<number> {
-  // Estimate: 30px per skill in a grid/chip layout
-  // For sidebar, might be more compact
-  const skillsPerRow = isSidebar ? 1 : 3;
-  const rows = Math.ceil(skills.length / skillsPerRow);
-  const height = rows * 35 + 20; // 35px per row, 20px margin
-  console.log(`  📏 [MEASURE] Skills (${skills.length} total, ${isSidebar ? 'sidebar' : 'main'}): ${height}px (${rows} rows, ${skillsPerRow} per row, estimated)`);
-  return height;
+  // Handle empty skills array
+  if (!skills || skills.length === 0) {
+    console.log(`  📏 [MEASURE] Skills: 0px (no skills)`);
+    return 0;
+  }
+
+  try {
+    // Get or create the measurement container
+    const container = getOrCreateMeasurementContainer();
+
+    // Create a wrapper div for this measurement
+    const measureWrapper = document.createElement('div');
+    measureWrapper.className = `skills-measure-container ${isSidebar ? 'sidebar-column' : 'main-column'}`;
+
+    // Render skills as badges
+    skills.forEach(skill => {
+      const badge = document.createElement('span');
+      badge.className = 'skill-measure-badge';
+      badge.textContent = skill;
+      measureWrapper.appendChild(badge);
+    });
+
+    // Add to measurement container
+    container.appendChild(measureWrapper);
+
+    // Force layout calculation
+    void measureWrapper.offsetHeight;
+
+    // Measure actual rendered height
+    const skillsHeight = measureWrapper.offsetHeight;
+
+    // Add section overhead (section title + margins)
+    const sectionOverhead = 50; // Section header + top/bottom margins
+    const totalHeight = skillsHeight + sectionOverhead;
+
+    // Clean up this specific measurement
+    container.removeChild(measureWrapper);
+
+    console.log(`  📏 [MEASURE] Skills (${skills.length} total, ${isSidebar ? 'sidebar' : 'main'}): ${totalHeight}px (skills: ${skillsHeight}px + overhead: ${sectionOverhead}px, DOM measured)`);
+    return totalHeight;
+  } catch (error) {
+    // Fallback to estimation if DOM measurement fails
+    console.warn('  📏 [MEASURE] Skills: DOM measurement failed, falling back to estimation', error);
+    const skillsPerRow = isSidebar ? 2 : 6; // More realistic fallback estimate
+    const rows = Math.ceil(skills.length / skillsPerRow);
+    const height = rows * 35 + 50; // 35px per row, 50px section overhead
+    console.log(`  📏 [MEASURE] Skills (${skills.length} total, ${isSidebar ? 'sidebar' : 'main'}): ${height}px (${rows} rows, ${skillsPerRow} per row, estimated fallback)`);
+    return height;
+  }
 }
 

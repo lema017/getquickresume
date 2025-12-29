@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { 
   ArrowRight, 
   CheckCircle, 
@@ -14,11 +15,76 @@ import {
 } from 'lucide-react';
 import { IconWrapper } from '@/components/IconWrapper';
 import { FeatureCard } from '@/components/FeatureCard';
+import {
+  getPageSEO,
+  generateOrganizationSchema,
+  generateWebSiteSchema,
+  generateSoftwareApplicationSchema,
+  generateFAQSchema,
+  commonFAQs,
+  BASE_URL,
+} from '@/utils/seoConfig';
 
 export function LandingPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language as 'en' | 'es';
+  const seo = getPageSEO('home', lang);
+
+  // Structured data schemas
+  const organizationSchema = generateOrganizationSchema();
+  const webSiteSchema = generateWebSiteSchema();
+  const softwareAppSchema = generateSoftwareApplicationSchema();
+  const faqSchema = generateFAQSchema(commonFAQs[lang]);
 
   return (
+    <>
+      <Helmet>
+        <title>{seo.title}</title>
+        <meta name="description" content={seo.description} />
+        <link rel="canonical" href={BASE_URL} />
+        
+        {/* hreflang for internationalization */}
+        <link rel="alternate" hreflang="en" href={BASE_URL} />
+        <link rel="alternate" hreflang="es" href={`${BASE_URL}?lang=es`} />
+        <link rel="alternate" hreflang="x-default" href={BASE_URL} />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={seo.title} />
+        <meta property="og:description" content={seo.description} />
+        <meta property="og:url" content={BASE_URL} />
+        <meta property="og:site_name" content="GetQuickResume" />
+        <meta property="og:image" content={`${BASE_URL}/images/og-default.png`} />
+        <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={seo.title} />
+        <meta name="twitter:description" content={seo.description} />
+        <meta name="twitter:image" content={`${BASE_URL}/images/og-default.png`} />
+        
+        {/* Additional SEO meta tags */}
+        <meta name="robots" content="index, follow" />
+        <meta name="keywords" content={lang === 'es' 
+          ? 'creador de cv, currículum con ia, plantillas de cv, cv profesional, ats cv, crear cv gratis'
+          : 'resume builder, ai resume, cv templates, professional resume, ats resume, free resume maker'
+        } />
+        
+        {/* Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify(organizationSchema)}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify(webSiteSchema)}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify(softwareAppSchema)}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify(faqSchema)}
+        </script>
+      </Helmet>
+
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 py-20 lg:py-32">
@@ -460,5 +526,6 @@ export function LandingPage() {
         </div>
       </section>
     </div>
+    </>
   );
 }

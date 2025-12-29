@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Menu, X, User, LogOut, Globe } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { Avatar } from './Avatar';
+import { formatName } from '@/utils/textFormatting';
 
 export function Header() {
   const { t, i18n } = useTranslation();
@@ -62,6 +63,15 @@ export function Header() {
                 </Link>
                 
                 <Link
+                  to="/blog"
+                  className={`text-sm font-medium transition-colors ${
+                    location.pathname.startsWith('/blog') ? 'text-primary' : 'text-gray-700 hover:text-primary'
+                  }`}
+                >
+                  {t('nav.blog')}
+                </Link>
+                
+                <Link
                   to="/premium"
                   className={`text-sm font-medium transition-colors ${
                     isActive('/premium') ? 'text-primary' : 'text-gray-700 hover:text-primary'
@@ -89,6 +99,15 @@ export function Header() {
                   }`}
                 >
                   Dashboard
+                </Link>
+                
+                <Link
+                  to="/blog"
+                  className={`text-sm font-medium transition-colors ${
+                    location.pathname.startsWith('/blog') ? 'text-primary' : 'text-gray-700 hover:text-primary'
+                  }`}
+                >
+                  {t('nav.blog')}
                 </Link>
                 
                 <Link
@@ -151,7 +170,7 @@ export function Header() {
                     alt={user?.fullName || 'User avatar'}
                     size="md"
                   />
-                  <span className="hidden sm:block">{user?.fullName}</span>
+                  <span className="hidden sm:block">{user?.fullName ? formatName(user.fullName) : ''}</span>
                 </button>
 
                 {/* Dropdown Menu */}
@@ -218,6 +237,14 @@ export function Header() {
                   </Link>
                   
                   <Link
+                    to="/blog"
+                    className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {t('nav.blog')}
+                  </Link>
+                  
+                  <Link
                     to="/premium"
                     className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md"
                     onClick={() => setIsMenuOpen(false)}
@@ -242,6 +269,14 @@ export function Header() {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {t('nav.home')}
+                  </Link>
+                  
+                  <Link
+                    to="/blog"
+                    className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {t('nav.blog')}
                   </Link>
                   
                   <Link

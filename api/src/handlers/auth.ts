@@ -6,6 +6,7 @@ import { exchangeCodeForToken, verifyLinkedInToken, parseLinkedInProfile } from 
 import { getUserByEmail, createUser, updateUser, getUserById } from '../services/dynamodb';
 import { generateToken } from '../services/jwt';
 import { User, AuthorizedEvent } from '../types';
+import { formatName } from '../utils/textFormatting';
 
 // Configuración simplificada para desarrollo local
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -65,10 +66,18 @@ export const googleAuth = async (event: APIGatewayProxyEvent): Promise<APIGatewa
     // Verificar el token de Google
     const googleUser = await verifyGoogleToken(token);
     
-    // Parsear nombre completo
-    const firstName = googleUser.given_name || googleUser.name.split(' ')[0] || '';
-    const lastName = googleUser.family_name || googleUser.name.split(' ').slice(1).join(' ') || '';
-    const fullName = googleUser.name;
+    // Parsear nombre completo y aplicar formato Title Case
+    const rawFirstName = googleUser.given_name || googleUser.name.split(' ')[0] || '';
+    const rawLastName = googleUser.family_name || googleUser.name.split(' ').slice(1).join(' ') || '';
+    const rawFullName = googleUser.name;
+    
+    console.log('[Google Auth] Raw names from Google:', { rawFirstName, rawLastName, rawFullName });
+    
+    const firstName = formatName(rawFirstName);
+    const lastName = formatName(rawLastName);
+    const fullName = formatName(rawFullName);
+    
+    console.log('[Google Auth] Formatted names:', { firstName, lastName, fullName });
     
     // Validar y limpiar avatarUrl
     let avatarUrl = googleUser.picture;
@@ -303,7 +312,25 @@ export const linkedinAuth = async (event: APIGatewayProxyEvent): Promise<APIGate
       console.log('LinkedIn profile received:', JSON.stringify(linkedinProfile, null, 2));
     
     // Parsear datos del perfil de LinkedIn usando la nueva función
-    const { email, firstName, lastName, fullName, avatarUrl, city, country, linkedinUrl } = parseLinkedInProfile(linkedinProfile);
+    const parsedProfile = parseLinkedInProfile(linkedinProfile);
+    
+    console.log('[LinkedIn Auth] Raw names from LinkedIn:', { 
+      firstName: parsedProfile.firstName, 
+      lastName: parsedProfile.lastName, 
+      fullName: parsedProfile.fullName 
+    });
+    
+    // Aplicar formato Title Case a los nombres
+    const email = parsedProfile.email;
+    const firstName = formatName(parsedProfile.firstName);
+    const lastName = formatName(parsedProfile.lastName);
+    const fullName = formatName(parsedProfile.fullName);
+    const avatarUrl = parsedProfile.avatarUrl;
+    const city = parsedProfile.city;
+    const country = parsedProfile.country;
+    const linkedinUrl = parsedProfile.linkedinUrl;
+    
+    console.log('[LinkedIn Auth] Formatted names:', { firstName, lastName, fullName });
     
     // Buscar usuario existente por email
     if (!email) {
@@ -467,6 +494,11 @@ export const getMe = async (
       };
     }
 
+    // Format names to Title Case (safety measure for existing users with lowercase names)
+    const formattedFirstName = formatName(user.firstName || '');
+    const formattedLastName = formatName(user.lastName || '');
+    const formattedFullName = formatName(user.fullName || '');
+
     // Return user data (excluding sensitive fields if needed)
     return {
       statusCode: 200,
@@ -481,9 +513,9 @@ export const getMe = async (
         user: {
           id: user.id,
           email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          fullName: user.fullName,
+          firstName: formattedFirstName,
+          lastName: formattedLastName,
+          fullName: formattedFullName,
           avatarUrl: user.avatarUrl,
           city: user.city,
           country: user.country,

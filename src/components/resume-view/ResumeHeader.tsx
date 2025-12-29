@@ -1,6 +1,7 @@
 import { Resume } from '@/types';
 import { useTranslation } from 'react-i18next';
 import { Edit2, Download, Calendar, FileText, Globe, Share2 } from 'lucide-react';
+import { formatName, formatProfession } from '@/utils/textFormatting';
 
 interface ResumeHeaderProps {
   resume: Resume;
@@ -43,14 +44,14 @@ export function ResumeHeader({ resume, onEdit, onDownload, onTranslate, onShare,
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-2xl font-bold text-gray-900">
-              {resumeData.firstName} {resumeData.lastName}
+              {formatName(`${resumeData.firstName} ${resumeData.lastName}`)}
             </h1>
             <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor()}`}>
               {t(`resumeView.status.${status}`)}
             </span>
           </div>
           {resumeData.profession && (
-            <p className="text-lg text-gray-600 mb-2">{resumeData.profession}</p>
+            <p className="text-lg text-gray-600 mb-2">{formatProfession(resumeData.profession)}</p>
           )}
           {title && title !== `${resumeData.firstName} ${resumeData.lastName} - CV` && (
             <p className="text-sm text-gray-500 mb-2">{title}</p>

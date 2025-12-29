@@ -14,16 +14,96 @@ Here the order of the sections of the Resume template we must render
   4) Experience
   5) Projects
   6) Education
-  7) Languages
-  8) Achievements
-  9) Certifications
+  7) Achievements
+  8) Certifications
+  9) Languages (ALWAYS LAST)
 
 ### Technical Constraints
 - **Web Component**: Must use Custom Elements API with Shadow DOM
 - **Registration**: Must use `customElements.define()` to register the component
 - **Data Property**: Component accepts a `data` property/attribute with resume data
+- **Language Attribute**: Component accepts a `language` attribute ('en' or 'es') for section title localization
 - **No External Libraries**: Use only native DOM, CSS, and JavaScript APIs
 - **Browser Compatibility**: Must work in modern browsers (Chrome, Firefox, Safari, Edge)
+
+### Internationalization (i18n) - REQUIRED
+
+**⚠️ CRITICAL: All section titles MUST be localized based on the `language` attribute.**
+
+Templates must include a `getSectionTitle()` method that returns the correct title based on the language:
+
+```javascript
+getSectionTitle(section) {
+  const titles = {
+    en: {
+      profile: 'PROFILE',
+      skills: 'SKILLS',
+      experience: 'WORK EXPERIENCE',
+      projects: 'PROJECTS',
+      education: 'EDUCATION',
+      achievements: 'ACHIEVEMENTS',
+      certifications: 'CERTIFICATIONS',
+      languages: 'LANGUAGES'
+    },
+    es: {
+      profile: 'PERFIL',
+      skills: 'HABILIDADES',
+      experience: 'EXPERIENCIA LABORAL',
+      projects: 'PROYECTOS',
+      education: 'EDUCACIÓN',
+      achievements: 'LOGROS',
+      certifications: 'CERTIFICACIONES',
+      languages: 'IDIOMAS'
+    }
+  };
+  return titles[this._language]?.[section] || titles['en'][section];
+}
+```
+
+**Required Implementation:**
+1. Store the language in a class property: `this._language = this.getAttribute('language') || 'en';`
+2. Update language when attribute changes in `attributeChangedCallback`
+3. Use `this.getSectionTitle('experience')` instead of hardcoded "WORK EXPERIENCE"
+4. Add 'language' to the `observedAttributes` static getter
+
+**Example Usage in Render Methods:**
+
+**⚠️ NEVER use hardcoded section titles like "SKILLS", "Experience", "Habilidades", "Perfil Profesional", etc.**
+**⚠️ ALWAYS use `${this.getSectionTitle('sectionName')}` for ALL section titles.**
+
+```javascript
+// CORRECT - Use getSectionTitle() for ALL sections:
+renderProfile(profile) {
+  return `<div class="section-title">${this.getSectionTitle('profile')}</div>...`;
+}
+renderSkills(skills) {
+  return `<div class="section-title">${this.getSectionTitle('skills')}</div>...`;
+}
+renderExperience(experience) {
+  return `<div class="section-title">${this.getSectionTitle('experience')}</div>...`;
+}
+renderProjects(projects) {
+  return `<div class="section-title">${this.getSectionTitle('projects')}</div>...`;
+}
+renderEducation(education) {
+  return `<div class="section-title">${this.getSectionTitle('education')}</div>...`;
+}
+renderAchievements(achievements) {
+  return `<div class="section-title">${this.getSectionTitle('achievements')}</div>...`;
+}
+renderCertifications(certifications) {
+  return `<div class="section-title">${this.getSectionTitle('certifications')}</div>...`;
+}
+renderLanguages(languages) {
+  return `<div class="section-title">${this.getSectionTitle('languages')}</div>...`;
+}
+
+// WRONG - Never hardcode titles:
+// ❌ <div class="section-title">SKILLS</div>
+// ❌ <div class="section-title">Experience</div>
+// ❌ <div class="section-title">Habilidades</div>
+// ❌ <div class="section-title">Perfil Profesional</div>
+```
 
 ### Layout Requirement - CRITICAL: Single Column Only - MUST IGNORE MULTI-COLUMN DESIGNS
 
@@ -38,7 +118,7 @@ Here the order of the sections of the Resume template we must render
 **⚠️ IF THE IMAGE SHOWS MULTIPLE COLUMNS, YOU MUST COMPLETELY DISREGARD THAT LAYOUT STRUCTURE AND CONVERT IT TO SINGLE COLUMN**
 
 **Key Requirements:**
-- The main content area (all sections: Header, Profile, Skills, Experience, Projects, Education, Languages, Achievements, Certifications) MUST flow vertically in a single column
+- The main content area (all sections: Header, Profile, Skills, Experience, Projects, Education, Achievements, Certifications, Languages) MUST flow vertically in a single column
 - Sections MUST be stacked vertically, one after another
 - DO NOT create sidebars, multiple columns, or grid layouts for the main content
 - **MUST IGNORE** any multi-column layout structure shown in the reference image
@@ -89,7 +169,7 @@ If the image shows:
 - Right column: Header, Profile, Experience, Projects
 
 You MUST generate:
-- Single column: Header, Profile, Skills, Experience, Projects, Education, Languages (all in vertical order)
+- Single column: Header, Profile, Skills, Experience, Projects, Education, Achievements, Certifications, Languages (all in vertical order, Languages ALWAYS last)
 
 **⚠️ ADDITIONAL EXAMPLES OF WHAT TO IGNORE:**
 - If image shows a sidebar on the left with Skills/Education → **IGNORE the sidebar, convert to single column**
@@ -189,11 +269,12 @@ render() {
       ${this.renderExperience(experience)}
       ${this.renderProjects(projects)}
       ${this.renderEducation(education)}
-      ${this.renderLanguages(languages)}
       ${this.renderAchievements(achievements)}
       ${this.renderCertifications(certifications)}
+      ${this.renderLanguages(languages)}
     </div>
   `;
+  // NOTE: Languages section is ALWAYS rendered last
 }
 
 renderHeader(name, title, contact) {
@@ -217,7 +298,7 @@ renderExperience(experience) {
   if (!experience || experience.length === 0) return '';
   return `
     <div class="section">
-      <div class="section-title">WORK EXPERIENCE</div>
+      <div class="section-title">${this.getSectionTitle('experience')}</div>
       <div class="section-content">
         ${experience.map(job => `
           <div class="experience-item">
@@ -243,9 +324,10 @@ renderExperience(experience) {
 renderLanguages(languages) {
   if (!languages || languages.length === 0) return '';
   // Languages is an array of strings, NOT objects
+  // NOTE: This section should always be rendered LAST in the resume
   return `
     <div class="section">
-      <div class="section-title">LANGUAGES</div>
+      <div class="section-title">${this.getSectionTitle('languages')}</div>
       <div class="section-content">
         ${languages.map(lang => `<div>${lang}</div>`).join('')}
       </div>
@@ -354,7 +436,7 @@ renderSkills(skills) {
   if (!skills || skills.length === 0) return '';
   return `
     <div class="section">
-      <div class="section-title">SKILLS</div>
+      <div class="section-title">${this.getSectionTitle('skills')}</div>
       <div class="section-content">
         <div class="skills-container">
           ${skills.map(skill => `<span class="skill-item">${skill}</span>`).join('')}

@@ -3,6 +3,7 @@ export const es = {
   common: {
     loading: 'Cargando...',
     saving: 'Guardando...',
+    deleting: 'Eliminando...',
     save: 'Guardar',
     cancel: 'Cancelar',
     continue: 'Continuar',
@@ -24,6 +25,7 @@ export const es = {
     showTips: 'Mostrar Tips',
     closeTips: 'Cerrar tips',
     preview: 'Ver',
+    view: 'Ver',
   },
 
   // Navigation
@@ -31,12 +33,14 @@ export const es = {
     home: 'Inicio',
     dashboard: 'Dashboard',
     create: 'Crear CV',
+    blog: 'Blog',
     premium: 'Premium',
     account: 'Mi Cuenta',
     contact: 'Contacto',
     about: 'Acerca de',
     privacy: 'Privacidad',
     terms: 'Términos',
+    refund: 'Política de Reembolsos',
     support: 'Soporte',
   },
 
@@ -1058,7 +1062,8 @@ export const es = {
             expPanelTitle: 'Sugerencias de IA para Experiencia',
             diffPanelTitle: 'Sugerencias de IA para Diferenciadores',
             generating: 'Generando sugerencias...',
-            noneForProfession: 'No hay sugerencias disponibles para esta profesión.'
+            noneForProfession: 'No hay sugerencias disponibles para esta profesión.',
+            errorLoading: 'No se pudieron cargar las sugerencias. Por favor, intenta de nuevo.'
           },
           placeholders: {
             summary: 'Describe tu experiencia profesional en 3-4 líneas...',
@@ -1159,52 +1164,82 @@ export const es = {
             message: 'Por favor, mantén esta ventana abierta. La IA está trabajando en tu CV.',
             retry: 'Cancelar y reintentar'
           }
-        }
-      },
-      generatedResume: {
+        },
+        generatedResume: {
         sections: {
-          contactInfo: 'Información de Contacto',
-          professionalSummary: 'Resumen Profesional',
-          experience: 'Experiencia Laboral',
-          skills: 'Habilidades',
-          education: 'Educación',
-          certifications: 'Certificaciones',
-          projects: 'Proyectos',
-          achievements: 'Logros Generales',
-          languages: 'Idiomas'
-        },
-        skills: {
-          technical: 'Habilidades Técnicas',
-          soft: 'Habilidades Blandas',
-          tools: 'Herramientas'
-        },
-        experience: {
-          achievements: 'Logros Clave',
-          skills: 'Habilidades',
-          impact: 'Impacto Medible'
-        },
-        education: {
-          relevantCoursework: 'Cursos Relevantes',
-          honors: 'Honores',
-          gpa: 'GPA'
-        },
-        projects: {
-          technologies: 'Tecnologías',
-          achievements: 'Logros',
-          impact: 'Impacto'
-        },
-        languages: {
-          level: {
-            native: 'Nativo',
-            advanced: 'Avanzado',
-            intermediate: 'Intermedio',
-            basic: 'Básico'
+          contact: {
+            title: 'Información de Contacto',
+            fullName: 'Nombre Completo',
+            email: 'Correo Electrónico',
+            phone: 'Teléfono',
+            location: 'Ubicación',
+            linkedin: 'LinkedIn'
+          },
+          summary: {
+            title: 'Resumen Profesional',
+            placeholder: 'Ingresa tu resumen profesional...'
+          },
+          experience: {
+            title: 'Experiencia Laboral',
+            jobTitle: 'Cargo',
+            company: 'Empresa',
+            duration: 'Duración',
+            location: 'Ubicación',
+            description: 'Descripción',
+            achievements: 'Logros Clave',
+            skills: 'Habilidades',
+            addAchievement: 'Agregar Logro'
+          },
+          skills: {
+            title: 'Habilidades',
+            technical: 'Habilidades Técnicas',
+            soft: 'Habilidades Blandas',
+            tools: 'Herramientas',
+            addSkill: 'Agregar Habilidad'
+          },
+          education: {
+            title: 'Educación',
+            degree: 'Título',
+            institution: 'Institución',
+            field: 'Campo de Estudio',
+            duration: 'Duración',
+            gpa: 'GPA',
+            coursework: 'Cursos Relevantes',
+            honors: 'Honores'
+          },
+          certifications: {
+            title: 'Certificaciones',
+            name: 'Nombre de Certificación',
+            issuer: 'Emisor',
+            date: 'Fecha',
+            credentialId: 'ID de Credencial',
+            skills: 'Habilidades Relacionadas'
+          },
+          projects: {
+            title: 'Proyectos',
+            name: 'Nombre del Proyecto',
+            duration: 'Duración',
+            description: 'Descripción',
+            technologies: 'Tecnologías',
+            achievements: 'Logros',
+            viewProject: 'Ver Proyecto'
+          },
+          achievements: {
+            title: 'Logros Generales'
+          },
+          languages: {
+            title: 'Idiomas',
+            language: 'Idioma',
+            level: 'Nivel',
+            certifications: 'Certificaciones'
           }
         },
         actions: {
           edit: 'Editar',
-          view: 'Ver',
-          viewProject: 'Ver Proyecto'
+          save: 'Guardar',
+          cancel: 'Cancelar',
+          aiSuggestions: 'Sugerencias de IA'
+        }
         }
       },
       final: {
@@ -1719,6 +1754,9 @@ export const es = {
     terms: {
       title: 'Términos de Servicio',
     },
+    refund: {
+      title: 'Política de Reembolsos',
+    },
   },
 
   // Errors
@@ -1858,6 +1896,29 @@ export const es = {
       jobApplications: 'Aplicaciones de Trabajo',
       jobApplicationsDesc: 'Rastrea y gestiona tus aplicaciones de trabajo',
       availableSoon: 'Próximamente Disponible',
+    },
+    coverLetters: {
+      title: 'Cartas de Presentación',
+      description: 'Genera cartas de presentación personalizadas con IA',
+      hint: 'Crea cartas de presentación que coincidan con tu CV y la descripción del puesto',
+      createButton: 'Crear Carta de Presentación',
+      createNew: 'Nueva',
+      count: {
+        singular: 'carta de presentación',
+        plural: 'cartas de presentación',
+      },
+      confirmDelete: '¿Estás seguro de que quieres eliminar esta carta de presentación?',
+      deleteSuccess: 'Carta de presentación eliminada',
+      deleteError: 'Error al eliminar la carta de presentación',
+      deleteModal: {
+        title: 'Eliminar Carta de Presentación',
+        description: '¿Estás seguro de que quieres eliminar esta carta de presentación? Esta acción no se puede deshacer.',
+      },
+    },
+    status: {
+      draft: 'Borrador',
+      generated: 'Generada',
+      saved: 'Guardada',
     },
     edit: 'Editar',
     download: 'Descargar',
@@ -2249,5 +2310,172 @@ export const es = {
     processingNote: 'Recibirás un correo de confirmación una vez que tu suscripción esté activa.',
     needHelp: '¿Necesitas ayuda?',
     contactSupport: 'Contactar Soporte',
+  },
+
+  // Cover Letter
+  coverLetter: {
+    title: 'Generador de Cartas de Presentación',
+    subtitle: 'Crea cartas de presentación personalizadas con IA',
+    generate: 'Generar Carta',
+    generating: 'Generando...',
+    confirmLeave: 'Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?',
+    
+    leaveModal: {
+      title: 'Cambios sin Guardar',
+      description: 'Tienes cambios sin guardar. ¿Estás seguro de que quieres salir? Tu carta de presentación se perderá.',
+      stay: 'Quedarse',
+      leave: 'Salir sin Guardar',
+    },
+    
+    sourceSelector: {
+      title: '¿Cómo quieres empezar?',
+      subtitle: 'Elige un punto de partida para tu carta',
+      fromResume: {
+        title: 'Desde un CV Existente',
+        description: 'Usa los datos de tu CV para autocompletar',
+        noResumes: 'No se encontraron CVs. ¡Crea uno primero!',
+        noProfession: 'Sin profesión especificada',
+      },
+      fromScratch: {
+        title: 'Empezar de Cero',
+        description: 'Ingresa toda la información manualmente',
+        cta: 'Crear desde cero',
+        hint: 'Perfecto para nuevas aplicaciones',
+        button: 'Empezar de Cero',
+      },
+    },
+
+    form: {
+      sections: {
+        company: 'Empresa y Puesto',
+        companyDesc: 'Cuéntanos sobre la posición',
+        personal: 'Toque Personal',
+        personalDesc: 'Hazlo único para ti',
+        personalInfo: 'Tu Información',
+        personalInfoDesc: 'Agrega tus datos de contacto',
+        style: 'Tono y Estilo',
+        styleDesc: 'Personaliza la voz',
+      },
+      companyName: 'Nombre de la Empresa',
+      companyNamePlaceholder: 'ej., Google, Microsoft, Startup Inc.',
+      jobTitle: 'Título del Puesto',
+      jobTitlePlaceholder: 'ej., Ingeniero de Software, Gerente de Producto',
+      jobDescription: 'Descripción del Puesto',
+      jobDescriptionPlaceholder: 'Pega la descripción del puesto aquí para mejor personalización...',
+      jobDescriptionHint: 'Opcional pero recomendado para mejores resultados',
+      hiringManager: 'Nombre del Reclutador',
+      hiringManagerPlaceholder: 'ej., Juan Pérez (opcional)',
+      whyCompany: '¿Por Qué Esta Empresa?',
+      whyCompanyPlaceholder: '¿Qué te emociona de esta empresa? Su misión, cultura, productos...',
+      keyAchievement: 'Logro Clave a Destacar',
+      keyAchievementPlaceholder: 'Tu logro más relevante para este rol...',
+      fullName: 'Nombre Completo',
+      fullNamePlaceholder: 'Tu nombre completo',
+      email: 'Correo Electrónico',
+      emailPlaceholder: 'tu.correo@ejemplo.com',
+      phone: 'Teléfono',
+      phonePlaceholder: '+52 (555) 123-4567',
+      linkedin: 'LinkedIn',
+      linkedinPlaceholder: 'linkedin.com/in/tuperfil',
+      toneLabel: 'Elige tu tono',
+      lengthLabel: 'Elige la extensión',
+      requiredHint: 'Por favor completa todos los campos requeridos (*)',
+      tone: {
+        professional: 'Profesional',
+        friendly: 'Amigable',
+        confident: 'Seguro',
+        creative: 'Creativo',
+      },
+      length: {
+        concise: 'Conciso',
+        conciseDesc: '3-4 párrafos, directo al punto',
+        standard: 'Estándar',
+        standardDesc: '5-6 párrafos, detalle balanceado',
+        detailed: 'Detallado',
+        detailedDesc: '7+ párrafos, comprensivo',
+      },
+    },
+
+    templates: {
+      title: 'Elegir Plantilla',
+      classic: {
+        name: 'Clásico',
+        description: 'Estilo tradicional y formal',
+      },
+      modern: {
+        name: 'Moderno',
+        description: 'Limpio y contemporáneo',
+      },
+      minimal: {
+        name: 'Minimalista',
+        description: 'Simple y elegante',
+      },
+      creative: {
+        name: 'Creativo',
+        description: 'Diseño audaz y único',
+      },
+    },
+
+    preview: {
+      title: 'Vista Previa',
+      copy: 'Copiar al portapapeles',
+      download: 'Descargar PDF',
+      print: 'Imprimir',
+      save: 'Guardar',
+      saved: '¡Guardado!',
+      saveFailed: 'Error al guardar la carta',
+      copied: '¡Copiado al portapapeles!',
+      downloadStarted: '¡Descarga iniciada!',
+      downloadingPdf: 'Generando PDF...',
+      downloadFailed: 'Error al descargar PDF',
+      generating: 'Generando tu carta de presentación...',
+      generatingHint: 'Nuestra IA está creando una carta personalizada basada en tus datos',
+      edit: 'Editar',
+      regenerate: 'Regenerar',
+      regeneratePremium: 'Función premium',
+      paragraphRegenerated: '¡Párrafo regenerado!',
+      paragraphSaved: '¡Cambios guardados!',
+      empty: {
+        title: 'Tu carta aparecerá aquí',
+        description: 'Completa el formulario y haz clic en Generar para crear tu carta personalizada',
+      },
+    },
+
+    success: {
+      generated: '¡Carta de presentación generada exitosamente!',
+    },
+
+    errors: {
+      companyRequired: 'Por favor ingresa el nombre de la empresa',
+      jobTitleRequired: 'Por favor ingresa el título del puesto',
+      nameRequired: 'Por favor ingresa tu nombre completo',
+      generateFailed: 'Error al generar la carta. Por favor intenta de nuevo.',
+      regenerateFailed: 'Error al regenerar el párrafo. Por favor intenta de nuevo.',
+      premiumRequired: 'Has alcanzado tu límite de cartas gratuitas. Actualiza a premium para más.',
+      loadFailed: 'Error al cargar la carta. Por favor intenta de nuevo.',
+    },
+
+    loading: 'Cargando carta de presentación...',
+
+    ai: {
+      getSuggestions: 'Sugerencias IA',
+      enhance: 'Mejorar con IA',
+      jobDescriptionRequired: 'Por favor agrega una descripción del puesto arriba para generar sugerencias IA',
+      suggestionsLoaded: '¡Sugerencias cargadas!',
+      suggestionsFailed: 'Error al obtener sugerencias',
+      achievementEnhanced: '¡Logro mejorado!',
+      enhanceFailed: 'Error al mejorar el logro',
+      rateLimitExceeded: 'Demasiadas solicitudes. Por favor espera un momento.',
+      clickToAdd: 'Haz clic para agregar:',
+      suggestionApplied: '¡Sugerencia agregada!',
+    },
+
+    premium: {
+      title: 'Función Premium',
+      suggestionsDescription: 'Las sugerencias impulsadas por IA te ayudan a escribir razones convincentes sobre por qué quieres trabajar en esta empresa. ¡Actualiza a premium para acceso ilimitado!',
+      enhanceDescription: 'La mejora con IA transforma tu logro en una declaración profesional e impactante. ¡Actualiza a premium para acceso ilimitado!',
+      regenerateDescription: 'Regenerar párrafos con IA es una función premium. ¡Actualiza para acceder a regeneraciones ilimitadas y más!',
+      upgrade: 'Actualizar Ahora',
+    },
   },
 };

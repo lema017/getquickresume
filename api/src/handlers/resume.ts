@@ -5,6 +5,7 @@ import { getUserById, markFreeResumeUsed, incrementPremiumResumeCount } from '..
 import { createResume, getResumesByUserId, getResumeById, updateResume, deleteResume, updateResumeWithGenerated, updateResumeWithScore } from '../services/resumeService';
 import { checkRateLimit } from '../middleware/rateLimiter';
 import { resumeScoringService } from '../services/resumeScoringService';
+import { formatProfession } from '../utils/textFormatting';
 
 export const generateResume = async (
   event: APIGatewayProxyEvent & AuthorizedEvent
@@ -91,6 +92,10 @@ export const generateResume = async (
 
     const requestBody: GenerateResumeRequest = JSON.parse(event.body);
 
+    // Format profession field to Title Case
+    if (requestBody.resumeData?.profession) {
+      requestBody.resumeData.profession = formatProfession(requestBody.resumeData.profession);
+    }
 
     if (!requestBody.resumeData) {
       return {
@@ -434,6 +439,11 @@ export const createResumeHandler = async (
     const requestBody = JSON.parse(event.body);
     const { resumeData, title } = requestBody;
 
+    // Format profession field to Title Case
+    if (resumeData?.profession) {
+      resumeData.profession = formatProfession(resumeData.profession);
+    }
+
     if (!resumeData) {
       return {
         statusCode: 400,
@@ -531,6 +541,16 @@ export const updateResumeHandler = async (
     }
 
     const updates = JSON.parse(event.body);
+    
+    // Format profession field to Title Case if present
+    if (updates.profession) {
+      updates.profession = formatProfession(updates.profession);
+    }
+    // Also format profession in nested resumeData if present
+    if (updates.resumeData?.profession) {
+      updates.resumeData.profession = formatProfession(updates.resumeData.profession);
+    }
+    
     const resume = await updateResume(userId, resumeId, updates);
     
     const response: ResumeResponse = {

@@ -1,0 +1,182 @@
+# GetQuickResume - Complete Information
+
+> AI-powered resume builder that helps job seekers create professional, ATS-optimized resumes in minutes.
+
+Website: https://getquickresume.com
+
+---
+
+## Company Overview
+
+GetQuickResume is a modern resume building platform that combines artificial intelligence with professional design to help job seekers create effective resumes. Our mission is to make professional resume creation accessible to everyone, regardless of their design skills or budget.
+
+### Core Values
+- **Accessibility**: Professional tools should be available to everyone
+- **Precision**: Every resume should be optimized for success
+- **Efficiency**: Creating a great resume shouldn't take hours
+
+---
+
+## Product Features
+
+### AI-Powered Content Generation
+Our AI analyzes your work experience and skills to generate:
+- Professional summary statements tailored to your industry
+- Achievement-focused bullet points with quantifiable results
+- Optimized job descriptions that highlight your value
+- Skills suggestions based on your experience
+
+### ATS (Applicant Tracking System) Optimization
+All GetQuickResume templates are designed to:
+- Use clean, parseable formatting
+- Include proper heading hierarchy
+- Avoid complex graphics that confuse ATS software
+- Maintain consistent font and spacing
+- Support keyword optimization
+
+### Template Library
+- **Free Templates**: Professional designs available at no cost
+- **Premium Templates**: Advanced layouts with unique designs
+- All templates are responsive and print-ready
+- Multiple color schemes and customization options
+
+### Multi-Language Support
+- Full support for English and Spanish
+- Interface available in both languages
+- AI content generation in both languages
+- Language-specific formatting conventions
+
+### Resume Scoring
+AI-powered analysis that evaluates:
+- Content completeness
+- Keyword optimization
+- Format and structure
+- Professional language use
+- Overall impact score
+
+---
+
+## Pricing Plans
+
+### Free Plan ($0)
+- Create 1 professional resume
+- Access to free template collection
+- AI-powered content suggestions
+- PDF download
+- Basic resume scoring
+
+### Premium Monthly ($9.99/month)
+Everything in Free, plus:
+- Unlimited resumes
+- All premium templates
+- Advanced AI enhancements
+- Priority support
+- Full resume scoring with detailed feedback
+
+### Premium Yearly ($59.99/year)
+Everything in Premium Monthly, plus:
+- 50% savings vs monthly
+- Annual subscription flexibility
+- Same great features at better value
+
+---
+
+## How It Works
+
+### Step 1: Sign Up
+Create a free account using Google, LinkedIn, or email. No credit card required for the free plan.
+
+### Step 2: Enter Your Information
+Our guided wizard walks you through:
+1. Personal information and contact details
+2. Work experience with achievement suggestions
+3. Education and certifications
+4. Skills (auto-suggested based on your experience)
+5. Projects and additional sections
+6. Professional summary (AI-assisted)
+
+### Step 3: Choose a Template
+Browse our template library and select a design that matches your industry and personal style. Preview your content in different templates before deciding.
+
+### Step 4: Download and Apply
+Export your finished resume as a high-quality PDF. Share it directly with employers or upload to job application portals.
+
+---
+
+## Frequently Asked Questions
+
+### Is GetQuickResume really free?
+Yes! Our free plan allows you to create one professional resume with access to free templates and AI-powered content suggestions. No credit card is required.
+
+### What is ATS and why does it matter?
+ATS (Applicant Tracking System) is software used by employers to scan and filter resumes before they reach human recruiters. Studies show 75% of resumes are rejected by ATS before being seen by a person. Our templates are designed to pass these systems.
+
+### How does the AI help me write my resume?
+Our AI analyzes your experience, skills, and target role to generate:
+- Professional summary statements
+- Achievement-focused bullet points
+- Optimized descriptions of your work history
+- Relevant skill suggestions
+
+### Can I download my resume as a PDF?
+Yes! All plans include high-quality PDF export. Your resume will be properly formatted and ready to submit to employers.
+
+### What languages does GetQuickResume support?
+GetQuickResume currently supports English and Spanish for both the interface and resume content. You can create resumes in either language and switch between them.
+
+### How do I cancel my subscription?
+You can cancel your subscription at any time from your account settings. Your premium features will remain active until the end of your billing period.
+
+### Is my data secure?
+Yes. We use industry-standard encryption and security practices. Your personal information is never shared with third parties without your consent.
+
+---
+
+## Blog Articles
+
+### How to Create a Resume That Gets You Hired
+Complete guide covering:
+- Essential resume sections
+- Formatting best practices
+- Action verbs and power words
+- Common mistakes to avoid
+URL: https://getquickresume.com/blog/how-to-make-good-resume
+
+### What is ATS? How Applicant Tracking Systems Work
+Learn about:
+- How ATS software works
+- Why most resumes get rejected
+- Strategies to beat ATS
+- Keywords and optimization
+URL: https://getquickresume.com/blog/what-is-ats-system
+
+---
+
+## Technical Information
+
+- **Platform**: Web-based (works on desktop and mobile browsers)
+- **Supported Browsers**: Chrome, Firefox, Safari, Edge (latest versions)
+- **Export Format**: PDF (high-resolution, print-ready)
+- **Languages**: English, Spanish
+- **Authentication**: Google OAuth, LinkedIn OAuth, Email/Password
+
+---
+
+## Contact Information
+
+- **General Inquiries**: contacto@getquickresume.com
+- **Technical Support**: soporte@getquickresume.com
+- **Website**: https://getquickresume.com
+- **Contact Page**: https://getquickresume.com/contact
+
+---
+
+## Legal
+
+- **Privacy Policy**: https://getquickresume.com/legal/privacy
+- **Terms of Service**: https://getquickresume.com/legal/terms
+
+---
+
+Last Updated: December 2024
+

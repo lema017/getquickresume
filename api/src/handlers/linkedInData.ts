@@ -5,6 +5,7 @@ import { createResume } from '../services/resumeService';
 import { sanitizeUserInput, validateInput, sanitizeUserMultiline, validateInputLarge } from '../utils/inputSanitizer';
 import { checkRateLimit } from '../middleware/rateLimiter';
 import { getUserById } from '../services/dynamodb';
+import { formatProfession } from '../utils/textFormatting';
 
 export const parseLinkedInData = async (
   event: APIGatewayProxyEvent
@@ -178,6 +179,11 @@ export const parseLinkedInData = async (
 
     console.log('LinkedIn data processed successfully');
     console.log('🔧 LinkedIn import - Profession in processedData:', processedData.profession);
+
+    // Format profession field to Title Case
+    if (processedData.profession) {
+      processedData.profession = formatProfession(processedData.profession);
+    }
 
     // Create resume in database
     console.log('Creating resume in database...');

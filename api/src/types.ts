@@ -35,6 +35,10 @@ export interface User {
   premiumResumeMonth: string; // YYYY-MM format
   freeDownloadUsed: boolean; // Tracks if free user used their 1 free download
   totalDownloads: number; // Tracks total downloads for analytics
+  // Cover letter tracking
+  freeCoverLetterUsed: boolean; // Free user lifetime limit (1 cover letter)
+  premiumCoverLetterCount: number; // Monthly count for premium users
+  premiumCoverLetterMonth: string; // YYYY-MM format for monthly reset
   subscriptionExpiration?: string; // ISO date
   planType?: 'monthly' | 'yearly';
   subscriptionStartDate?: string; // ISO date
@@ -576,4 +580,126 @@ export interface PaddleWebhookPayload {
     }>;
     custom_data?: Record<string, string>;
   };
+}
+
+// ============================================================================
+// Cover Letter Types
+// ============================================================================
+
+export type CoverLetterTone = 'professional' | 'friendly' | 'confident' | 'creative';
+export type CoverLetterLength = 'concise' | 'standard' | 'detailed';
+export type CoverLetterTemplate = 'classic' | 'modern' | 'minimal' | 'creative';
+
+export interface CoverLetterParagraph {
+  id: string;
+  type: 'greeting' | 'opening' | 'body' | 'skills' | 'closing' | 'signature';
+  content: string;
+}
+
+// Resume context for AI-powered cover letter generation
+export interface ResumeContext {
+  profession?: string;
+  skills?: string[];
+  experienceSummary?: string; // Condensed work history
+  summary?: string; // Professional summary from resume
+  achievements?: string[]; // Key achievements from resume
+}
+
+export interface CoverLetterData {
+  // Source
+  sourceResumeId?: string;
+  resumeContext?: ResumeContext; // Rich context from selected resume
+  
+  // Company & Job Details
+  companyName: string;
+  jobTitle: string;
+  jobDescription: string;
+  hiringManagerName?: string;
+  
+  // Personal Touch
+  whyThisCompany?: string;
+  keyAchievement?: string;
+  
+  // User Info (from resume or manual input)
+  fullName: string;
+  email: string;
+  phone?: string;
+  linkedin?: string;
+  
+  // Tone & Style
+  tone: CoverLetterTone;
+  length: CoverLetterLength;
+  template: CoverLetterTemplate;
+  
+  // Language for AI output
+  language?: 'en' | 'es';
+}
+
+export interface GeneratedCoverLetter {
+  id: string;
+  paragraphs: CoverLetterParagraph[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CoverLetter {
+  id: string;
+  userId: string;
+  title: string;
+  data: CoverLetterData;
+  generatedContent?: GeneratedCoverLetter;
+  status: 'draft' | 'generated' | 'saved';
+  aiCost?: {
+    totalInputTokens: number;
+    totalOutputTokens: number;
+    totalCostUSD: number;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Cover Letter API Request/Response Types
+export interface GenerateCoverLetterRequest {
+  data: CoverLetterData;
+  coverLetterId?: string; // Optional: for regenerating existing
+}
+
+export interface GenerateCoverLetterResponse {
+  success: boolean;
+  data?: GeneratedCoverLetter;
+  coverLetterId?: string;
+  error?: string;
+  code?: string; // e.g., 'PREMIUM_REQUIRED'
+  message?: string;
+  remainingRequests?: number;
+  resetTime?: number;
+}
+
+export interface RegenerateParagraphRequest {
+  paragraphType: CoverLetterParagraph['type'];
+  data: CoverLetterData;
+}
+
+export interface RegenerateParagraphResponse {
+  success: boolean;
+  data?: string; // New paragraph content
+  error?: string;
+  code?: string;
+  message?: string;
+  remainingRequests?: number;
+  resetTime?: number;
+}
+
+export interface CoverLetterListResponse {
+  success: boolean;
+  data?: CoverLetter[];
+  error?: string;
+  message?: string;
+}
+
+export interface CoverLetterResponse {
+  success: boolean;
+  data?: CoverLetter;
+  error?: string;
+  message?: string;
 }

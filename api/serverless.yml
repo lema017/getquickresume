@@ -24,6 +24,7 @@ provider:
     SUPPORT_TICKETS_TABLE: ${self:service}-support-tickets-${self:provider.stage}
     AI_USAGE_LOGS_TABLE: ${self:service}-ai-usage-logs-${self:provider.stage}
     RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+    COVER_LETTERS_TABLE: ${self:service}-cover-letters-${self:provider.stage}
     RESUME_VIEWS_TABLE: ${self:service}-resume-views-${self:provider.stage}
     PROFESSION_SUGGESTIONS_TABLE: ${self:service}-profession-suggestions-${self:provider.stage}
     OPENAI_API_KEY: ${ssm:/getquickresume/${self:provider.stage}/openai-api-key}
@@ -64,6 +65,8 @@ provider:
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-resume-views-${self:provider.stage}/index/*"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-ai-usage-logs-${self:provider.stage}"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-ai-usage-logs-${self:provider.stage}/index/*"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-cover-letters-${self:provider.stage}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-cover-letters-${self:provider.stage}/index/*"
     - Effect: Allow
       Action:
         - s3:GetObject
@@ -302,6 +305,199 @@ functions:
       - http:
           path: api/resumes/{id}
           method: delete
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Cover Letter endpoints
+  generateCoverLetter:
+    handler: dist/handlers/coverLetter.generateCoverLetterHandler
+    timeout: 120
+    environment:
+      COVER_LETTERS_TABLE: ${self:service}-cover-letters-${self:provider.stage}
+    events:
+      - http:
+          path: api/cover-letters/generate
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  regenerateCoverLetterParagraph:
+    handler: dist/handlers/coverLetter.regenerateParagraphHandler
+    timeout: 60
+    environment:
+      COVER_LETTERS_TABLE: ${self:service}-cover-letters-${self:provider.stage}
+    events:
+      - http:
+          path: api/cover-letters/{id}/regenerate
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  listCoverLetters:
+    handler: dist/handlers/coverLetter.listCoverLettersHandler
+    timeout: 30
+    environment:
+      COVER_LETTERS_TABLE: ${self:service}-cover-letters-${self:provider.stage}
+    events:
+      - http:
+          path: api/cover-letters
+          method: get
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  getCoverLetter:
+    handler: dist/handlers/coverLetter.getCoverLetterHandler
+    timeout: 30
+    environment:
+      COVER_LETTERS_TABLE: ${self:service}-cover-letters-${self:provider.stage}
+    events:
+      - http:
+          path: api/cover-letters/{id}
+          method: get
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  createCoverLetter:
+    handler: dist/handlers/coverLetter.createCoverLetterHandler
+    timeout: 30
+    environment:
+      COVER_LETTERS_TABLE: ${self:service}-cover-letters-${self:provider.stage}
+    events:
+      - http:
+          path: api/cover-letters
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  updateCoverLetter:
+    handler: dist/handlers/coverLetter.updateCoverLetterHandler
+    timeout: 30
+    environment:
+      COVER_LETTERS_TABLE: ${self:service}-cover-letters-${self:provider.stage}
+    events:
+      - http:
+          path: api/cover-letters/{id}
+          method: put
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  deleteCoverLetter:
+    handler: dist/handlers/coverLetter.deleteCoverLetterHandler
+    timeout: 30
+    environment:
+      COVER_LETTERS_TABLE: ${self:service}-cover-letters-${self:provider.stage}
+    events:
+      - http:
+          path: api/cover-letters/{id}
+          method: delete
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Cover Letter AI Features (Premium only)
+  suggestWhyCompany:
+    handler: dist/handlers/coverLetter.suggestWhyCompanyHandler
+    timeout: 60
+    environment:
+      COVER_LETTERS_TABLE: ${self:service}-cover-letters-${self:provider.stage}
+      GROQ_API_KEY: ${ssm:/getquickresume/${self:provider.stage}/groq-api-key}
+    events:
+      - http:
+          path: api/cover-letters/suggest-why-company
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  enhanceAchievement:
+    handler: dist/handlers/coverLetter.enhanceAchievementHandler
+    timeout: 60
+    environment:
+      COVER_LETTERS_TABLE: ${self:service}-cover-letters-${self:provider.stage}
+      GROQ_API_KEY: ${ssm:/getquickresume/${self:provider.stage}/groq-api-key}
+    events:
+      - http:
+          path: api/cover-letters/enhance-achievement
+          method: post
           authorizer:
             name: authorize
             type: token

@@ -210,7 +210,7 @@ export function ResumeCard({
             </div>
             <div className="flex justify-between">
               <span>{t('resumeCard.info.experience')}</span>
-              <span className="font-medium capitalize">{resume.resumeData.targetLevel}</span>
+              <span className="font-medium">{t(`targetLevel.${resume.resumeData.targetLevel}`)}</span>
             </div>
             <div className="flex justify-between">
               <span>{t('resumeCard.info.experiences')}</span>

@@ -6,6 +6,7 @@ const resumeService_1 = require("../services/resumeService");
 const inputSanitizer_1 = require("../utils/inputSanitizer");
 const rateLimiter_1 = require("../middleware/rateLimiter");
 const dynamodb_1 = require("../services/dynamodb");
+const textFormatting_1 = require("../utils/textFormatting");
 const parseLinkedInData = async (event) => {
     try {
         console.log('LinkedIn data parsing request received');
@@ -160,6 +161,10 @@ const parseLinkedInData = async (event) => {
         const processedData = await aiService_1.aiService.parseLinkedInTextToResumeData(sanitizedData, requestContext);
         console.log('LinkedIn data processed successfully');
         console.log('🔧 LinkedIn import - Profession in processedData:', processedData.profession);
+        // Format profession field to Title Case
+        if (processedData.profession) {
+            processedData.profession = (0, textFormatting_1.formatProfession)(processedData.profession);
+        }
         // Create resume in database
         console.log('Creating resume in database...');
         const resume = await (0, resumeService_1.createResume)(userId, processedData, 'LinkedIn Import');

@@ -12,6 +12,7 @@ const client = new DynamoDBClient({
 
 const usersTableName = process.env.DYNAMODB_TABLE || 'getquickresume-api-users-dev';
 const resumesTableName = process.env.RESUMES_TABLE || 'getquickresume-api-resumes-dev';
+const coverLettersTableName = process.env.COVER_LETTERS_TABLE || 'getquickresume-api-cover-letters-dev';
 const professionSuggestionsTableName = process.env.PROFESSION_SUGGESTIONS_TABLE || 'getquickresume-api-profession-suggestions-dev';
 const jobTitleAchievementsTableName = process.env.JOB_TITLE_ACHIEVEMENTS_TABLE || 'getquickresume-api-job-title-achievements-dev';
 const rateLimitsTableName = process.env.RATE_LIMITS_TABLE || 'getquickresume-api-rate-limits-dev';
@@ -158,6 +159,46 @@ async function createResumesTable() {
   }
 }
 
+async function createCoverLettersTable() {
+  try {
+    console.log(`Creating table: ${coverLettersTableName}`);
+    
+    const command = new CreateTableCommand({
+      TableName: coverLettersTableName,
+      AttributeDefinitions: [
+        {
+          AttributeName: 'userId',
+          AttributeType: 'S'
+        },
+        {
+          AttributeName: 'coverLetterId',
+          AttributeType: 'S'
+        }
+      ],
+      KeySchema: [
+        {
+          AttributeName: 'userId',
+          KeyType: 'HASH'  // Partition key - ensures ownership isolation
+        },
+        {
+          AttributeName: 'coverLetterId',
+          KeyType: 'RANGE'  // Sort key
+        }
+      ],
+      BillingMode: 'PAY_PER_REQUEST'
+    });
+
+    await client.send(command);
+    console.log(`✅ Table ${coverLettersTableName} created successfully!`);
+  } catch (error) {
+    if (error.name === 'ResourceInUseException') {
+      console.log(`ℹ️  Table ${coverLettersTableName} already exists`);
+    } else {
+      console.error('❌ Error creating table:', error);
+      throw error;
+    }
+  }
+}
 
 async function createProfessionSuggestionsTable() {
   try {
@@ -474,6 +515,7 @@ async function main() {
     console.log(`DynamoDB Endpoint: ${process.env.DYNAMODB_ENDPOINT || 'http://localhost:8000'}`);
     console.log(`Users Table: ${usersTableName}`);
     console.log(`Resumes Table: ${resumesTableName}`);
+    console.log(`Cover Letters Table: ${coverLettersTableName}`);
     console.log(`Profession Suggestions Table: ${professionSuggestionsTableName}`);
     console.log(`Job Title Achievements Table: ${jobTitleAchievementsTableName}`);
     console.log(`Rate Limits Table: ${rateLimitsTableName}`);
@@ -485,6 +527,7 @@ async function main() {
 
     await createUsersTable();
     await createResumesTable();
+    await createCoverLettersTable();
     await createProfessionSuggestionsTable();
     await createJobTitleAchievementsTable();
     await createRateLimitsTable();

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.upgradeUserToPremium = exports.updateUser = exports.incrementPremiumResumeCount = exports.markFreeResumeUsed = exports.getUserById = exports.createUser = exports.getUserByEmail = void 0;
+exports.upgradeUserToPremium = exports.updateUser = exports.incrementPremiumCoverLetterCount = exports.markFreeCoverLetterUsed = exports.incrementPremiumResumeCount = exports.markFreeResumeUsed = exports.getUserById = exports.createUser = exports.getUserByEmail = void 0;
 const client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
 const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
 // Configuración para desarrollo local y producción
@@ -64,6 +64,10 @@ const createUser = async (userData) => {
             premiumResumeMonth: currentMonth,
             freeDownloadUsed: false,
             totalDownloads: 0,
+            // Cover letter tracking - initialize
+            freeCoverLetterUsed: false,
+            premiumCoverLetterCount: 0,
+            premiumCoverLetterMonth: currentMonth,
             createdAt: now,
             updatedAt: now,
         };
@@ -169,6 +173,77 @@ const incrementPremiumResumeCount = async (userId) => {
     }
 };
 exports.incrementPremiumResumeCount = incrementPremiumResumeCount;
+// Mark free cover letter as used (lifetime limit for free users)
+const markFreeCoverLetterUsed = async (userId) => {
+    try {
+        const now = new Date().toISOString();
+        const command = new lib_dynamodb_1.UpdateCommand({
+            TableName: tableName,
+            Key: { id: userId },
+            UpdateExpression: 'SET freeCoverLetterUsed = :freeCoverLetterUsed, updatedAt = :updatedAt',
+            ExpressionAttributeValues: {
+                ':freeCoverLetterUsed': true,
+                ':updatedAt': now,
+            },
+            ReturnValues: 'ALL_NEW',
+        });
+        const result = await dynamodb.send(command);
+        return result.Attributes;
+    }
+    catch (error) {
+        console.error('Error marking free cover letter as used:', error);
+        throw new Error('Database error');
+    }
+};
+exports.markFreeCoverLetterUsed = markFreeCoverLetterUsed;
+// Update premium cover letter count for current month
+const incrementPremiumCoverLetterCount = async (userId) => {
+    try {
+        const now = new Date().toISOString();
+        const currentMonth = now.slice(0, 7); // YYYY-MM format
+        // First, get the user to check current month
+        const user = await (0, exports.getUserById)(userId);
+        if (!user) {
+            throw new Error('User not found');
+        }
+        // If it's a new month, reset the count
+        if (user.premiumCoverLetterMonth !== currentMonth) {
+            const command = new lib_dynamodb_1.UpdateCommand({
+                TableName: tableName,
+                Key: { id: userId },
+                UpdateExpression: 'SET premiumCoverLetterCount = :count, premiumCoverLetterMonth = :month, updatedAt = :updatedAt',
+                ExpressionAttributeValues: {
+                    ':count': 1,
+                    ':month': currentMonth,
+                    ':updatedAt': now,
+                },
+                ReturnValues: 'ALL_NEW',
+            });
+            const result = await dynamodb.send(command);
+            return result.Attributes;
+        }
+        else {
+            // Increment existing count
+            const command = new lib_dynamodb_1.UpdateCommand({
+                TableName: tableName,
+                Key: { id: userId },
+                UpdateExpression: 'SET premiumCoverLetterCount = premiumCoverLetterCount + :inc, updatedAt = :updatedAt',
+                ExpressionAttributeValues: {
+                    ':inc': 1,
+                    ':updatedAt': now,
+                },
+                ReturnValues: 'ALL_NEW',
+            });
+            const result = await dynamodb.send(command);
+            return result.Attributes;
+        }
+    }
+    catch (error) {
+        console.error('Error incrementing premium cover letter count:', error);
+        throw new Error('Database error');
+    }
+};
+exports.incrementPremiumCoverLetterCount = incrementPremiumCoverLetterCount;
 const updateUser = async (id, updates) => {
     try {
         const now = new Date().toISOString();

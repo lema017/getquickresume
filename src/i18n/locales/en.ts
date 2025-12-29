@@ -3,6 +3,7 @@ export const en = {
   common: {
     loading: 'Loading...',
     saving: 'Saving...',
+    deleting: 'Deleting...',
     save: 'Save',
     cancel: 'Cancel',
     continue: 'Continue',
@@ -24,6 +25,7 @@ export const en = {
     showTips: 'Show Tips',
     closeTips: 'Close tips',
     preview: 'Preview',
+    view: 'View',
   },
 
   // Navigation
@@ -31,12 +33,14 @@ export const en = {
     home: 'Home',
     dashboard: 'Dashboard',
     create: 'Create CV',
+    blog: 'Blog',
     premium: 'Premium',
     account: 'My Account',
     contact: 'Contact',
     about: 'About',
     privacy: 'Privacy',
     terms: 'Terms',
+    refund: 'Refund Policy',
     support: 'Support',
   },
 
@@ -752,7 +756,8 @@ export const en = {
           ai: {
             suggestionsButton: 'AI Suggestions',
             generating: 'Generating suggestions...',
-            noneForProfession: 'No suggestions available for this profession.'
+            noneForProfession: 'No suggestions available for this profession.',
+            errorLoading: 'Could not load suggestions. Please try again.'
           },
           placeholders: {
             skill: 'E.g: JavaScript, React, Leadership, Data analysis, Excel...',
@@ -1113,6 +1118,82 @@ export const en = {
             title: 'Generation is taking longer than expected',
             message: 'Please keep this window open. The AI is working on your CV.',
             retry: 'Cancel and retry'
+          }
+        },
+        generatedResume: {
+          sections: {
+            contact: {
+              title: 'Contact Information',
+              fullName: 'Full Name',
+              email: 'Email',
+              phone: 'Phone',
+              location: 'Location',
+              linkedin: 'LinkedIn'
+            },
+            summary: {
+              title: 'Professional Summary',
+              placeholder: 'Enter your professional summary...'
+            },
+            experience: {
+              title: 'Work Experience',
+              jobTitle: 'Job Title',
+              company: 'Company',
+              duration: 'Duration',
+              location: 'Location',
+              description: 'Description',
+              achievements: 'Key Achievements',
+              skills: 'Skills',
+              addAchievement: 'Add Achievement'
+            },
+            skills: {
+              title: 'Skills',
+              technical: 'Technical Skills',
+              soft: 'Soft Skills',
+              tools: 'Tools',
+              addSkill: 'Add Skill'
+            },
+            education: {
+              title: 'Education',
+              degree: 'Degree',
+              institution: 'Institution',
+              field: 'Field of Study',
+              duration: 'Duration',
+              gpa: 'GPA',
+              coursework: 'Relevant Coursework',
+              honors: 'Honors'
+            },
+            certifications: {
+              title: 'Certifications',
+              name: 'Certification Name',
+              issuer: 'Issuer',
+              date: 'Date',
+              credentialId: 'Credential ID',
+              skills: 'Related Skills'
+            },
+            projects: {
+              title: 'Projects',
+              name: 'Project Name',
+              duration: 'Duration',
+              description: 'Description',
+              technologies: 'Technologies',
+              achievements: 'Achievements',
+              viewProject: 'View Project'
+            },
+            achievements: {
+              title: 'General Achievements'
+            },
+            languages: {
+              title: 'Languages',
+              language: 'Language',
+              level: 'Level',
+              certifications: 'Certifications'
+            }
+          },
+          actions: {
+            edit: 'Edit',
+            save: 'Save',
+            cancel: 'Cancel',
+            aiSuggestions: 'AI Suggestions'
           }
         }
       },
@@ -1628,6 +1709,9 @@ export const en = {
     terms: {
       title: 'Terms of Service',
     },
+    refund: {
+      title: 'Refund Policy',
+    },
   },
 
   // Errors
@@ -1767,6 +1851,29 @@ export const en = {
       jobApplications: 'Job Applications',
       jobApplicationsDesc: 'Track and manage your job applications',
       availableSoon: 'Coming Soon',
+    },
+    coverLetters: {
+      title: 'Cover Letters',
+      description: 'Generate personalized cover letters with AI',
+      hint: 'Create tailored cover letters that match your resume and job description',
+      createButton: 'Create Cover Letter',
+      createNew: 'New',
+      count: {
+        singular: 'cover letter',
+        plural: 'cover letters',
+      },
+      confirmDelete: 'Are you sure you want to delete this cover letter?',
+      deleteSuccess: 'Cover letter deleted',
+      deleteError: 'Failed to delete cover letter',
+      deleteModal: {
+        title: 'Delete Cover Letter',
+        description: 'Are you sure you want to delete this cover letter? This action cannot be undone.',
+      },
+    },
+    status: {
+      draft: 'Draft',
+      generated: 'Generated',
+      saved: 'Saved',
     },
     edit: 'Edit',
     download: 'Download',
@@ -2148,5 +2255,172 @@ export const en = {
     processingNote: 'You will receive a confirmation email once your subscription is active.',
     needHelp: 'Need help?',
     contactSupport: 'Contact Support',
+  },
+
+  // Cover Letter
+  coverLetter: {
+    title: 'Cover Letter Generator',
+    subtitle: 'Create personalized cover letters with AI',
+    generate: 'Generate Cover Letter',
+    generating: 'Generating...',
+    confirmLeave: 'You have unsaved changes. Are you sure you want to leave?',
+    
+    leaveModal: {
+      title: 'Unsaved Changes',
+      description: 'You have unsaved changes. Are you sure you want to leave? Your cover letter will be lost.',
+      stay: 'Stay',
+      leave: 'Leave Without Saving',
+    },
+    
+    sourceSelector: {
+      title: 'How would you like to start?',
+      subtitle: 'Choose a starting point for your cover letter',
+      fromResume: {
+        title: 'From Existing Resume',
+        description: 'Use your resume data to auto-fill',
+        noResumes: 'No resumes found. Create one first!',
+        noProfession: 'No profession specified',
+      },
+      fromScratch: {
+        title: 'Start Fresh',
+        description: 'Enter all information manually',
+        cta: 'Create from scratch',
+        hint: 'Perfect for new applications',
+        button: 'Start Fresh',
+      },
+    },
+
+    form: {
+      sections: {
+        company: 'Company & Job Details',
+        companyDesc: 'Tell us about the position',
+        personal: 'Personal Touch',
+        personalDesc: 'Make it unique to you',
+        personalInfo: 'Your Information',
+        personalInfoDesc: 'Add your contact details',
+        style: 'Tone & Style',
+        styleDesc: 'Customize the voice',
+      },
+      companyName: 'Company Name',
+      companyNamePlaceholder: 'e.g., Google, Microsoft, Startup Inc.',
+      jobTitle: 'Job Title',
+      jobTitlePlaceholder: 'e.g., Software Engineer, Product Manager',
+      jobDescription: 'Job Description',
+      jobDescriptionPlaceholder: 'Paste the job description here for better personalization...',
+      jobDescriptionHint: 'Optional but recommended for best results',
+      hiringManager: 'Hiring Manager Name',
+      hiringManagerPlaceholder: 'e.g., John Smith (optional)',
+      whyCompany: 'Why This Company?',
+      whyCompanyPlaceholder: 'What excites you about this company? Their mission, culture, products...',
+      keyAchievement: 'Key Achievement to Highlight',
+      keyAchievementPlaceholder: 'Your most relevant achievement for this role...',
+      fullName: 'Full Name',
+      fullNamePlaceholder: 'Your full name',
+      email: 'Email',
+      emailPlaceholder: 'your.email@example.com',
+      phone: 'Phone',
+      phonePlaceholder: '+1 (555) 123-4567',
+      linkedin: 'LinkedIn',
+      linkedinPlaceholder: 'linkedin.com/in/yourprofile',
+      toneLabel: 'Choose your tone',
+      lengthLabel: 'Choose length',
+      requiredHint: 'Please fill in all required fields (*)',
+      tone: {
+        professional: 'Professional',
+        friendly: 'Friendly',
+        confident: 'Confident',
+        creative: 'Creative',
+      },
+      length: {
+        concise: 'Concise',
+        conciseDesc: '3-4 paragraphs, straight to the point',
+        standard: 'Standard',
+        standardDesc: '5-6 paragraphs, balanced detail',
+        detailed: 'Detailed',
+        detailedDesc: '7+ paragraphs, comprehensive',
+      },
+    },
+
+    templates: {
+      title: 'Choose Template',
+      classic: {
+        name: 'Classic',
+        description: 'Traditional and formal style',
+      },
+      modern: {
+        name: 'Modern',
+        description: 'Clean and contemporary',
+      },
+      minimal: {
+        name: 'Minimal',
+        description: 'Simple and elegant',
+      },
+      creative: {
+        name: 'Creative',
+        description: 'Bold and unique design',
+      },
+    },
+
+    preview: {
+      title: 'Preview',
+      copy: 'Copy to clipboard',
+      download: 'Download PDF',
+      print: 'Print',
+      save: 'Save',
+      saved: 'Saved!',
+      saveFailed: 'Failed to save cover letter',
+      copied: 'Copied to clipboard!',
+      downloadStarted: 'Download started!',
+      downloadingPdf: 'Generating PDF...',
+      downloadFailed: 'Failed to download PDF',
+      generating: 'Generating your cover letter...',
+      generatingHint: 'Our AI is crafting a personalized letter based on your inputs',
+      edit: 'Edit',
+      regenerate: 'Regenerate',
+      regeneratePremium: 'Premium feature',
+      paragraphRegenerated: 'Paragraph regenerated!',
+      paragraphSaved: 'Changes saved!',
+      empty: {
+        title: 'Your cover letter will appear here',
+        description: 'Fill in the form and click Generate to create your personalized cover letter',
+      },
+    },
+
+    success: {
+      generated: 'Cover letter generated successfully!',
+    },
+
+    errors: {
+      companyRequired: 'Please enter a company name',
+      jobTitleRequired: 'Please enter a job title',
+      nameRequired: 'Please enter your full name',
+      generateFailed: 'Failed to generate cover letter. Please try again.',
+      regenerateFailed: 'Failed to regenerate paragraph. Please try again.',
+      premiumRequired: 'You have reached your free cover letter limit. Upgrade to premium for more.',
+      loadFailed: 'Failed to load cover letter. Please try again.',
+    },
+
+    loading: 'Loading cover letter...',
+
+    ai: {
+      getSuggestions: 'AI Suggestions',
+      enhance: 'Enhance with AI',
+      jobDescriptionRequired: 'Please add a job description above to generate AI suggestions',
+      suggestionsLoaded: 'Suggestions loaded!',
+      suggestionsFailed: 'Failed to get suggestions',
+      achievementEnhanced: 'Achievement enhanced!',
+      enhanceFailed: 'Failed to enhance achievement',
+      rateLimitExceeded: 'Too many requests. Please wait a moment.',
+      clickToAdd: 'Click to add:',
+      suggestionApplied: 'Suggestion added!',
+    },
+
+    premium: {
+      title: 'Premium Feature',
+      suggestionsDescription: 'AI-powered suggestions help you write compelling reasons for why you want to work at this company. Upgrade to premium for unlimited access!',
+      enhanceDescription: 'AI enhancement transforms your achievement into an impactful, professional statement. Upgrade to premium for unlimited access!',
+      regenerateDescription: 'Regenerating paragraphs with AI is a premium feature. Upgrade to access unlimited regenerations and more!',
+      upgrade: 'Upgrade Now',
+    },
   },
 };

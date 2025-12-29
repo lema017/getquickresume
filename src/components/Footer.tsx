@@ -87,6 +87,11 @@ export function Footer() {
                   {t('nav.terms')}
                 </Link>
               </li>
+              <li>
+                <Link to="/legal/refund" className="text-gray-400 hover:text-white transition-colors">
+                  {t('nav.refund')}
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

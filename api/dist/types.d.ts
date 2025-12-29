@@ -32,6 +32,9 @@ export interface User {
     premiumResumeMonth: string;
     freeDownloadUsed: boolean;
     totalDownloads: number;
+    freeCoverLetterUsed: boolean;
+    premiumCoverLetterCount: number;
+    premiumCoverLetterMonth: string;
     subscriptionExpiration?: string;
     planType?: 'monthly' | 'yearly';
     subscriptionStartDate?: string;
@@ -492,5 +495,98 @@ export interface PaddleWebhookPayload {
         }>;
         custom_data?: Record<string, string>;
     };
+}
+export type CoverLetterTone = 'professional' | 'friendly' | 'confident' | 'creative';
+export type CoverLetterLength = 'concise' | 'standard' | 'detailed';
+export type CoverLetterTemplate = 'classic' | 'modern' | 'minimal' | 'creative';
+export interface CoverLetterParagraph {
+    id: string;
+    type: 'greeting' | 'opening' | 'body' | 'skills' | 'closing' | 'signature';
+    content: string;
+}
+export interface ResumeContext {
+    profession?: string;
+    skills?: string[];
+    experienceSummary?: string;
+    summary?: string;
+    achievements?: string[];
+}
+export interface CoverLetterData {
+    sourceResumeId?: string;
+    resumeContext?: ResumeContext;
+    companyName: string;
+    jobTitle: string;
+    jobDescription: string;
+    hiringManagerName?: string;
+    whyThisCompany?: string;
+    keyAchievement?: string;
+    fullName: string;
+    email: string;
+    phone?: string;
+    linkedin?: string;
+    tone: CoverLetterTone;
+    length: CoverLetterLength;
+    template: CoverLetterTemplate;
+    language?: 'en' | 'es';
+}
+export interface GeneratedCoverLetter {
+    id: string;
+    paragraphs: CoverLetterParagraph[];
+    createdAt: string;
+    updatedAt: string;
+}
+export interface CoverLetter {
+    id: string;
+    userId: string;
+    title: string;
+    data: CoverLetterData;
+    generatedContent?: GeneratedCoverLetter;
+    status: 'draft' | 'generated' | 'saved';
+    aiCost?: {
+        totalInputTokens: number;
+        totalOutputTokens: number;
+        totalCostUSD: number;
+    };
+    createdAt: string;
+    updatedAt: string;
+}
+export interface GenerateCoverLetterRequest {
+    data: CoverLetterData;
+    coverLetterId?: string;
+}
+export interface GenerateCoverLetterResponse {
+    success: boolean;
+    data?: GeneratedCoverLetter;
+    coverLetterId?: string;
+    error?: string;
+    code?: string;
+    message?: string;
+    remainingRequests?: number;
+    resetTime?: number;
+}
+export interface RegenerateParagraphRequest {
+    paragraphType: CoverLetterParagraph['type'];
+    data: CoverLetterData;
+}
+export interface RegenerateParagraphResponse {
+    success: boolean;
+    data?: string;
+    error?: string;
+    code?: string;
+    message?: string;
+    remainingRequests?: number;
+    resetTime?: number;
+}
+export interface CoverLetterListResponse {
+    success: boolean;
+    data?: CoverLetter[];
+    error?: string;
+    message?: string;
+}
+export interface CoverLetterResponse {
+    success: boolean;
+    data?: CoverLetter;
+    error?: string;
+    message?: string;
 }
 //# sourceMappingURL=types.d.ts.map

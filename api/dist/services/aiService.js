@@ -181,6 +181,18 @@ Do not include additional text, headers, or markdown.
    - Maintain narrative and temporal consistency.
    - Do not invent metrics or achievements to match the experience level.
 
+9. **Grammar and Typography Quality Assurance**
+   - **CRITICAL**: Review all generated text for spelling errors, typos, and grammatical mistakes before finalizing the resume.
+   - Verify proper punctuation throughout all sections (commas, periods, semicolons, apostrophes).
+   - Ensure consistent terminology and avoid repetitive language.
+   - Check for proper capitalization in all sections (especially proper nouns, job titles, company names).
+   - Verify subject-verb agreement and correct verb tenses.
+   - Ensure professional language usage appropriate for the target language (${outputLanguage}).
+   - Double-check all numbers, dates, and technical terms for accuracy.
+   - Review sentence structure for clarity and conciseness.
+   - Ensure no grammatical errors exist in any section (summary, experience, education, projects, certifications).
+   - The final resume must be publication-ready with zero typos or grammar errors.
+
 Here is the TypeScript interface for the JSON object you must generate:
 
 \`\`\`typescript
