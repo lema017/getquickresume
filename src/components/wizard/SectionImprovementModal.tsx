@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { sectionImprovementService } from '@/services/sectionImprovementService';
 import { Loader2, AlertCircle, CheckCircle, RotateCcw, X, Sparkles } from 'lucide-react';
 import { RateLimitWarning } from '@/components/RateLimitWarning';
+import { PremiumActionModal } from '@/components/PremiumActionModal';
 
 interface SectionImprovementModalProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ export function SectionImprovementModal({
   const [error, setError] = useState<string | null>(null);
   const [attempts, setAttempts] = useState(0);
   const [isRateLimited, setIsRateLimited] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
   
   // Character limit
   const MAX_CHARS = 500;
@@ -61,7 +63,9 @@ export function SectionImprovementModal({
       setImprovedText(result.data || '');
       setAttempts(prev => prev + 1);
     } catch (err: any) {
-      if (err.message.includes('rate limit') || err.message.includes('429')) {
+      if (err.code === 'PREMIUM_REQUIRED') {
+        setShowPremiumModal(true);
+      } else if (err.message.includes('rate limit') || err.message.includes('429')) {
         setError(t('sectionImprovement.rateLimitMessage'));
         setIsRateLimited(true);
       } else {
@@ -265,6 +269,13 @@ export function SectionImprovementModal({
           )}
         </div>
       </div>
+
+      {/* Premium Action Modal for AI features */}
+      <PremiumActionModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        feature="aiSuggestions"
+      />
     </div>
   );
 }

@@ -3,13 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { ArrowRight, ArrowLeft, Plus, X, CheckCircle, Wand2 } from 'lucide-react';
-import { FloatingTips } from '@/components/FloatingTips';
-import { TipsButton } from '@/components/TipsButton';
 import { MonthYearPicker } from '@/components/MonthYearPicker';
 import { MandatoryFieldLabel } from '@/components/MandatoryFieldLabel';
 import { EnhanceProjectModal } from './EnhanceProjectModal';
 import { Tooltip } from '@/components/ui/Tooltip';
-import { useTips } from '@/hooks/useTips';
 import { ErrorModal } from '@/components/ErrorModal';
 import { Project, Language } from '@/types';
 
@@ -17,7 +14,6 @@ export function Step5Projects() {
   const { t } = useTranslation();
   const { navigateToStep } = useWizardNavigation();
   const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, currentResumeId } = useResumeStore();
-  const { areTipsClosed, closeTips, showTips } = useTips();
   const [projects, setProjects] = useState(resumeData.projects);
   const [languages, setLanguages] = useState(resumeData.languages);
 
@@ -95,6 +91,9 @@ export function Step5Projects() {
   const isFormValid = projects.length === 0 || 
     projects.every(project => project.name.trim() && project.description.trim());
 
+  // Validation errors state
+  const [showErrors, setShowErrors] = useState(false);
+
   const handleNext = () => {
     // Projects are optional, but if any are added, they must be complete
     const incompleteProjects = projects.filter(project => 
@@ -102,11 +101,16 @@ export function Step5Projects() {
     );
     
     if (incompleteProjects.length > 0) {
-      setErrorMessage(t('wizard.validation.projects.alertComplete'));
-      setShowErrorModal(true);
+      setShowErrors(true);
+      // Scroll to error section
+      const errorElement = document.querySelector('.validation-error-box');
+      if (errorElement) {
+        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
     
+    setShowErrors(false);
     updateResumeData({ projects, languages });
     markStepCompleted(5);
     setCurrentStep(6);
@@ -153,24 +157,6 @@ export function Step5Projects() {
             }
           </p>
         </div>
-      </div>
-
-      {/* Tips Section */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">{t('wizard.steps.projects.ui.sectionTitle')}</h3>
-          {areTipsClosed && (
-            <TipsButton onClick={showTips} />
-          )}
-        </div>
-        
-        {!areTipsClosed && (
-          <FloatingTips
-            title={`💡 ${t('wizard.steps.projects.ui.tips.title')}`}
-            tips={t('wizard.steps.projects.ui.tips.items', { returnObjects: true }) as unknown as string[]}
-            onClose={closeTips}
-          />
-        )}
       </div>
 
       {/* Projects Section */}
@@ -344,6 +330,18 @@ export function Step5Projects() {
           {t('wizard.steps.projects.motivator')}
         </p>
       </div>
+
+      {/* Show validation errors if user tried to proceed */}
+      {showErrors && !isFormValid && (
+        <div className="validation-error-box mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-800 font-medium mb-2">
+            {t('wizard.validation.pleaseComplete')}
+          </p>
+          <ul className="list-disc list-inside text-red-700 space-y-1">
+            <li>{t('wizard.validation.projects.incomplete')}</li>
+          </ul>
+        </div>
+      )}
 
       {/* Navigation */}
       <div className="flex justify-between mt-8">

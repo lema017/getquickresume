@@ -4,6 +4,7 @@ import {
   EnhanceTextRequest,
   EnhanceTextResponse
 } from '@/types';
+import { handleAuthError } from '@/utils/authErrorHandler';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/dev';
 
@@ -35,11 +36,7 @@ class ExperienceAchievementService {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       
-      if (response.status === 401) {
-        throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
-      }
-      
-      // Handle premium required error (403)
+      // Handle premium required error (403) - do NOT logout
       if (response.status === 403 && errorData.code === 'PREMIUM_REQUIRED') {
         const error = new Error(errorData.message || 'Premium feature required');
         (error as any).code = 'PREMIUM_REQUIRED';
@@ -47,7 +44,9 @@ class ExperienceAchievementService {
         throw error;
       }
       
-      if (response.status === 403) {
+      // Handle auth errors (401/403) - logout and redirect
+      if (response.status === 401 || response.status === 403) {
+        handleAuthError();
         throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
       }
       
@@ -184,6 +183,88 @@ class ExperienceAchievementService {
       return response.data;
     } catch (error) {
       console.error('Error enhancing project description:', error);
+      throw error;
+    }
+  }
+
+  async enhanceSummaryText(
+    text: string,
+    jobTitle?: string,
+    language: 'es' | 'en' = 'es',
+    resumeId?: string
+  ): Promise<string> {
+    if (!text || text.trim() === '') {
+      throw new Error('El texto es requerido para mejorar con IA.');
+    }
+
+    const requestBody: EnhanceTextRequest & { resumeId?: string } = {
+      context: 'summary',
+      text: text.trim(),
+      language,
+      jobTitle
+    };
+
+    if (resumeId) {
+      requestBody.resumeId = resumeId;
+    }
+
+    try {
+      const response = await this.makeRequest<EnhanceTextResponse>(
+        'api/ai/enhance',
+        {
+          method: 'POST',
+          body: JSON.stringify(requestBody)
+        }
+      );
+
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Error al mejorar el texto con IA');
+      }
+
+      return response.data;
+    } catch (error) {
+      console.error('Error enhancing summary text:', error);
+      throw error;
+    }
+  }
+
+  async enhanceDifferentiatorsText(
+    text: string,
+    jobTitle?: string,
+    language: 'es' | 'en' = 'es',
+    resumeId?: string
+  ): Promise<string> {
+    if (!text || text.trim() === '') {
+      throw new Error('El texto es requerido para mejorar con IA.');
+    }
+
+    const requestBody: EnhanceTextRequest & { resumeId?: string } = {
+      context: 'differentiators',
+      text: text.trim(),
+      language,
+      jobTitle
+    };
+
+    if (resumeId) {
+      requestBody.resumeId = resumeId;
+    }
+
+    try {
+      const response = await this.makeRequest<EnhanceTextResponse>(
+        'api/ai/enhance',
+        {
+          method: 'POST',
+          body: JSON.stringify(requestBody)
+        }
+      );
+
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Error al mejorar el texto con IA');
+      }
+
+      return response.data;
+    } catch (error) {
+      console.error('Error enhancing differentiators text:', error);
       throw error;
     }
   }

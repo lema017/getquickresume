@@ -4,9 +4,6 @@ import { useResumeStore } from '@/stores/resumeStore';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { ResumeScoreCard } from '@/components/resume/ResumeScoreCard';
-import { FloatingTips } from '@/components/FloatingTips';
-import { TipsButton } from '@/components/TipsButton';
-import { useTips } from '@/hooks/useTips';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '@/stores/authStore';
 import { resumeService } from '@/services/resumeService';
@@ -30,7 +27,6 @@ export function Step9Score() {
     setGeneratedResume
   } = useResumeStore();
   const { user } = useAuthStore();
-  const { areTipsClosed, closeTips, showTips } = useTips();
   const [hasStartedPolling, setHasStartedPolling] = useState(false);
 
   // Reset polling flag when resumeId changes
@@ -83,7 +79,19 @@ export function Step9Score() {
           await resumeService.updateResume(currentResumeId, {
             generatedResume: updatedResume
           });
-          toast.success('Section enhanced and saved successfully!');
+          toast.success('Section enhanced! Re-scoring to update checklist...');
+          
+          // Auto-rescore after enhancement to update the checklist
+          // This uses deterministic scoring, so it's fast and consistent
+          if (user?.isPremium) {
+            try {
+              await scoreResume(currentResumeId);
+              toast.success('Checklist updated with your improvements!');
+            } catch (scoreError) {
+              console.error('Auto-rescore failed:', scoreError);
+              // Don't show error - enhancement was still successful
+            }
+          }
         } else {
           toast.success('Section enhanced successfully!');
         }
@@ -130,34 +138,11 @@ export function Step9Score() {
       {/* Header */}
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Resume Score & Analysis
+          Resume Score & Optimization
         </h2>
         <p className="text-gray-600">
-          Review your resume score and get AI-powered recommendations to improve it
+          Complete your checklist items to optimize your resume for ATS and recruiters
         </p>
-      </div>
-
-      {/* Tips Section */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Tips</h3>
-          {areTipsClosed && (
-            <TipsButton onClick={showTips} />
-          )}
-        </div>
-        
-        {!areTipsClosed && (
-          <FloatingTips
-            title="💡 Resume Scoring Tips"
-            tips={[
-              'A score of 8+ indicates a strong resume',
-              'Focus on improving sections with low scores',
-              'Use the enhancement feature to improve specific sections',
-              'Quantifiable achievements boost your score significantly'
-            ]}
-            onClose={closeTips}
-          />
-        )}
       </div>
 
       {/* Resume Score Card */}

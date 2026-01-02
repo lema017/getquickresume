@@ -129,16 +129,18 @@ export function ResumeCreationMode() {
             </div>
           </div>
 
-          {/* Upload Resume - Coming Soon */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 h-full flex flex-col opacity-75 relative">
-            {/* Coming Soon Badge */}
-            <div className="absolute top-4 right-4 bg-yellow-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
-              {t('wizard.creationMode.upload.comingSoon')}
-            </div>
+          {/* Upload Resume - Available to All Users */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 group cursor-pointer h-full flex flex-col" onClick={handleUploadResume}>
+            {/* Free Notice for Free Users */}
+            {!isPremium && !user?.freeResumeUsed && (
+              <div className="absolute top-4 right-4 bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">
+                {t('wizard.creationMode.upload.freeNotice')}
+              </div>
+            )}
             
             <div className="text-center flex-1 flex flex-col">
               {/* Icon */}
-              <div className="mx-auto w-16 h-16 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center mb-4">
+              <div className="mx-auto w-16 h-16 bg-gradient-to-br from-green-500 to-teal-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                 <Upload className="w-8 h-8 text-white" />
               </div>
               
@@ -173,12 +175,10 @@ export function ResumeCreationMode() {
               </div>
             </div>
 
-            {/* CTA Button - Disabled */}
-            <button 
-              disabled
-              className="w-full bg-gray-400 text-white py-3 px-4 rounded-lg font-semibold text-sm cursor-not-allowed flex items-center justify-center gap-2"
-            >
+            {/* CTA Button */}
+            <button className="w-full bg-gradient-to-r from-green-600 to-teal-600 text-white py-3 px-4 rounded-lg font-semibold text-sm hover:from-green-700 hover:to-teal-700 transition-all duration-200 flex items-center justify-center gap-2 group-hover:shadow-lg">
               <span>{t('wizard.creationMode.upload.cta')}</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
             </button>
 
             {/* Time estimate */}

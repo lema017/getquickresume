@@ -29,7 +29,6 @@ export function Avatar({ src, alt = 'User avatar', size = 'md', className = '' }
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     console.error('[Avatar] Image failed to load:', {
       src,
-      error: e.currentTarget.error,
       naturalWidth: e.currentTarget.naturalWidth,
       naturalHeight: e.currentTarget.naturalHeight
     });

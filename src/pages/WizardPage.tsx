@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 // Wizard Components
 import { ResumeCreationMode } from '@/components/wizard/ResumeCreationMode';
 import { UploadResume } from '@/components/wizard/UploadResume';
+import { ResumeExtractionReview } from '@/components/wizard/ResumeExtractionReview';
 import { LinkedInImport } from '@/components/wizard/LinkedInImport';
 
 // Wizard Steps
@@ -331,6 +332,7 @@ export function WizardPage() {
           {/* Main wizard routes */}
           <Route path="/" element={<ResumeCreationMode />} />
           <Route path="/upload" element={<UploadResume />} />
+          <Route path="/upload/review" element={<ResumeExtractionReview />} />
           <Route path="/linkedin" element={<LinkedInImport />} />
           
           {/* Manual creation wizard */}

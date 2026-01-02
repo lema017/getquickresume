@@ -17,9 +17,9 @@ export function AboutPage() {
         <link rel="canonical" href={`${BASE_URL}/about`} />
         
         {/* hreflang */}
-        <link rel="alternate" hreflang="en" href={`${BASE_URL}/about`} />
-        <link rel="alternate" hreflang="es" href={`${BASE_URL}/about?lang=es`} />
-        <link rel="alternate" hreflang="x-default" href={`${BASE_URL}/about`} />
+        <link rel="alternate" hrefLang="en" href={`${BASE_URL}/about`} />
+        <link rel="alternate" hrefLang="es" href={`${BASE_URL}/about?lang=es`} />
+        <link rel="alternate" hrefLang="x-default" href={`${BASE_URL}/about`} />
         
         {/* Open Graph */}
         <meta property="og:type" content="website" />

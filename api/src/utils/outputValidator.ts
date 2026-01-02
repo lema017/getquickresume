@@ -71,12 +71,13 @@ export function validateImprovedText(
   }
 
   // 6. Verificar que no contiene contenido inapropiado básico
+  // Use word boundaries (\b) to avoid false positives like "skills" matching "kill"
   const inappropriatePatterns = [
-    /fuck|shit|damn|hell/i,
-    /hate|kill|murder|death/i,
-    /sex|porn|nude/i,
-    /drug|cocaine|heroin/i,
-    /terrorist|bomb|weapon/i,
+    /\b(fuck|shit|damn)\b/i,  // Removed "hell" - too many false positives (shell, hello, excelling)
+    /\b(murder|death)\b/i,    // Removed "kill" and "hate" - false positives (skills, whatever)
+    /\b(porn|nude)\b/i,       // Removed "sex" - could be in "Sussex" etc.
+    /\b(cocaine|heroin)\b/i,  // Removed generic "drug" - could be "drugstore"
+    /\b(terrorist|bomb)\b/i,  // Removed "weapon" - could be in legitimate context
   ];
 
   for (const pattern of inappropriatePatterns) {
@@ -101,6 +102,106 @@ export function validateImprovedText(
       return { isValid: false, reason: 'Improved text contains injection attempts' };
     }
   }
+
+  return { isValid: true };
+}
+
+/**
+ * Validates mechanical enhancement output.
+ * Less restrictive than validateImprovedText - skips similarity check since
+ * mechanical fixes (like removing first-person pronouns) intentionally change
+ * the text structure while preserving meaning.
+ * 
+ * Keeps all security checks: script patterns, inappropriate content, injection attempts.
+ */
+export function validateMechanicalEnhancement(
+  improved: string,
+  original: string
+): { isValid: boolean; reason?: string } {
+  
+  if (!improved || typeof improved !== 'string') {
+    return { isValid: false, reason: 'Improved text is required' };
+  }
+
+  if (!original || typeof original !== 'string') {
+    return { isValid: false, reason: 'Original text is required' };
+  }
+
+  // 1. Verify reasonable length (not > 5x original for mechanical fixes)
+  if (improved.length > original.length * 5) {
+    return { isValid: false, reason: 'Improved text is too long' };
+  }
+
+  // 2. Verify it doesn't contain code/scripts
+  const scriptPatterns = [
+    /<script/i,
+    /javascript:/i,
+    /onerror=/i,
+    /onload=/i,
+    /eval\(/i,
+    /function\s*\(/i,
+    /alert\(/i,
+    /document\./i,
+    /window\./i,
+    /console\./i,
+    /setTimeout/i,
+    /setInterval/i,
+    /XMLHttpRequest/i,
+    /fetch\(/i,
+  ];
+
+  for (const pattern of scriptPatterns) {
+    if (pattern.test(improved)) {
+      return { isValid: false, reason: 'Improved text contains potentially dangerous code' };
+    }
+  }
+
+  // 3. Verify it's not completely empty
+  if (improved.trim().length === 0) {
+    return { isValid: false, reason: 'Improved text cannot be empty' };
+  }
+
+  // 4. Verify minimum length (at least 10% of original - mechanical fixes shouldn't delete most content)
+  if (improved.trim().length < original.trim().length * 0.1) {
+    return { isValid: false, reason: 'Improved text is too short' };
+  }
+
+  // 5. Verify it doesn't contain inappropriate content
+  // Use word boundaries (\b) to avoid false positives like "skills" matching "kill"
+  const inappropriatePatterns = [
+    /\b(fuck|shit|damn)\b/i,  // Removed "hell" - too many false positives (shell, hello, excelling)
+    /\b(murder|death)\b/i,    // Removed "kill" and "hate" - false positives (skills, whatever)
+    /\b(porn|nude)\b/i,       // Removed "sex" - could be in "Sussex" etc.
+    /\b(cocaine|heroin)\b/i,  // Removed generic "drug" - could be "drugstore"
+    /\b(terrorist|bomb)\b/i,  // Removed "weapon" - could be in legitimate context
+  ];
+
+  for (const pattern of inappropriatePatterns) {
+    if (pattern.test(improved)) {
+      return { isValid: false, reason: 'Improved text contains inappropriate content' };
+    }
+  }
+
+  // 6. Verify it doesn't contain prompt injection attempts
+  const injectionPatterns = [
+    /ignore\s+previous\s+instructions/i,
+    /system\s*:/i,
+    /assistant\s*:/i,
+    /<\|.*?\|>/i,
+    /```.*?```/s,
+    /\[INST\]/i,
+    /\[\/INST\]/i,
+  ];
+
+  for (const pattern of injectionPatterns) {
+    if (pattern.test(improved)) {
+      return { isValid: false, reason: 'Improved text contains injection attempts' };
+    }
+  }
+
+  // NOTE: We intentionally skip the similarity check here because mechanical fixes
+  // like removing first-person pronouns will legitimately change the word structure
+  // while preserving the meaning. The targeted prompt is trusted to maintain context.
 
   return { isValid: true };
 }
@@ -132,9 +233,9 @@ export function validateResumeScore(score: any): { isValid: boolean; reason?: st
     return { isValid: false, reason: 'Score must be an object' };
   }
 
-  // Validate totalScore
-  if (typeof score.totalScore !== 'number' || score.totalScore < 1 || score.totalScore > 10) {
-    return { isValid: false, reason: 'totalScore must be a number between 1 and 10' };
+  // Validate totalScore (allow 0 for new deterministic scoring)
+  if (typeof score.totalScore !== 'number' || score.totalScore < 0 || score.totalScore > 10) {
+    return { isValid: false, reason: 'totalScore must be a number between 0 and 10' };
   }
 
   // Validate breakdown
@@ -143,14 +244,14 @@ export function validateResumeScore(score: any): { isValid: boolean; reason?: st
   }
 
   const breakdownRanges = {
-    summary: { min: 0, max: 2.0 },
-    experience: { min: 0, max: 2.5 },
-    skills: { min: 0, max: 1.5 },
-    education: { min: 0, max: 1.0 },
-    projects: { min: 0, max: 1.0 },
-    achievements: { min: 0, max: 1.0 },
-    languages: { min: 0, max: 0.5 },
-    contact: { min: 0, max: 0.5 },
+    summary: { min: 0, max: 2.5 },
+    experience: { min: 0, max: 3.0 },
+    skills: { min: 0, max: 2.0 },
+    education: { min: 0, max: 1.5 },
+    projects: { min: 0, max: 1.5 },
+    achievements: { min: 0, max: 1.5 },
+    languages: { min: 0, max: 1.0 },
+    contact: { min: 0, max: 1.0 },
   };
 
   for (const [key, range] of Object.entries(breakdownRanges)) {
@@ -162,19 +263,27 @@ export function validateResumeScore(score: any): { isValid: boolean; reason?: st
     }
   }
 
+  // Validate new deterministic fields
+  if (typeof score.completionPercentage !== 'number') {
+    return { isValid: false, reason: 'completionPercentage must be a number' };
+  }
+  if (typeof score.isOptimized !== 'boolean') {
+    return { isValid: false, reason: 'isOptimized must be a boolean' };
+  }
+  if (!score.checklist || typeof score.checklist !== 'object') {
+    return { isValid: false, reason: 'checklist is required and must be an object' };
+  }
+
   // Validate strengths
   if (!Array.isArray(score.strengths)) {
     return { isValid: false, reason: 'strengths must be an array' };
   }
-  if (score.strengths.length === 0) {
-    return { isValid: false, reason: 'strengths array cannot be empty' };
-  }
-  if (score.strengths.length > 10) {
-    return { isValid: false, reason: 'strengths array cannot have more than 10 items' };
+  if (score.strengths.length > 15) {
+    return { isValid: false, reason: 'strengths array cannot have more than 15 items' };
   }
   for (const strength of score.strengths) {
-    if (typeof strength !== 'string' || strength.length === 0 || strength.length > 200) {
-      return { isValid: false, reason: 'Each strength must be a string between 1 and 200 characters' };
+    if (typeof strength !== 'string' || strength.length > 300) {
+      return { isValid: false, reason: 'Each strength must be a string up to 300 characters' };
     }
   }
 
@@ -186,38 +295,8 @@ export function validateResumeScore(score: any): { isValid: boolean; reason?: st
     return { isValid: false, reason: 'improvements array cannot have more than 20 items' };
   }
   for (const improvement of score.improvements) {
-    if (typeof improvement !== 'string' || improvement.length === 0 || improvement.length > 200) {
-      return { isValid: false, reason: 'Each improvement must be a string between 1 and 200 characters' };
-    }
-  }
-
-  // Validate detailedFeedback
-  if (!Array.isArray(score.detailedFeedback)) {
-    return { isValid: false, reason: 'detailedFeedback must be an array' };
-  }
-  if (score.detailedFeedback.length > 15) {
-    return { isValid: false, reason: 'detailedFeedback array cannot have more than 15 items' };
-  }
-  for (const feedback of score.detailedFeedback) {
-    if (!feedback.section || typeof feedback.section !== 'string') {
-      return { isValid: false, reason: 'Each feedback item must have a section string' };
-    }
-    if (typeof feedback.currentScore !== 'number' || feedback.currentScore < 0) {
-      return { isValid: false, reason: 'Each feedback item must have a valid currentScore' };
-    }
-    if (!Array.isArray(feedback.recommendations)) {
-      return { isValid: false, reason: 'Each feedback item must have a recommendations array' };
-    }
-    if (feedback.recommendations.length > 10) {
-      return { isValid: false, reason: 'Each feedback item cannot have more than 10 recommendations' };
-    }
-    for (const rec of feedback.recommendations) {
-      if (typeof rec !== 'string' || rec.length === 0 || rec.length > 300) {
-        return { isValid: false, reason: 'Each recommendation must be a string between 1 and 300 characters' };
-      }
-    }
-    if (!['high', 'medium', 'low'].includes(feedback.priority)) {
-      return { isValid: false, reason: 'Each feedback item must have a priority of high, medium, or low' };
+    if (typeof improvement !== 'string' || improvement.length > 300) {
+      return { isValid: false, reason: 'Each improvement must be a string up to 300 characters' };
     }
   }
 
@@ -225,23 +304,15 @@ export function validateResumeScore(score: any): { isValid: boolean; reason?: st
   if (!score.generatedAt || typeof score.generatedAt !== 'string') {
     return { isValid: false, reason: 'generatedAt is required and must be a string' };
   }
-  if (!score.aiProvider || typeof score.aiProvider !== 'string') {
-    return { isValid: false, reason: 'aiProvider is required and must be a string' };
-  }
-  if (!score.model || typeof score.model !== 'string') {
-    return { isValid: false, reason: 'model is required and must be a string' };
+  if (!score.scoringVersion || typeof score.scoringVersion !== 'string') {
+    return { isValid: false, reason: 'scoringVersion is required and must be a string' };
   }
 
-  // Sanitize strings in recommendations and improvements
+  // Sanitize strings
   const sanitized = {
     ...score,
-    strengths: score.strengths.map((s: string) => s.trim().slice(0, 200)),
-    improvements: score.improvements.map((i: string) => i.trim().slice(0, 200)),
-    detailedFeedback: score.detailedFeedback.map((f: any) => ({
-      ...f,
-      section: f.section.trim().slice(0, 100),
-      recommendations: f.recommendations.map((r: string) => r.trim().slice(0, 300)),
-    })),
+    strengths: score.strengths.map((s: string) => s.trim().slice(0, 300)),
+    improvements: score.improvements.map((i: string) => i.trim().slice(0, 300)),
   };
 
   return { isValid: true, validated: sanitized };

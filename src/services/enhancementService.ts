@@ -1,3 +1,5 @@
+import { handleAuthError } from '@/utils/authErrorHandler';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/dev';
 
 export interface Question {
@@ -22,6 +24,7 @@ export interface GenerateQuestionsResponse {
   };
   error?: string;
   message?: string;
+  code?: string;
   remainingRequests?: number;
   resetTime?: number;
 }
@@ -43,6 +46,7 @@ export interface EnhanceWithContextResponse {
   data?: string;
   error?: string;
   message?: string;
+  code?: string;
   remainingRequests?: number;
   resetTime?: number;
 }
@@ -64,8 +68,27 @@ export interface GenerateAnswerSuggestionResponse {
   };
   error?: string;
   message?: string;
+  code?: string;
   remainingRequests?: number;
   resetTime?: number;
+}
+
+export interface DirectEnhanceRequest {
+  checklistItemId: string;
+  sectionType: 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language';
+  originalText: string;
+  language: 'es' | 'en';
+  resumeId?: string;
+}
+
+export interface DirectEnhanceResponse {
+  success: boolean;
+  data?: string;
+  error?: string;
+  message?: string;
+  remainingRequests?: number;
+  resetTime?: number;
+  code?: string;
 }
 
 class EnhancementService {
@@ -100,8 +123,12 @@ class EnhancementService {
       const data: GenerateQuestionsResponse = await response.json();
 
       if (!response.ok) {
-        if (response.status === 403) {
-          throw new Error('This feature is available only for premium users. Please upgrade to access guided enhancement.');
+        if (response.status === 401 || response.status === 403) {
+          // Check if this is a premium feature restriction (not an auth error)
+          if (data.code !== 'PREMIUM_REQUIRED') {
+            handleAuthError();
+          }
+          throw new Error(data.message || 'This feature is available only for premium users. Please upgrade to access guided enhancement.');
         }
         if (response.status === 429) {
           throw new Error('Too many requests. Please wait before trying again.');
@@ -157,8 +184,12 @@ class EnhancementService {
       const data: EnhanceWithContextResponse = await response.json();
 
       if (!response.ok) {
-        if (response.status === 403) {
-          throw new Error('This feature is available only for premium users. Please upgrade to access guided enhancement.');
+        if (response.status === 401 || response.status === 403) {
+          // Check if this is a premium feature restriction (not an auth error)
+          if (data.code !== 'PREMIUM_REQUIRED') {
+            handleAuthError();
+          }
+          throw new Error(data.message || 'This feature is available only for premium users. Please upgrade to access guided enhancement.');
         }
         if (response.status === 429) {
           throw new Error('Too many requests. Please wait before trying again.');
@@ -202,8 +233,12 @@ class EnhancementService {
       const data: GenerateAnswerSuggestionResponse = await response.json();
 
       if (!response.ok) {
-        if (response.status === 403) {
-          throw new Error('This feature is available only for premium users. Please upgrade to access AI suggestions.');
+        if (response.status === 401 || response.status === 403) {
+          // Check if this is a premium feature restriction (not an auth error)
+          if (data.code !== 'PREMIUM_REQUIRED') {
+            handleAuthError();
+          }
+          throw new Error(data.message || 'This feature is available only for premium users. Please upgrade to access AI suggestions.');
         }
         if (response.status === 429) {
           throw new Error('Too many requests. Please wait before trying again.');
@@ -221,6 +256,58 @@ class EnhancementService {
         throw error;
       }
       throw new Error(error.message || 'Failed to generate suggestion');
+    }
+  }
+
+  /**
+   * Direct enhancement for mechanical fixes that don't require user context.
+   * Skips the question-gathering step and directly returns enhanced text.
+   */
+  async directEnhance(request: DirectEnhanceRequest): Promise<string> {
+    try {
+      const token = await this.getAuthToken();
+      const response = await fetch(
+        `${API_BASE_URL}/api/ai/direct-enhance`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(request),
+        }
+      );
+
+      const data: DirectEnhanceResponse = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          // Check if this is a premium feature restriction (not an auth error)
+          if (data.code !== 'PREMIUM_REQUIRED') {
+            handleAuthError();
+          }
+          throw new Error(data.message || 'This feature is available only for premium users. Please upgrade to access direct enhancement.');
+        }
+        if (response.status === 429) {
+          throw new Error('Too many requests. Please wait before trying again.');
+        }
+        // Handle case where item requires context
+        if (data.code === 'CONTEXT_REQUIRED') {
+          throw new Error('This fix requires additional context. Please use guided enhancement instead.');
+        }
+        throw new Error(data.message || 'Failed to enhance section');
+      }
+
+      if (!data.success || !data.data) {
+        throw new Error(data.message || 'Failed to enhance section');
+      }
+
+      return data.data;
+    } catch (error: any) {
+      if (error.message) {
+        throw error;
+      }
+      throw new Error(error.message || 'Failed to enhance section');
     }
   }
 }

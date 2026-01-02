@@ -1,25 +1,21 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { useAuthStore } from '@/stores/authStore';
-import { ArrowRight, ArrowLeft, CheckCircle, Sparkles, Lightbulb, Loader2, Plus, X, Crown } from 'lucide-react';
-import { FloatingTips } from '@/components/FloatingTips';
-import { TipsButton } from '@/components/TipsButton';
+import { ArrowRight, ArrowLeft, CheckCircle, Sparkles, Lightbulb, Loader2, X, Wand2 } from 'lucide-react';
 import { MandatoryFieldLabel } from '@/components/MandatoryFieldLabel';
 import { PremiumActionModal } from '@/components/PremiumActionModal';
+import { RateLimitWarning } from '@/components/RateLimitWarning';
+import { EnhanceSummaryModal } from './EnhanceSummaryModal';
 import { validateSummary } from '@/utils/validation';
-import { useTips } from '@/hooks/useTips';
 import { summarySuggestionService } from '@/services/summarySuggestionService';
 
 export function Step7Summary() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { navigateToStep } = useWizardNavigation();
   const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, calculateCharacters, currentResumeId } = useResumeStore();
   const { user } = useAuthStore();
-  const { areTipsClosed, closeTips, showTips } = useTips();  
   const [summary, setSummary] = useState(resumeData.summary);
   const [jobDescription, setJobDescription] = useState(resumeData.jobDescription);
 
@@ -62,6 +58,10 @@ export function Step7Summary() {
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
+  // Estados para Enhance with AI modals
+  const [showEnhanceSummaryModal, setShowEnhanceSummaryModal] = useState(false);
+  const [showEnhanceDifferentiatorsModal, setShowEnhanceDifferentiatorsModal] = useState(false);
+
   // Check if user can use AI features (premium OR free user who hasn't used their quota)
   const canUseAIFeatures = user?.isPremium || !user?.freeResumeUsed;
 
@@ -69,16 +69,24 @@ export function Step7Summary() {
   const validationErrors = validateSummary(summary || '', jobDescription || '');
   const isFormValid = Object.keys(validationErrors).length === 0;
 
+  // Validation errors state for the error box display
+  const [showErrors, setShowErrors] = useState(false);
+
   const handleNext = () => {
     setHasAttemptedSubmit(true);
     // Validate before proceeding
     const errors = validateSummary(summary || '', jobDescription || '');
     if (Object.keys(errors).length > 0) {
-      const errorMessages = Object.values(errors).map(e => e.message).join(', ');
-      alert(t('wizard.validation.summary.alertComplete', { errors: errorMessages }));
+      setShowErrors(true);
+      // Scroll to error section
+      const errorElement = document.querySelector('.validation-error-box');
+      if (errorElement) {
+        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
     
+    setShowErrors(false);
     updateResumeData({ summary, jobDescription });
     markStepCompleted(7);
     setCurrentStep(8);
@@ -254,6 +262,33 @@ export function Step7Summary() {
     setShowDifferentiatorsSuggestions(!showDifferentiatorsSuggestions);
   };
 
+  // Handlers for Enhance with AI
+  const handleEnhanceSummary = () => {
+    if (!canUseAIFeatures) {
+      setShowPremiumModal(true);
+      return;
+    }
+    setShowEnhanceSummaryModal(true);
+  };
+
+  const handleEnhanceDifferentiators = () => {
+    if (!canUseAIFeatures) {
+      setShowPremiumModal(true);
+      return;
+    }
+    setShowEnhanceDifferentiatorsModal(true);
+  };
+
+  const handleSummaryEnhanceApprove = (enhancedText: string) => {
+    setSummary(enhancedText);
+    updateResumeData({ summary: enhancedText });
+  };
+
+  const handleDifferentiatorsEnhanceApprove = (enhancedText: string) => {
+    setJobDescription(enhancedText);
+    updateResumeData({ jobDescription: enhancedText });
+  };
+
   const characterCount = summary.length + jobDescription.length;
   const isNearLimit = characterCount > 2800;
 
@@ -285,12 +320,6 @@ export function Step7Summary() {
           </p>
         </div>
       </div>
-
-      {/* Floating Tips */}
-      <FloatingTips
-        title={`💡 ${t('wizard.steps.summary.ui.tips.title')}`}
-        tips={t('wizard.steps.summary.ui.tips.items', { returnObjects: true }) as unknown as string[]}
-      />
 
       {/* Guided Questions */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
@@ -355,28 +384,44 @@ export function Step7Summary() {
                   min: 50
                 })} {summary.length >= 50 ? '✓' : t('wizard.validation.summary.minimumRequired')}
               </span>
+              {/* Enhance with AI button for summary */}
+              {summary.trim().length > 0 && (
+                <button
+                  onClick={handleEnhanceSummary}
+                  className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md ${
+                    canUseAIFeatures
+                      ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600'
+                      : 'bg-gradient-to-r from-amber-500 to-yellow-600 text-white hover:from-amber-600 hover:to-yellow-700'
+                  }`}
+                  title={t('wizard.steps.summary.enhanceTooltip')}
+                >
+                  <Wand2 className="w-4 h-4 mr-1.5" />
+                  {t('wizard.steps.summary.enhanceWithAI')}
+                </button>
+              )}
             </div>
             {hasAttemptedSubmit && validationErrors.summary && (
               <p className="text-red-600 text-sm mt-1">{validationErrors.summary.message}</p>
             )}
             
-            {/* Show API errors (including rate limit) for Experience section */}
-            {experienceError && (
+            {/* Rate Limit Error for Experience section - with countdown timer */}
+            {isExperienceRateLimited && experienceError && (
+              <div className="mt-3">
+                <RateLimitWarning 
+                  message={experienceError}
+                  onRetry={() => {
+                    setIsExperienceRateLimited(false);
+                    setExperienceError(null);
+                    loadExperienceSuggestions();
+                  }}
+                />
+              </div>
+            )}
+            
+            {/* Generic Error (non-rate limit) for Experience section */}
+            {experienceError && !isExperienceRateLimited && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3 mt-3">
                 <p className="text-yellow-800 text-sm">{experienceError}</p>
-                {isExperienceRateLimited && (
-                  <button
-                    onClick={() => {
-                      setIsExperienceRateLimited(false);
-                      setExperienceError(null);
-                      navigate('/premium');
-                    }}
-                    className="mt-2 inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all shadow-sm hover:shadow-md"
-                  >
-                    <Crown className="w-4 h-4 mr-1" />
-                    {t('wizard.rateLimit.upgradeCta')}
-                  </button>
-                )}
               </div>
             )}
             
@@ -497,28 +542,44 @@ export function Step7Summary() {
                   min: 30
                 })} {jobDescription.length >= 30 ? '✓' : t('wizard.validation.summary.minimumRequired')}
               </span>
+              {/* Enhance with AI button for differentiators */}
+              {jobDescription.trim().length > 0 && (
+                <button
+                  onClick={handleEnhanceDifferentiators}
+                  className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md ${
+                    canUseAIFeatures
+                      ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600'
+                      : 'bg-gradient-to-r from-amber-500 to-yellow-600 text-white hover:from-amber-600 hover:to-yellow-700'
+                  }`}
+                  title={t('wizard.steps.summary.enhanceTooltip')}
+                >
+                  <Wand2 className="w-4 h-4 mr-1.5" />
+                  {t('wizard.steps.summary.enhanceWithAI')}
+                </button>
+              )}
             </div>
             {hasAttemptedSubmit && validationErrors.jobDescription && (
               <p className="text-red-600 text-sm mt-1">{validationErrors.jobDescription.message}</p>
             )}
             
-            {/* Show API errors (including rate limit) for Differentiators section */}
-            {differentiatorsError && (
+            {/* Rate Limit Error for Differentiators section - with countdown timer */}
+            {isDifferentiatorsRateLimited && differentiatorsError && (
+              <div className="mt-3">
+                <RateLimitWarning 
+                  message={differentiatorsError}
+                  onRetry={() => {
+                    setIsDifferentiatorsRateLimited(false);
+                    setDifferentiatorsError(null);
+                    loadDifferentiatorsSuggestions();
+                  }}
+                />
+              </div>
+            )}
+            
+            {/* Generic Error (non-rate limit) for Differentiators section */}
+            {differentiatorsError && !isDifferentiatorsRateLimited && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3 mt-3">
                 <p className="text-yellow-800 text-sm">{differentiatorsError}</p>
-                {isDifferentiatorsRateLimited && (
-                  <button
-                    onClick={() => {
-                      setIsDifferentiatorsRateLimited(false);
-                      setDifferentiatorsError(null);
-                      navigate('/premium');
-                    }}
-                    className="mt-2 inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all shadow-sm hover:shadow-md"
-                  >
-                    <Crown className="w-4 h-4 mr-1" />
-                    {t('wizard.rateLimit.upgradeCta')}
-                  </button>
-                )}
               </div>
             )}
             
@@ -617,6 +678,21 @@ export function Step7Summary() {
         </p>
       </div>
 
+      {/* Show validation errors if user tried to proceed */}
+      {showErrors && Object.keys(validationErrors).length > 0 && (
+        <div className="validation-error-box mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-800 font-medium mb-2">
+            {t('wizard.validation.pleaseComplete')}
+          </p>
+          <ul className="list-disc list-inside text-red-700 space-y-1">
+            {Object.entries(validationErrors).map(([field, error]) => (
+              <li key={field}>
+                {error.messageKey ? t(error.messageKey) : error.message}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Navigation */}
       <div className="flex justify-between mt-8">
@@ -642,6 +718,30 @@ export function Step7Summary() {
         isOpen={showPremiumModal}
         onClose={() => setShowPremiumModal(false)}
         feature="aiSuggestions"
+      />
+
+      {/* Enhance with AI Modal for Summary */}
+      <EnhanceSummaryModal
+        isOpen={showEnhanceSummaryModal}
+        onClose={() => setShowEnhanceSummaryModal(false)}
+        originalText={summary}
+        type="summary"
+        jobTitle={resumeData.profession}
+        language={resumeData.language}
+        onApprove={handleSummaryEnhanceApprove}
+        resumeId={currentResumeId || undefined}
+      />
+
+      {/* Enhance with AI Modal for Differentiators */}
+      <EnhanceSummaryModal
+        isOpen={showEnhanceDifferentiatorsModal}
+        onClose={() => setShowEnhanceDifferentiatorsModal(false)}
+        originalText={jobDescription}
+        type="differentiators"
+        jobTitle={resumeData.profession}
+        language={resumeData.language}
+        onApprove={handleDifferentiatorsEnhanceApprove}
+        resumeId={currentResumeId || undefined}
       />
     </div>
   );

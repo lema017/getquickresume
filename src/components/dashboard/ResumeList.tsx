@@ -17,6 +17,7 @@ interface ResumeListProps {
   onShare?: (resume: Resume) => void;
   onEnhance?: (resume: Resume) => void;
   onRescore?: (resume: Resume) => void;
+  onTailorForJob?: (resume: Resume) => void;
   onDelete: (resume: Resume) => void;
   rescoringResumeId?: string;
 }
@@ -31,6 +32,7 @@ export function ResumeList({
   onShare,
   onEnhance,
   onRescore,
+  onTailorForJob,
   onDelete,
   rescoringResumeId
 }: ResumeListProps) {
@@ -158,6 +160,7 @@ export function ResumeList({
               onShare={onShare}
               onEnhance={onEnhance}
               onRescore={onRescore}
+              onTailorForJob={onTailorForJob}
               onDelete={onDelete}
               isRescoring={rescoringResumeId === resume.id}
             />

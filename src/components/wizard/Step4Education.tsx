@@ -3,17 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { ArrowRight, ArrowLeft, Plus, X, CheckCircle } from 'lucide-react';
-import { FloatingTips } from '@/components/FloatingTips';
-import { TipsButton } from '@/components/TipsButton';
 import { MonthYearPicker } from '@/components/MonthYearPicker';
-import { useTips } from '@/hooks/useTips';
 import { Education, Certification } from '@/types';
 
 export function Step4Education() {
   const { t } = useTranslation();
   const { navigateToStep } = useWizardNavigation();
   const { resumeData, updateResumeData, markStepCompleted, setCurrentStep } = useResumeStore();
-  const { areTipsClosed, closeTips, showTips } = useTips();
   const [education, setEducation] = useState(resumeData.education);
   const [certifications, setCertifications] = useState(resumeData.certifications);
   const [isSkipped, setIsSkipped] = useState(false);
@@ -79,24 +75,6 @@ export function Step4Education() {
         <p className="text-gray-600">
           {t('wizard.steps.education.description')}
         </p>
-      </div>
-
-      {/* Tips Section */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">{t('wizard.steps.education.ui.sectionTitle')}</h3>
-          {areTipsClosed && (
-            <TipsButton onClick={showTips} />
-          )}
-        </div>
-        
-        {!areTipsClosed && (
-          <FloatingTips
-            title={`💡 ${t('wizard.steps.education.ui.tips.title')}`}
-            tips={t('wizard.steps.education.ui.tips.items', { returnObjects: true }) as unknown as string[]}
-            onClose={closeTips}
-          />
-        )}
       </div>
 
       {/* Skip Option */}

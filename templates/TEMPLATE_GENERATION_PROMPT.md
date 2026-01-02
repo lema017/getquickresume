@@ -9,12 +9,12 @@ Your expertise includes creating production-ready, maintainable code that follow
 
 Here the order of the sections of the Resume template we must render
   1) Header
-  2) Profile
-  3) Skills
+  2) Skills
+  3) Profile
   4) Experience
   5) Projects
-  6) Education
-  7) Achievements
+  6) Achievements
+  7) Education
   8) Certifications
   9) Languages (ALWAYS LAST)
 
@@ -25,6 +25,59 @@ Here the order of the sections of the Resume template we must render
 - **Language Attribute**: Component accepts a `language` attribute ('en' or 'es') for section title localization
 - **No External Libraries**: Use only native DOM, CSS, and JavaScript APIs
 - **Browser Compatibility**: Must work in modern browsers (Chrome, Firefox, Safari, Edge)
+
+### Multi-Page CSS Support - REQUIRED
+
+**⚠️ CRITICAL: Templates MUST include CSS that supports multi-page rendering.**
+
+The resume content may span multiple A4 pages. Templates must use flexible CSS that allows content to expand beyond a single page height.
+
+**Required CSS for :host element:**
+```css
+:host {
+  position: relative;
+  display: block;
+  width: 794px; /* A4 width in pixels at 96 DPI */
+  min-height: 1123px; /* A4 height - minimum, can expand */
+  height: auto; /* CRITICAL: Allow content to expand */
+  overflow: visible; /* CRITICAL: Do not clip content */
+  background: white;
+  box-sizing: border-box;
+}
+```
+
+**Required CSS for main resume container:**
+```css
+.resume, .resume-container {
+  min-height: 1083px; /* A4 content height with margins */
+  height: auto; /* Allow content to expand */
+  position: relative;
+  overflow: visible; /* Do not clip content */
+}
+```
+
+**What NOT to Do (WRONG):**
+- ❌ Do NOT use `height: 1123px` (fixed height prevents multi-page)
+- ❌ Do NOT use `overflow: hidden` (clips content at page boundary)
+- ❌ Do NOT use `max-height` that would limit content expansion
+
+**Correct Pattern:**
+```css
+/* CORRECT - allows multi-page rendering */
+:host {
+  width: 794px;
+  min-height: 1123px;
+  height: auto;
+  overflow: visible;
+}
+
+/* WRONG - prevents multi-page rendering */
+:host {
+  width: 794px;
+  height: 1123px; /* Fixed height clips content */
+  overflow: hidden; /* Clips content at boundary */
+}
+```
 
 ### Internationalization (i18n) - REQUIRED
 
@@ -264,12 +317,12 @@ render() {
     <style>...</style>
     <div class="resume">
       ${this.renderHeader(name, title, contact)}
-      ${this.renderProfile(profile)}
       ${this.renderSkills(skills)}
+      ${this.renderProfile(profile)}
       ${this.renderExperience(experience)}
       ${this.renderProjects(projects)}
-      ${this.renderEducation(education)}
       ${this.renderAchievements(achievements)}
+      ${this.renderEducation(education)}
       ${this.renderCertifications(certifications)}
       ${this.renderLanguages(languages)}
     </div>

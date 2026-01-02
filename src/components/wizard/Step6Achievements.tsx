@@ -1,25 +1,20 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { useAuthStore } from '@/stores/authStore';
-import { ArrowRight, ArrowLeft, Plus, X, CheckCircle, Trophy, Sparkles, Loader2, Crown } from 'lucide-react';
-import { FloatingTips } from '@/components/FloatingTips';
-import { TipsButton } from '@/components/TipsButton';
+import { ArrowRight, ArrowLeft, Plus, X, CheckCircle, Trophy, Sparkles, Loader2 } from 'lucide-react';
 import { MandatoryFieldLabel } from '@/components/MandatoryFieldLabel';
 import { PremiumActionModal } from '@/components/PremiumActionModal';
-import { useTips } from '@/hooks/useTips';
+import { RateLimitWarning } from '@/components/RateLimitWarning';
 import { achievementSuggestionService } from '@/services/achievementSuggestionService';
 import { AchievementSuggestion } from '@/types';
 
 export function Step6Achievements() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { navigateToStep } = useWizardNavigation();
   const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, currentResumeId } = useResumeStore();
   const { user } = useAuthStore();
-  const { areTipsClosed, closeTips, showTips } = useTips();  
   const [achievements, setAchievements] = useState(resumeData.achievements || []);
 
   // Sync local state when resumeData changes (for edit mode)
@@ -129,7 +124,27 @@ export function Step6Achievements() {
     setUsedSuggestions(prev => new Set([...prev, suggestion.title]));
   };
 
+  // Validation errors state
+  const [showErrors, setShowErrors] = useState(false);
+
+  // Validation: achievements are optional, but if added, each achievement needs title and description
+  const isFormValid = achievements.length === 0 || achievements.every(achievement => 
+    achievement.title.trim() !== '' && achievement.description.trim() !== ''
+  );
+
   const handleNext = () => {
+    // Validate that if any achievements are added, they must be complete
+    if (!isFormValid) {
+      setShowErrors(true);
+      // Scroll to error section
+      const errorElement = document.querySelector('.validation-error-box');
+      if (errorElement) {
+        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+    
+    setShowErrors(false);
     updateResumeData({ achievements });
     markStepCompleted(6);
     setCurrentStep(7);
@@ -139,11 +154,6 @@ export function Step6Achievements() {
   const handleBack = () => {
     navigateToStep(5);
   };
-
-  // Validation: achievements are optional, but if added, each achievement needs title and description
-  const isFormValid = achievements.length === 0 || achievements.every(achievement => 
-    achievement.title.trim() !== '' && achievement.description.trim() !== ''
-  );
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -184,47 +194,34 @@ export function Step6Achievements() {
         </div>
       </div>
 
-      {/* Tips Section */}
+      {/* Achievements Section Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900">{t('wizard.steps.achievements.ui.headerTitle')}</h3>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={loadAISuggestions}
-              disabled={isLoadingAISuggestions || !resumeData.profession}
-              className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 ${
-                isLoadingAISuggestions || !resumeData.profession
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : canUseAIFeatures
-                  ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 shadow-sm hover:shadow-md'
-                  : 'bg-gradient-to-r from-amber-500 to-yellow-600 text-white hover:from-amber-600 hover:to-yellow-700 shadow-sm hover:shadow-md'
-              }`}
-            >
-              {isLoadingAISuggestions ? (
-                <Loader2 className="w-4 h-4 mr-1 animate-spin" />
-              ) : (
-                <Sparkles className="w-4 h-4 mr-1" />
-              )}
-              <span>{canUseAIFeatures ? t('wizard.steps.achievements.ui.ai.suggestionsButton') : t('dashboard.premiumAction.aiSuggestions.cta')}</span>
-              {aiSuggestions.length > 0 && !isLoadingAISuggestions && canUseAIFeatures && (
-                <span className="ml-2 px-2 py-0.5 bg-white/20 rounded-full text-xs">
-                  {aiSuggestions.length}
-                </span>
-              )}
-            </button>
-            {areTipsClosed && (
-              <TipsButton onClick={showTips} />
+          <button
+            onClick={loadAISuggestions}
+            disabled={isLoadingAISuggestions || !resumeData.profession}
+            className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+              isLoadingAISuggestions || !resumeData.profession
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                : canUseAIFeatures
+                ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 shadow-sm hover:shadow-md'
+                : 'bg-gradient-to-r from-amber-500 to-yellow-600 text-white hover:from-amber-600 hover:to-yellow-700 shadow-sm hover:shadow-md'
+            }`}
+          >
+            {isLoadingAISuggestions ? (
+              <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+            ) : (
+              <Sparkles className="w-4 h-4 mr-1" />
             )}
-          </div>
+            <span>{canUseAIFeatures ? t('wizard.steps.achievements.ui.ai.suggestionsButton') : t('dashboard.premiumAction.aiSuggestions.cta')}</span>
+            {aiSuggestions.length > 0 && !isLoadingAISuggestions && canUseAIFeatures && (
+              <span className="ml-2 px-2 py-0.5 bg-white/20 rounded-full text-xs">
+                {aiSuggestions.length}
+              </span>
+            )}
+          </button>
         </div>
-        
-        {!areTipsClosed && (
-          <FloatingTips
-            title={`💡 ${t('wizard.steps.achievements.ui.tips.title')}`}
-            tips={t('wizard.steps.achievements.ui.tips.items', { returnObjects: true }) as unknown as string[]}
-            onClose={closeTips}
-          />
-        )}
       </div>
 
       {/* AI Suggestions Section */}
@@ -241,22 +238,18 @@ export function Step6Achievements() {
                 <Loader2 className="w-6 h-6 animate-spin text-purple-600 mr-2" />
                 <span className="text-purple-700">{t('wizard.steps.achievements.ui.ai.generating')}</span>
               </div>
+            ) : isRateLimited && suggestionsError ? (
+              <RateLimitWarning 
+                message={suggestionsError}
+                onRetry={() => {
+                  setIsRateLimited(false);
+                  setSuggestionsError(null);
+                  loadAISuggestions();
+                }}
+              />
             ) : suggestionsError ? (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <p className="text-red-800 text-sm">{suggestionsError || t('wizard.steps.achievements.ui.ai.errorLoading')}</p>
-                {isRateLimited && (
-                  <button
-                    onClick={() => {
-                      setIsRateLimited(false);
-                      setSuggestionsError(null);
-                      navigate('/premium');
-                    }}
-                    className="mt-2 inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all shadow-sm hover:shadow-md"
-                  >
-                    <Crown className="w-4 h-4 mr-1" />
-                    {t('wizard.rateLimit.upgradeCta')}
-                  </button>
-                )}
               </div>
             ) : aiSuggestions.length > 0 ? (
               <div className="space-y-3">
@@ -385,6 +378,18 @@ export function Step6Achievements() {
           {t('wizard.steps.achievements.ui.motivator')}
         </p>
       </div>
+
+      {/* Show validation errors if user tried to proceed */}
+      {showErrors && !isFormValid && (
+        <div className="validation-error-box mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-800 font-medium mb-2">
+            {t('wizard.validation.pleaseComplete')}
+          </p>
+          <ul className="list-disc list-inside text-red-700 space-y-1">
+            <li>{t('wizard.validation.achievements.incomplete')}</li>
+          </ul>
+        </div>
+      )}
 
       {/* Navigation */}
       <div className="flex justify-between">

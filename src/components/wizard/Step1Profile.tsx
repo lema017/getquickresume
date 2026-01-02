@@ -10,11 +10,9 @@ import { validateProfile, FieldValidation } from '@/utils/validation';
 import { ValidationError } from '@/components/ValidationError';
 import { SanitizedInput } from '@/components/SanitizedInput';
 import { PhoneInput } from '@/components/PhoneInput';
-import { FloatingTips } from '@/components/FloatingTips';
-import { TipsButton } from '@/components/TipsButton';
 import { MandatoryFieldLabel } from '@/components/MandatoryFieldLabel';
-import { useTips } from '@/hooks/useTips';
 import { formatName, formatProfession } from '@/utils/textFormatting';
+import { DevResumePreloader } from './DevResumePreloader';
 
 export function Step1Profile() {
   const { t } = useTranslation();
@@ -22,7 +20,6 @@ export function Step1Profile() {
   const { navigateToStep } = useWizardNavigation();
   const { resumeData, updateResumeData, markStepCompleted, setCurrentStep } = useResumeStore();
   const { user } = useAuthStore();
-  const { areTipsClosed, closeTips, showTips } = useTips();
   const [errors, setErrors] = useState<FieldValidation>({});
   const [formData, setFormData] = useState({
     firstName: formatName(resumeData.firstName || user?.firstName || user?.fullName?.split(' ')[0] || ''),
@@ -142,23 +139,8 @@ export function Step1Profile() {
         </p>
       </div>
 
-      {/* Tips Section */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">{t('wizard.steps.profile.ui.sectionTitle')}</h3>
-          {areTipsClosed && (
-            <TipsButton onClick={showTips} />
-          )}
-        </div>
-        
-        {!areTipsClosed && (
-          <FloatingTips
-            title={`💡 ${t('wizard.steps.profile.ui.tips.title')}`}
-            tips={t('wizard.steps.profile.ui.tips.items', { returnObjects: true }) as unknown as string[]}
-            onClose={closeTips}
-          />
-        )}
-      </div>
+      {/* Dev-only: Quick fill resume data for testing */}
+      <DevResumePreloader onLoadMockData={updateResumeData} />
 
       {/* Guided Questions */}
       <div className="mb-8">

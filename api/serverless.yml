@@ -29,6 +29,7 @@ provider:
     PROFESSION_SUGGESTIONS_TABLE: ${self:service}-profession-suggestions-${self:provider.stage}
     OPENAI_API_KEY: ${ssm:/getquickresume/${self:provider.stage}/openai-api-key}
     GROQ_API_KEY: ${ssm:/getquickresume/${self:provider.stage}/groq-api-key}
+    PREMIUM_AI_PROVIDER: ${ssm:/getquickresume/${self:provider.stage}/premium-ai-provider, 'openai'}
     PADDLE_API_KEY: ${ssm:/getquickresume/${self:provider.stage}/paddle-api-key}
     PADDLE_WEBHOOK_SECRET: ${ssm:/getquickresume/${self:provider.stage}/paddle-webhook-secret}
     PADDLE_ENVIRONMENT: ${ssm:/getquickresume/${self:provider.stage}/paddle-environment}
@@ -576,6 +577,24 @@ functions:
               - Authorization
             allowCredentials: false
 
+  # Public endpoint for recent viewers - no authentication required
+  getPublicRecentViewers:
+    handler: dist/handlers/resumeSharing.getPublicRecentViewers
+    timeout: 30
+    environment:
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+      RESUME_VIEWS_TABLE: ${self:service}-resume-views-${self:provider.stage}
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+    events:
+      - http:
+          path: api/public/share/{shareToken}/recent-viewers
+          method: get
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+            allowCredentials: false
+
   # Public resume endpoints (no authentication required)
   getPublicResume:
     handler: dist/handlers/publicResume.getPublicResume
@@ -886,6 +905,30 @@ functions:
               - Authorization
             allowCredentials: false
 
+  # AI Direct Enhancement endpoint (Premium only - mechanical fixes)
+  directEnhance:
+    handler: dist/handlers/aiDirectEnhancement.directEnhance
+    timeout: 30
+    environment:
+      AI_PROVIDER: openai
+      AI_MODEL: gpt-4o
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+    events:
+      - http:
+          path: api/ai/direct-enhance
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
   # LinkedIn Data Processing Function
   linkedInDataParser:
     handler: dist/handlers/linkedInData.parseLinkedInData
@@ -1048,6 +1091,208 @@ functions:
             headers:
               - Content-Type
               - Paddle-Signature
+            allowCredentials: false
+
+  # ============================================================================
+  # Job Tailoring API Endpoints
+  # ============================================================================
+  
+  # Validate and extract job posting from URL
+  validateJobUrl:
+    handler: dist/handlers/jobTailoring.validateJobUrlHandler
+    timeout: 30
+    environment:
+      GROQ_API_KEY: ${self:provider.environment.GROQ_API_KEY}
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+      AI_USAGE_LOGS_TABLE: ${self:service}-ai-usage-logs-${self:provider.stage}
+    events:
+      - http:
+          path: api/job-tailoring/validate-url
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Analyze job posting and compare with resume
+  analyzeJobPosting:
+    handler: dist/handlers/jobTailoring.analyzeJob
+    timeout: 60
+    environment:
+      GROQ_API_KEY: ${self:provider.environment.GROQ_API_KEY}
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+      AI_USAGE_LOGS_TABLE: ${self:service}-ai-usage-logs-${self:provider.stage}
+    events:
+      - http:
+          path: api/job-tailoring/analyze
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Generate clarification questions
+  generateJobQuestions:
+    handler: dist/handlers/jobTailoring.generateQuestions
+    timeout: 60
+    environment:
+      GROQ_API_KEY: ${self:provider.environment.GROQ_API_KEY}
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+      AI_USAGE_LOGS_TABLE: ${self:service}-ai-usage-logs-${self:provider.stage}
+    events:
+      - http:
+          path: api/job-tailoring/questions
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Enhance answer with AI
+  enhanceJobAnswer:
+    handler: dist/handlers/jobTailoring.enhanceAnswerHandler
+    timeout: 30
+    environment:
+      GROQ_API_KEY: ${self:provider.environment.GROQ_API_KEY}
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+      AI_USAGE_LOGS_TABLE: ${self:service}-ai-usage-logs-${self:provider.stage}
+    events:
+      - http:
+          path: api/job-tailoring/enhance-answer
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Generate tailored resume
+  generateTailoredResume:
+    handler: dist/handlers/jobTailoring.generateTailoredResumeHandler
+    timeout: 120
+    environment:
+      GROQ_API_KEY: ${self:provider.environment.GROQ_API_KEY}
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+      AI_USAGE_LOGS_TABLE: ${self:service}-ai-usage-logs-${self:provider.stage}
+    events:
+      - http:
+          path: api/job-tailoring/generate
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Save tailored resume
+  saveTailoredResume:
+    handler: dist/handlers/jobTailoring.saveTailoredResumeHandler
+    timeout: 60
+    environment:
+      GROQ_API_KEY: ${self:provider.environment.GROQ_API_KEY}
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+      AI_USAGE_LOGS_TABLE: ${self:service}-ai-usage-logs-${self:provider.stage}
+    events:
+      - http:
+          path: api/job-tailoring/save
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Get tailoring usage limits
+  getTailoringLimits:
+    handler: dist/handlers/jobTailoring.getTailoringLimitsHandler
+    timeout: 30
+    environment:
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+    events:
+      - http:
+          path: api/job-tailoring/limits
+          method: get
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # ==========================================================================
+  # Resume Extraction from Document Upload
+  # ==========================================================================
+
+  # Extract structured resume data from plain text
+  extractResumeData:
+    handler: dist/handlers/resumeExtraction.extractResumeData
+    timeout: 60
+    environment:
+      GROQ_API_KEY: ${self:provider.environment.GROQ_API_KEY}
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+      AI_USAGE_LOGS_TABLE: ${self:service}-ai-usage-logs-${self:provider.stage}
+    events:
+      - http:
+          path: api/resume-extraction/extract
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
             allowCredentials: false
 
 resources:

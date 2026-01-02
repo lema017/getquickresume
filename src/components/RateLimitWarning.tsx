@@ -78,9 +78,9 @@ export function RateLimitWarning({
             {t('wizard.rateLimit.title')}
           </h4>
           
-          {/* Error message */}
+          {/* Error message - always use translated message for consistency */}
           <p className="text-sm text-amber-700 mb-2">
-            {message || t('wizard.rateLimit.defaultMessage')}
+            {t('wizard.rateLimit.defaultMessage')}
           </p>
           
           {/* Free user explanation */}

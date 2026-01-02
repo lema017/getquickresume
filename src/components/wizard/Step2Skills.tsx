@@ -1,26 +1,21 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { useAuthStore } from '@/stores/authStore';
-import { ArrowRight, ArrowLeft, Plus, X, CheckCircle, Lightbulb, Loader2, Sparkles, Crown } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Plus, X, CheckCircle, Lightbulb, Loader2, Sparkles } from 'lucide-react';
 import { validateSkills, FieldValidation } from '@/utils/validation';
 import { ValidationError } from '@/components/ValidationError';
 import { SanitizedInput } from '@/components/SanitizedInput';
-import { FloatingTips } from '@/components/FloatingTips';
-import { TipsButton } from '@/components/TipsButton';
 import { PremiumActionModal } from '@/components/PremiumActionModal';
-import { useTips } from '@/hooks/useTips';
+import { RateLimitWarning } from '@/components/RateLimitWarning';
 import { suggestionService } from '@/services/suggestionService';
 
 export function Step2Skills() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { navigateToStep } = useWizardNavigation();
   const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, calculateCharacters, currentResumeId } = useResumeStore();
   const { user } = useAuthStore();
-  const { areTipsClosed, closeTips, showTips } = useTips();
   const [errors, setErrors] = useState<FieldValidation>({});
   const [skills, setSkills] = useState(resumeData.skillsRaw || []);
   const [newSkill, setNewSkill] = useState('');
@@ -116,6 +111,11 @@ export function Step2Skills() {
       if (error?.code === 'RATE_LIMIT_EXCEEDED' || error?.status === 429) {
         setIsRateLimited(true);
       }
+      // Check if it's an invalid profession error
+      if (error?.code === 'INVALID_PROFESSION') {
+        setSuggestionsError(t('wizard.steps.skills.errors.invalidProfession'));
+        return;
+      }
       const errorMessage = error instanceof Error ? error.message : 'No se pudieron cargar las sugerencias de habilidades.';
       setSuggestionsError(errorMessage);
     } finally {
@@ -197,16 +197,26 @@ export function Step2Skills() {
     setShowSuggestions(!showSuggestions);
   };
 
+  // State to show validation errors
+  const [showErrors, setShowErrors] = useState(false);
+
   const handleNext = () => {
     // Validar habilidades (mínimo 5)
     const validationErrors = validateSkills(skills);
     
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      setShowErrors(true);
+      // Scroll to error section
+      const errorElement = document.querySelector('.validation-error-box');
+      if (errorElement) {
+        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
     
     // Si no hay errores, continuar
+    setShowErrors(false);
     updateResumeData({ skillsRaw: skills });
     markStepCompleted(2);
     setCurrentStep(3);
@@ -250,24 +260,6 @@ export function Step2Skills() {
             }
           </p>
         </div>
-      </div>
-
-      {/* Tips Section */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">{t('wizard.steps.skills.ui.sectionTitle')}</h3>
-          {areTipsClosed && (
-            <TipsButton onClick={showTips} />
-          )}
-        </div>
-        
-        {!areTipsClosed && (
-          <FloatingTips
-            title={`💡 ${t('wizard.steps.skills.ui.tips.title')}`}
-            tips={t('wizard.steps.skills.ui.tips.items', { returnObjects: true }) as unknown as string[]}
-            onClose={closeTips}
-          />
-        )}
       </div>
 
       {/* Guided Questions */}
@@ -383,22 +375,24 @@ export function Step2Skills() {
                   </div>
                 )}
                 
-                {suggestionsError && (
+                {/* Rate Limit Error - with countdown timer */}
+                {isRateLimited && suggestionsError && (
+                  <div className="mb-3">
+                    <RateLimitWarning 
+                      message={suggestionsError}
+                      onRetry={() => {
+                        setIsRateLimited(false);
+                        setSuggestionsError(null);
+                        loadSuggestions();
+                      }}
+                    />
+                  </div>
+                )}
+                
+                {/* Generic Error (non-rate limit) */}
+                {suggestionsError && !isRateLimited && (
                   <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3">
                     <p className="text-yellow-800 text-sm">{suggestionsError}</p>
-                    {isRateLimited && (
-                      <button
-                        onClick={() => {
-                          setIsRateLimited(false);
-                          setSuggestionsError(null);
-                          navigate('/premium');
-                        }}
-                        className="mt-2 inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all shadow-sm hover:shadow-md"
-                      >
-                        <Crown className="w-4 h-4 mr-1" />
-                        {t('wizard.rateLimit.upgradeCta')}
-                      </button>
-                    )}
                   </div>
                 )}
                 
@@ -451,6 +445,22 @@ export function Step2Skills() {
         </p>
       </div>
 
+      {/* Show validation errors if user tried to proceed */}
+      {showErrors && Object.keys(errors).length > 0 && (
+        <div className="validation-error-box mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-800 font-medium mb-2">
+            {t('wizard.validation.pleaseComplete')}
+          </p>
+          <ul className="list-disc list-inside text-red-700 space-y-1">
+            {Object.entries(errors).map(([field, error]) => (
+              <li key={field}>
+                {error.messageKey ? t(error.messageKey) : error.message}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {/* Navigation */}
       <div className="flex justify-between mt-8">
         <button onClick={handleBack} className="btn-outline flex items-center">
@@ -469,20 +479,6 @@ export function Step2Skills() {
           <ArrowRight className="w-4 h-4 ml-2" />
         </button>
       </div>
-      
-      {/* Show validation errors if user tried to proceed */}
-      {Object.keys(errors).length > 0 && (
-        <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-800 font-medium mb-2">
-            {t('wizard.validation.pleaseComplete')}
-          </p>
-          <ul className="list-disc list-inside text-red-700 space-y-1">
-            {Object.entries(errors).map(([field, error]) => (
-              <li key={field}>{error.message}</li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       {/* Premium Action Modal for AI features */}
       <PremiumActionModal

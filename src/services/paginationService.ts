@@ -106,6 +106,19 @@ export async function calculatePagination(
   return result;
 }
 
+// Canonical section order for reference and documentation
+export const SECTION_ORDER = [
+  'header',
+  'skills',
+  'summary',
+  'experience',
+  'projects',
+  'achievements',
+  'education',
+  'certifications',
+  'languages'
+] as const;
+
 /**
  * Calculate pagination for single-column layout
  */
@@ -120,11 +133,11 @@ async function calculateSingleColumnPagination(
   const maxPageHeight = A4_DIMENSIONS.contentHeight; // 1083px
   console.log('📄 [SINGLE-COLUMN] Max page height:', maxPageHeight, 'px');
 
-  // Order for single-column: Header, Summary, Experience, Projects, Skills, Education, Achievements, Certifications, Languages
+  // Order for single-column: Header, Skills, Summary, Experience, Projects, Achievements, Education, Certifications, Languages
   const sections: Array<{ type: string; data: any; measure: () => Promise<number> }> = [];
   console.log('📄 [SINGLE-COLUMN] Building sections list...');
 
-  // Header section
+  // 1. Header section
   if (resumeData.firstName || resumeData.lastName) {
     sections.push({
       type: 'header',
@@ -133,34 +146,7 @@ async function calculateSingleColumnPagination(
     });
   }
 
-  // Summary section
-  if (resumeData.summary) {
-    sections.push({
-      type: 'summary',
-      data: resumeData.summary,
-      measure: async () => await measureSummary(resumeData.summary, template),
-    });
-  }
-
-  // Experience items
-  resumeData.experience.forEach((exp) => {
-    sections.push({
-      type: 'experience',
-      data: exp,
-      measure: async () => await measureExperienceItem(exp, template),
-    });
-  });
-
-  // Projects
-  resumeData.projects.forEach((proj) => {
-    sections.push({
-      type: 'project',
-      data: proj,
-      measure: async () => await measureProjectItem(proj, template),
-    });
-  });
-
-  // Skills (as a group)
+  // 2. Skills (as a group) - Moved up to match template render order
   if (resumeData.skillsRaw.length > 0) {
     sections.push({
       type: 'skills',
@@ -169,16 +155,34 @@ async function calculateSingleColumnPagination(
     });
   }
 
-  // Education
-  resumeData.education.forEach((edu) => {
+  // 3. Summary section
+  if (resumeData.summary) {
     sections.push({
-      type: 'education',
-      data: edu,
-      measure: async () => await measureEducationItem(edu, template),
+      type: 'summary',
+      data: resumeData.summary,
+      measure: async () => await measureSummary(resumeData.summary, template),
+    });
+  }
+
+  // 4. Experience items
+  resumeData.experience.forEach((exp) => {
+    sections.push({
+      type: 'experience',
+      data: exp,
+      measure: async () => await measureExperienceItem(exp, template),
     });
   });
 
-  // Achievements
+  // 5. Projects
+  resumeData.projects.forEach((proj) => {
+    sections.push({
+      type: 'project',
+      data: proj,
+      measure: async () => await measureProjectItem(proj, template),
+    });
+  });
+
+  // 6. Achievements - Moved up
   resumeData.achievements.forEach((ach) => {
     sections.push({
       type: 'achievement',
@@ -187,7 +191,16 @@ async function calculateSingleColumnPagination(
     });
   });
 
-  // Certifications
+  // 7. Education - Moved down
+  resumeData.education.forEach((edu) => {
+    sections.push({
+      type: 'education',
+      data: edu,
+      measure: async () => await measureEducationItem(edu, template),
+    });
+  });
+
+  // 8. Certifications
   resumeData.certifications.forEach((cert) => {
     sections.push({
       type: 'certification',
@@ -196,7 +209,7 @@ async function calculateSingleColumnPagination(
     });
   });
 
-  // Languages (always last section)
+  // 9. Languages (always last section)
   resumeData.languages.forEach((lang) => {
     sections.push({
       type: 'language',

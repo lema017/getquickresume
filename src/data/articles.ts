@@ -1,7 +1,10 @@
 import { ArticleMeta } from '@/components/blog/ArticleCard';
 
+// Type for supported languages
+export type SupportedLanguage = 'en' | 'es';
+
 // Articles organized by language
-export const articles: Record<'en' | 'es', ArticleMeta[]> = {
+export const articles: Record<SupportedLanguage, ArticleMeta[]> = {
   en: [
     {
       slug: 'how-to-make-good-resume',
@@ -44,7 +47,7 @@ export const articles: Record<'en' | 'es', ArticleMeta[]> = {
   ],
 };
 
-export function getArticleBySlug(slug: string, lang: 'en' | 'es' = 'en'): ArticleMeta | undefined {
+export function getArticleBySlug(slug: string, lang: SupportedLanguage = 'en'): ArticleMeta | undefined {
   return articles[lang].find(article => article.slug === slug);
 }
 

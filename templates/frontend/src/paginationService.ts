@@ -78,12 +78,15 @@ export function fitsOnPage(
 
 /**
  * Apply indivisibility rules
- * Header and Profile must stay on page 1
+ * Indivisible sections cannot be split across pages (they are atomic).
+ * Note: Header is typically on page 1, but profile/summary can appear on any page
+ * based on pagination calculations - they just cannot be split mid-content.
  */
 export function isIndivisible(type: string): boolean {
+  // These sections are atomic - they cannot be split across pages
   const indivisible = type === 'header' || type === 'profile' || type === 'summary';
   if (indivisible) {
-    console.log(`[PAGINATION] Section "${type}" is indivisible (must stay on page 1)`);
+    console.log(`[PAGINATION] Section "${type}" is indivisible (cannot be split across pages)`);
   }
   return indivisible;
 }

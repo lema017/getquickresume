@@ -77,12 +77,21 @@ export function EnhanceTextModal({
     handleEnhance();
   };
 
-  // Auto-enhance when modal opens
+  // Reset enhanced text when originalText changes (fixes bug where previous enhancement persists)
+  useEffect(() => {
+    if (isOpen && originalText) {
+      setEnhancedText('');
+      setError(null);
+      setIsRateLimited(false);
+    }
+  }, [isOpen, originalText]);
+
+  // Auto-enhance when modal opens (runs after reset effect)
   useEffect(() => {
     if (isOpen && originalText && !enhancedText && !isLoading) {
       handleEnhance();
     }
-  }, [isOpen, originalText]);
+  }, [isOpen, originalText, enhancedText]);
 
   if (!isOpen) return null;
 

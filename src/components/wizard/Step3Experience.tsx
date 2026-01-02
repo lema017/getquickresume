@@ -5,22 +5,18 @@ import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { useAuthStore } from '@/stores/authStore';
 import { ArrowRight, ArrowLeft, Plus, X, CheckCircle, Lightbulb, Sparkles, Wand2 } from 'lucide-react';
 import { WorkExperience } from '@/types';
-import { FloatingTips } from '@/components/FloatingTips';
-import { TipsButton } from '@/components/TipsButton';
 import { MonthYearPicker } from '@/components/MonthYearPicker';
 import { MandatoryFieldLabel } from '@/components/MandatoryFieldLabel';
 import { AchievementSuggestionsModal } from './AchievementSuggestionsModal';
 import { EnhanceTextModal } from './EnhanceTextModal';
 import { PremiumActionModal } from '@/components/PremiumActionModal';
 import { Tooltip } from '@/components/ui/Tooltip';
-import { useTips } from '@/hooks/useTips';
 
 export function Step3Experience() {
   const { t } = useTranslation();
   const { navigateToStep } = useWizardNavigation();
   const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, addWorkExperience, currentResumeId } = useResumeStore();
   const { user } = useAuthStore();
-  const { areTipsClosed, closeTips, showTips } = useTips();
   const [experiences, setExperiences] = useState(resumeData.experience);
 
   // Sync local state when resumeData changes (for edit mode)
@@ -193,29 +189,51 @@ export function Step3Experience() {
   const isFormValid = experiences.length > 0 && areAllDatesValid() && 
     experiences.every(exp => exp.title.trim() && exp.company.trim() && exp.startDate);
 
-  const handleNext = () => {
-    // Validate that at least one experience exists
+  // Validation errors state
+  const [showErrors, setShowErrors] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+
+  // Compute validation errors
+  const computeValidationErrors = () => {
+    const errors: string[] = [];
+    
+    // Check if at least one experience exists
     if (experiences.length === 0) {
-      alert(t('wizard.validation.experience.alertAdd'));
-      return;
+      errors.push(t('wizard.validation.experience.atLeastOne'));
     }
     
-    // Validate dates before proceeding
+    // Check dates validity
     if (!areAllDatesValid()) {
-      alert(t('wizard.steps.experience.ui.alerts.invalidDatesMessage'));
-      return;
+      errors.push(t('wizard.validation.experience.invalidDates'));
     }
     
-    // Validate that all experiences have required fields
+    // Check for incomplete experiences
     const incompleteExperiences = experiences.filter(exp => 
       !exp.title.trim() || !exp.company.trim() || !exp.startDate
     );
     
     if (incompleteExperiences.length > 0) {
-      alert(t('wizard.validation.experience.alertComplete'));
+      errors.push(t('wizard.validation.experience.incompleteFields'));
+    }
+    
+    return errors;
+  };
+
+  const handleNext = () => {
+    const errors = computeValidationErrors();
+    
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      setShowErrors(true);
+      // Scroll to error section
+      const errorElement = document.querySelector('.validation-error-box');
+      if (errorElement) {
+        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
     
+    setShowErrors(false);
     updateResumeData({ experience: experiences });
     markStepCompleted(3);
     setCurrentStep(4);
@@ -273,24 +291,6 @@ export function Step3Experience() {
           </div>
         </div>
       )}
-
-      {/* Tips Section */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">{t('wizard.steps.experience.ui.sectionTitle')}</h3>
-          {areTipsClosed && (
-            <TipsButton onClick={showTips} />
-          )}
-        </div>
-        
-        {!areTipsClosed && (
-          <FloatingTips
-            title={`💡 ${t('wizard.steps.experience.ui.tips.title')}`}
-            tips={t('wizard.steps.experience.ui.tips.items', { returnObjects: true }) as unknown as string[]}
-            onClose={closeTips}
-          />
-        )}
-      </div>
 
       {/* Guided Questions */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
@@ -467,6 +467,20 @@ export function Step3Experience() {
           {t('wizard.steps.experience.motivator')}
         </p>
       </div>
+
+      {/* Show validation errors if user tried to proceed */}
+      {showErrors && validationErrors.length > 0 && (
+        <div className="validation-error-box mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-800 font-medium mb-2">
+            {t('wizard.validation.pleaseComplete')}
+          </p>
+          <ul className="list-disc list-inside text-red-700 space-y-1">
+            {validationErrors.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Navigation */}
       <div className="flex justify-between mt-8">

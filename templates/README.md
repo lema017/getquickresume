@@ -152,14 +152,14 @@ project.date              // NOT project.dates
 Sections MUST appear in this exact order, always:
 
 1. Header (name, title, contact)
-2. Summary/Profile
-3. Skills
+2. Skills
+3. Summary/Profile
 4. Experience
 5. Projects
-6. Education
-7. Languages
-8. Achievements
-9. Certifications
+6. Achievements
+7. Education
+8. Certifications
+9. Languages
 
 **Within each page**, sections must respect this order. Sections cannot be reordered or mixed.
 
@@ -409,7 +409,7 @@ Before generating code, verify:
 - ✅ Will use `job.date` (NOT `job.dates`)
 
 **Section Order:**
-- ✅ Header → Summary → Skills → Experience → Projects → Education → Languages → Achievements → Certifications
+- ✅ Header → Skills → Summary → Experience → Projects → Achievements → Education → Certifications → Languages
 
 **Pagination:**
 - ✅ Will implement pageNumber-based algorithm

@@ -1,5 +1,6 @@
 import { ResumeData, GeneratedResume } from '../types';
-import { TokenUsage, trackAIUsage } from './aiUsageService';
+import { TokenUsage, trackAIUsage, AIProvider } from './aiUsageService';
+import { getAIConfigForUser, GROQ_PREMIUM_MODEL } from '../utils/aiProviderSelector';
 
 interface TranslationTrackingContext {
   userId: string;
@@ -11,12 +12,14 @@ interface TranslationTrackingContext {
  * Service for translating resumes to different languages using AI
  */
 class TranslationService {
-  private apiKey: string;
-  private model: string;
+  private openaiApiKey: string;
+  private groqApiKey: string;
+  private openaiModel: string;
 
   constructor() {
-    this.apiKey = process.env.OPENAI_API_KEY || '';
-    this.model = process.env.AI_MODEL || 'gpt-4o';
+    this.openaiApiKey = process.env.OPENAI_API_KEY || '';
+    this.groqApiKey = process.env.GROQ_API_KEY || '';
+    this.openaiModel = process.env.AI_MODEL || 'gpt-4o';
   }
 
   /**
@@ -32,8 +35,23 @@ class TranslationService {
       // Build translation prompt
       const prompt = this.buildTranslationPrompt(resumeData, generatedResume, targetLanguage);
 
-      // Call OpenAI API with usage tracking
-      const { content, usage } = await this.callOpenAIWithUsage(prompt);
+      // Determine provider based on user type and feature flag
+      const isPremium = trackingContext?.isPremium ?? true; // Default to premium if no context
+      const { provider, model } = getAIConfigForUser(isPremium);
+
+      // Call appropriate API with usage tracking
+      let content: string;
+      let usage: TokenUsage;
+      
+      if (provider === 'groq') {
+        const result = await this.callGroqWithUsage(prompt, model);
+        content = result.content;
+        usage = result.usage;
+      } else {
+        const result = await this.callOpenAIWithUsage(prompt);
+        content = result.content;
+        usage = result.usage;
+      }
 
       // Track AI usage if context provided
       if (trackingContext) {
@@ -41,8 +59,8 @@ class TranslationService {
           userId: trackingContext.userId,
           resumeId: trackingContext.resumeId,
           endpoint: 'translateResume',
-          provider: 'openai',
-          model: this.model,
+          provider,
+          model,
           usage,
           isPremium: trackingContext.isPremium
         });
@@ -111,7 +129,7 @@ Ensure all text fields are translated to ${targetLanguageName}.`;
    */
   private async callOpenAIWithUsage(prompt: string): Promise<{ content: string; usage: TokenUsage }> {
     const requestBody: any = {
-      model: this.model,
+      model: this.openaiModel,
       messages: [
         {
           role: 'system',
@@ -130,7 +148,7 @@ Ensure all text fields are translated to ${targetLanguageName}.`;
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
+        'Authorization': `Bearer ${this.openaiApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(requestBody),
@@ -160,6 +178,65 @@ Ensure all text fields are translated to ${targetLanguageName}.`;
     
     if (!content || content.trim().length === 0) {
       throw new Error('OpenAI API returned empty response');
+    }
+    
+    return { content, usage };
+  }
+
+  /**
+   * Call Groq API for translation with usage tracking
+   */
+  private async callGroqWithUsage(prompt: string, model: string): Promise<{ content: string; usage: TokenUsage }> {
+    const requestBody = {
+      model,
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a professional resume translator. Translate resumes accurately while maintaining professional tone and structure. Always return valid JSON.'
+        },
+        {
+          role: 'user',
+          content: prompt
+        }
+      ],
+      response_format: { type: 'json_object' },
+      temperature: 0.2,
+      max_tokens: 8000
+    };
+
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.groqApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      let errorMessage = `Groq API error: ${response.statusText}`;
+      try {
+        const errorJson = JSON.parse(errorBody);
+        errorMessage = `Groq API error: ${errorJson.error?.message || response.statusText}`;
+      } catch (e) {
+        // Ignore parse error
+      }
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json() as any;
+    const content = data.choices[0]?.message?.content || '';
+    
+    // Extract usage data
+    const usage: TokenUsage = {
+      promptTokens: data.usage?.prompt_tokens || 0,
+      completionTokens: data.usage?.completion_tokens || 0,
+      totalTokens: data.usage?.total_tokens || 0
+    };
+    
+    if (!content || content.trim().length === 0) {
+      throw new Error('Groq API returned empty response');
     }
     
     return { content, usage };

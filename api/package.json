@@ -14,7 +14,8 @@
     "build": "tsc",
     "type-check": "tsc --noEmit",
     "create-tables": "node scripts/create-tables.js",
-    "migrate-suggestions": "node scripts/migrate-suggestions.js"
+    "migrate-suggestions": "node scripts/migrate-suggestions.js",
+    "sync-templates": "node scripts/sync-templates-prod-to-local.js"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.450.0",

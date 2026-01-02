@@ -64,6 +64,13 @@ export interface User {
   paddleSubscriptionId?: string;
   paddleTransactionId?: string;
   aiUsageStats?: AIUsageStats; // AI usage tracking for cost analysis
+  // Job Tailoring usage tracking
+  jobTailoringUsage?: {
+    totalUsed: number;           // For free users (lifetime count)
+    monthlyUsed: number;         // For premium users (monthly count)
+    currentMonth: string;        // "YYYY-MM" format for monthly reset
+    lastTailoredAt?: string;     // ISO timestamp of last tailoring
+  };
   createdAt: string;
   updatedAt: string;
 }

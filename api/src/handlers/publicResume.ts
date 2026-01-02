@@ -128,11 +128,8 @@ export const getPublicResume = async (
       referrer,
     };
 
-    // Record view (fire and forget)
-    recordView(view).catch(err => {
-      console.error('Error recording view:', err);
-      // Don't fail the request if analytics recording fails
-    });
+    // NOTE: View recording removed from GET endpoint to prevent duplicates.
+    // Views are now only recorded via the explicit POST /view endpoint.
 
     // Return resume data (without sensitive information)
     return {

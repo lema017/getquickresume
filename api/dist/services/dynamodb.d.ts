@@ -42,6 +42,12 @@ export interface User {
     paddleSubscriptionId?: string;
     paddleTransactionId?: string;
     aiUsageStats?: AIUsageStats;
+    jobTailoringUsage?: {
+        totalUsed: number;
+        monthlyUsed: number;
+        currentMonth: string;
+        lastTailoredAt?: string;
+    };
     createdAt: string;
     updatedAt: string;
 }

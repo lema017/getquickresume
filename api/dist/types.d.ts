@@ -42,6 +42,12 @@ export interface User {
     paddleSubscriptionId?: string;
     paddleTransactionId?: string;
     aiUsageStats?: AIUsageStats;
+    jobTailoringUsage?: {
+        totalUsed: number;
+        monthlyUsed: number;
+        currentMonth: string;
+        lastTailoredAt?: string;
+    };
     createdAt: string;
     updatedAt: string;
 }
@@ -241,29 +247,63 @@ export interface LanguageProficiency {
     level: string;
     certifications?: string[];
 }
+export type ChecklistItemPriority = 'required' | 'recommended' | 'optional';
+export interface ChecklistItem {
+    id: string;
+    label: string;
+    description: string;
+    isCompleted: boolean;
+    completedAt?: string;
+    priority: ChecklistItemPriority;
+    verifierId: string;
+    details?: string;
+    evidence?: string;
+}
+export interface SectionChecklist {
+    section: string;
+    displayName: string;
+    items: ChecklistItem[];
+    completedCount: number;
+    totalCount: number;
+    requiredCount: number;
+    requiredCompletedCount: number;
+    maxPoints: number;
+    earnedPoints: number;
+}
+export interface EnhancementRecord {
+    id: string;
+    checklistItemId: string;
+    section: string;
+    enhancedAt: string;
+    previousValue?: string;
+    newValue?: string;
+}
+export interface KeywordAnalysisData {
+    totalKeywordsFound: number;
+    hardSkills: string[];
+    softSkills: string[];
+    actionVerbs: string[];
+    industryTerms: string[];
+    atsScore: 'excellent' | 'good' | 'fair' | 'needs-work';
+    scoreValue: number;
+    tierLabel: string;
+    breakdown: string;
+}
 export interface ResumeScore {
     totalScore: number;
-    breakdown: {
-        summary: number;
-        experience: number;
-        skills: number;
-        education: number;
-        projects: number;
-        achievements: number;
-        languages: number;
-        contact: number;
-    };
+    maxPossibleScore: number;
+    completionPercentage: number;
+    isOptimized: boolean;
+    breakdown: Record<string, number>;
+    checklist: Record<string, SectionChecklist>;
+    enhancementHistory: EnhancementRecord[];
+    keywordAnalysis?: KeywordAnalysisData;
     strengths: string[];
     improvements: string[];
-    detailedFeedback: {
-        section: string;
-        currentScore: number;
-        recommendations: string[];
-        priority: 'high' | 'medium' | 'low';
-    }[];
     generatedAt: string;
-    aiProvider: string;
-    model: string;
+    scoringVersion: string;
+    aiProvider?: string;
+    model?: string;
 }
 export interface ScoreResumeResponse {
     success: boolean;
@@ -300,8 +340,165 @@ export interface Resume {
     isPubliclyShared: boolean;
     shareCreatedAt?: string;
     aiCost?: ResumeAICost;
+    isTailored?: boolean;
+    tailoringMetadata?: TailoredResumeMetadata;
     createdAt: string;
     updatedAt: string;
+}
+export interface JobPostingInfo {
+    companyName: string;
+    jobTitle: string;
+    location?: string;
+    description: string;
+    url?: string;
+    requirements: string[];
+    keywords: string[];
+    salary?: string;
+    employmentType?: string;
+}
+export interface JobAnalysisResult {
+    jobInfo: JobPostingInfo;
+    matchScore: number;
+    matchingSkills: string[];
+    missingSkills: string[];
+    keywordMatches: {
+        keyword: string;
+        found: boolean;
+        context?: string;
+    }[];
+    suggestions: string[];
+}
+export interface ClarificationQuestion {
+    id: string;
+    question: string;
+    context: string;
+    type: 'text' | 'textarea' | 'select';
+    required: boolean;
+    suggestedAnswer?: string;
+    options?: string[];
+    relatedSkill?: string;
+}
+export interface ClarificationAnswer {
+    questionId: string;
+    question: string;
+    answer: string;
+}
+export interface ResumeChange {
+    section: 'summary' | 'experience' | 'skills' | 'education' | 'projects' | 'achievements';
+    sectionIndex?: number;
+    fieldName?: string;
+    originalValue: string;
+    newValue: string;
+    changeType: 'added' | 'modified' | 'removed' | 'enhanced';
+    reason: string;
+}
+export interface TailoringResult {
+    originalResumeId: string;
+    changes: ResumeChange[];
+    atsScoreBefore: number;
+    atsScoreAfter: number;
+    grammarCorrections: {
+        original: string;
+        corrected: string;
+        location: string;
+    }[];
+    keywordOptimizations: string[];
+}
+export interface TailoredResumeMetadata {
+    isTailored: true;
+    sourceResumeId: string;
+    jobPosting: JobPostingInfo;
+    clarificationAnswers: ClarificationAnswer[];
+    matchScore: number;
+    tailoringResult?: TailoringResult;
+    createdAt: string;
+}
+export interface TailoringLimits {
+    used: number;
+    limit: number;
+    resetDate?: string;
+    isPremium: boolean;
+}
+export interface AnalyzeJobRequest {
+    resumeId: string;
+    description: string;
+    language: 'en' | 'es';
+}
+export interface AnalyzeJobResponse {
+    success: boolean;
+    data?: JobAnalysisResult;
+    error?: string;
+    message?: string;
+    remainingRequests?: number;
+    resetTime?: number;
+}
+export interface GenerateQuestionsRequest {
+    resumeId: string;
+    jobInfo: JobPostingInfo;
+    language: 'en' | 'es';
+    suggestions?: string[];
+}
+export interface GenerateQuestionsResponse {
+    success: boolean;
+    data?: ClarificationQuestion[];
+    error?: string;
+    message?: string;
+    remainingRequests?: number;
+    resetTime?: number;
+}
+export interface EnhanceAnswerRequest {
+    text: string;
+    context: string;
+    questionId: string;
+    language: 'en' | 'es';
+    resumeId?: string;
+}
+export interface EnhanceAnswerResponse {
+    success: boolean;
+    data?: string;
+    error?: string;
+    message?: string;
+    remainingRequests?: number;
+    resetTime?: number;
+}
+export interface GenerateTailoredResumeRequest {
+    resumeId: string;
+    jobInfo: JobPostingInfo;
+    answers: ClarificationAnswer[];
+    language: 'en' | 'es';
+}
+export interface GenerateTailoredResumeResponse {
+    success: boolean;
+    data?: {
+        tailoredResume: GeneratedResume;
+        result: TailoringResult;
+    };
+    error?: string;
+    code?: string;
+    message?: string;
+    remainingRequests?: number;
+    resetTime?: number;
+}
+export interface SaveTailoredResumeRequest {
+    sourceResumeId: string;
+    tailoredResume: GeneratedResume;
+    tailoringResult: TailoringResult;
+    jobInfo: JobPostingInfo;
+    answers: ClarificationAnswer[];
+    matchScore: number;
+    title: string;
+}
+export interface SaveTailoredResumeResponse {
+    success: boolean;
+    resumeId?: string;
+    error?: string;
+    message?: string;
+}
+export interface TailoringLimitsResponse {
+    success: boolean;
+    data?: TailoringLimits;
+    error?: string;
+    message?: string;
 }
 export interface GenerateResumeResponse {
     success: boolean;

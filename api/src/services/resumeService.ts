@@ -15,7 +15,11 @@ const client = new DynamoDBClient({
   })
 });
 
-const dynamodb = DynamoDBDocumentClient.from(client);
+const dynamodb = DynamoDBDocumentClient.from(client, {
+  marshallOptions: {
+    removeUndefinedValues: true,  // Remove undefined values from nested objects
+  },
+});
 const tableName = process.env.RESUMES_TABLE || 'getquickresume-api-resumes-dev';
 
 export const createResume = async (userId: string, resumeData: ResumeData, title?: string): Promise<Resume> => {

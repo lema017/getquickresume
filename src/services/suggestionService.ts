@@ -1,4 +1,5 @@
 import { SuggestionsResponse, ProfessionSuggestions } from '@/types';
+import { handleAuthError } from '@/utils/authErrorHandler';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/dev';
 
@@ -33,11 +34,7 @@ class SuggestionService {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       
-      if (response.status === 401) {
-        throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
-      }
-      
-      // Handle premium required error (403)
+      // Handle premium required error (403) - do NOT logout
       if (response.status === 403 && errorData.code === 'PREMIUM_REQUIRED') {
         const error = new Error(errorData.message || 'Premium feature required');
         (error as any).code = 'PREMIUM_REQUIRED';
@@ -45,7 +42,9 @@ class SuggestionService {
         throw error;
       }
       
-      if (response.status === 403) {
+      // Handle auth errors (401/403) - logout and redirect
+      if (response.status === 401 || response.status === 403) {
+        handleAuthError();
         throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
       }
       
@@ -54,6 +53,14 @@ class SuggestionService {
         const error = new Error(errorData.message || 'Too many requests. Please wait before trying again.');
         (error as any).code = 'RATE_LIMIT_EXCEEDED';
         (error as any).status = 429;
+        throw error;
+      }
+      
+      // Handle invalid profession error (400)
+      if (response.status === 400 && errorData.error === 'INVALID_PROFESSION') {
+        const error = new Error(errorData.message || 'The provided text does not appear to be a valid profession or job title.');
+        (error as any).code = 'INVALID_PROFESSION';
+        (error as any).status = 400;
         throw error;
       }
       

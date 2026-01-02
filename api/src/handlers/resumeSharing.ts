@@ -1,8 +1,9 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { AuthorizedEvent } from '../types';
-import { getResumeById, updateResume } from '../services/resumeService';
+import { getResumeById, updateResume, getResumeByShareToken } from '../services/resumeService';
 import { getUserById } from '../services/dynamodb';
-import { getAnalytics } from '../services/analyticsService';
+import { getAnalytics, getRecentViewers } from '../services/analyticsService';
+import { checkRateLimit, getClientIP } from '../utils/rateLimiter';
 
 // Generate a secure 12-character alphanumeric token
 const generateShareToken = (): string => {
@@ -356,6 +357,101 @@ export const getSharingAnalytics = async (
         success: false,
         error: 'Internal server error',
         message: (error as Error).message || 'Failed to retrieve analytics'
+      })
+    };
+  }
+};
+
+/**
+ * PUBLIC endpoint - Get recent viewers for a shared resume
+ * No authentication required - uses shareToken for authorization
+ * Rate limited by IP address
+ */
+export const getPublicRecentViewers = async (
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> => {
+  const headers = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET,OPTIONS'
+  };
+
+  try {
+    const shareToken = event.pathParameters?.shareToken;
+    const limitParam = event.queryStringParameters?.limit;
+    const limit = limitParam ? parseInt(limitParam, 10) : 10;
+
+    // Validate shareToken format
+    if (!shareToken || shareToken.length < 8) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: 'Invalid share token'
+        })
+      };
+    }
+
+    // Rate limiting by IP address
+    const clientIP = getClientIP(event);
+    const rateLimit = await checkRateLimit(clientIP, 'recent-viewers', 60, 60);
+
+    if (!rateLimit.allowed) {
+      return {
+        statusCode: 429,
+        headers: {
+          ...headers,
+          'Retry-After': String(rateLimit.resetAt - Math.floor(Date.now() / 1000)),
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset': String(rateLimit.resetAt)
+        },
+        body: JSON.stringify({
+          success: false,
+          error: 'Too many requests. Please try again later.'
+        })
+      };
+    }
+
+    // Validate shareToken exists and resume is publicly shared
+    const resume = await getResumeByShareToken(shareToken);
+
+    if (!resume) {
+      return {
+        statusCode: 404,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: 'Share link not found or has been disabled'
+        })
+      };
+    }
+
+    // Get recent viewers (anonymized)
+    const viewers = await getRecentViewers(shareToken, Math.min(limit, 50));
+
+    return {
+      statusCode: 200,
+      headers: {
+        ...headers,
+        'X-RateLimit-Remaining': String(rateLimit.remaining),
+        'X-RateLimit-Reset': String(rateLimit.resetAt),
+        'Cache-Control': 'private, max-age=60' // Cache for 1 minute
+      },
+      body: JSON.stringify({
+        success: true,
+        data: viewers
+      })
+    };
+  } catch (error) {
+    console.error('[ResumeSharing] Error getting recent viewers:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        error: 'Internal server error'
       })
     };
   }

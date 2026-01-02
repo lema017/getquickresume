@@ -93,8 +93,18 @@ export type AIEndpointType =
   | 'improveSection'
   | 'enhancementQuestions'
   | 'answerSuggestion'
+  | 'directEnhance'
+  | 'keywordAnalysis'
   | 'linkedInParsing'
-  | 'translateResume';
+  | 'translateResume'
+  // Job Tailoring endpoints
+  | 'jobAnalysis'
+  | 'jobQuestions'
+  | 'jobAnswerEnhance'
+  | 'jobTailoredResume'
+  | 'jobUrlExtraction'
+  // Resume Extraction endpoint
+  | 'resumeExtraction';
 
 export interface AIUsageLog {
   id: string;
@@ -306,7 +316,14 @@ export async function updateUserAggregates(
     await dynamodb.send(command);
   } catch (error: any) {
     // If the update fails because aiUsageStats doesn't exist, initialize it
-    if (error.name === 'ConditionalCheckFailedException' || error.code === 'ValidationException') {
+    const errorName = error?.name || error?.code || '';
+    const errorMessage = error?.message || '';
+    // DynamoDB throws ValidationException ("document path ... invalid") when a parent map doesn't exist yet.
+    if (
+      errorName === 'ConditionalCheckFailedException' ||
+      errorName === 'ValidationException' ||
+      errorMessage.toLowerCase().includes('document path')
+    ) {
       try {
         const initCommand = new UpdateCommand({
           TableName: usersTable,
@@ -464,6 +481,16 @@ function getBreakdownCategory(endpointType: AIEndpointType): string {
       return 'linkedInParsing';
     case 'translateResume':
       return 'translation';
+    // Job Tailoring endpoints
+    case 'jobAnalysis':
+    case 'jobQuestions':
+    case 'jobAnswerEnhance':
+    case 'jobTailoredResume':
+    case 'jobUrlExtraction':
+      return 'jobTailoring';
+    // Resume Extraction endpoint
+    case 'resumeExtraction':
+      return 'extraction';
     default:
       return 'enhancements';
   }

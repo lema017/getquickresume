@@ -88,7 +88,7 @@ export function Step8Templates() {
           <div className="lg:col-span-2">
             <div className="border border-gray-200 rounded-lg p-3 bg-white">
               {mainTemplate ? (
-                <TemplatePreview code={mainTemplate.reactTemplateCode} resumeData={resumeData} height={720} />
+                <TemplatePreview code={mainTemplate.jsCode} resumeData={resumeData} height={720} />
               ) : (
                 <div className="h-[720px] flex items-center justify-center text-gray-500">Selecciona un template</div>
               )}
@@ -139,7 +139,7 @@ function Gallery({ templates, selectedId, onSelect, resumeData }: { templates: R
             <div className="text-sm font-medium text-gray-800 truncate mr-2">{tpl.name || 'Template'}</div>
             {tpl.category === 'premium' && <Crown className="w-4 h-4 text-amber-500" aria-label="Premium" />}
           </div>
-          <TemplatePreview code={tpl.reactTemplateCode} resumeData={resumeData} />
+          <TemplatePreview code={tpl.jsCode} resumeData={resumeData} />
         </div>
       </div>
     );

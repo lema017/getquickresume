@@ -6,6 +6,7 @@ const outputValidator_1 = require("../utils/outputValidator");
 const dynamodb_1 = require("./dynamodb");
 const jsonrepair_1 = require("jsonrepair");
 const aiUsageService_1 = require("./aiUsageService");
+const aiProviderSelector_1 = require("../utils/aiProviderSelector");
 class AIService {
     constructor() {
         this.config = {
@@ -18,14 +19,13 @@ class AIService {
         const prompt = this.buildPrompt(resumeData);
         try {
             let aiResponse;
-            // Select provider based on user type: Groq for free users, OpenAI for premium
-            const provider = isPremium ? 'openai' : 'groq';
-            const model = provider === 'groq' ? 'openai/gpt-oss-20b' : this.config.model;
+            // Select provider based on user type and feature flag
+            const { provider, model } = (0, aiProviderSelector_1.getAIConfigForUser)(isPremium);
             if (provider === 'openai') {
                 aiResponse = await this.callOpenAIWithUsage(prompt);
             }
             else if (provider === 'groq') {
-                aiResponse = await this.callGroqWithUsage(prompt);
+                aiResponse = await this.callGroqWithUsage(prompt, { model });
             }
             else {
                 aiResponse = await this.callAnthropicWithUsage(prompt);
@@ -283,14 +283,13 @@ interface LanguageProficiency {
             }
             const isPremium = user.isPremium;
             let aiResponse;
-            // Select provider based on premium status: OpenAI for premium, Groq for free
-            const provider = isPremium ? 'openai' : 'groq';
-            const model = provider === 'groq' ? 'openai/gpt-oss-20b' : this.config.model;
+            // Select provider based on user type and feature flag
+            const { provider, model } = (0, aiProviderSelector_1.getAIConfigForUser)(isPremium);
             if (provider === 'openai') {
                 aiResponse = await this.callOpenAIWithUsage(prompt);
             }
             else if (provider === 'groq') {
-                aiResponse = await this.callGroqWithUsage(prompt);
+                aiResponse = await this.callGroqWithUsage(prompt, { model });
             }
             else {
                 aiResponse = await this.callAnthropicWithUsage(prompt);
@@ -309,13 +308,41 @@ interface LanguageProficiency {
         }
         catch (error) {
             console.error('Error generating bilingual profession suggestions with AI:', error);
+            // Propagate INVALID_PROFESSION error with its code
+            if (error?.code === 'INVALID_PROFESSION') {
+                throw error;
+            }
             throw new Error('Failed to generate bilingual profession suggestions with AI');
         }
     }
     buildBilingualProfessionSuggestionsPrompt(profession) {
-        return `You are an expert in human resources and recruitment with over 20 years of experience. Your task is to generate a comprehensive list of skills (including tools, technologies, and competencies) for the profession "${profession}" in SPANISH and ENGLISH.
+        return `You are an expert in human resources and recruitment with over 20 years of experience.
 
-**Instructions:**
+**CRITICAL FIRST STEP - VALIDATE THE PROFESSION:**
+Before generating any suggestions, you MUST validate if "${profession}" is a real, recognizable profession or job title.
+
+A VALID profession is:
+- A real job title (e.g., "Software Engineer", "Marketing Manager", "Nurse", "Teacher", "Chef")
+- A career field (e.g., "Data Science", "Healthcare", "Finance")
+- Written in any language (Spanish, English, etc.)
+
+An INVALID input is:
+- Random characters or gibberish (e.g., "asdfgh", "1234abc", "xyzqwe")
+- Nonsense text that doesn't represent any profession
+- Single letters or numbers without meaning
+- Keyboard smashing or test input
+
+**IF THE INPUT IS INVALID/NONSENSE:**
+Respond with EXACTLY this JSON structure:
+{
+  "error": "invalid_profession",
+  "message": "The provided text does not appear to be a valid profession or job title."
+}
+
+**IF THE INPUT IS A VALID PROFESSION:**
+Generate a comprehensive list of skills (including tools, technologies, and competencies) for this profession in SPANISH and ENGLISH.
+
+**Instructions for valid professions:**
 1. Generate 20-30 skills relevant for this profession IN SPANISH
 2. Generate 20-30 skills relevant for this profession IN ENGLISH
 3. Skills should include:
@@ -329,7 +356,7 @@ interface LanguageProficiency {
 7. Do NOT separate tools from skills - everything should be in a single "skills" array
 8. Respond ONLY with a valid JSON object
 
-**Required response format (EXACTLY this structure):**
+**Response format for VALID professions:**
 {
   "es": {
     "skills": ["JavaScript", "React", "AWS", "Leadership", "Docker", "Problem Solving", ...]
@@ -339,15 +366,21 @@ interface LanguageProficiency {
   }
 }
 
-**Profession:** ${profession}
+**Input to validate:** ${profession}
 
-Generate specific and relevant skills for this profession in both languages:`;
+First validate the input, then respond accordingly:`;
     }
     parseBilingualProfessionSuggestionsResponse(response) {
         try {
             // Limpiar la respuesta de posibles caracteres extra
             const cleanResponse = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
             const parsed = JSON.parse(cleanResponse);
+            // Check for invalid profession error response
+            if (parsed.error === 'invalid_profession') {
+                const error = new Error(parsed.message || 'The provided text does not appear to be a valid profession or job title.');
+                error.code = 'INVALID_PROFESSION';
+                throw error;
+            }
             // Validar estructura
             if (!parsed.es || !parsed.en) {
                 throw new Error('Missing language keys in response');
@@ -381,6 +414,10 @@ Generate specific and relevant skills for this profession in both languages:`;
         catch (error) {
             console.error('Error parsing bilingual profession suggestions response:', error);
             console.error('Raw response:', response);
+            // Propagate INVALID_PROFESSION error without wrapping
+            if (error?.code === 'INVALID_PROFESSION') {
+                throw error;
+            }
             throw new Error('Failed to parse bilingual profession suggestions response');
         }
     }
@@ -395,14 +432,13 @@ Generate specific and relevant skills for this profession in both languages:`;
             }
             const isPremium = user.isPremium;
             let aiResponse;
-            // Select provider based on premium status: OpenAI for premium, Groq for free
-            const provider = isPremium ? 'openai' : 'groq';
-            const model = provider === 'groq' ? 'openai/gpt-oss-20b' : this.config.model;
+            // Select provider based on user type and feature flag
+            const { provider, model } = (0, aiProviderSelector_1.getAIConfigForUser)(isPremium);
             if (provider === 'openai') {
                 aiResponse = await this.callOpenAIWithUsage(prompt);
             }
             else if (provider === 'groq') {
-                aiResponse = await this.callGroqWithUsage(prompt);
+                aiResponse = await this.callGroqWithUsage(prompt, { model });
             }
             else {
                 aiResponse = await this.callAnthropicWithUsage(prompt);
@@ -506,14 +542,13 @@ Generate specific and relevant achievements using qualitative language only:`;
             }
             const isPremium = user.isPremium;
             let aiResponse;
-            // Select provider based on premium status: OpenAI for premium, Groq for free
-            const provider = isPremium ? 'openai' : 'groq';
-            const model = provider === 'groq' ? 'openai/gpt-oss-20b' : this.config.model;
+            // Select provider based on user type and feature flag
+            const { provider, model } = (0, aiProviderSelector_1.getAIConfigForUser)(isPremium);
             if (provider === 'openai') {
                 aiResponse = await this.callOpenAIWithUsage(prompt);
             }
             else if (provider === 'groq') {
-                aiResponse = await this.callGroqWithUsage(prompt);
+                aiResponse = await this.callGroqWithUsage(prompt, { model });
             }
             else {
                 aiResponse = await this.callAnthropicWithUsage(prompt);
@@ -615,14 +650,13 @@ Generate specific and relevant ${type} suggestions based on the provided informa
             }
             const isPremium = user.isPremium;
             let aiResponse;
-            // Select provider based on premium status: OpenAI for premium, Groq for free
-            const provider = isPremium ? 'openai' : 'groq';
-            const model = provider === 'groq' ? 'openai/gpt-oss-20b' : this.config.model;
+            // Select provider based on user type and feature flag
+            const { provider, model } = (0, aiProviderSelector_1.getAIConfigForUser)(isPremium);
             if (provider === 'openai') {
                 aiResponse = await this.callOpenAIWithUsage(prompt);
             }
             else if (provider === 'groq') {
-                aiResponse = await this.callGroqWithUsage(prompt);
+                aiResponse = await this.callGroqWithUsage(prompt, { model });
             }
             else {
                 aiResponse = await this.callAnthropicWithUsage(prompt);
@@ -720,14 +754,13 @@ Generate specific and relevant achievements for this job title (without specific
             }
             const isPremium = user.isPremium;
             let aiResponse;
-            // Select provider based on premium status: OpenAI for premium, Groq for free
-            const provider = isPremium ? 'openai' : 'groq';
-            const model = provider === 'groq' ? 'openai/gpt-oss-20b' : this.config.model;
+            // Select provider based on user type and feature flag
+            const { provider, model } = (0, aiProviderSelector_1.getAIConfigForUser)(isPremium);
             if (provider === 'openai') {
                 aiResponse = await this.callOpenAIWithUsage(prompt);
             }
             else if (provider === 'groq') {
-                aiResponse = await this.callGroqWithUsage(prompt);
+                aiResponse = await this.callGroqWithUsage(prompt, { model });
             }
             else {
                 aiResponse = await this.callAnthropicWithUsage(prompt);
@@ -755,7 +788,8 @@ Generate specific and relevant achievements for this job title (without specific
             achievement: 'Enhance this professional achievement to be more impactful and specific. Add quantifiable metrics, strong action verbs, and measurable results. The achievement should highlight the value delivered and business impact.',
             summary: 'Enhance this professional summary to be more compelling and specific. Add relevant keywords, impact metrics, and highlight the candidate\'s unique strengths.',
             project: 'Enhance this project description to be more detailed and professional. Add technical context, results achieved, technologies used, and project impact.',
-            responsibility: 'Enhance this responsibility to be more specific and results-oriented. Convert responsibilities into achievements with measurable impact and added value.'
+            responsibility: 'Enhance this responsibility to be more specific and results-oriented. Convert responsibilities into achievements with measurable impact and added value.',
+            differentiators: 'Enhance this professional differentiator statement to be more compelling and specific. Highlight unique strengths, specialized expertise, key accomplishments, and what makes this candidate stand out from others in their field. Focus on distinctive value propositions and competitive advantages.'
         };
         const jobTitleContext = jobTitle
             ? `\n**Job title:** ${jobTitle}\n`
@@ -868,12 +902,16 @@ Enhance the text:`;
         const prompt = gatheredContext && gatheredContext.length > 0
             ? this.buildContextAwareSectionImprovementPrompt(sanitizedSectionType, originalText, sanitizedInstructions, sanitizedLanguage, gatheredContext)
             : this.buildSecureSectionImprovementPrompt(sanitizedSectionType, originalText, sanitizedInstructions, sanitizedLanguage);
-        // 4. Llamar AI con configuración segura
+        // 4. Llamar AI con configuración segura - use getAIConfigForUser for provider selection
         let aiResponse;
-        const provider = this.config.provider === 'openai' ? 'openai' : 'anthropic';
+        const isPremium = trackingContext?.isPremium ?? false;
+        const { provider, model } = (0, aiProviderSelector_1.getAIConfigForUser)(isPremium);
         try {
-            if (this.config.provider === 'openai') {
+            if (provider === 'openai') {
                 aiResponse = await this.callOpenAIWithUsage(prompt, { temperature: 0.3, max_tokens: 2000 });
+            }
+            else if (provider === 'groq') {
+                aiResponse = await this.callGroqWithUsage(prompt, { temperature: 0.3, max_tokens: 2000, model });
             }
             else {
                 aiResponse = await this.callAnthropicWithUsage(prompt, { temperature: 0.3, max_tokens: 2000 });
@@ -890,7 +928,7 @@ Enhance the text:`;
                 resumeId: trackingContext.resumeId,
                 endpoint: 'improveSection',
                 provider,
-                model: this.config.model,
+                model,
                 usage: aiResponse.usage,
                 isPremium: trackingContext.isPremium
             });
@@ -912,7 +950,7 @@ Enhance the text:`;
     }
     /**
      * Generate contextual questions based on a recommendation for enhancing a resume section
-     * Premium-only feature - uses OpenAI
+     * Premium-only feature - uses configured AI provider
      */
     async generateEnhancementQuestions(sectionType, recommendation, originalText, language, requestContext, resumeId) {
         const prompt = this.buildEnhancementQuestionsPrompt(sectionType, recommendation, originalText, language);
@@ -923,20 +961,37 @@ Enhance the text:`;
             if (!user) {
                 throw new Error('User not found');
             }
-            // This is a premium-only feature, but we already check in the handler
-            // Use OpenAI for question generation (premium feature)
-            const aiResponse = await this.callOpenAIWithUsage(prompt, {
-                temperature: 0.7,
-                max_tokens: 1500,
-                responseFormatJson: true
-            });
-            // Track AI usage (always OpenAI for premium feature)
+            // This is a premium-only feature - use configured provider
+            const { provider, model } = (0, aiProviderSelector_1.getAIConfigForUser)(true);
+            let aiResponse;
+            if (provider === 'openai') {
+                aiResponse = await this.callOpenAIWithUsage(prompt, {
+                    temperature: 0.7,
+                    max_tokens: 1500,
+                    responseFormatJson: true
+                });
+            }
+            else if (provider === 'groq') {
+                aiResponse = await this.callGroqWithUsage(prompt, {
+                    temperature: 0.7,
+                    max_tokens: 1500,
+                    responseFormatJson: true,
+                    model
+                });
+            }
+            else {
+                aiResponse = await this.callAnthropicWithUsage(prompt, {
+                    temperature: 0.7,
+                    max_tokens: 1500
+                });
+            }
+            // Track AI usage
             await (0, aiUsageService_1.trackAIUsage)({
                 userId,
                 resumeId,
                 endpoint: 'enhancementQuestions',
-                provider: 'openai',
-                model: this.config.model,
+                provider,
+                model,
                 usage: aiResponse.usage,
                 isPremium: true // This is a premium-only feature
             });
@@ -1024,7 +1079,7 @@ Generate questions that will help create a more impactful and detailed version o
     }
     /**
      * Generate AI-powered answer suggestion for an enhancement question
-     * Premium-only feature - uses OpenAI
+     * Premium-only feature - uses configured AI provider
      */
     async generateAnswerSuggestion(question, questionCategory, originalText, recommendation, sectionType, language, requestContext, resumeId) {
         const prompt = this.buildAnswerSuggestionPrompt(question, questionCategory, originalText, recommendation, sectionType, language);
@@ -1035,20 +1090,35 @@ Generate questions that will help create a more impactful and detailed version o
             if (!user) {
                 throw new Error('User not found');
             }
-            // This is a premium-only feature, but we already check in the handler
-            // Use OpenAI for answer suggestion generation (premium feature)
-            const aiResponse = await this.callOpenAIWithUsage(prompt, {
-                temperature: 0.7,
-                max_tokens: 500,
-                responseFormatJson: false
-            });
-            // Track AI usage (always OpenAI for premium feature)
+            // This is a premium-only feature - use configured provider
+            const { provider, model } = (0, aiProviderSelector_1.getAIConfigForUser)(true);
+            let aiResponse;
+            if (provider === 'openai') {
+                aiResponse = await this.callOpenAIWithUsage(prompt, {
+                    temperature: 0.7,
+                    max_tokens: 1500
+                });
+            }
+            else if (provider === 'groq') {
+                aiResponse = await this.callGroqWithUsage(prompt, {
+                    temperature: 0.7,
+                    max_tokens: 1500,
+                    model
+                });
+            }
+            else {
+                aiResponse = await this.callAnthropicWithUsage(prompt, {
+                    temperature: 0.7,
+                    max_tokens: 1500
+                });
+            }
+            // Track AI usage
             await (0, aiUsageService_1.trackAIUsage)({
                 userId,
                 resumeId,
                 endpoint: 'answerSuggestion',
-                provider: 'openai',
-                model: this.config.model,
+                provider,
+                model,
                 usage: aiResponse.usage,
                 isPremium: true // This is a premium-only feature
             });
@@ -1062,7 +1132,7 @@ Generate questions that will help create a more impactful and detailed version o
     buildAnswerSuggestionPrompt(question, questionCategory, originalText, recommendation, sectionType, language) {
         const languageText = language === 'es' ? 'Spanish' : 'English';
         const sectionTypeText = sectionType.charAt(0).toUpperCase() + sectionType.slice(1);
-        return `You are a professional resume consultant helping a user answer a question to improve their resume section.
+        return `You are a professional resume writer. Generate a READY-TO-USE answer that the user can directly copy and paste.
 
 **Context:**
 - Section Type: ${sectionTypeText}
@@ -1070,25 +1140,40 @@ Generate questions that will help create a more impactful and detailed version o
 - Current Section Text:
 ${originalText}
 
-**Question to Answer:**
+**Question:**
 ${question}
 - Category: ${questionCategory}
 
-**Instructions:**
-1. Generate a helpful, specific answer example that addresses this question
-2. The answer should be realistic and relevant to the section type and recommendation
-3. Use ${languageText} language
-4. Keep the answer concise (2-4 sentences, maximum 200 words)
-5. Make it actionable and specific - avoid generic responses
-6. The answer should help provide context that can be used to enhance the resume section
-7. If the question asks for metrics, provide example numbers that make sense for the context
-8. If the question asks for impact, describe realistic business outcomes
-9. If the question asks for context, provide relevant background information
+**CRITICAL INSTRUCTIONS:**
+1. Generate a READY-TO-USE answer - NOT tips, NOT guidance, NOT suggestions
+2. Write the answer as if YOU are the person answering about YOUR experience
+3. Use first-person perspective when appropriate (e.g., "I led a team of 12..." or "Increased revenue by 35%...")
+4. Use ${languageText} language
+5. Keep it concise: 1-3 sentences, maximum 100 words
+6. If metrics are asked, provide realistic placeholder numbers the user can adjust
+7. Make the answer specific and professional
+
+**FORBIDDEN - NEVER use these phrases:**
+- "Consider including..."
+- "You could mention..."
+- "For example, you might..."
+- "To quantify this, think about..."
+- "Some metrics to include..."
+- Any advisory or coaching language
+
+**CORRECT EXAMPLES:**
+- Question: "What metrics show your leadership impact?"
+  WRONG: "Consider including metrics such as team size, project success rate..."
+  RIGHT: "Led a team of 8 engineers, delivering 15 projects on time with 98% client satisfaction"
+
+- Question: "What was the business impact?"
+  WRONG: "You could mention revenue increases, cost savings..."
+  RIGHT: "Generated $2.4M in new revenue and reduced operational costs by 28%"
 
 **Response Format:**
-Return ONLY the answer text, no explanations, no markdown, no quotes. Just the plain answer that the user can use directly.
+Return ONLY the ready-to-use answer. No explanations, no markdown, no quotes.
 
-Generate a helpful answer example:`;
+Answer:`;
     }
     parseAnswerSuggestionResponse(response) {
         try {
@@ -1101,10 +1186,6 @@ Generate a helpful answer example:`;
             }
             if (!cleanResponse || cleanResponse.length === 0) {
                 throw new Error('Empty answer suggestion received from AI');
-            }
-            // Limit length to 500 characters (textarea max)
-            if (cleanResponse.length > 500) {
-                cleanResponse = cleanResponse.substring(0, 497) + '...';
             }
             return cleanResponse.trim();
         }
@@ -1389,7 +1470,7 @@ Improve the text according to the instructions and user-provided context, mainta
     }
     async callGroqWithUsage(prompt, options = {}) {
         const groqApiKey = process.env.GROQ_API_KEY || '';
-        const groqModel = 'openai/gpt-oss-20b';
+        const groqModel = options.model || aiProviderSelector_1.GROQ_FREE_MODEL;
         const maxTokensValue = options.max_tokens || 20000;
         const requestBody = {
             model: groqModel,
@@ -1480,9 +1561,8 @@ Improve the text according to the instructions and user-provided context, mainta
             }
             const isPremium = user.isPremium;
             let aiResponse;
-            // Select provider based on premium status: OpenAI for premium, Groq for free
-            const provider = isPremium ? 'openai' : 'groq';
-            const model = provider === 'groq' ? 'openai/gpt-oss-20b' : this.config.model;
+            // Select provider based on user type and feature flag
+            const { provider, model } = (0, aiProviderSelector_1.getAIConfigForUser)(isPremium);
             if (provider === 'openai') {
                 // For gpt-5 models, use higher max_completion_tokens due to large prompt size
                 const hasRestrictions = this.hasRestrictedParameters(this.config.model);
@@ -1490,8 +1570,8 @@ Improve the text according to the instructions and user-provided context, mainta
                 aiResponse = await this.callOpenAIWithUsage(prompt, { responseFormatJson: true, max_tokens: maxTokens, temperature: 0.1 });
             }
             else if (provider === 'groq') {
-                // Groq also supports JSON mode
-                aiResponse = await this.callGroqWithUsage(prompt, { responseFormatJson: true, max_tokens: 6000, temperature: 0.1 });
+                // Groq also supports JSON mode - use premium model for better JSON handling
+                aiResponse = await this.callGroqWithUsage(prompt, { responseFormatJson: true, max_tokens: 6000, temperature: 0.1, model });
             }
             else {
                 aiResponse = await this.callAnthropicWithUsage(prompt);
@@ -1816,6 +1896,131 @@ Process the information and return the structured JSON object:`;
         const recentCompany = data.experience?.[0]?.company || '';
         const companyText = recentCompany ? ` with experience at ${recentCompany}` : '';
         return `${profession} with ${years} years of experience${skillsText}${companyText}. Proven track record in delivering high-quality solutions and technical leadership.`;
+    }
+    /**
+     * Direct enhancement for mechanical fixes that don't require user context.
+     * Uses targeted prompts based on the checklist item type.
+     * Premium-only feature.
+     */
+    async directEnhance(checklistItemId, sectionType, originalText, language, requestContext, resumeId) {
+        // Get the targeted prompt for this checklist item type
+        const prompt = this.buildDirectEnhancePrompt(checklistItemId, sectionType, originalText, language);
+        try {
+            const userId = requestContext.authorizer.userId;
+            const user = await (0, dynamodb_1.getUserById)(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
+            // This is a premium-only feature - use configured provider
+            const { provider, model } = (0, aiProviderSelector_1.getAIConfigForUser)(true);
+            let aiResponse;
+            if (provider === 'openai') {
+                aiResponse = await this.callOpenAIWithUsage(prompt, {
+                    temperature: 0.3, // Low temperature for consistent mechanical fixes
+                    max_tokens: 2000
+                });
+            }
+            else if (provider === 'groq') {
+                aiResponse = await this.callGroqWithUsage(prompt, {
+                    temperature: 0.3,
+                    max_tokens: 2000,
+                    model
+                });
+            }
+            else {
+                aiResponse = await this.callAnthropicWithUsage(prompt, {
+                    temperature: 0.3,
+                    max_tokens: 2000
+                });
+            }
+            // Track AI usage
+            await (0, aiUsageService_1.trackAIUsage)({
+                userId,
+                resumeId,
+                endpoint: 'directEnhance',
+                provider,
+                model,
+                usage: aiResponse.usage,
+                isPremium: true
+            });
+            // Validate output using mechanical-specific validator (less restrictive on similarity)
+            const improvedText = aiResponse.content.trim();
+            const outputValidation = (0, outputValidator_1.validateMechanicalEnhancement)(improvedText, originalText);
+            if (!outputValidation.isValid) {
+                console.error('Direct enhance output validation failed:', outputValidation.reason);
+                throw new Error(`Enhancement validation failed: ${outputValidation.reason}`);
+            }
+            if (!(0, outputValidator_1.validateTextLength)(improvedText, 2000)) {
+                console.error('Direct enhanced text exceeds maximum length');
+                throw new Error('Enhanced text exceeds maximum allowed length');
+            }
+            return improvedText;
+        }
+        catch (error) {
+            console.error('Error in direct enhance:', error);
+            throw new Error('Failed to enhance section');
+        }
+    }
+    /**
+     * Build targeted prompt for mechanical fixes based on checklist item type.
+     */
+    buildDirectEnhancePrompt(checklistItemId, sectionType, originalText, language) {
+        const languageText = language === 'es' ? 'Spanish' : 'English';
+        // Targeted prompts for each mechanical fix type
+        const targetedPrompts = {
+            'summary-no-first-person': {
+                en: `Rewrite this professional summary removing ALL first-person pronouns (I, my, me, mine, myself, I'm, I've, I'll) while preserving the exact meaning and professional tone. Use third-person or passive voice where needed. Do not add new information or change the facts.`,
+                es: `Reescribe este resumen profesional eliminando TODOS los pronombres en primera persona (yo, mi, mis, me, mí mismo, soy, he, haré) manteniendo el significado exacto y el tono profesional. Usa tercera persona o voz pasiva donde sea necesario. No agregues información nueva ni cambies los hechos.`,
+            },
+            'summary-ats-keywords': {
+                en: `Enhance this professional summary by incorporating strong action verbs and ATS-friendly keywords relevant to the profession. Maintain the original meaning but make it more impactful for applicant tracking systems. Replace passive language with active, results-oriented language. Do not add fabricated achievements or metrics.`,
+                es: `Mejora este resumen profesional incorporando verbos de acción fuertes y palabras clave compatibles con ATS relevantes para la profesión. Mantén el significado original pero hazlo más impactante para sistemas de seguimiento de candidatos. Reemplaza el lenguaje pasivo con lenguaje activo orientado a resultados. No agregues logros o métricas inventadas.`,
+            },
+            'experience-action-verbs': {
+                en: `Rewrite these experience bullet points using strong action verbs at the beginning of each point. Replace weak verbs (did, made, was responsible for, helped, worked on) with powerful action verbs (led, developed, achieved, implemented, streamlined, orchestrated, spearheaded, optimized). Maintain the same achievements and metrics - only improve the verb usage.`,
+                es: `Reescribe estos puntos de experiencia usando verbos de acción fuertes al inicio de cada punto. Reemplaza verbos débiles (hice, hizo, fue responsable de, ayudó, trabajó en) con verbos de acción poderosos (lideró, desarrolló, logró, implementó, optimizó, orquestó, encabezó, mejoró). Mantén los mismos logros y métricas - solo mejora el uso de verbos.`,
+            },
+            'skills-organized': {
+                en: `Reorganize these skills into clear, logical categories. Group related skills together under appropriate headings such as: Technical Skills, Programming Languages, Frameworks & Libraries, Tools & Technologies, Soft Skills, Languages. Order categories by relevance. Format each category with a clear heading followed by the skills.`,
+                es: `Reorganiza estas habilidades en categorías claras y lógicas. Agrupa habilidades relacionadas bajo encabezados apropiados como: Habilidades Técnicas, Lenguajes de Programación, Frameworks y Librerías, Herramientas y Tecnologías, Habilidades Blandas, Idiomas. Ordena las categorías por relevancia. Formatea cada categoría con un encabezado claro seguido de las habilidades.`,
+            },
+        };
+        const promptConfig = targetedPrompts[checklistItemId];
+        if (!promptConfig) {
+            // Fallback for unknown checklist items - use generic improvement
+            return `You are an expert resume writer. Improve the following ${sectionType} text for a professional resume.
+
+**Language:** ${languageText}
+**Original text:**
+${originalText}
+
+**Instructions:**
+- Maintain the original meaning and facts
+- Make it more professional and impactful
+- Use strong action verbs and professional language
+- Keep the same length (don't add new information)
+- Respond ONLY with the improved text, no explanations
+
+Improved text:`;
+        }
+        const instruction = language === 'es' ? promptConfig.es : promptConfig.en;
+        return `You are an expert resume writer and ATS optimization specialist.
+
+**Task:** ${instruction}
+
+**Language:** ${languageText}
+**Section Type:** ${sectionType}
+**Original text:**
+${originalText}
+
+**Critical Rules:**
+1. Respond ONLY with the improved text - no explanations, comments, or formatting
+2. Maintain the exact same facts and information
+3. Do not add, remove, or fabricate any details
+4. Keep approximately the same length
+5. Write in ${languageText}
+
+Improved text:`;
     }
 }
 exports.aiService = new AIService();

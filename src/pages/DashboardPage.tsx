@@ -9,6 +9,7 @@ import { ShareResumeModal } from '@/components/ShareResumeModal';
 import { PremiumActionModal } from '@/components/PremiumActionModal';
 import { ResumeList } from '@/components/dashboard/ResumeList';
 import { CoverLetterList } from '@/components/dashboard/CoverLetterList';
+import { JobApplicationsList } from '@/components/dashboard/JobApplicationsList';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { resumeScoringService } from '@/services/resumeScoringService';
@@ -17,7 +18,6 @@ import { formatName } from '@/utils/textFormatting';
 import { 
   FileText, 
   Mail, 
-  Search, 
   Plus,
   CheckCircle,
   TrendingUp
@@ -116,6 +116,14 @@ export function DashboardPage() {
 
     // Navigate to resume view where enhancement options are available
     navigate(`/resume/${resume.id}`);
+  };
+
+  const handleTailorForJob = (resume: Resume) => {
+    if (!resume.generatedResume) {
+      toast.error(t('dashboard.actions.resumeNotGenerated'));
+      return;
+    }
+    navigate(`/job-tailoring/${resume.id}`);
   };
 
   const handleRescoreResume = async (resume: Resume) => {
@@ -326,6 +334,7 @@ export function DashboardPage() {
             onShare={handleShareResume}
             onEnhance={handleEnhanceResume}
             onRescore={handleRescoreResume}
+            onTailorForJob={handleTailorForJob}
             onDelete={handleDeleteResume}
             rescoringResumeId={rescoringResumeId || undefined}
           />
@@ -333,33 +342,8 @@ export function DashboardPage() {
           {/* Cover Letters Section */}
           <CoverLetterList />
 
-          {/* Coming Soon Sections */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Job Application Assistant */}
-            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center">
-                  <Search className="w-6 h-6 text-orange-600" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900">{t('dashboard.comingSoon.jobApplications')}</h3>
-                  <p className="text-gray-600">{t('dashboard.comingSoon.jobApplicationsDesc')}</p>
-                </div>
-              </div>
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Search className="w-8 h-8 text-gray-400" />
-                </div>
-                <p className="text-gray-500 mb-4">{t('dashboard.comingSoon.availableSoon')}</p>
-                <button
-                  disabled
-                  className="px-4 py-2 bg-gray-100 text-gray-400 rounded-lg cursor-not-allowed"
-                >
-                  {t('dashboard.comingSoon.availableSoon')}
-                </button>
-              </div>
-            </div>
-          </div>
+          {/* Job Applications Section */}
+          <JobApplicationsList />
         </div>
       </div>
 

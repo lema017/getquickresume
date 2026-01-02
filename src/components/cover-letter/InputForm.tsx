@@ -26,6 +26,7 @@ import { useCoverLetterStore } from '@/stores/coverLetterStore';
 import { useAuthStore } from '@/stores/authStore';
 import { CoverLetterTone, CoverLetterLength } from '@/types/coverLetter';
 import { coverLetterService } from '@/services/coverLetterService';
+import { RateLimitWarning } from '@/components/RateLimitWarning';
 import toast from 'react-hot-toast';
 
 // Input character limits
@@ -59,6 +60,12 @@ export function InputForm({ onGenerate }: InputFormProps) {
   const [whyCompanySuggestions, setWhyCompanySuggestions] = useState<string[]>([]);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [premiumFeature, setPremiumFeature] = useState<'suggestions' | 'enhance'>('suggestions');
+  
+  // Rate limit states
+  const [isSuggestionsRateLimited, setIsSuggestionsRateLimited] = useState(false);
+  const [suggestionsRateLimitMessage, setSuggestionsRateLimitMessage] = useState<string | null>(null);
+  const [isEnhanceRateLimited, setIsEnhanceRateLimited] = useState(false);
+  const [enhanceRateLimitMessage, setEnhanceRateLimitMessage] = useState<string | null>(null);
 
   const isPremium = user?.isPremium;
   const currentLanguage = (i18n.language?.startsWith('es') ? 'es' : 'en') as 'en' | 'es';
@@ -78,6 +85,10 @@ export function InputForm({ onGenerate }: InputFormProps) {
       return;
     }
 
+    // Clear previous rate limit state
+    setIsSuggestionsRateLimited(false);
+    setSuggestionsRateLimitMessage(null);
+
     setIsLoadingSuggestions(true);
     try {
       const suggestions = await coverLetterService.suggestWhyCompany(
@@ -93,7 +104,8 @@ export function InputForm({ onGenerate }: InputFormProps) {
         setPremiumFeature('suggestions');
         setShowPremiumModal(true);
       } else if (error?.code === 'RATE_LIMIT_EXCEEDED') {
-        toast.error(t('coverLetter.ai.rateLimitExceeded') || 'Too many requests. Please wait a moment.');
+        setIsSuggestionsRateLimited(true);
+        setSuggestionsRateLimitMessage(t('coverLetter.ai.rateLimitExceeded') || 'Too many requests. Please wait a moment.');
       } else {
         toast.error(t('coverLetter.ai.suggestionsFailed') || 'Failed to get suggestions');
       }
@@ -115,6 +127,10 @@ export function InputForm({ onGenerate }: InputFormProps) {
       return;
     }
 
+    // Clear previous rate limit state
+    setIsEnhanceRateLimited(false);
+    setEnhanceRateLimitMessage(null);
+
     setIsEnhancing(true);
     try {
       const enhanced = await coverLetterService.enhanceAchievement(
@@ -132,7 +148,8 @@ export function InputForm({ onGenerate }: InputFormProps) {
         setPremiumFeature('enhance');
         setShowPremiumModal(true);
       } else if (error?.code === 'RATE_LIMIT_EXCEEDED') {
-        toast.error(t('coverLetter.ai.rateLimitExceeded') || 'Too many requests. Please wait a moment.');
+        setIsEnhanceRateLimited(true);
+        setEnhanceRateLimitMessage(t('coverLetter.ai.rateLimitExceeded') || 'Too many requests. Please wait a moment.');
       } else {
         toast.error(t('coverLetter.ai.enhanceFailed') || 'Failed to enhance achievement');
       }
@@ -343,8 +360,22 @@ export function InputForm({ onGenerate }: InputFormProps) {
                 </span>
               </div>
               
+              {/* Rate Limit Warning for Suggestions */}
+              {isSuggestionsRateLimited && suggestionsRateLimitMessage && (
+                <div className="mt-3">
+                  <RateLimitWarning 
+                    message={suggestionsRateLimitMessage}
+                    onRetry={() => {
+                      setIsSuggestionsRateLimited(false);
+                      setSuggestionsRateLimitMessage(null);
+                      handleGetSuggestions();
+                    }}
+                  />
+                </div>
+              )}
+
               {/* AI Suggestion Chips */}
-              {whyCompanySuggestions.length > 0 && (
+              {whyCompanySuggestions.length > 0 && !isSuggestionsRateLimited && (
                 <div className="mt-3 space-y-2">
                   <p className="text-xs text-gray-500 font-medium">
                     {t('coverLetter.ai.clickToAdd') || 'Click to add:'}
@@ -404,6 +435,20 @@ export function InputForm({ onGenerate }: InputFormProps) {
                   {currentCoverLetter.keyAchievement?.length || 0}/{INPUT_LIMITS.achievement}
                 </span>
               </div>
+
+              {/* Rate Limit Warning for Enhance */}
+              {isEnhanceRateLimited && enhanceRateLimitMessage && (
+                <div className="mt-3">
+                  <RateLimitWarning 
+                    message={enhanceRateLimitMessage}
+                    onRetry={() => {
+                      setIsEnhanceRateLimited(false);
+                      setEnhanceRateLimitMessage(null);
+                      handleEnhanceAchievement();
+                    }}
+                  />
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -220,9 +220,9 @@ export function HUD() {
           isOverLimit ? 'bg-red-50 text-red-800' : 'bg-amber-50 text-amber-800'
         }`}>
           {isOverLimit ? (
-            t('hud.limitExceeded', { count: (charactersUsed - maxCharacters).toLocaleString() })
+            t('hud.limitExceeded', { count: charactersUsed - maxCharacters })
           ) : (
-            t('hud.charactersRemaining', { count: (maxCharacters - charactersUsed).toLocaleString() })
+            t('hud.charactersRemaining', { count: maxCharacters - charactersUsed })
           )}
         </div>
       )}

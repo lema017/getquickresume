@@ -54,7 +54,7 @@ export function BlogLayout({
   ]);
   
   // Generate article schema
-  const articleSchema = generateArticleSchema(title, excerpt, publishDate, publishDate, imageUrl);
+  const articleSchema = generateArticleSchema(title, excerpt, publishDate, publishDate, imageUrl) as Record<string, unknown>;
   articleSchema.mainEntityOfPage = { "@type": "WebPage", "@id": canonicalUrl };
   
   // Generate HowTo schema if steps are provided
@@ -80,9 +80,9 @@ export function BlogLayout({
         <link rel="canonical" href={canonicalUrl} />
         
         {/* hreflang */}
-        <link rel="alternate" hreflang="en" href={`${BASE_URL}/blog/${slug}`} />
-        <link rel="alternate" hreflang="es" href={`${BASE_URL}/blog/${slug}?lang=es`} />
-        <link rel="alternate" hreflang="x-default" href={`${BASE_URL}/blog/${slug}`} />
+        <link rel="alternate" hrefLang="en" href={`${BASE_URL}/blog/${slug}`} />
+        <link rel="alternate" hrefLang="es" href={`${BASE_URL}/blog/${slug}?lang=es`} />
+        <link rel="alternate" hrefLang="x-default" href={`${BASE_URL}/blog/${slug}`} />
         
         {/* Open Graph */}
         <meta property="og:type" content="article" />

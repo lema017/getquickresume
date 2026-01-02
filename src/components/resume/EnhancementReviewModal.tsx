@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { X, CheckCircle, XCircle, Edit2, RotateCcw } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { X, CheckCircle, XCircle, Edit2, RotateCcw, AlertTriangle } from 'lucide-react';
 
 interface EnhancementReviewModalProps {
   isOpen: boolean;
@@ -22,7 +22,12 @@ export function EnhancementReviewModal({
 }: EnhancementReviewModalProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState(enhancedText);
-  const [viewMode, setViewMode] = useState<'side-by-side' | 'enhanced'>('enhanced');
+  const [viewMode, setViewMode] = useState<'side-by-side' | 'enhanced'>('side-by-side');
+
+  // Check if enhanced text is identical or nearly identical to original
+  const isUnchanged = useMemo(() => {
+    return originalText.trim() === enhancedText.trim();
+  }, [originalText, enhancedText]);
 
   if (!isOpen) return null;
 
@@ -108,6 +113,19 @@ export function EnhancementReviewModal({
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6">
+          {/* Warning if texts are identical */}
+          {isUnchanged && (
+            <div className="mb-4 bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-amber-800">No changes detected</p>
+                <p className="text-sm text-amber-700 mt-1">
+                  The enhanced text appears identical to the original. This may indicate the AI couldn't find improvements for this specific recommendation, or the text already meets the criteria.
+                </p>
+              </div>
+            </div>
+          )}
+
           {viewMode === 'side-by-side' ? (
             <div className="grid grid-cols-2 gap-4">
               {/* Original */}
@@ -123,9 +141,20 @@ export function EnhancementReviewModal({
 
               {/* Enhanced */}
               <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  <h3 className="text-sm font-semibold text-gray-700">Enhanced</h3>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-600" />
+                    <h3 className="text-sm font-semibold text-gray-700">Enhanced</h3>
+                  </div>
+                  {!isEditing && (
+                    <button
+                      onClick={handleEdit}
+                      className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                      Edit
+                    </button>
+                  )}
                 </div>
                 {isEditing ? (
                   <div className="space-y-2">

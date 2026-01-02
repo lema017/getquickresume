@@ -37,6 +37,24 @@ export interface AnalyticsResponse {
   error?: string;
 }
 
+// Interface for anonymized recent viewer data
+export interface RecentViewer {
+  id: string;           // Anonymized identifier
+  viewedAt: string;     // ISO timestamp
+  device: 'mobile' | 'desktop' | 'tablet' | 'unknown';
+  browser: string;
+  os: string;
+  country: string;
+  city: string;
+  referrer?: string;    // Domain only
+}
+
+export interface RecentViewersResponse {
+  success: boolean;
+  data?: RecentViewer[];
+  error?: string;
+}
+
 class ResumeSharingService {
   private async getAuthToken(): Promise<string> {
     const token = localStorage.getItem('auth-token');
@@ -94,6 +112,36 @@ class ResumeSharingService {
         method: 'GET',
       }
     );
+  }
+
+  /**
+   * PUBLIC endpoint - Get recent viewers for a shared resume
+   * No authentication required - uses shareToken for authorization
+   * @param shareToken - The resume's share token
+   * @param limit - Maximum number of viewers to return (default: 10, max: 50)
+   */
+  async getPublicRecentViewers(shareToken: string, limit: number = 10): Promise<RecentViewersResponse> {
+    const response = await fetch(
+      `${API_BASE_URL}/api/public/share/${shareToken}/recent-viewers?limit=${limit}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          // No Authorization header - this is a public endpoint
+        },
+      }
+    );
+
+    if (!response.ok) {
+      if (response.status === 429) {
+        const retryAfter = response.headers.get('Retry-After');
+        throw new Error(`Rate limit exceeded. Please try again ${retryAfter ? `in ${retryAfter} seconds` : 'later'}.`);
+      }
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
   }
 }
 

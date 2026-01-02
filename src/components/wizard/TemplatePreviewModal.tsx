@@ -8,7 +8,6 @@ import toast from 'react-hot-toast';
 import { convertResumeDataToTemplateFormat, filterDataForPage, TemplateDataFormat } from '@/utils/resumeDataToTemplateFormat';
 import { calculatePagination } from '@/services/paginationService';
 import { calculateAndAssignPageNumbers, extractPaginationFields } from './Step9Preview';
-import { modifyTemplateCodeForMultiPageDisplay } from '@/utils/templateCodeModifier';
 import { useResumeStore } from '@/stores/resumeStore';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 
@@ -184,12 +183,11 @@ export function TemplatePreviewModal({
   const [totalPages, setTotalPages] = useState(1);
   const [paginatedPages, setPaginatedPages] = useState<TemplateDataFormat[]>([]);
 
-  // Modify template JS code to allow multi-page display
+  // Set template JS code (templates now include multi-page CSS built-in)
   useEffect(() => {
     if (!template.jsCode) return;
 
-    const modifiedCode = modifyTemplateCodeForMultiPageDisplay(template.jsCode);
-    setModifiedJsCode(modifiedCode);
+    setModifiedJsCode(template.jsCode);
   }, [template.jsCode]);
 
   // Calculate scale based on container width

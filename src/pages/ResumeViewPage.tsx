@@ -31,7 +31,6 @@ import { calculateAndAssignPageNumbers } from '@/components/wizard/Step9Preview'
 import { convertResumeDataToTemplateFormat, filterDataForPage, TemplateDataFormat } from '@/utils/resumeDataToTemplateFormat';
 import { generateResumePDFFromPages } from '@/utils/pdfGenerator';
 import { WebComponentRenderer } from '@/components/wizard/WebComponentRenderer';
-import { modifyTemplateCodeForMultiPageDisplay } from '@/utils/templateCodeModifier';
 import { A4_DIMENSIONS } from '@/utils/a4Dimensions';
 
 export function ResumeViewPage() {
@@ -234,9 +233,8 @@ export function ResumeViewPage() {
       }
       setPaginatedPages(pages);
 
-      // Step 5: Modify template code for multi-page
-      const modifiedCode = modifyTemplateCodeForMultiPageDisplay(template.jsCode);
-      setModifiedJsCode(modifiedCode);
+      // Step 5: Set template code (templates now include multi-page CSS built-in)
+      setModifiedJsCode(template.jsCode);
 
       // Step 6: Render template pages (wait a bit for DOM to update)
       setGeneratingProgress(t('resumeView.download.rendering'));

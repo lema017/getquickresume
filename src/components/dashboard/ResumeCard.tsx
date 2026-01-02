@@ -1,5 +1,6 @@
-import React from 'react';
-import { Calendar, FileText, Download, Edit, Trash2, Eye, MoreVertical, Globe, Share2, Target, Sparkles, RefreshCw } from 'lucide-react';
+import React, { memo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Calendar, FileText, Download, Edit, Trash2, Eye, MoreVertical, Globe, Share2, Target, Sparkles, RefreshCw, BarChart3 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Resume } from '@/types';
 import { IconWrapper } from '../IconWrapper';
@@ -21,12 +22,14 @@ interface ResumeCardProps {
   onShare?: (resume: Resume) => void;
   onEnhance?: (resume: Resume) => void;
   onRescore?: (resume: Resume) => void;
+  onTailorForJob?: (resume: Resume) => void;
   onDelete: (resume: Resume) => void;
   isLoading?: boolean;
   isRescoring?: boolean;
 }
 
-export function ResumeCard({ 
+// Memoized to prevent re-renders when list updates but this card's data hasn't changed
+export const ResumeCard = memo(function ResumeCard({ 
   resume, 
   onView, 
   onEdit, 
@@ -35,11 +38,13 @@ export function ResumeCard({
   onShare,
   onEnhance,
   onRescore,
+  onTailorForJob,
   onDelete, 
   isLoading = false,
   isRescoring = false
 }: ResumeCardProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const formatDate = (date: Date | string) => {
     try {
       const dateObj = typeof date === 'string' ? new Date(date) : date;
@@ -174,6 +179,15 @@ export function ResumeCard({
                       {t('resumeCard.actions.rescore')}
                     </button>
                   )}
+                  {onTailorForJob && (
+                    <button
+                      onClick={() => onTailorForJob(resume)}
+                      className="w-full px-4 py-2 text-left text-sm text-orange-600 hover:bg-orange-50 flex items-center gap-2"
+                    >
+                      <Target className="w-4 h-4" />
+                      {t('resumeCard.actions.tailorForJob') || 'Tailor for Job'}
+                    </button>
+                  )}
                 </>
               )}
               <hr className="my-1" />
@@ -264,20 +278,51 @@ export function ResumeCard({
       </div>
 
       {/* Quick Actions */}
-      <div className="mt-4 pt-4 border-t border-gray-100 flex gap-2">
-        <button
-          onClick={() => onView(resume)}
-          className="flex-1 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
-        >
-          {t('resumeCard.actions.viewResume')}
-        </button>
-        <button
-          onClick={() => onEdit(resume)}
-          className="flex-1 px-3 py-2 text-sm font-medium text-gray-600 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-        >
-          {t('resumeCard.actions.edit')}
-        </button>
+      <div className="mt-4 pt-4 border-t border-gray-100 space-y-2">
+        <div className="flex gap-2">
+          <button
+            onClick={() => onView(resume)}
+            className="flex-1 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+          >
+            {t('resumeCard.actions.viewResume')}
+          </button>
+          <button
+            onClick={() => onEdit(resume)}
+            className="flex-1 px-3 py-2 text-sm font-medium text-gray-600 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            {t('resumeCard.actions.edit')}
+          </button>
+        </div>
+        
+        {/* Prominent Share Button */}
+        {resume.generatedResume && (
+          <button
+            onClick={() => navigate(`/resume/${resume.id}/share`)}
+            className={`w-full px-3 py-2.5 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${
+              resume.isPubliclyShared
+                ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 shadow-sm'
+                : 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 shadow-sm'
+            }`}
+          >
+            {resume.isPubliclyShared ? (
+              <>
+                <BarChart3 className="w-4 h-4" />
+                {t('resumeCard.actions.viewAnalytics') || 'View Analytics'}
+                {resume.score?.totalScore && (
+                  <span className="ml-1 px-2 py-0.5 bg-white/20 rounded-full text-xs">
+                    {resume.score.totalScore.toFixed(0)}+ views
+                  </span>
+                )}
+              </>
+            ) : (
+              <>
+                <Share2 className="w-4 h-4" />
+                {t('resumeCard.actions.shareAndTrack') || 'Share & Track Views'}
+              </>
+            )}
+          </button>
+        )}
       </div>
     </div>
   );
-}
+});

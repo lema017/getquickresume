@@ -1,6 +1,7 @@
 import { ResumeScore, ScoreResumeResponse } from '@/types';
+import { handleAuthError } from '@/utils/authErrorHandler';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/dev';
 
 class ResumeScoringService {
   private async getAuthToken(): Promise<string> {
@@ -28,6 +29,21 @@ class ResumeScoringService {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
+      
+      // Handle premium required error (403) - do NOT logout
+      if (response.status === 403 && errorData.code === 'PREMIUM_REQUIRED') {
+        const error = new Error(errorData.message || 'Premium feature required');
+        (error as any).code = 'PREMIUM_REQUIRED';
+        (error as any).status = 403;
+        throw error;
+      }
+      
+      // Handle auth errors (401/403) - logout and redirect
+      if (response.status === 401 || response.status === 403) {
+        handleAuthError();
+        throw new Error('Session expired. Please log in again.');
+      }
+      
       throw new Error(errorData.error || errorData.message || `HTTP error! status: ${response.status}`);
     }
 

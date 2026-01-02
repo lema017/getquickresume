@@ -46,6 +46,13 @@ export interface User {
   paddleSubscriptionId?: string;
   paddleTransactionId?: string;
   aiUsageStats?: AIUsageStats; // AI usage tracking for cost analysis
+  // Job Tailoring usage tracking
+  jobTailoringUsage?: {
+    totalUsed: number;           // For free users (lifetime count)
+    monthlyUsed: number;         // For premium users (monthly count)
+    currentMonth: string;        // "YYYY-MM" format for monthly reset
+    lastTailoredAt?: string;     // ISO timestamp of last tailoring
+  };
   createdAt: string;
   updatedAt: string;
 }
@@ -285,30 +292,80 @@ export interface LanguageProficiency {
   certifications?: string[];
 }
 
-// Resume Scoring Types
-export interface ResumeScore {
-  totalScore: number;  // 1-10 scale
-  breakdown: {
-    summary: number;
-    experience: number;
-    skills: number;
-    education: number;
-    projects: number;
-    achievements: number;
-    languages: number;
-    contact: number;
-  };
-  strengths: string[];  // Always shown
-  improvements: string[];  // Premium only
-  detailedFeedback: {  // Premium only
+// Resume Scoring Types - Deterministic Checklist System
+export type ChecklistItemPriority = 'required' | 'recommended' | 'optional';
+
+export interface ChecklistItem {
+  id: string;
+  label: string;
+  description: string;
+  isCompleted: boolean;
+  completedAt?: string;
+  priority: ChecklistItemPriority;
+  verifierId: string;
+  details?: string;
+  evidence?: string;
+}
+
+export interface SectionChecklist {
     section: string;
-    currentScore: number;
-    recommendations: string[];
-    priority: 'high' | 'medium' | 'low';
-  }[];
+  displayName: string;
+  items: ChecklistItem[];
+  completedCount: number;
+  totalCount: number;
+  requiredCount: number;
+  requiredCompletedCount: number;
+  maxPoints: number;
+  earnedPoints: number;
+}
+
+export interface EnhancementRecord {
+  id: string;
+  checklistItemId: string;
+  section: string;
+  enhancedAt: string;
+  previousValue?: string;
+  newValue?: string;
+}
+
+// Keyword Analysis Data for ATS scoring
+export interface KeywordAnalysisData {
+  totalKeywordsFound: number;
+  hardSkills: string[];
+  softSkills: string[];
+  actionVerbs: string[];
+  industryTerms: string[];
+  atsScore: 'excellent' | 'good' | 'fair' | 'needs-work';
+  scoreValue: number;
+  tierLabel: string;
+  breakdown: string;
+}
+
+export interface ResumeScore {
+  totalScore: number;  // 0-10 scale
+  maxPossibleScore: number;  // 10.0
+  completionPercentage: number;  // 0-100%
+  isOptimized: boolean;  // True when all required items complete and score >= 8
+  
+  // Legacy breakdown for backward compatibility (now includes ATS)
+  breakdown: Record<string, number>;
+  
+  // New deterministic checklist system
+  checklist: Record<string, SectionChecklist>;
+  enhancementHistory: EnhancementRecord[];
+  
+  // ATS keyword analysis (AI-powered)
+  keywordAnalysis?: KeywordAnalysisData;
+  
+  strengths: string[];  // Auto-generated from completed items
+  improvements: string[];  // Auto-generated from incomplete items (prioritized)
+  
   generatedAt: string;
-  aiProvider: string;
-  model: string;
+  scoringVersion: string;  // Version of scoring algorithm
+  
+  // Legacy fields (deprecated)
+  aiProvider?: string;
+  model?: string;
 }
 
 export interface ScoreResumeResponse {
@@ -350,8 +407,190 @@ export interface Resume {
   isPubliclyShared: boolean;  // Toggle for public visibility
   shareCreatedAt?: string;    // When sharing was enabled
   aiCost?: ResumeAICost;      // AI usage cost tracking for this resume
+  // Job Tailoring metadata (for tailored resumes)
+  isTailored?: boolean;
+  tailoringMetadata?: TailoredResumeMetadata;
   createdAt: string;
   updatedAt: string;
+}
+
+// ============================================================================
+// Job Tailoring Types
+// ============================================================================
+
+export interface JobPostingInfo {
+  companyName: string;
+  jobTitle: string;
+  location?: string;
+  description: string;
+  url?: string;
+  requirements: string[];
+  keywords: string[];
+  salary?: string;
+  employmentType?: string;
+}
+
+export interface JobAnalysisResult {
+  jobInfo: JobPostingInfo;
+  matchScore: number;        // 0-100 percentage
+  matchingSkills: string[];
+  missingSkills: string[];
+  keywordMatches: {
+    keyword: string;
+    found: boolean;
+    context?: string;
+  }[];
+  suggestions: string[];
+}
+
+export interface ClarificationQuestion {
+  id: string;
+  question: string;
+  context: string;
+  type: 'text' | 'textarea' | 'select';
+  required: boolean;
+  suggestedAnswer?: string;
+  options?: string[];
+  relatedSkill?: string;
+}
+
+export interface ClarificationAnswer {
+  questionId: string;
+  question: string;
+  answer: string;
+}
+
+export interface ResumeChange {
+  section: 'summary' | 'experience' | 'skills' | 'education' | 'projects' | 'achievements';
+  sectionIndex?: number;
+  fieldName?: string;
+  originalValue: string;
+  newValue: string;
+  changeType: 'added' | 'modified' | 'removed' | 'enhanced';
+  reason: string;
+}
+
+export interface TailoringResult {
+  originalResumeId: string;
+  changes: ResumeChange[];
+  atsScoreBefore: number;
+  atsScoreAfter: number;
+  grammarCorrections: {
+    original: string;
+    corrected: string;
+    location: string;
+  }[];
+  keywordOptimizations: string[];
+}
+
+export interface TailoredResumeMetadata {
+  isTailored: true;
+  sourceResumeId: string;
+  jobPosting: JobPostingInfo;
+  clarificationAnswers: ClarificationAnswer[];
+  matchScore: number;
+  tailoringResult?: TailoringResult;
+  createdAt: string;
+}
+
+export interface TailoringLimits {
+  used: number;
+  limit: number;
+  resetDate?: string;
+  isPremium: boolean;
+}
+
+// Job Tailoring API Request/Response Types
+export interface AnalyzeJobRequest {
+  resumeId: string;
+  description: string;
+  language: 'en' | 'es';
+}
+
+export interface AnalyzeJobResponse {
+  success: boolean;
+  data?: JobAnalysisResult;
+  error?: string;
+  message?: string;
+  remainingRequests?: number;
+  resetTime?: number;
+}
+
+export interface GenerateQuestionsRequest {
+  resumeId: string;
+  jobInfo: JobPostingInfo;
+  language: 'en' | 'es';
+  suggestions?: string[];  // Analysis suggestions to base questions on
+}
+
+export interface GenerateQuestionsResponse {
+  success: boolean;
+  data?: ClarificationQuestion[];
+  error?: string;
+  message?: string;
+  remainingRequests?: number;
+  resetTime?: number;
+}
+
+export interface EnhanceAnswerRequest {
+  text: string;
+  context: string;
+  questionId: string;
+  language: 'en' | 'es';
+  resumeId?: string;
+}
+
+export interface EnhanceAnswerResponse {
+  success: boolean;
+  data?: string;
+  error?: string;
+  message?: string;
+  remainingRequests?: number;
+  resetTime?: number;
+}
+
+export interface GenerateTailoredResumeRequest {
+  resumeId: string;
+  jobInfo: JobPostingInfo;
+  answers: ClarificationAnswer[];
+  language: 'en' | 'es';
+}
+
+export interface GenerateTailoredResumeResponse {
+  success: boolean;
+  data?: {
+    tailoredResume: GeneratedResume;
+    result: TailoringResult;
+  };
+  error?: string;
+  code?: string;
+  message?: string;
+  remainingRequests?: number;
+  resetTime?: number;
+}
+
+export interface SaveTailoredResumeRequest {
+  sourceResumeId: string;
+  tailoredResume: GeneratedResume;
+  tailoringResult: TailoringResult;
+  jobInfo: JobPostingInfo;
+  answers: ClarificationAnswer[];
+  matchScore: number;
+  title: string;
+}
+
+export interface SaveTailoredResumeResponse {
+  success: boolean;
+  resumeId?: string;
+  error?: string;
+  message?: string;
+}
+
+export interface TailoringLimitsResponse {
+  success: boolean;
+  data?: TailoringLimits;
+  error?: string;
+  message?: string;
 }
 
 

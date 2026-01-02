@@ -1,3 +1,5 @@
+import { handleAuthError } from '@/utils/authErrorHandler';
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/dev';
 
 export interface TrackDownloadResponse {
@@ -41,12 +43,18 @@ export const downloadService = {
       if (!response.ok) {
         // Handle specific error cases
         if (response.status === 403) {
-          // Download limit reached
-          return {
-            allowed: false,
-            freeDownloadUsed: data.data?.freeDownloadUsed || false,
-            totalDownloads: data.data?.totalDownloads || 0,
-          };
+          // Check if this is a download limit response (has data field)
+          if (data.data && typeof data.data.freeDownloadUsed !== 'undefined') {
+            // Download limit reached - not an auth error
+            return {
+              allowed: false,
+              freeDownloadUsed: data.data.freeDownloadUsed || false,
+              totalDownloads: data.data.totalDownloads || 0,
+            };
+          }
+          // Otherwise it's an auth error
+          handleAuthError();
+          throw new Error('Session expired - please log in again');
         }
 
         if (response.status === 404) {
@@ -54,6 +62,7 @@ export const downloadService = {
         }
 
         if (response.status === 401) {
+          handleAuthError();
           throw new Error('Unauthorized - please log in again');
         }
 

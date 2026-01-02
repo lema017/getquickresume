@@ -120,6 +120,7 @@ export interface Education {
   startDate: string;
   endDate?: string;
   isCompleted: boolean;
+  isCurrentlyStudying?: boolean;
   gpa?: string;
   pageNumber: number | null;
 }
@@ -355,30 +356,80 @@ export interface GenerateResumeResponse {
   score?: ResumeScore;  // Score is now included synchronously from the API
 }
 
-// Resume Scoring Types
+// Resume Scoring Types - Deterministic Checklist System
+export type ChecklistItemPriority = 'required' | 'recommended' | 'optional';
+
+export interface ChecklistItem {
+  id: string;
+  label: string;
+  description: string;
+  isCompleted: boolean;
+  completedAt?: string;
+  priority: ChecklistItemPriority;
+  verifierId: string;
+  details?: string;
+  evidence?: string;
+}
+
+export interface SectionChecklist {
+  section: string;
+  displayName: string;
+  items: ChecklistItem[];
+  completedCount: number;
+  totalCount: number;
+  requiredCount: number;
+  requiredCompletedCount: number;
+  maxPoints: number;
+  earnedPoints: number;
+}
+
+export interface EnhancementRecord {
+  id: string;
+  checklistItemId: string;
+  section: string;
+  enhancedAt: string;
+  previousValue?: string;
+  newValue?: string;
+}
+
+// Keyword Analysis Data for ATS scoring
+export interface KeywordAnalysisData {
+  totalKeywordsFound: number;
+  hardSkills: string[];
+  softSkills: string[];
+  actionVerbs: string[];
+  industryTerms: string[];
+  atsScore: 'excellent' | 'good' | 'fair' | 'needs-work';
+  scoreValue: number;
+  tierLabel: string;
+  breakdown: string;
+}
+
 export interface ResumeScore {
-  totalScore: number;  // 1-10 scale
-  breakdown: {
-    summary: number;
-    experience: number;
-    skills: number;
-    education: number;
-    projects: number;
-    achievements: number;
-    languages: number;
-    contact: number;
-  };
-  strengths: string[];  // Always shown
-  improvements: string[];  // Premium only
-  detailedFeedback: {  // Premium only
-    section: string;
-    currentScore: number;
-    recommendations: string[];
-    priority: 'high' | 'medium' | 'low';
-  }[];
+  totalScore: number;  // 0-10 scale
+  maxPossibleScore: number;  // 10.0
+  completionPercentage: number;  // 0-100%
+  isOptimized: boolean;  // True when all required items complete and score >= 8
+  
+  // Legacy breakdown for backward compatibility (now includes ATS)
+  breakdown: Record<string, number>;
+  
+  // New deterministic checklist system
+  checklist: Record<string, SectionChecklist>;
+  enhancementHistory: EnhancementRecord[];
+  
+  // ATS keyword analysis (AI-powered)
+  keywordAnalysis?: KeywordAnalysisData;
+  
+  strengths: string[];  // Auto-generated from completed items
+  improvements: string[];  // Auto-generated from incomplete items (prioritized)
+  
   generatedAt: string;
-  aiProvider: string;
-  model: string;
+  scoringVersion: string;  // Version of scoring algorithm
+  
+  // Legacy fields (deprecated)
+  aiProvider?: string;
+  model?: string;
 }
 
 export interface ScoreResumeResponse {
@@ -388,6 +439,44 @@ export interface ScoreResumeResponse {
   message?: string;
   remainingRequests?: number;
   resetTime?: number;
+}
+
+// Job Tailoring Types
+export interface JobPostingInfo {
+  companyName: string;
+  jobTitle: string;
+  location?: string;
+  description: string;
+  url?: string;
+  requirements: string[];
+  keywords: string[];
+  salary?: string;
+  employmentType?: string;
+}
+
+export interface ClarificationAnswer {
+  questionId: string;
+  question: string;
+  answer: string;
+}
+
+export interface TailoringResult {
+  originalResumeId: string;
+  changes: any[];
+  atsScoreBefore: number;
+  atsScoreAfter: number;
+  grammarCorrections: any[];
+  keywordOptimizations: string[];
+}
+
+export interface TailoredResumeMetadata {
+  isTailored: true;
+  sourceResumeId: string;
+  jobPosting: JobPostingInfo;
+  clarificationAnswers: ClarificationAnswer[];
+  matchScore: number;
+  tailoringResult?: TailoringResult;
+  createdAt: string;
 }
 
 // Resume Management Types
@@ -401,8 +490,14 @@ export interface Resume {
   scoreGeneratedAt?: string;  // ISO timestamp
   scoreVersion?: string;  // Version of scoring algorithm
   status: 'draft' | 'generated' | 'optimized';
-  createdAt: Date;
-  updatedAt: Date;
+  shareToken?: string;        // Unique public share token
+  isPubliclyShared?: boolean;  // Toggle for public visibility
+  shareCreatedAt?: string;    // When sharing was enabled
+  // Job Tailoring metadata (for tailored resumes)
+  isTailored?: boolean;
+  tailoringMetadata?: TailoredResumeMetadata;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 
@@ -484,7 +579,7 @@ export interface JobTitleAchievementsResponse {
 
 // AI Text Enhancement Types
 export interface EnhanceTextRequest {
-  context: 'achievement' | 'summary' | 'project' | 'responsibility';
+  context: 'achievement' | 'summary' | 'project' | 'responsibility' | 'differentiators';
   text: string;
   language: 'es' | 'en';
   jobTitle?: string;

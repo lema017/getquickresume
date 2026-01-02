@@ -51,7 +51,7 @@ declare class AIService {
     }, resumeId?: string): Promise<string[]>;
     private buildJobTitleAchievementsPrompt;
     private parseJobTitleAchievementsResponse;
-    enhanceText(context: 'achievement' | 'summary' | 'project' | 'responsibility', text: string, language: 'es' | 'en', requestContext: {
+    enhanceText(context: 'achievement' | 'summary' | 'project' | 'responsibility' | 'differentiators', text: string, language: 'es' | 'en', requestContext: {
         authorizer: {
             userId: string;
         };
@@ -65,7 +65,7 @@ declare class AIService {
     }>, trackingContext?: AITrackingContext): Promise<string>;
     /**
      * Generate contextual questions based on a recommendation for enhancing a resume section
-     * Premium-only feature - uses OpenAI
+     * Premium-only feature - uses configured AI provider
      */
     generateEnhancementQuestions(sectionType: 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language', recommendation: string, originalText: string, language: 'es' | 'en', requestContext: {
         authorizer: {
@@ -81,7 +81,7 @@ declare class AIService {
     private parseEnhancementQuestionsResponse;
     /**
      * Generate AI-powered answer suggestion for an enhancement question
-     * Premium-only feature - uses OpenAI
+     * Premium-only feature - uses configured AI provider
      */
     generateAnswerSuggestion(question: string, questionCategory: string, originalText: string, recommendation: string, sectionType: 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language', language: 'es' | 'en', requestContext: {
         authorizer: {
@@ -109,6 +109,20 @@ declare class AIService {
     private buildLinkedInParsingPrompt;
     private parseLinkedInResponse;
     private generateDefaultJobDescription;
+    /**
+     * Direct enhancement for mechanical fixes that don't require user context.
+     * Uses targeted prompts based on the checklist item type.
+     * Premium-only feature.
+     */
+    directEnhance(checklistItemId: string, sectionType: 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language', originalText: string, language: 'es' | 'en', requestContext: {
+        authorizer: {
+            userId: string;
+        };
+    }, resumeId?: string): Promise<string>;
+    /**
+     * Build targeted prompt for mechanical fixes based on checklist item type.
+     */
+    private buildDirectEnhancePrompt;
 }
 export declare const aiService: AIService;
 export {};

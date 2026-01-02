@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Loader2, AlertCircle } from 'lucide-react';
@@ -21,6 +21,8 @@ export function PublicResumePage() {
   const [resume, setResume] = useState<Resume | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Guard to prevent double view recording (React StrictMode runs useEffect twice)
+  const hasRecordedView = useRef(false);
 
   useEffect(() => {
     const loadResume = async () => {
@@ -41,8 +43,11 @@ export function PublicResumePage() {
 
         setResume(response.data);
         
-        // Record view asynchronously
-        publicResumeService.recordView(shareToken);
+        // Record view asynchronously (only once, guard against StrictMode double-execution)
+        if (!hasRecordedView.current) {
+          hasRecordedView.current = true;
+          publicResumeService.recordView(shareToken);
+        }
       } catch (err) {
         console.error('Error loading public resume:', err);
         if (err instanceof Error) {

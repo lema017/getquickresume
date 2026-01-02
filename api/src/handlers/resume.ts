@@ -225,7 +225,7 @@ export const generateResume = async (
       );
       await updateResumeWithScore(userId, savedResume.id, resumeScore);
       console.log(`Scoring completed for resume ${savedResume.id}, score: ${resumeScore.totalScore}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Scoring failed (non-blocking):', error);
       // Don't fail the request if scoring fails - resume is still generated successfully
     }

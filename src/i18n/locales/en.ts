@@ -26,6 +26,9 @@ export const en = {
     closeTips: 'Close tips',
     preview: 'Preview',
     view: 'View',
+    show: 'Show',
+    hide: 'Hide',
+    refresh: 'Refresh',
   },
 
   // Navigation
@@ -47,117 +50,214 @@ export const en = {
   // Landing Page
   landing: {
     hero: {
-      title: 'Create Your Professional CV with AI',
-      subtitle: 'Free Resume creation',
-      description: 'Access professional AI features to create a CV that stands out.',
-      badge: '✨ Try Free',
-      ctaPrimary: 'Start Free',
-      ctaSecondary: 'Explore Features',
+      title: 'Create Professional Resumes with AI',
+      subtitle: 'Free. Fast. ATS-Optimized.',
+      description: 'Build job-winning resumes in minutes — no credit card required.',
+      badge: '🚀 Start Free Today',
+      ctaPrimary: 'Create Free Resume',
+      ctaSecondary: 'See All Features',
       trustIndicators: {
-        noCardRequired: 'No card required',
-        dataSecure: 'Secure data',
+        noCardRequired: 'No credit card',
+        freeForever: '1 Free Resume',
+        aiPowered: 'AI-Powered',
       },
-    },
-    benefits: {
-      title: 'Everything You Need to Stand Out',
-      subtitle: 'Professional tools at your fingertips',
-      items: [
-        {
-          icon: 'gift',
-          title: '1 Free CV to Start',
-          description: 'Create your first professional CV completely free, no credit card required',
-        },
-        {
-          icon: 'brain',
-          title: 'Advanced Professional AI',
-          description: 'Intelligent optimization and content generation with cutting-edge technology',
-        },
-        {
-          icon: 'sparkles',
-          title: 'Premium Templates',
-          description: 'Professional designs created by recruitment experts',
-        },
-        {
-          icon: 'chart-bar',
-          title: 'Professional Analytics',
-          description: 'Discover who views your CV and optimize your strategy',
-        },
-        {
-          icon: 'shield-check',
-          title: 'Privacy and Security',
-          description: 'Your data protected with the highest standards',
-        },
-        {
-          icon: 'zap',
-          title: 'Intelligent Content Generation',
-          description: 'Create professional and optimized descriptions automatically with AI',
-        },
+      animatedFeatures: [
+        { icon: 'brain', text: 'AI Resume Builder' },
+        { icon: 'file-text', text: 'Cover Letter Generator' },
+        { icon: 'target', text: 'Job Tailoring' },
+        { icon: 'bar-chart', text: 'ATS Optimization' },
+        { icon: 'globe', text: 'Multi-Language' },
+        { icon: 'qr-code', text: 'QR Sharing' },
       ],
     },
-    premiumFeatures: {
-      title: 'Premium Features',
-      subtitle: 'Unlock your full professional potential',
-      viewPricing: 'View Plans and Pricing →',
-      features: [
+    socialProof: {
+      title: 'Trusted by Professionals Worldwide',
+      stats: {
+        resumesCreated: {
+          value: '10,000+',
+          label: 'Resumes Created',
+        },
+        languages: {
+          value: '10+',
+          label: 'Languages Supported',
+        },
+        atsScore: {
+          value: '95%',
+          label: 'Avg. ATS Score',
+        },
+        satisfaction: {
+          value: '4.9/5',
+          label: 'User Satisfaction',
+        },
+      },
+    },
+    coreFeatures: {
+      title: 'Everything You Need to Land Your Dream Job',
+      subtitle: 'Powerful AI tools designed to give you a competitive edge',
+      items: [
         {
           icon: 'brain',
-          title: 'AI Enhancement',
-          description: 'Intelligent section optimization and professional content',
-          badge: 'Premium',
+          title: 'AI Resume Builder',
+          description: 'Create professional resumes with intelligent content suggestions and automatic formatting',
+          highlight: 'Free',
         },
         {
-          icon: 'award',
-          title: 'AI Scoring & Analysis',
-          description: 'Detailed analysis and improvement suggestions with section-by-section scoring',
-          badge: 'Premium',
+          icon: 'file-text',
+          title: 'Cover Letter Generator',
+          description: 'Generate personalized cover letters that match your resume and job posting',
+          highlight: 'AI-Powered',
+        },
+        {
+          icon: 'target',
+          title: 'Job Tailoring',
+          description: 'Customize your resume for each job application with AI-powered recommendations',
+          highlight: 'New',
+        },
+        {
+          icon: 'bar-chart',
+          title: 'ATS Optimization & Scoring',
+          description: 'Beat applicant tracking systems with optimized formatting and strategic keywords',
+          highlight: 'Premium',
+        },
+        {
+          icon: 'spell-check',
+          title: 'Grammar & Style Check',
+          description: 'Eliminate errors with advanced grammar checking and professional tone suggestions',
+          highlight: 'AI-Powered',
         },
         {
           icon: 'globe',
           title: 'Multi-Language Translation',
-          description: 'Translate your CV to the top 10 most used languages worldwide',
-          badge: 'Premium',
+          description: 'Translate your resume to 10+ languages with professional accuracy',
+          highlight: 'Premium',
         },
         {
-          icon: 'share-2',
-          title: 'Share with QR Code',
-          description: 'Share your CV with QR code and analyze who views it',
-          badge: 'Premium',
+          icon: 'qr-code',
+          title: 'QR Code Sharing',
+          description: 'Share your resume instantly with scannable QR codes for networking events',
+          highlight: 'Premium',
         },
         {
-          icon: 'bar-chart-2',
-          title: 'Advanced Analytics',
-          description: 'View statistics, devices, and locations',
-          badge: 'Premium',
-        },
-        {
-          icon: 'target',
-          title: 'ATS Optimization',
-          description: 'Optimize your CV for Applicant Tracking Systems (ATS)',
-          badge: 'Premium',
+          icon: 'line-chart',
+          title: 'Resume Analytics',
+          description: 'Track who views your resume with detailed analytics on devices and locations',
+          highlight: 'Premium',
         },
       ],
     },
+    featureShowcase: {
+      title: 'See Our Features in Action',
+      subtitle: 'Powerful tools that set you apart from other candidates',
+      tabs: {
+        jobTailoring: {
+          title: 'Job Tailoring',
+          description: 'Paste any job posting and our AI will automatically analyze requirements, suggest improvements, and optimize your resume to match the position perfectly.',
+          benefits: [
+            'AI analyzes job requirements instantly',
+            'Get personalized improvement suggestions',
+            'Increase your match score automatically',
+            'Save time on each application',
+          ],
+        },
+        coverLetter: {
+          title: 'Cover Letters',
+          description: 'Generate compelling cover letters that complement your resume and speak directly to what employers are looking for.',
+          benefits: [
+            'Personalized content for each application',
+            'Professional tone and formatting',
+            'Highlights your key qualifications',
+            'Edit and regenerate paragraphs',
+          ],
+        },
+        atsScoring: {
+          title: 'ATS Scoring',
+          description: 'Get a detailed score showing how well your resume will perform with Applicant Tracking Systems used by 99% of Fortune 500 companies.',
+          benefits: [
+            'Section-by-section analysis',
+            'Keyword optimization suggestions',
+            'Format compatibility check',
+            'Instant improvement tips',
+          ],
+        },
+        translation: {
+          title: 'Translation',
+          description: 'Expand your job search globally by translating your resume into 10+ languages while maintaining professional quality.',
+          benefits: [
+            'Professional translation quality',
+            'Maintains original formatting',
+            '10+ languages supported',
+            'Perfect for international jobs',
+          ],
+        },
+        qrSharing: {
+          title: 'QR Sharing',
+          description: 'Share your resume at networking events, on business cards, or anywhere with a scannable QR code that tracks engagement.',
+          benefits: [
+            'Instant sharing at events',
+            'Track who views your resume',
+            'Device and location analytics',
+            'Perfect for networking',
+          ],
+        },
+      },
+    },
+    freeTier: {
+      title: 'Start 100% Free',
+      subtitle: 'No credit card required — no strings attached',
+      description: 'Create your first professional resume completely free and keep it forever. Upgrade anytime to unlock all premium features.',
+      badge: 'Free Forever',
+      features: [
+        {
+          icon: 'check',
+          text: '1 Professional Resume',
+        },
+        {
+          icon: 'check',
+          text: 'AI Content Generation',
+        },
+        {
+          icon: 'check',
+          text: 'Professional Templates',
+        },
+        {
+          icon: 'check',
+          text: 'PDF Download',
+        },
+        {
+          icon: 'check',
+          text: 'Grammar Check',
+        },
+      ],
+      cta: 'Create My Free Resume',
+      upgradeHint: 'Need more? Upgrade to Premium for unlimited resumes and all features',
+    },
     howItWorks: {
-      title: 'How It Works',
-      subtitle: 'Three steps to your professional CV',
+      title: 'Create Your Perfect Resume in 4 Simple Steps',
+      subtitle: 'From sign-up to job applications in minutes',
       steps: [
         {
           number: '01',
           title: 'Sign Up Free',
-          description: 'Create your account in seconds with Google or email',
+          description: 'Create your account instantly with Google — no credit card needed',
           icon: 'user-plus',
         },
         {
           number: '02',
-          title: 'Create Your CV',
-          description: 'Guided wizard with intelligent AI suggestions',
+          title: 'Build Your Resume',
+          description: 'Follow our guided wizard with AI suggestions for every section',
           icon: 'edit-3',
         },
         {
           number: '03',
-          title: 'Unlock Premium',
-          description: 'Upgrade to Premium for unlimited CVs and all features',
-          icon: 'zap',
+          title: 'Enhance & Optimize',
+          description: 'Use AI to improve content, check grammar, and boost your ATS score',
+          icon: 'sparkles',
+        },
+        {
+          number: '04',
+          title: 'Share & Apply',
+          description: 'Download, share via QR code, or tailor for specific job postings',
+          icon: 'share-2',
         },
       ],
     },
@@ -166,122 +266,171 @@ export const en = {
       items: [
         {
           question: 'Is it really free to start?',
-          answer: 'Yes, creating your account and generating your first CV is completely free. No credit card required.',
+          answer: 'Absolutely! Create your account and your first professional resume completely free. No credit card required, no time limits, no hidden fees.',
         },
         {
-          question: 'Do I need a credit card?',
-          answer: 'No. You can sign up and create your first CV free without providing payment information.',
+          question: 'What can I do with the free plan?',
+          answer: 'With the free plan, you get 1 professional resume with AI content generation, grammar checking, professional templates, and PDF download. Your free resume is yours forever.',
+        },
+        {
+          question: 'What is Job Tailoring?',
+          answer: 'Job Tailoring is our AI feature that analyzes job postings and automatically optimizes your resume to match specific job requirements, increasing your chances of getting interviews.',
+        },
+        {
+          question: 'How does ATS Optimization work?',
+          answer: 'Our ATS (Applicant Tracking System) optimization analyzes your resume format, keywords, and structure to ensure it passes through automated filtering systems used by 99% of companies.',
         },
         {
           question: 'What does Premium include?',
-          answer: 'With Premium you get unlimited CVs, translation to multiple languages, QR sharing and analytics, AI enhancement, advanced scoring, and unlimited editing of your CVs.',
+          answer: 'Premium unlocks unlimited resumes, cover letter generation, job tailoring, multi-language translation, QR code sharing with analytics, AI enhancement, and priority support.',
         },
         {
-          question: 'How do plans work?',
-          answer: 'We offer monthly and yearly plans. The free plan includes 1 CV for life. Premium includes all advanced features. See pricing page for more details.',
+          question: 'Can I cancel anytime?',
+          answer: 'Yes! You can cancel your Premium subscription at any time. Your access continues until the end of your billing period, and your resumes remain accessible.',
         },
       ],
-      viewPricingDetails: 'View pricing details and plans',
+      viewPricingDetails: 'View complete pricing details',
     },
     atsExplainer: {
-      title: 'What is ATS Optimization?',
-      subtitle: 'Increase your chances of passing the first filter',
-      description: 'ATS (Applicant Tracking System) are software that companies use to automatically filter CVs before they reach human recruiters.',
+      title: 'Beat the ATS and Get Noticed',
+      subtitle: '75% of resumes are rejected by ATS before a human ever sees them',
+      description: 'Applicant Tracking Systems (ATS) are software used by companies to filter resumes before they reach recruiters. Our AI ensures your resume passes through every time.',
       benefits: [
         {
           icon: 'target',
-          title: 'Greater Visibility',
-          description: 'Your CV will be detected by automatic filtering systems'
+          title: 'Keyword Optimization',
+          description: 'AI identifies and adds relevant keywords from job descriptions'
         },
         {
           icon: 'check-circle',
-          title: 'Compatible Format',
-          description: 'Structure optimized for machine reading'
+          title: 'ATS-Friendly Format',
+          description: 'Clean structure that machines can read perfectly'
         },
         {
-          icon: 'zap',
-          title: 'Strategic Keywords',
-          description: 'Relevant keywords for your industry'
+          icon: 'trending-up',
+          title: 'Score Tracking',
+          description: 'See your ATS score and improve it with specific suggestions'
         }
       ],
-      cta: 'Optimize My CV with ATS'
+      cta: 'Check My ATS Score'
     },
     cta: {
-      title: 'Start Free Now',
-      subtitle: 'Create your professional CV in minutes',
-      description: '1 free CV for life • No card required',
-      ctaPrimary: 'Create My Free CV',
-      ctaSecondary: 'View Plans →',
+      title: 'Ready to Land Your Dream Job?',
+      subtitle: 'Join thousands of professionals who got hired with GetQuickResume',
+      description: 'Start free today — no credit card required',
+      features: [
+        '1 Free Resume Forever',
+        'AI-Powered Content',
+        'ATS Optimization',
+        'Professional Templates',
+      ],
+      ctaPrimary: 'Create My Free Resume',
+      ctaSecondary: 'Compare Plans',
     },
     testimonials: {
-      title: 'What Our Users Say',
-      subtitle: 'Thousands of professionals already trust us',
+      title: 'Success Stories from Real Users',
+      subtitle: 'See how GetQuickResume helped professionals land their dream jobs',
       items: [
         {
           name: 'Maria Gonzalez',
           role: 'Senior UX Designer',
-          content: 'The premium features helped me stand out. The AI review and analytics were key to getting 3 interviews in one week.',
+          company: 'Tech Startup',
+          content: 'The Job Tailoring feature is a game-changer! I customized my resume for 5 different positions and got interviews at 3 of them within a week.',
           rating: 5,
+          result: '3 interviews in 1 week',
         },
         {
           name: 'Carlos Rodriguez',
           role: 'Full Stack Developer',
-          content: 'I upgraded to Premium and it was worth every penny. The ATS optimization and QR sharing set me apart from other candidates.',
+          company: 'Fortune 500',
+          content: 'My ATS score went from 62% to 94% after using the optimization tools. I finally started getting callbacks after months of silence.',
           rating: 5,
+          result: 'ATS score: 62% → 94%',
         },
         {
           name: 'Ana Martinez',
           role: 'Marketing Manager',
-          content: 'The premium credits gave me access to tools that would normally cost much more. My CV now looks incredibly professional.',
+          company: 'Agency',
+          content: 'The QR code sharing was perfect for a networking event. Three recruiters scanned it, and I could see when they viewed my resume. Landed my dream job!',
           rating: 5,
+          result: 'Hired in 2 weeks',
+        },
+        {
+          name: 'David Chen',
+          role: 'Product Manager',
+          company: 'SaaS Company',
+          content: 'The cover letter generator saved me hours. It created personalized letters that actually sounded like me. Highly recommend the Premium plan.',
+          rating: 5,
+          result: 'Saved 10+ hours',
         },
       ],
     },
     plans: {
-      title: 'Choose Your Plan',
-      subtitle: 'Flexible plans for every need',
+      title: 'Simple, Transparent Pricing',
+      subtitle: 'Start free, upgrade when you need more power',
+      popularBadge: 'Most Popular',
       free: {
         name: 'Free',
         price: '$0',
-        period: 'for life',
+        period: 'forever',
+        description: 'Perfect for getting started',
         features: [
-          '1 free CV',
-          'AI generation',
-          'Basic templates',
-          'PDF download',
-          'Email support',
+          '1 Professional Resume',
+          'AI Content Generation',
+          'Grammar Check',
+          'Basic Templates',
+          'PDF Download',
         ],
         cta: 'Start Free',
       },
       monthly: {
-        name: 'Premium Monthly',
+        name: 'Premium',
         price: '$9.99',
         period: 'month',
+        description: 'For active job seekers',
         features: [
-          'Unlimited CVs',
-          'AI Enhancement',
-          'Scoring & Analysis',
-          'Translation to 10 languages',
+          'Unlimited Resumes',
+          'Cover Letter Generator',
+          'Job Tailoring',
+          'ATS Scoring & Analysis',
+          'Translation to 10+ Languages',
           'QR Code Sharing',
-          'Advanced Analytics',
-          'Unlimited Editing',
+          'Resume Analytics',
+          'AI Enhancement',
           'Premium Templates',
+          'Priority Support',
         ],
-        cta: 'Upgrade to Premium',
+        cta: 'Get Premium',
       },
       yearly: {
         name: 'Premium Yearly',
         price: '$4.99',
         period: 'month',
-        savings: 'Save 50% • Billed $59.88/year',
+        savings: 'Save 50% — Billed $59.88/year',
         badge: 'Best Value',
+        description: 'Best for long-term career growth',
         features: [
           'Everything in Premium Monthly',
-          '50% savings',
-          'Annual billing',
-          'Priority support',
+          '50% Savings',
+          'Annual Billing',
+          'Priority Support',
         ],
-        cta: 'Upgrade to Premium',
+        cta: 'Get Premium Yearly',
+      },
+      comparisonTitle: 'Compare Plans',
+      comparisonFeatures: {
+        resumes: { name: 'Resumes', free: '1', premium: 'Unlimited' },
+        aiGeneration: { name: 'AI Generation', free: true, premium: true },
+        grammarCheck: { name: 'Grammar Check', free: true, premium: true },
+        templates: { name: 'Templates', free: 'Basic', premium: 'All Premium' },
+        pdfDownload: { name: 'PDF Download', free: true, premium: true },
+        coverLetters: { name: 'Cover Letters', free: false, premium: true },
+        jobTailoring: { name: 'Job Tailoring', free: false, premium: true },
+        atsScoring: { name: 'ATS Scoring', free: false, premium: true },
+        translation: { name: 'Translation', free: false, premium: '10+ Languages' },
+        qrSharing: { name: 'QR Sharing', free: false, premium: true },
+        analytics: { name: 'Analytics', free: false, premium: true },
+        support: { name: 'Support', free: 'Email', premium: 'Priority' },
       },
     },
   },
@@ -405,7 +554,189 @@ export const en = {
         invalidType: 'Please select a PDF, DOC, DOCX or TXT file',
         tooLarge: 'The file is too large. Maximum 10MB',
         processed: 'CV processed successfully!',
-        processError: 'Error processing the file. Please try again.'
+        processError: 'Error processing the file. Please try again.',
+        resumeCreated: 'Resume created successfully!'
+      },
+      // New upload flow with client-side extraction
+      dragDrop: {
+        title: 'Drag and drop your CV here',
+        or: 'or',
+        browse: 'Browse files',
+        hint: 'Supported: PDF, Word (.docx), Plain text (.txt)',
+        fileSelected: 'File selected',
+        changeFile: 'Change file'
+      },
+      extraction: {
+        extractingText: 'Extracting text from document...',
+        analyzingContent: 'Analyzing content with AI...',
+        extractionFailed: 'Could not extract text from the document. Please try another file.',
+        notResume: 'The uploaded document does not appear to be a resume. Please upload a file containing your CV information.',
+        textPreview: 'Preview of extracted text',
+        showMore: 'Show more',
+        showLess: 'Show less',
+        characters: '{{count}} characters extracted'
+      },
+      freeUserNotice: {
+        title: 'Free Resume Usage',
+        message: 'Creating a resume from this upload will use your free resume.',
+        upgradeHint: 'Upgrade to Premium for unlimited resume creation.'
+      },
+      quotaExceeded: {
+        title: 'Free Resume Already Used',
+        message: 'You have already used your free resume. Upgrade to Premium to continue.',
+        upgradeButton: 'Upgrade to Premium'
+      },
+      review: {
+        title: 'Review Extracted Data',
+        subtitle: 'Verify and edit the information extracted from your CV before creating your resume.',
+        sections: {
+          profile: 'Profile Information',
+          skills: 'Skills',
+          experience: 'Work Experience',
+          education: 'Education',
+          certifications: 'Certifications',
+          projects: 'Projects',
+          languages: 'Languages',
+          achievements: 'Achievements',
+          summary: 'Professional Summary'
+        },
+        required: 'Required',
+        optional: 'Optional',
+        recommended: 'Recommended',
+        addNew: 'Add new',
+        removeItem: 'Remove',
+        noItems: 'No items found',
+        addButton: 'Add {{item}}',
+        validation: {
+          requiredFields: 'Please complete all required fields',
+          fixErrors: 'Please fix the errors below'
+        },
+        actions: {
+          back: 'Back',
+          createResume: 'Create Resume'
+        },
+        creating: 'Creating your resume...',
+        success: 'Resume created successfully!',
+        ai: {
+          enhance: 'Enhance with AI',
+          enhancing: 'Enhancing...',
+          getSuggestions: 'Get AI Suggestions',
+          loadingSuggestions: 'Loading suggestions...',
+          clickToAdd: 'Click to add',
+          addAll: 'Add All',
+          enhanced: 'Text enhanced!',
+          error: 'Error enhancing text',
+          premiumRequired: 'Premium required for AI features'
+        },
+        fields: {
+          // Profile fields
+          firstName: 'First Name',
+          lastName: 'Last Name',
+          email: 'Email',
+          phone: 'Phone',
+          profession: 'Profession / Job Title',
+          country: 'Country',
+          linkedin: 'LinkedIn URL',
+          targetLevel: 'Experience Level',
+          tone: 'Resume Tone',
+          // Experience fields
+          jobTitle: 'Job Title',
+          company: 'Company',
+          startDate: 'Start Date',
+          endDate: 'End Date',
+          currentJob: 'Currently working here',
+          responsibilities: 'Responsibilities/Achievements',
+          // Education fields
+          degree: 'Degree',
+          field: 'Field of Study',
+          institution: 'Institution',
+          isCompleted: 'Completed',
+          currentlyStudying: 'Currently studying here',
+          // Certification fields
+          certificationName: 'Certification Name',
+          issuer: 'Issuer',
+          certDate: 'Date Obtained',
+          credentialId: 'Credential ID',
+          certUrl: 'Credential URL',
+          // Project fields
+          projectName: 'Project Name',
+          description: 'Description',
+          technologies: 'Technologies',
+          url: 'URL',
+          projectOngoing: 'Ongoing Project',
+          // Language fields
+          languageName: 'Language',
+          languageLevel: 'Proficiency Level',
+          // Achievement fields
+          achievementTitle: 'Achievement Title',
+          year: 'Year',
+          // Summary field
+          summaryText: 'Professional Summary',
+          summaryPlaceholder: 'Write a brief professional summary highlighting your key strengths, experience, and career goals...'
+        },
+        targetLevelOptions: {
+          entry: 'Entry Level (0-2 years)',
+          mid: 'Mid Level (3-5 years)',
+          senior: 'Senior (6-10 years)',
+          executive: 'Executive (10+ years)'
+        },
+        toneOptions: {
+          professional: 'Professional',
+          creative: 'Creative',
+          technical: 'Technical',
+          friendly: 'Friendly'
+        },
+        languageLevelOptions: {
+          basic: 'Basic',
+          intermediate: 'Intermediate',
+          advanced: 'Advanced',
+          native: 'Native'
+        }
+      },
+      scorePage: {
+        title: 'Resume Analysis Complete',
+        subtitle: 'Review your ATS score and recommendations to improve your resume.',
+        backToDashboard: 'Back to Dashboard',
+        overallScore: 'Overall Score',
+        quickStats: {
+          title: 'Quick Stats',
+          skills: 'Skills',
+          experience: 'Experience',
+          education: 'Education',
+          certifications: 'Certifications',
+          projects: 'Projects',
+          achievements: 'Achievements',
+          languages: 'Languages',
+          completeness: 'Completeness'
+        },
+        sectionAnalysis: {
+          title: 'Section Analysis',
+          enhance: 'Enhance',
+          excellent: 'Excellent',
+          good: 'Good',
+          needsWork: 'Needs Work',
+          recommendations: 'Recommendations'
+        },
+        atsTips: {
+          title: 'ATS Tips & Best Practices',
+          description: 'Follow these guidelines to ensure your resume passes ATS filters'
+        },
+        actions: {
+          continueToDashboard: 'Continue to Dashboard',
+          openEditor: 'Open Resume Editor',
+          enhanceAll: 'Enhance All Sections'
+        },
+        status: {
+          excellent: 'Excellent! Your resume is highly competitive',
+          good: 'Good! Ready for most applications',
+          average: 'Average. Some improvements recommended',
+          needsWork: 'Needs work. Follow recommendations below'
+        },
+        premium: {
+          enhanceTitle: 'Enhance with AI',
+          enhanceDescription: 'Use AI to automatically improve this section',
+          upgradeRequired: 'Premium required for AI enhancements'
+        }
       }
     },
     linkedinImportPage: {
@@ -643,7 +974,6 @@ export const en = {
       },
       upload: {
         title: 'Upload Current CV',
-        comingSoon: 'Coming Soon',
         description: 'Upload your current resume and we will optimize it with AI. We will extract the information and improve it automatically.',
         features: {
           dataExtraction: 'Automatic data extraction',
@@ -651,8 +981,9 @@ export const en = {
           multiFormat: 'Multiple formats supported',
           editing: 'Editing available afterwards',
         },
-        cta: 'Upload',
+        cta: 'Upload CV',
         timeEstimate: 'Estimated time: 2–5 minutes',
+        freeNotice: 'Uses your free resume',
       },
       linkedin: {
         title: 'LinkedIn Public Profile',
@@ -774,6 +1105,9 @@ export const en = {
         motivator: 'Excellent! Your skills show your potential.',
         skillsLabel: 'Skills',
         addSkillPlaceholder: 'Add skill...',
+        errors: {
+          invalidProfession: 'Please enter a valid profession in the previous step. The AI cannot generate suggestions for invalid or nonsense text.',
+        },
       },
       experience: {
         title: 'Work Experience',
@@ -1037,6 +1371,8 @@ export const en = {
         tips: 'Be brief and focused: 3-4 lines maximum',
         motivator: 'Your summary will be the jewel of your resume!',
         improveButton: 'Improve writing',
+        enhanceWithAI: 'Enhance with AI',
+        enhanceTooltip: 'Let AI improve your text to be more professional and impactful',
       },
       review: {
         title: 'Review and Download',
@@ -1302,6 +1638,9 @@ export const en = {
         tooltip: 'Please add at least one experience with all required fields (Position, Company, Start Date)',
         alertAdd: 'Please add at least one work experience to continue.',
         alertComplete: 'Please complete all required fields (Position, Company, Start Date) for all experiences.',
+        atLeastOne: 'At least one work experience is required',
+        incompleteFields: 'Please complete all required fields (Position, Company, Start Date) for all experiences',
+        invalidDates: 'All experiences must have valid dates (end date must be after start date)',
       },
       projects: {
         optional: 'Optional: Add projects to showcase your work',
@@ -1310,12 +1649,14 @@ export const en = {
         tooltip: 'Please add at least one project with Name and Description to continue',
         alertAdd: 'Please add at least one project to continue.',
         alertComplete: 'Please complete all required fields (Name, Description) for all projects.',
+        incomplete: 'All projects must have a Name and Description. Please complete all fields or remove incomplete projects.',
       },
       achievements: {
         optional: 'Optional: Add achievements to highlight your successes',
         requirement: 'Required: {{count}} achievement{{plural}} (add at least 1 with Title and Description)',
         requirementMet: '✓ {{count}} achievement{{plural}} added (minimum requirement met)',
         tooltip: 'Please add at least one achievement with Title and Description to continue',
+        incomplete: 'All achievements must have a Title and Description. Please complete all fields or remove incomplete achievements.',
       },
       summary: {
         requirement: 'Required: Summary ({{current}}/50 characters), Job Description ({{jobCurrent}}/30 characters)',
@@ -1556,9 +1897,90 @@ export const en = {
   // Account
   account: {
     title: 'My Account',
-    profile: 'Profile',
+    loading: 'Loading account...',
+    
+    // Profile Header
+    profile: {
+      title: 'Profile',
+      memberSince: 'Member since',
+      authProvider: 'Signed in with',
+      premium: 'Premium',
+      free: 'Free',
+      notSpecified: 'Not specified',
+    },
+    
+    // Subscription Section
+    subscription: {
+      title: 'Subscription',
+      currentPlan: 'Current Plan',
+      free: 'Free',
+      premiumMonthly: 'Premium Monthly',
+      premiumYearly: 'Premium Yearly',
+      renewsOn: 'Renews on',
+      expiresOn: 'Expires on',
+      startedOn: 'Started on',
+      manageSubscription: 'Manage Subscription',
+      upgradeToPremium: 'Upgrade to Premium',
+      upgradeDescription: 'Unlock unlimited resumes, cover letters, and job tailoring',
+      cancelInfo: 'You can cancel anytime from the subscription portal',
+    },
+    
+    // Usage Statistics
+    usage: {
+      title: 'Usage Statistics',
+      resumes: 'Resumes',
+      resumesDescription: 'Professional resumes created',
+      coverLetters: 'Cover Letters',
+      coverLettersDescription: 'AI-generated cover letters',
+      jobTailoring: 'Job Tailoring',
+      jobTailoringDescription: 'Resumes tailored for jobs',
+      downloads: 'Downloads',
+      downloadsDescription: 'Total resume downloads',
+      unlimited: 'Unlimited',
+      perMonth: '/month',
+      lifetime: 'lifetime',
+      used: 'used',
+      of: 'of',
+      freeLimit: '1 free',
+      premiumLimit: '40/month',
+    },
+    
+    // Quick Actions
+    actions: {
+      title: 'Quick Actions',
+      createResume: 'Create Resume',
+      createResumeDescription: 'Start a new professional resume',
+      createCoverLetter: 'Cover Letter',
+      createCoverLetterDescription: 'Generate an AI cover letter',
+      tailorForJob: 'Tailor for Job',
+      tailorForJobDescription: 'Optimize resume for a job posting',
+      changeLanguage: 'Language',
+      changeLanguageDescription: 'Switch between English and Spanish',
+      contactSupport: 'Support',
+      contactSupportDescription: 'Get help from our team',
+      viewDashboard: 'Dashboard',
+      viewDashboardDescription: 'View all your resumes',
+    },
+    
+    // Account Details
+    details: {
+      title: 'Account Details',
+      email: 'Email',
+      provider: 'Login Provider',
+      accountId: 'Account ID',
+      memberSince: 'Member Since',
+    },
+    
+    // Danger Zone
+    dangerZone: {
+      title: 'Account',
+      signOut: 'Sign Out',
+      signOutConfirm: 'Are you sure you want to sign out?',
+      signOutDescription: 'You will need to sign in again to access your resumes',
+    },
+    
+    // Legacy keys for backward compatibility
     tokens: 'Tokens',
-    downloads: 'Downloads',
     settings: 'Settings',
     language: 'Language',
     logout: 'Sign out',
@@ -1939,6 +2361,8 @@ export const en = {
     minItems: 'Must have at least {{count}} item{{count, plural, one {} other {s}}',
     allItemsComplete: 'All items must be complete',
     invalidCharacters: 'contains invalid characters. Only letters, numbers and basic symbols (. , - + ( ) / @ < > =) are allowed',
+    professionTooShort: 'Profession must be at least 3 characters',
+    professionInvalid: 'Please enter a valid profession or job title',
     profile: {
       firstName: 'First name is required',
       lastName: 'Last name is required',
@@ -2021,6 +2445,9 @@ export const en = {
       download: 'Download',
       delete: 'Delete',
       viewResume: 'View Resume',
+      tailorForJob: 'Tailor for Job',
+      viewAnalytics: 'View Analytics',
+      shareAndTrack: 'Share & Track Views',
     },
     info: {
       title: 'Resume Information',
@@ -2056,6 +2483,8 @@ export const en = {
       edit: 'Edit Resume',
       translate: 'Translate',
       share: 'Share',
+      analytics: 'Analytics',
+      shareAndAnalytics: 'Share & Analytics',
       download: 'Download PDF',
       login: 'Login',
       viewCertificate: 'View Certificate',
@@ -2193,6 +2622,9 @@ export const en = {
       enableFailed: 'Failed to enable sharing',
       disableFailed: 'Failed to disable sharing',
       copyFailed: 'Failed to copy link',
+      loadFailed: 'Failed to load resume',
+      notFound: 'Resume not found',
+      toggleFailed: 'Failed to toggle sharing',
     },
     analytics: {
       title: 'Analytics',
@@ -2205,6 +2637,94 @@ export const en = {
       browsers: 'Browsers',
       locations: 'Locations',
       viewsOverTime: 'Views Over Time',
+    },
+  },
+  resumeShare: {
+    pageTitle: 'Share & Analytics',
+    backToResume: 'Back to Resume',
+    sharingActive: 'Sharing Active',
+    enabled: 'Sharing enabled successfully',
+    disabled: 'Sharing disabled successfully',
+    linkCopied: 'Link copied to clipboard',
+    errors: {
+      loadFailed: 'Failed to load resume data',
+      notFound: 'Resume not found',
+      toggleFailed: 'Failed to toggle sharing',
+      copyFailed: 'Failed to copy link',
+    },
+    premium: {
+      title: 'Unlock Resume Sharing',
+      description: 'Share your professional resume with recruiters and track who views it with powerful analytics. Get insights into viewer locations, devices, and engagement.',
+      upgradeButton: 'Upgrade to Premium',
+      feature1: {
+        title: 'Share Anywhere',
+        description: 'Generate a unique link and QR code to share your resume instantly',
+      },
+      feature2: {
+        title: 'Track Views',
+        description: 'See who viewed your resume, when, and for how long',
+      },
+      feature3: {
+        title: 'Detailed Analytics',
+        description: 'Get insights on viewer locations, devices, and engagement trends',
+      },
+    },
+    controls: {
+      title: 'Share Controls',
+      subtitle: 'Manage how your resume is shared',
+    },
+    status: {
+      active: 'Sharing Active',
+      inactive: 'Sharing Inactive',
+      activeDescription: 'Your resume is publicly accessible',
+      inactiveDescription: 'Enable to share your resume',
+    },
+    shareLink: 'Share Link',
+    shareButton: 'Share Resume',
+    shareVia: 'Share via social media',
+    socialText: 'Check out my professional resume!',
+    emailSubject: 'My Professional Resume',
+    qrCode: {
+      title: 'QR Code',
+      description: 'Scan to view resume on mobile',
+    },
+    enableToSeeAnalytics: {
+      title: 'Enable Sharing to See Analytics',
+      description: 'Turn on sharing to start tracking who views your resume and get detailed analytics.',
+    },
+    stats: {
+      totalViews: 'Total Views',
+      uniqueVisitors: 'Unique Visitors',
+      thisWeek: 'This Week',
+    },
+    viewers: {
+      title: 'Recent Viewers',
+      subtitle: 'Anonymous viewer activity',
+      viewAll: 'View all {{count}} viewers',
+      noViewers: {
+        title: 'No Viewers Yet',
+        description: 'Share your resume link to start tracking views',
+      },
+      rateLimitError: 'Too many requests. Please try again in a moment.',
+    },
+    charts: {
+      title: 'Engagement Analytics',
+      subtitle: 'Track your resume performance',
+      viewsOverTime: 'Views Over Time',
+      deviceBreakdown: 'Device Breakdown',
+      desktop: 'Desktop',
+      mobile: 'Mobile',
+      tablet: 'Tablet',
+      noData: 'No data available',
+    },
+    geoMap: {
+      title: 'Geographic Distribution',
+      subtitle: 'See where your viewers are located',
+      topCountries: 'Top Countries',
+      noData: {
+        title: 'No Location Data',
+        description: 'Location data will appear as viewers visit your resume',
+      },
     },
   },
   publicResume: {
@@ -2421,6 +2941,230 @@ export const en = {
       enhanceDescription: 'AI enhancement transforms your achievement into an impactful, professional statement. Upgrade to premium for unlimited access!',
       regenerateDescription: 'Regenerating paragraphs with AI is a premium feature. Upgrade to access unlimited regenerations and more!',
       upgrade: 'Upgrade Now',
+    },
+  },
+
+  // Job Tailoring Feature
+  jobTailoring: {
+    // Page-level strings
+    page: {
+      title: 'Job Tailoring',
+      subtitle: 'Optimize your resume for specific jobs',
+      back: 'Back',
+    },
+
+    // Step names
+    steps: {
+      jobDetails: 'Job Details',
+      analysis: 'Analysis',
+      questions: 'Questions',
+      review: 'Review',
+      save: 'Save',
+    },
+
+    // JobInput component
+    jobInput: {
+      title: 'Tailor Your Resume',
+      subtitle: 'Select a resume and provide the job posting details to get started',
+      selectResume: 'Select Resume to Tailor',
+      change: 'Change',
+      loadingResumes: 'Loading resumes...',
+      noResumes: 'No generated resumes found',
+      noResumesHint: 'Create and generate a resume first to use this feature',
+      untitledResume: 'Untitled Resume',
+      jobPostingDetails: 'Job Posting Details',
+      pasteDescription: 'Paste Description',
+      enterUrl: 'Enter URL',
+      jobDescriptionLabel: 'Job Description',
+      jobDescriptionPlaceholder: 'Paste the full job description here...\n\nInclude:\n• Job title and company name\n• Required skills and qualifications\n• Responsibilities\n• Preferred experience',
+      characters: '{{count}} characters',
+      minCharacters: 'Please provide more details (min 50 characters)',
+      tipsTitle: '💡 Tips for best results:',
+      tips: {
+        complete: 'Include the complete job description, not just the title',
+        skills: 'Make sure to include required skills and qualifications',
+        keywords: 'Include any keywords that appear multiple times in the posting',
+      },
+      errors: {
+        selectResume: 'Please select a resume to tailor',
+        provideDescription: 'Please provide a job description',
+      },
+      analyzeJob: 'Analyze Job',
+      updated: 'Updated {{date}}',
+    },
+
+    // UrlValidator component
+    urlValidator: {
+      placeholder: 'https://linkedin.com/jobs/view/...',
+      validating: 'Validating job posting URL...',
+      successReady: 'Job posting found - Ready to analyze!',
+      detected: 'Detected:',
+      validateButton: 'Validate & Extract Job Info',
+      supportedBoards: 'Supported job boards',
+      supportedBoardsDesc: 'We have optimized extraction for these job boards:',
+      otherUrlsNote: 'Other job posting URLs may also work, but extraction quality may vary.',
+      or: 'or',
+      pasteManually: 'Paste job description manually',
+      pasteManuallyLink: 'Paste the job description manually instead',
+    },
+
+    // JobPreviewCard component
+    jobPreview: {
+      found: 'Job Posting Found!',
+      reviewInfo: 'Review the extracted information below',
+      jobTitle: 'Job Title',
+      company: 'Company',
+      descriptionPreview: 'Job Description Preview',
+      showLess: 'Show less',
+      showFull: 'Show full description',
+      notRight: "This doesn't look right?",
+      enterManually: 'Enter details manually',
+      editDetails: 'Edit Details',
+      confirmContinue: 'Confirm & Continue',
+    },
+
+    // JobAnalysis component
+    analysis: {
+      analyzing: 'Analyzing Job Posting...',
+      analyzingDesc: "We're extracting key requirements and matching them with your resume",
+      noData: 'No analysis data available. Please go back and try again.',
+      goBack: '← Go Back',
+      title: 'Job Analysis Complete',
+      subtitle: 'Review the extracted information and match score',
+      jobDetails: 'Job Details',
+      edit: 'Edit',
+      cancel: 'Cancel',
+      save: 'Save',
+      jobTitleLabel: 'Job Title',
+      companyLabel: 'Company',
+      locationLabel: 'Location',
+      notSpecified: 'Not specified',
+      keywordsDetected: 'Keywords Detected',
+      keyRequirements: 'Key Requirements',
+      currentMatchScore: 'Current Match Score',
+      canBeImproved: 'Can be improved with tailoring',
+      matchingSkills: 'Matching Skills',
+      skillsToHighlight: 'Skills to Highlight',
+      aiSuggestions: 'AI Suggestions',
+      continueToQuestions: 'Continue to Questions',
+    },
+
+    // ClarificationQuestions component
+    questions: {
+      generating: 'Generating Questions...',
+      generatingDesc: 'Our AI is creating personalized questions based on the job requirements',
+      title: 'Quick Clarifications',
+      subtitle: 'Help us tailor your resume by answering a few questions about your experience',
+      tipsTitle: 'Tips for better results:',
+      tips: {
+        specific: 'Be specific and include numbers when possible',
+        enhance: 'Use the "Enhance with AI" button to improve your answers',
+        skip: 'You can skip optional questions if not relevant',
+      },
+      required: 'Required',
+      selectOption: 'Select an option...',
+      typeAnswer: 'Type your answer here...',
+      useAiSuggestion: 'Use AI Suggestion',
+      enhancing: 'Enhancing...',
+      enhanceWithAi: 'Enhance with AI',
+      generateWithAi: 'Generate with AI',
+      skip: 'Skip',
+      aiSuggestion: 'AI Suggestion',
+      relatedTo: 'Related to:',
+      progress: '{{answered}} of {{total}} questions answered',
+      completeRequired: 'Complete required questions to continue',
+      generateTailored: 'Generate Tailored Resume',
+    },
+
+    // ReviewChanges component
+    review: {
+      tailoring: 'Tailoring Your Resume...',
+      tailoringDesc: 'Our AI is optimizing your resume for this specific job posting',
+      progress: {
+        analyzing: 'Analyzing job requirements',
+        optimizing: 'Optimizing content for ATS',
+        keywords: 'Enhancing keywords',
+        grammar: 'Checking grammar',
+      },
+      noResults: 'No tailoring results available. Please go back and try again.',
+      title: 'Review Changes',
+      subtitle: "See how we've optimized your resume for this position",
+      before: 'Before',
+      after: 'After',
+      atsScore: 'ATS Score',
+      pointsImproved: 'Points improved',
+      changesMade: 'Changes Made',
+      keywordsAdded: 'Keywords Added',
+      grammarFixes: 'Grammar Fixes',
+      matchScore: 'Match Score',
+      detailedChanges: 'Detailed Changes',
+      hideDiff: 'Hide Diff',
+      showDiff: 'Show Diff',
+      original: 'Original',
+      tailored: 'Tailored',
+      keywordsOptimized: 'Keywords Optimized for ATS',
+      grammarImprovements: 'Grammar & Style Improvements',
+      saveTailoredResume: 'Save Tailored Resume',
+      changeTypes: {
+        added: 'added',
+        modified: 'modified',
+        enhanced: 'enhanced',
+      },
+    },
+
+    // SaveTailored component
+    save: {
+      successTitle: 'Resume Tailored Successfully!',
+      successDesc: 'Your resume has been optimized for the {{jobTitle}} position at {{companyName}}',
+      viewResume: 'View Resume',
+      dashboard: 'Dashboard',
+      tailorAnother: 'Tailor for Another Job',
+      tip: '💡 Tip: Download your tailored resume and apply directly to the job posting!',
+      title: 'Save Your Tailored Resume',
+      subtitle: 'Give your tailored resume a name and save it to your account',
+      resumeTitle: 'Resume Title',
+      resumeTitlePlaceholder: 'e.g., Senior Developer - TechCorp',
+      resumeTitleHint: 'This will help you identify this resume in your dashboard',
+      tailoredFor: 'Tailored for:',
+      position: 'Position',
+      improvementsMade: 'Improvements Made',
+      atsScoreBoost: 'ATS Score Boost',
+      optimizations: 'Optimizations',
+      keywordsAddedLabel: 'Keywords Added',
+      grammarFixesLabel: 'Grammar Fixes',
+      saving: 'Saving...',
+      saveResume: 'Save Resume',
+      tailoredBadge: 'Tailored',
+    },
+
+    // JobApplicationsList component (Dashboard)
+    dashboard: {
+      title: 'Job Applications',
+      subtitle: 'Tailored resumes for specific job postings',
+      tailoredCount: '{{count}} tailored resume',
+      tailoredCountPlural: '{{count}} tailored resumes',
+      new: 'New',
+      upgrade: 'Upgrade',
+      createFirst: 'Create Resume First',
+      createFirstDesc: 'Create and generate a resume first, then you can tailor it for specific job postings.',
+      increaseChances: 'Increase your chances of getting interviews!',
+      increaseChancesDesc: 'Tailor your resume for a specific job to improve ATS scores and keyword matching.',
+      tailorForJob: 'Tailor Resume for a Job',
+      upgradeForMore: 'Upgrade for More Tailored Resumes',
+      features: {
+        atsScores: 'Higher ATS scores',
+        keywords: 'Keyword optimization',
+        grammar: 'Grammar checked',
+      },
+      from: 'From:',
+      view: 'View',
+      edit: 'Edit',
+      delete: 'Delete',
+      deleteModal: {
+        title: 'Delete Tailored Resume',
+        description: 'Are you sure you want to delete this tailored resume? This action cannot be undone.',
+        deleting: 'Deleting...',
+      },
     },
   },
 };

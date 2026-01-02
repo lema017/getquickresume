@@ -31,8 +31,8 @@ export function AchievementsSection({ achievements }: AchievementsSectionProps) 
               {achievement.description && (
                 <p className="text-sm text-gray-600 mt-1">{achievement.description}</p>
               )}
-              {achievement.date && (
-                <p className="text-sm text-gray-500 mt-1">{achievement.date}</p>
+              {achievement.year && (
+                <p className="text-sm text-gray-500 mt-1">{achievement.year}</p>
               )}
             </div>
           </div>

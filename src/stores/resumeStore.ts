@@ -882,9 +882,9 @@ export const useResumeStore = create<ResumeStore>((set, get) => ({
           
           case 'achievement':
           case 'achievements':
-            // Achievements are typically part of experience entries
-            // Intelligent parsing: handle both newline-separated and sentence-separated formats
-            if (updatedResume.experience && updatedResume.experience.length > 0) {
+            // Update the STANDALONE achievements array (generatedResume.achievements)
+            // This is what the scoring verifier checks, not experience[].achievements
+            {
               let achievements: string[] = [];
               
               // First, try splitting by newlines (preferred format)
@@ -930,17 +930,8 @@ export const useResumeStore = create<ResumeStore>((set, get) => ({
                 achievements = [];
               }
               
-              // Validate: if original had multiple achievements, try to preserve that structure
-              const originalAchievements = updatedResume.experience[0]?.achievements || [];
-              if (originalAchievements.length > 1 && achievements.length === 1) {
-                // Original had multiple but we got one - log warning but use what we have
-                console.warn('Achievements were combined into single item during enhancement. Original had', originalAchievements.length, 'items, enhanced has', achievements.length);
-              }
-              
-              updatedResume.experience[0] = {
-                ...updatedResume.experience[0],
-                achievements: achievements
-              };
+              // Update the standalone achievements array (this is what the verifier checks)
+              updatedResume.achievements = achievements;
             }
             break;
           

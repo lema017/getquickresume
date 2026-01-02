@@ -77,6 +77,10 @@ class SuggestionService {
         }
         catch (error) {
             console.error('Error generating and saving bilingual suggestions:', error);
+            // Propagate INVALID_PROFESSION error without wrapping
+            if (error?.code === 'INVALID_PROFESSION') {
+                throw error;
+            }
             throw new Error('Failed to generate bilingual suggestions');
         }
     }
@@ -226,6 +230,10 @@ class SuggestionService {
         }
         catch (error) {
             console.error('Error getting suggestions:', error);
+            // Propagate INVALID_PROFESSION error with its code
+            if (error?.code === 'INVALID_PROFESSION') {
+                throw error;
+            }
             throw new Error('Failed to get suggestions');
         }
     }

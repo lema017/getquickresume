@@ -26,6 +26,9 @@ export const es = {
     closeTips: 'Cerrar tips',
     preview: 'Ver',
     view: 'Ver',
+    show: 'Mostrar',
+    hide: 'Ocultar',
+    refresh: 'Actualizar',
   },
 
   // Navigation
@@ -47,117 +50,214 @@ export const es = {
   // Landing Page
   landing: {
     hero: {
-      title: 'Crea tu CV Profesional con IA',
-      subtitle: 'Creación de CV Gratis',
-      description: 'Accede a funcionalidades profesionales de IA para crear un CV que destaque.',
-      badge: '✨ Prueba Gratis',
-      ctaPrimary: 'Comenzar Gratis',
-      ctaSecondary: 'Explorar Funcionalidades',
+      title: 'Crea CVs Profesionales con IA',
+      subtitle: 'Gratis. Rápido. Optimizado para ATS.',
+      description: 'Crea CVs ganadores en minutos — sin tarjeta de crédito.',
+      badge: '🚀 Comienza Gratis Hoy',
+      ctaPrimary: 'Crear CV Gratis',
+      ctaSecondary: 'Ver Funciones',
       trustIndicators: {
-        noCardRequired: 'Sin tarjeta requerida',
-        dataSecure: 'Datos seguros',
+        noCardRequired: 'Sin tarjeta',
+        freeForever: '1 CV Gratis',
+        aiPowered: 'Con IA',
       },
-    },
-    benefits: {
-      title: 'Todo lo que Necesitas para Destacar',
-      subtitle: 'Herramientas profesionales al alcance de un clic',
-      items: [
-        {
-          icon: 'gift',
-          title: '1 CV Gratis para Empezar',
-          description: 'Crea tu primer CV profesional completamente gratis, sin tarjeta de crédito',
-        },
-        {
-          icon: 'brain',
-          title: 'IA Avanzada Profesional',
-          description: 'Optimización inteligente y generación de contenido con tecnología de última generación',
-        },
-        {
-          icon: 'sparkles',
-          title: 'Plantillas Premium',
-          description: 'Diseños profesionales creados por expertos en reclutamiento',
-        },
-        {
-          icon: 'chart-bar',
-          title: 'Analíticas Profesionales',
-          description: 'Descubre quién ve tu CV y optimiza tu estrategia',
-        },
-        {
-          icon: 'shield-check',
-          title: 'Privacidad y Seguridad',
-          description: 'Tus datos protegidos con los más altos estándares',
-        },
-        {
-          icon: 'zap',
-          title: 'Generación Inteligente de Contenido',
-          description: 'Crea descripciones profesionales y optimizadas automáticamente con IA',
-        },
+      animatedFeatures: [
+        { icon: 'brain', text: 'Creador con IA' },
+        { icon: 'file-text', text: 'Cartas de Presentación' },
+        { icon: 'target', text: 'Adaptación para Empleos' },
+        { icon: 'bar-chart', text: 'Optimización ATS' },
+        { icon: 'globe', text: 'Multi-idioma' },
+        { icon: 'qr-code', text: 'Compartir con QR' },
       ],
     },
-    premiumFeatures: {
-      title: 'Funcionalidades Premium',
-      subtitle: 'Desbloquea todo tu potencial profesional',
-      viewPricing: 'Ver Planes y Precios →',
-      features: [
+    socialProof: {
+      title: 'Confianza de Profesionales en Todo el Mundo',
+      stats: {
+        resumesCreated: {
+          value: '10,000+',
+          label: 'CVs Creados',
+        },
+        languages: {
+          value: '10+',
+          label: 'Idiomas Soportados',
+        },
+        atsScore: {
+          value: '95%',
+          label: 'Puntuación ATS Promedio',
+        },
+        satisfaction: {
+          value: '4.9/5',
+          label: 'Satisfacción de Usuarios',
+        },
+      },
+    },
+    coreFeatures: {
+      title: 'Todo lo que Necesitas para Conseguir Tu Trabajo Ideal',
+      subtitle: 'Herramientas de IA potentes diseñadas para darte ventaja competitiva',
+      items: [
         {
           icon: 'brain',
-          title: 'Mejora con IA',
-          description: 'Optimización inteligente de secciones y contenido profesional',
-          badge: 'Premium',
+          title: 'Creador de CV con IA',
+          description: 'Crea CVs profesionales con sugerencias inteligentes de contenido y formato automático',
+          highlight: 'Gratis',
         },
         {
-          icon: 'award',
-          title: 'Puntuación y Análisis IA',
-          description: 'Análisis detallado y sugerencias de mejora con puntuación por sección',
-          badge: 'Premium',
+          icon: 'file-text',
+          title: 'Generador de Cartas de Presentación',
+          description: 'Genera cartas personalizadas que complementan tu CV y la oferta de trabajo',
+          highlight: 'IA',
+        },
+        {
+          icon: 'target',
+          title: 'Adaptación para Empleos',
+          description: 'Personaliza tu CV para cada solicitud con recomendaciones potenciadas por IA',
+          highlight: 'Nuevo',
+        },
+        {
+          icon: 'bar-chart',
+          title: 'Optimización y Puntuación ATS',
+          description: 'Supera los sistemas de seguimiento con formato optimizado y palabras clave estratégicas',
+          highlight: 'Premium',
+        },
+        {
+          icon: 'spell-check',
+          title: 'Revisión Gramatical y de Estilo',
+          description: 'Elimina errores con revisión gramatical avanzada y sugerencias de tono profesional',
+          highlight: 'IA',
         },
         {
           icon: 'globe',
           title: 'Traducción Multi-idioma',
-          description: 'Traduce tu CV a los 10 idiomas más usados del mundo',
-          badge: 'Premium',
+          description: 'Traduce tu CV a más de 10 idiomas con precisión profesional',
+          highlight: 'Premium',
         },
         {
-          icon: 'share-2',
-          title: 'Compartir con QR',
-          description: 'Comparte tu CV con código QR y analiza quién lo ve',
-          badge: 'Premium',
+          icon: 'qr-code',
+          title: 'Compartir con Código QR',
+          description: 'Comparte tu CV instantáneamente con códigos QR escaneables para eventos de networking',
+          highlight: 'Premium',
         },
         {
-          icon: 'bar-chart-2',
-          title: 'Analíticas Avanzadas',
-          description: 'Estadísticas de visualización, dispositivos y ubicaciones',
-          badge: 'Premium',
-        },
-        {
-          icon: 'target',
-          title: 'Optimización ATS',
-          description: 'Optimiza tu CV para sistemas de seguimiento de candidatos (ATS)',
-          badge: 'Premium',
+          icon: 'line-chart',
+          title: 'Analíticas del CV',
+          description: 'Rastrea quién ve tu CV con analíticas detalladas de dispositivos y ubicaciones',
+          highlight: 'Premium',
         },
       ],
     },
+    featureShowcase: {
+      title: 'Descubre Nuestras Funciones en Acción',
+      subtitle: 'Herramientas poderosas que te diferencian de otros candidatos',
+      tabs: {
+        jobTailoring: {
+          title: 'Adaptación para Empleos',
+          description: 'Pega cualquier oferta de trabajo y nuestra IA analizará automáticamente los requisitos, sugerirá mejoras y optimizará tu CV para que coincida perfectamente con la posición.',
+          benefits: [
+            'La IA analiza los requisitos instantáneamente',
+            'Obtén sugerencias de mejora personalizadas',
+            'Aumenta tu puntuación de coincidencia automáticamente',
+            'Ahorra tiempo en cada solicitud',
+          ],
+        },
+        coverLetter: {
+          title: 'Cartas de Presentación',
+          description: 'Genera cartas de presentación convincentes que complementan tu CV y hablan directamente de lo que buscan los empleadores.',
+          benefits: [
+            'Contenido personalizado para cada solicitud',
+            'Tono y formato profesional',
+            'Destaca tus calificaciones clave',
+            'Edita y regenera párrafos',
+          ],
+        },
+        atsScoring: {
+          title: 'Puntuación ATS',
+          description: 'Obtén una puntuación detallada que muestra qué tan bien funcionará tu CV con los Sistemas de Seguimiento de Candidatos usados por el 99% de las empresas Fortune 500.',
+          benefits: [
+            'Análisis sección por sección',
+            'Sugerencias de optimización de palabras clave',
+            'Verificación de compatibilidad de formato',
+            'Consejos de mejora instantáneos',
+          ],
+        },
+        translation: {
+          title: 'Traducción',
+          description: 'Expande tu búsqueda de empleo globalmente traduciendo tu CV a más de 10 idiomas manteniendo la calidad profesional.',
+          benefits: [
+            'Calidad de traducción profesional',
+            'Mantiene el formato original',
+            'Más de 10 idiomas soportados',
+            'Perfecto para empleos internacionales',
+          ],
+        },
+        qrSharing: {
+          title: 'Compartir con QR',
+          description: 'Comparte tu CV en eventos de networking, tarjetas de presentación o donde sea con un código QR escaneable que rastrea la interacción.',
+          benefits: [
+            'Compartir instantáneo en eventos',
+            'Rastrea quién ve tu CV',
+            'Analíticas de dispositivo y ubicación',
+            'Perfecto para networking',
+          ],
+        },
+      },
+    },
+    freeTier: {
+      title: 'Comienza 100% Gratis',
+      subtitle: 'Sin tarjeta de crédito — sin compromisos',
+      description: 'Crea tu primer CV profesional completamente gratis y consérvalo para siempre. Actualiza cuando quieras para desbloquear todas las funciones premium.',
+      badge: 'Gratis Para Siempre',
+      features: [
+        {
+          icon: 'check',
+          text: '1 CV Profesional',
+        },
+        {
+          icon: 'check',
+          text: 'Generación de Contenido con IA',
+        },
+        {
+          icon: 'check',
+          text: 'Plantillas Profesionales',
+        },
+        {
+          icon: 'check',
+          text: 'Descarga en PDF',
+        },
+        {
+          icon: 'check',
+          text: 'Revisión Gramatical',
+        },
+      ],
+      cta: 'Crear Mi CV Gratis',
+      upgradeHint: '¿Necesitas más? Actualiza a Premium para CVs ilimitados y todas las funciones',
+    },
     howItWorks: {
-      title: 'Cómo Funciona',
-      subtitle: 'Tres pasos para tu CV profesional',
+      title: 'Crea Tu CV Perfecto en 4 Simples Pasos',
+      subtitle: 'Desde el registro hasta las solicitudes de trabajo en minutos',
       steps: [
         {
           number: '01',
           title: 'Regístrate Gratis',
-          description: 'Crea tu cuenta en segundos con Google o email',
+          description: 'Crea tu cuenta instantáneamente con Google — sin tarjeta de crédito',
           icon: 'user-plus',
         },
         {
           number: '02',
-          title: 'Crea tu CV',
-          description: 'Wizard guiado con sugerencias inteligentes de IA',
+          title: 'Construye Tu CV',
+          description: 'Sigue nuestro asistente guiado con sugerencias de IA para cada sección',
           icon: 'edit-3',
         },
         {
           number: '03',
-          title: 'Desbloquea Premium',
-          description: 'Actualiza a Premium para CVs ilimitados y todas las funciones',
-          icon: 'zap',
+          title: 'Mejora y Optimiza',
+          description: 'Usa IA para mejorar contenido, revisar gramática y aumentar tu puntuación ATS',
+          icon: 'sparkles',
+        },
+        {
+          number: '04',
+          title: 'Comparte y Aplica',
+          description: 'Descarga, comparte vía QR o adapta para ofertas de trabajo específicas',
+          icon: 'share-2',
         },
       ],
     },
@@ -166,122 +266,171 @@ export const es = {
       items: [
         {
           question: '¿Es realmente gratis comenzar?',
-          answer: 'Sí, crear tu cuenta y generar tu primer CV es completamente gratis. Sin tarjeta de crédito requerida.',
+          answer: '¡Absolutamente! Crea tu cuenta y tu primer CV profesional completamente gratis. Sin tarjeta de crédito, sin límites de tiempo, sin costos ocultos.',
         },
         {
-          question: '¿Necesito tarjeta de crédito?',
-          answer: 'No. Puedes registrarte y crear tu primer CV gratis sin proporcionar información de pago.',
+          question: '¿Qué puedo hacer con el plan gratuito?',
+          answer: 'Con el plan gratuito obtienes 1 CV profesional con generación de contenido IA, revisión gramatical, plantillas profesionales y descarga en PDF. Tu CV gratis es tuyo para siempre.',
+        },
+        {
+          question: '¿Qué es la Adaptación para Empleos?',
+          answer: 'La Adaptación para Empleos es nuestra función de IA que analiza ofertas de trabajo y optimiza automáticamente tu CV para coincidir con los requisitos específicos, aumentando tus posibilidades de conseguir entrevistas.',
+        },
+        {
+          question: '¿Cómo funciona la Optimización ATS?',
+          answer: 'Nuestra optimización ATS (Sistema de Seguimiento de Candidatos) analiza el formato, palabras clave y estructura de tu CV para asegurar que pase los sistemas de filtrado automático usados por el 99% de las empresas.',
         },
         {
           question: '¿Qué incluye Premium?',
-          answer: 'Con Premium obtienes CVs ilimitados, traducción a múltiples idiomas, compartir con QR y analíticas, mejora con IA, puntuación avanzada, y edición ilimitada de tus CVs.',
+          answer: 'Premium desbloquea CVs ilimitados, generación de cartas de presentación, adaptación para empleos, traducción multi-idioma, compartir con QR y analíticas, mejora con IA y soporte prioritario.',
         },
         {
-          question: '¿Cómo funcionan los planes?',
-          answer: 'Ofrecemos planes mensuales y anuales. El plan gratuito incluye 1 CV de por vida. Premium incluye todas las funciones avanzadas. Ver página de precios para más detalles.',
+          question: '¿Puedo cancelar en cualquier momento?',
+          answer: '¡Sí! Puedes cancelar tu suscripción Premium cuando quieras. Tu acceso continúa hasta el final de tu período de facturación, y tus CVs permanecen accesibles.',
         },
       ],
-      viewPricingDetails: 'Ver detalles de precios y planes',
+      viewPricingDetails: 'Ver detalles completos de precios',
     },
     atsExplainer: {
-      title: '¿Qué es la Optimización ATS?',
-      subtitle: 'Aumenta tus posibilidades de pasar el primer filtro',
-      description: 'Los sistemas ATS (Applicant Tracking System) son software que usan las empresas para filtrar CVs automáticamente antes de que lleguen a los reclutadores humanos.',
+      title: 'Supera el ATS y Destaca',
+      subtitle: 'El 75% de los CVs son rechazados por ATS antes de que un humano los vea',
+      description: 'Los Sistemas de Seguimiento de Candidatos (ATS) son software usados por empresas para filtrar CVs antes de que lleguen a los reclutadores. Nuestra IA asegura que tu CV pase siempre.',
       benefits: [
         {
           icon: 'target',
-          title: 'Mayor Visibilidad',
-          description: 'Tu CV será detectado por los sistemas de filtrado automático'
+          title: 'Optimización de Palabras Clave',
+          description: 'La IA identifica y agrega palabras clave relevantes de las descripciones de trabajo'
         },
         {
           icon: 'check-circle',
-          title: 'Formato Compatible',
-          description: 'Estructura optimizada para lectura por máquinas'
+          title: 'Formato Compatible con ATS',
+          description: 'Estructura limpia que las máquinas pueden leer perfectamente'
         },
         {
-          icon: 'zap',
-          title: 'Keywords Estratégicas',
-          description: 'Palabras clave relevantes para tu industria'
+          icon: 'trending-up',
+          title: 'Seguimiento de Puntuación',
+          description: 'Ve tu puntuación ATS y mejórala con sugerencias específicas'
         }
       ],
-      cta: 'Optimizar Mi CV con ATS'
+      cta: 'Verificar Mi Puntuación ATS'
     },
     cta: {
-      title: 'Comienza Gratis Ahora',
-      subtitle: 'Crea tu CV profesional en minutos',
-      description: '1 CV gratis de por vida • Sin tarjeta requerida',
+      title: '¿Listo para Conseguir Tu Trabajo Ideal?',
+      subtitle: 'Únete a miles de profesionales que consiguieron empleo con GetQuickResume',
+      description: 'Comienza gratis hoy — sin tarjeta de crédito',
+      features: [
+        '1 CV Gratis Para Siempre',
+        'Contenido Potenciado por IA',
+        'Optimización ATS',
+        'Plantillas Profesionales',
+      ],
       ctaPrimary: 'Crear Mi CV Gratis',
-      ctaSecondary: 'Ver Planes →',
+      ctaSecondary: 'Comparar Planes',
     },
     testimonials: {
-      title: 'Lo Que Dicen Nuestros Usuarios',
-      subtitle: 'Miles de profesionales ya confían en nosotros',
+      title: 'Historias de Éxito de Usuarios Reales',
+      subtitle: 'Descubre cómo GetQuickResume ayudó a profesionales a conseguir su trabajo ideal',
       items: [
         {
           name: 'María González',
           role: 'Diseñadora UX Senior',
-          content: 'Las funcionalidades premium me ayudaron a destacar. La revisión con IA y las analíticas fueron clave para conseguir 3 entrevistas en una semana.',
+          company: 'Startup Tech',
+          content: '¡La función de Adaptación para Empleos es revolucionaria! Personalicé mi CV para 5 posiciones diferentes y conseguí entrevistas en 3 de ellas en una semana.',
           rating: 5,
+          result: '3 entrevistas en 1 semana',
         },
         {
           name: 'Carlos Rodríguez',
           role: 'Desarrollador Full Stack',
-          content: 'Actualicé a Premium y valió cada centavo. La optimización ATS y el compartir con QR me diferenciaron de otros candidatos.',
+          company: 'Fortune 500',
+          content: 'Mi puntuación ATS pasó del 62% al 94% después de usar las herramientas de optimización. Finalmente empecé a recibir llamadas después de meses de silencio.',
           rating: 5,
+          result: 'Puntuación ATS: 62% → 94%',
         },
         {
           name: 'Ana Martínez',
           role: 'Marketing Manager',
-          content: 'Los créditos premium me dieron acceso a herramientas que normalmente costarían mucho más. Mi CV ahora luce increíblemente profesional.',
+          company: 'Agencia',
+          content: 'Compartir con QR fue perfecto para un evento de networking. Tres reclutadores lo escanearon, y pude ver cuándo vieron mi CV. ¡Conseguí mi trabajo ideal!',
           rating: 5,
+          result: 'Contratada en 2 semanas',
+        },
+        {
+          name: 'David Chen',
+          role: 'Product Manager',
+          company: 'Empresa SaaS',
+          content: 'El generador de cartas de presentación me ahorró horas. Creó cartas personalizadas que realmente sonaban como yo. Recomiendo mucho el plan Premium.',
+          rating: 5,
+          result: 'Ahorró 10+ horas',
         },
       ],
     },
     plans: {
-      title: 'Elige Tu Plan',
-      subtitle: 'Planes flexibles para cada necesidad',
+      title: 'Precios Simples y Transparentes',
+      subtitle: 'Comienza gratis, actualiza cuando necesites más poder',
+      popularBadge: 'Más Popular',
       free: {
         name: 'Gratis',
         price: '$0',
-        period: 'de por vida',
+        period: 'para siempre',
+        description: 'Perfecto para comenzar',
         features: [
-          '1 CV gratis',
-          'Generación con IA',
-          'Plantillas básicas',
+          '1 CV Profesional',
+          'Generación de Contenido con IA',
+          'Revisión Gramatical',
+          'Plantillas Básicas',
           'Descarga en PDF',
-          'Soporte por email',
         ],
         cta: 'Comenzar Gratis',
       },
       monthly: {
-        name: 'Premium Mensual',
+        name: 'Premium',
         price: '$9.99',
         period: 'mes',
+        description: 'Para buscadores de empleo activos',
         features: [
-          'CVs ilimitados',
+          'CVs Ilimitados',
+          'Generador de Cartas de Presentación',
+          'Adaptación para Empleos',
+          'Puntuación y Análisis ATS',
+          'Traducción a 10+ Idiomas',
+          'Compartir con Código QR',
+          'Analíticas del CV',
           'Mejora con IA',
-          'Puntuación y análisis',
-          'Traducción a 10 idiomas',
-          'Compartir con QR',
-          'Analíticas avanzadas',
-          'Edición ilimitada',
-          'Plantillas premium',
+          'Plantillas Premium',
+          'Soporte Prioritario',
         ],
-        cta: 'Actualizar a Premium',
+        cta: 'Obtener Premium',
       },
       yearly: {
         name: 'Premium Anual',
         price: '$4.99',
         period: 'mes',
-        savings: 'Ahorra 50% • Facturado $59.88/año',
+        savings: 'Ahorra 50% — Facturado $59.88/año',
         badge: 'Mejor Valor',
+        description: 'Ideal para crecimiento profesional a largo plazo',
         features: [
           'Todo lo de Premium Mensual',
-          'Ahorro del 50%',
-          'Facturación anual',
-          'Soporte prioritario',
+          '50% de Ahorro',
+          'Facturación Anual',
+          'Soporte Prioritario',
         ],
-        cta: 'Actualizar a Premium',
+        cta: 'Obtener Premium Anual',
+      },
+      comparisonTitle: 'Comparar Planes',
+      comparisonFeatures: {
+        resumes: { name: 'CVs', free: '1', premium: 'Ilimitados' },
+        aiGeneration: { name: 'Generación IA', free: true, premium: true },
+        grammarCheck: { name: 'Revisión Gramatical', free: true, premium: true },
+        templates: { name: 'Plantillas', free: 'Básicas', premium: 'Todas Premium' },
+        pdfDownload: { name: 'Descarga PDF', free: true, premium: true },
+        coverLetters: { name: 'Cartas de Presentación', free: false, premium: true },
+        jobTailoring: { name: 'Adaptación para Empleos', free: false, premium: true },
+        atsScoring: { name: 'Puntuación ATS', free: false, premium: true },
+        translation: { name: 'Traducción', free: false, premium: '10+ Idiomas' },
+        qrSharing: { name: 'Compartir con QR', free: false, premium: true },
+        analytics: { name: 'Analíticas', free: false, premium: true },
+        support: { name: 'Soporte', free: 'Email', premium: 'Prioritario' },
       },
     },
   },
@@ -405,7 +554,189 @@ export const es = {
         invalidType: 'Por favor, selecciona un archivo PDF, DOC, DOCX o TXT',
         tooLarge: 'El archivo es demasiado grande. Máximo 10MB',
         processed: '¡CV procesado exitosamente!',
-        processError: 'Error al procesar el archivo. Inténtalo de nuevo.'
+        processError: 'Error al procesar el archivo. Inténtalo de nuevo.',
+        resumeCreated: '¡Currículum creado exitosamente!'
+      },
+      // New upload flow with client-side extraction
+      dragDrop: {
+        title: 'Arrastra y suelta tu CV aquí',
+        or: 'o',
+        browse: 'Explorar archivos',
+        hint: 'Soportados: PDF, Word (.docx), Texto plano (.txt)',
+        fileSelected: 'Archivo seleccionado',
+        changeFile: 'Cambiar archivo'
+      },
+      extraction: {
+        extractingText: 'Extrayendo texto del documento...',
+        analyzingContent: 'Analizando contenido con IA...',
+        extractionFailed: 'No se pudo extraer texto del documento. Por favor, intenta con otro archivo.',
+        notResume: 'El documento subido no parece ser un currículum. Por favor, sube un archivo que contenga tu información de CV.',
+        textPreview: 'Vista previa del texto extraído',
+        showMore: 'Mostrar más',
+        showLess: 'Mostrar menos',
+        characters: '{{count}} caracteres extraídos'
+      },
+      freeUserNotice: {
+        title: 'Uso de CV Gratuito',
+        message: 'Crear un CV desde esta carga usará tu CV gratuito.',
+        upgradeHint: 'Actualiza a Premium para creación ilimitada de CVs.'
+      },
+      quotaExceeded: {
+        title: 'CV Gratuito Ya Usado',
+        message: 'Ya has usado tu CV gratuito. Actualiza a Premium para continuar.',
+        upgradeButton: 'Actualizar a Premium'
+      },
+      review: {
+        title: 'Revisar Datos Extraídos',
+        subtitle: 'Verifica y edita la información extraída de tu CV antes de crear tu currículum.',
+        sections: {
+          profile: 'Información del Perfil',
+          skills: 'Habilidades',
+          experience: 'Experiencia Laboral',
+          education: 'Educación',
+          certifications: 'Certificaciones',
+          projects: 'Proyectos',
+          languages: 'Idiomas',
+          achievements: 'Logros',
+          summary: 'Resumen Profesional'
+        },
+        required: 'Requerido',
+        optional: 'Opcional',
+        recommended: 'Recomendado',
+        addNew: 'Agregar nuevo',
+        removeItem: 'Eliminar',
+        noItems: 'No se encontraron elementos',
+        addButton: 'Agregar {{item}}',
+        validation: {
+          requiredFields: 'Por favor, completa todos los campos requeridos',
+          fixErrors: 'Por favor, corrige los errores a continuación'
+        },
+        actions: {
+          back: 'Atrás',
+          createResume: 'Crear Currículum'
+        },
+        creating: 'Creando tu currículum...',
+        success: '¡Currículum creado exitosamente!',
+        ai: {
+          enhance: 'Mejorar con IA',
+          enhancing: 'Mejorando...',
+          getSuggestions: 'Obtener Sugerencias IA',
+          loadingSuggestions: 'Cargando sugerencias...',
+          clickToAdd: 'Clic para agregar',
+          addAll: 'Agregar Todas',
+          enhanced: '¡Texto mejorado!',
+          error: 'Error al mejorar texto',
+          premiumRequired: 'Premium requerido para funciones IA'
+        },
+        fields: {
+          // Profile fields
+          firstName: 'Nombre',
+          lastName: 'Apellido',
+          email: 'Correo Electrónico',
+          phone: 'Teléfono',
+          profession: 'Profesión / Puesto',
+          country: 'País',
+          linkedin: 'URL de LinkedIn',
+          targetLevel: 'Nivel de Experiencia',
+          tone: 'Tono del CV',
+          // Experience fields
+          jobTitle: 'Puesto',
+          company: 'Empresa',
+          startDate: 'Fecha Inicio',
+          endDate: 'Fecha Fin',
+          currentJob: 'Trabajo actual',
+          responsibilities: 'Responsabilidades/Logros',
+          // Education fields
+          degree: 'Título',
+          field: 'Campo de Estudio',
+          institution: 'Institución',
+          isCompleted: 'Completado',
+          currentlyStudying: 'Actualmente estudiando aquí',
+          // Certification fields
+          certificationName: 'Nombre de Certificación',
+          issuer: 'Emisor',
+          certDate: 'Fecha de Obtención',
+          credentialId: 'ID de Credencial',
+          certUrl: 'URL de Credencial',
+          // Project fields
+          projectName: 'Nombre del Proyecto',
+          description: 'Descripción',
+          technologies: 'Tecnologías',
+          url: 'URL',
+          projectOngoing: 'Proyecto en curso',
+          // Language fields
+          languageName: 'Idioma',
+          languageLevel: 'Nivel de Dominio',
+          // Achievement fields
+          achievementTitle: 'Título del Logro',
+          year: 'Año',
+          // Summary field
+          summaryText: 'Resumen Profesional',
+          summaryPlaceholder: 'Escribe un breve resumen profesional destacando tus fortalezas clave, experiencia y objetivos profesionales...'
+        },
+        targetLevelOptions: {
+          entry: 'Nivel Inicial (0-2 años)',
+          mid: 'Nivel Medio (3-5 años)',
+          senior: 'Senior (6-10 años)',
+          executive: 'Ejecutivo (10+ años)'
+        },
+        toneOptions: {
+          professional: 'Profesional',
+          creative: 'Creativo',
+          technical: 'Técnico',
+          friendly: 'Amigable'
+        },
+        languageLevelOptions: {
+          basic: 'Básico',
+          intermediate: 'Intermedio',
+          advanced: 'Avanzado',
+          native: 'Nativo'
+        }
+      },
+      scorePage: {
+        title: 'Análisis de CV Completado',
+        subtitle: 'Revisa tu puntuación ATS y recomendaciones para mejorar tu CV.',
+        backToDashboard: 'Volver al Dashboard',
+        overallScore: 'Puntuación General',
+        quickStats: {
+          title: 'Estadísticas Rápidas',
+          skills: 'Habilidades',
+          experience: 'Experiencia',
+          education: 'Educación',
+          certifications: 'Certificaciones',
+          projects: 'Proyectos',
+          achievements: 'Logros',
+          languages: 'Idiomas',
+          completeness: 'Completitud'
+        },
+        sectionAnalysis: {
+          title: 'Análisis por Sección',
+          enhance: 'Mejorar',
+          excellent: 'Excelente',
+          good: 'Bueno',
+          needsWork: 'Necesita Mejoras',
+          recommendations: 'Recomendaciones'
+        },
+        atsTips: {
+          title: 'Consejos ATS y Mejores Prácticas',
+          description: 'Sigue estas pautas para asegurar que tu CV pase los filtros ATS'
+        },
+        actions: {
+          continueToDashboard: 'Continuar al Dashboard',
+          openEditor: 'Abrir Editor de CV',
+          enhanceAll: 'Mejorar Todas las Secciones'
+        },
+        status: {
+          excellent: '¡Excelente! Tu CV es altamente competitivo',
+          good: '¡Bien! Listo para la mayoría de aplicaciones',
+          average: 'Promedio. Se recomiendan algunas mejoras',
+          needsWork: 'Necesita trabajo. Sigue las recomendaciones'
+        },
+        premium: {
+          enhanceTitle: 'Mejorar con IA',
+          enhanceDescription: 'Usa IA para mejorar automáticamente esta sección',
+          upgradeRequired: 'Premium requerido para mejoras con IA'
+        }
       }
     },
     linkedinImportPage: {
@@ -643,7 +974,6 @@ export const es = {
       },
       upload: {
         title: 'Subir CV Actual',
-        comingSoon: 'Próximamente',
         description: 'Sube tu CV actual y nosotros lo optimizaremos con IA. Extraeremos la información y la mejoraremos automáticamente.',
         features: {
           dataExtraction: 'Extracción automática de datos',
@@ -651,8 +981,9 @@ export const es = {
           multiFormat: 'Múltiples formatos soportados',
           editing: 'Edición posterior disponible',
         },
-        cta: 'Subir',
+        cta: 'Subir CV',
         timeEstimate: 'Tiempo estimado: 2–5 minutos',
+        freeNotice: 'Usa tu CV gratuito',
       },
       linkedin: {
         title: 'LinkedIn Public Profile',
@@ -773,6 +1104,9 @@ export const es = {
         motivator: '¡Excelente! Tus habilidades muestran tu potencial.',
         skillsLabel: 'Habilidades',
         addSkillPlaceholder: 'Agregar habilidad...',
+        errors: {
+          invalidProfession: 'Por favor ingresa una profesión válida en el paso anterior. La IA no puede generar sugerencias para texto inválido.',
+        },
       },
       experience: {
         title: 'Experiencia Laboral',
@@ -1082,6 +1416,8 @@ export const es = {
         tips: 'Sé breve y enfocado: 3-4 líneas máximo',
         motivator: '¡Tu resumen será la joya de tu currículum!',
         improveButton: 'Mejorar redacción',
+        enhanceWithAI: 'Mejorar con IA',
+        enhanceTooltip: 'Deja que la IA mejore tu texto para que sea más profesional e impactante',
       },
       review: {
         title: 'Revisión y Descarga',
@@ -1347,6 +1683,9 @@ export const es = {
         tooltip: 'Por favor, agrega al menos una experiencia con todos los campos requeridos (Posición, Empresa, Fecha de Inicio)',
         alertAdd: 'Por favor, agrega al menos una experiencia laboral para continuar.',
         alertComplete: 'Por favor, completa todos los campos requeridos (Posición, Empresa, Fecha de Inicio) para todas las experiencias.',
+        atLeastOne: 'Se requiere al menos una experiencia laboral',
+        incompleteFields: 'Por favor, completa todos los campos requeridos (Posición, Empresa, Fecha de Inicio) para todas las experiencias',
+        invalidDates: 'Todas las experiencias deben tener fechas válidas (la fecha de fin debe ser posterior a la fecha de inicio)',
       },
       projects: {
         optional: 'Opcional: Agrega proyectos para destacar tu trabajo',
@@ -1355,12 +1694,14 @@ export const es = {
         tooltip: 'Por favor, agrega al menos un proyecto con Nombre y Descripción para continuar',
         alertAdd: 'Por favor, agrega al menos un proyecto para continuar.',
         alertComplete: 'Por favor, completa todos los campos requeridos (Nombre, Descripción) para todos los proyectos.',
+        incomplete: 'Todos los proyectos deben tener Nombre y Descripción. Por favor, completa todos los campos o elimina los proyectos incompletos.',
       },
       achievements: {
         optional: 'Opcional: Agrega logros para destacar tus éxitos',
         requirement: 'Requerido: {{count}} logro{{plural}} (agrega al menos 1 con Título y Descripción)',
         requirementMet: '✓ {{count}} logro{{plural}} agregado{{plural}} (requisito mínimo cumplido)',
         tooltip: 'Por favor, agrega al menos un logro con Título y Descripción para continuar',
+        incomplete: 'Todos los logros deben tener Título y Descripción. Por favor, completa todos los campos o elimina los logros incompletos.',
       },
       summary: {
         requirement: 'Requerido: Resumen ({{current}}/50 caracteres), Descripción del Puesto ({{jobCurrent}}/30 caracteres)',
@@ -1601,9 +1942,90 @@ export const es = {
   // Account
   account: {
     title: 'Mi Cuenta',
-    profile: 'Perfil',
+    loading: 'Cargando cuenta...',
+    
+    // Profile Header
+    profile: {
+      title: 'Perfil',
+      memberSince: 'Miembro desde',
+      authProvider: 'Iniciaste sesión con',
+      premium: 'Premium',
+      free: 'Gratis',
+      notSpecified: 'No especificado',
+    },
+    
+    // Subscription Section
+    subscription: {
+      title: 'Suscripción',
+      currentPlan: 'Plan Actual',
+      free: 'Gratis',
+      premiumMonthly: 'Premium Mensual',
+      premiumYearly: 'Premium Anual',
+      renewsOn: 'Se renueva el',
+      expiresOn: 'Expira el',
+      startedOn: 'Iniciada el',
+      manageSubscription: 'Gestionar Suscripción',
+      upgradeToPremium: 'Actualizar a Premium',
+      upgradeDescription: 'Desbloquea CVs, cartas y adaptaciones ilimitadas',
+      cancelInfo: 'Puedes cancelar en cualquier momento desde el portal de suscripción',
+    },
+    
+    // Usage Statistics
+    usage: {
+      title: 'Estadísticas de Uso',
+      resumes: 'Currículums',
+      resumesDescription: 'CVs profesionales creados',
+      coverLetters: 'Cartas de Presentación',
+      coverLettersDescription: 'Cartas generadas con IA',
+      jobTailoring: 'Adaptación para Empleos',
+      jobTailoringDescription: 'CVs adaptados para empleos',
+      downloads: 'Descargas',
+      downloadsDescription: 'Total de descargas de CV',
+      unlimited: 'Ilimitado',
+      perMonth: '/mes',
+      lifetime: 'de por vida',
+      used: 'usado',
+      of: 'de',
+      freeLimit: '1 gratis',
+      premiumLimit: '40/mes',
+    },
+    
+    // Quick Actions
+    actions: {
+      title: 'Acciones Rápidas',
+      createResume: 'Crear CV',
+      createResumeDescription: 'Iniciar un nuevo CV profesional',
+      createCoverLetter: 'Carta de Presentación',
+      createCoverLetterDescription: 'Generar una carta con IA',
+      tailorForJob: 'Adaptar para Empleo',
+      tailorForJobDescription: 'Optimizar CV para un puesto',
+      changeLanguage: 'Idioma',
+      changeLanguageDescription: 'Cambiar entre inglés y español',
+      contactSupport: 'Soporte',
+      contactSupportDescription: 'Obtén ayuda de nuestro equipo',
+      viewDashboard: 'Panel',
+      viewDashboardDescription: 'Ver todos tus CVs',
+    },
+    
+    // Account Details
+    details: {
+      title: 'Detalles de la Cuenta',
+      email: 'Correo electrónico',
+      provider: 'Proveedor de inicio de sesión',
+      accountId: 'ID de cuenta',
+      memberSince: 'Miembro desde',
+    },
+    
+    // Danger Zone
+    dangerZone: {
+      title: 'Cuenta',
+      signOut: 'Cerrar Sesión',
+      signOutConfirm: '¿Estás seguro de que quieres cerrar sesión?',
+      signOutDescription: 'Necesitarás iniciar sesión de nuevo para acceder a tus CVs',
+    },
+    
+    // Legacy keys for backward compatibility
     tokens: 'Tokens',
-    downloads: 'Descargas',
     settings: 'Configuración',
     language: 'Idioma',
     logout: 'Cerrar sesión',
@@ -1984,6 +2406,8 @@ export const es = {
     minItems: 'Debe tener al menos {{count}} elemento{{count, plural, one {} other {s}}',
     allItemsComplete: 'Todos los elementos deben estar completos',
     invalidCharacters: 'contiene caracteres no permitidos. Solo se permiten letras, números y símbolos básicos (. , - + ( ) / @ < > =)',
+    professionTooShort: 'La profesión debe tener al menos 3 caracteres',
+    professionInvalid: 'Por favor ingresa una profesión o puesto de trabajo válido',
     profile: {
       firstName: 'Nombre es requerido',
       lastName: 'Apellido es requerido',
@@ -2076,6 +2500,9 @@ export const es = {
       download: 'Descargar',
       delete: 'Eliminar',
       viewResume: 'Ver CV',
+      tailorForJob: 'Adaptar para Empleo',
+      viewAnalytics: 'Ver Analíticas',
+      shareAndTrack: 'Compartir y Rastrear',
     },
     info: {
       title: 'Información del CV',
@@ -2111,6 +2538,8 @@ export const es = {
       edit: 'Editar CV',
       translate: 'Traducir',
       share: 'Compartir',
+      analytics: 'Analíticas',
+      shareAndAnalytics: 'Compartir y Analíticas',
       download: 'Descargar PDF',
       login: 'Iniciar Sesión',
       viewCertificate: 'Ver Certificado',
@@ -2248,6 +2677,9 @@ export const es = {
       enableFailed: 'Error al habilitar compartir',
       disableFailed: 'Error al deshabilitar compartir',
       copyFailed: 'Error al copiar enlace',
+      loadFailed: 'Error al cargar el CV',
+      notFound: 'CV no encontrado',
+      toggleFailed: 'Error al cambiar el estado de compartir',
     },
     analytics: {
       title: 'Analíticas',
@@ -2260,6 +2692,94 @@ export const es = {
       browsers: 'Navegadores',
       locations: 'Ubicaciones',
       viewsOverTime: 'Vistas en el Tiempo',
+    },
+  },
+  resumeShare: {
+    pageTitle: 'Compartir y Analíticas',
+    backToResume: 'Volver al CV',
+    sharingActive: 'Compartir Activo',
+    enabled: 'Compartir habilitado exitosamente',
+    disabled: 'Compartir deshabilitado exitosamente',
+    linkCopied: 'Enlace copiado al portapapeles',
+    errors: {
+      loadFailed: 'Error al cargar los datos del CV',
+      notFound: 'CV no encontrado',
+      toggleFailed: 'Error al cambiar el estado de compartir',
+      copyFailed: 'Error al copiar enlace',
+    },
+    premium: {
+      title: 'Desbloquea Compartir CV',
+      description: 'Comparte tu CV profesional con reclutadores y rastrea quién lo ve con analíticas potentes. Obtén información sobre ubicaciones, dispositivos y engagement de los visitantes.',
+      upgradeButton: 'Actualizar a Premium',
+      feature1: {
+        title: 'Comparte en Cualquier Lugar',
+        description: 'Genera un enlace único y código QR para compartir tu CV al instante',
+      },
+      feature2: {
+        title: 'Rastrea Vistas',
+        description: 'Ve quién vio tu CV, cuándo y por cuánto tiempo',
+      },
+      feature3: {
+        title: 'Analíticas Detalladas',
+        description: 'Obtén información sobre ubicaciones, dispositivos y tendencias de engagement',
+      },
+    },
+    controls: {
+      title: 'Controles de Compartir',
+      subtitle: 'Gestiona cómo se comparte tu CV',
+    },
+    status: {
+      active: 'Compartir Activo',
+      inactive: 'Compartir Inactivo',
+      activeDescription: 'Tu CV es accesible públicamente',
+      inactiveDescription: 'Habilita para compartir tu CV',
+    },
+    shareLink: 'Enlace de Compartir',
+    shareButton: 'Compartir CV',
+    shareVia: 'Compartir en redes sociales',
+    socialText: '¡Mira mi CV profesional!',
+    emailSubject: 'Mi CV Profesional',
+    qrCode: {
+      title: 'Código QR',
+      description: 'Escanea para ver el CV en móvil',
+    },
+    enableToSeeAnalytics: {
+      title: 'Habilita Compartir para Ver Analíticas',
+      description: 'Activa compartir para comenzar a rastrear quién ve tu CV y obtener analíticas detalladas.',
+    },
+    stats: {
+      totalViews: 'Vistas Totales',
+      uniqueVisitors: 'Visitantes Únicos',
+      thisWeek: 'Esta Semana',
+    },
+    viewers: {
+      title: 'Visitantes Recientes',
+      subtitle: 'Actividad anónima de visitantes',
+      viewAll: 'Ver los {{count}} visitantes',
+      noViewers: {
+        title: 'Sin Visitantes Aún',
+        description: 'Comparte el enlace de tu CV para comenzar a rastrear vistas',
+      },
+      rateLimitError: 'Demasiadas solicitudes. Por favor, inténtalo de nuevo en un momento.',
+    },
+    charts: {
+      title: 'Analíticas de Engagement',
+      subtitle: 'Rastrea el rendimiento de tu CV',
+      viewsOverTime: 'Vistas en el Tiempo',
+      deviceBreakdown: 'Distribución por Dispositivo',
+      desktop: 'Escritorio',
+      mobile: 'Móvil',
+      tablet: 'Tablet',
+      noData: 'Sin datos disponibles',
+    },
+    geoMap: {
+      title: 'Distribución Geográfica',
+      subtitle: 'Ve dónde están ubicados tus visitantes',
+      topCountries: 'Principales Países',
+      noData: {
+        title: 'Sin Datos de Ubicación',
+        description: 'Los datos de ubicación aparecerán cuando los visitantes vean tu CV',
+      },
     },
   },
   publicResume: {
@@ -2476,6 +2996,230 @@ export const es = {
       enhanceDescription: 'La mejora con IA transforma tu logro en una declaración profesional e impactante. ¡Actualiza a premium para acceso ilimitado!',
       regenerateDescription: 'Regenerar párrafos con IA es una función premium. ¡Actualiza para acceder a regeneraciones ilimitadas y más!',
       upgrade: 'Actualizar Ahora',
+    },
+  },
+
+  // Función de Personalización de CV
+  jobTailoring: {
+    // Strings a nivel de página
+    page: {
+      title: 'Personalización de CV',
+      subtitle: 'Optimiza tu CV para trabajos específicos',
+      back: 'Volver',
+    },
+
+    // Nombres de pasos
+    steps: {
+      jobDetails: 'Detalles del Trabajo',
+      analysis: 'Análisis',
+      questions: 'Preguntas',
+      review: 'Revisar',
+      save: 'Guardar',
+    },
+
+    // Componente JobInput
+    jobInput: {
+      title: 'Personaliza tu CV',
+      subtitle: 'Selecciona un CV y proporciona los detalles de la oferta de trabajo para comenzar',
+      selectResume: 'Seleccionar CV a Personalizar',
+      change: 'Cambiar',
+      loadingResumes: 'Cargando CVs...',
+      noResumes: 'No se encontraron CVs generados',
+      noResumesHint: 'Crea y genera un CV primero para usar esta función',
+      untitledResume: 'CV sin título',
+      jobPostingDetails: 'Detalles de la Oferta',
+      pasteDescription: 'Pegar Descripción',
+      enterUrl: 'Ingresar URL',
+      jobDescriptionLabel: 'Descripción del Trabajo',
+      jobDescriptionPlaceholder: 'Pega la descripción completa del trabajo aquí...\n\nIncluye:\n• Título del puesto y nombre de la empresa\n• Habilidades y requisitos necesarios\n• Responsabilidades\n• Experiencia preferida',
+      characters: '{{count}} caracteres',
+      minCharacters: 'Por favor proporciona más detalles (mín 50 caracteres)',
+      tipsTitle: '💡 Consejos para mejores resultados:',
+      tips: {
+        complete: 'Incluye la descripción completa del trabajo, no solo el título',
+        skills: 'Asegúrate de incluir las habilidades y requisitos necesarios',
+        keywords: 'Incluye palabras clave que aparezcan múltiples veces en la oferta',
+      },
+      errors: {
+        selectResume: 'Por favor selecciona un CV para personalizar',
+        provideDescription: 'Por favor proporciona una descripción del trabajo',
+      },
+      analyzeJob: 'Analizar Trabajo',
+      updated: 'Actualizado {{date}}',
+    },
+
+    // Componente UrlValidator
+    urlValidator: {
+      placeholder: 'https://linkedin.com/jobs/view/...',
+      validating: 'Validando URL de la oferta...',
+      successReady: 'Oferta encontrada - ¡Lista para analizar!',
+      detected: 'Detectado:',
+      validateButton: 'Validar y Extraer Info',
+      supportedBoards: 'Portales de empleo soportados',
+      supportedBoardsDesc: 'Hemos optimizado la extracción para estos portales de empleo:',
+      otherUrlsNote: 'Otras URLs de ofertas también pueden funcionar, pero la calidad de extracción puede variar.',
+      or: 'o',
+      pasteManually: 'Pegar descripción manualmente',
+      pasteManuallyLink: 'Pega la descripción del trabajo manualmente',
+    },
+
+    // Componente JobPreviewCard
+    jobPreview: {
+      found: '¡Oferta de Trabajo Encontrada!',
+      reviewInfo: 'Revisa la información extraída a continuación',
+      jobTitle: 'Título del Puesto',
+      company: 'Empresa',
+      descriptionPreview: 'Vista Previa de la Descripción',
+      showLess: 'Mostrar menos',
+      showFull: 'Mostrar descripción completa',
+      notRight: '¿Esto no parece correcto?',
+      enterManually: 'Ingresar detalles manualmente',
+      editDetails: 'Editar Detalles',
+      confirmContinue: 'Confirmar y Continuar',
+    },
+
+    // Componente JobAnalysis
+    analysis: {
+      analyzing: 'Analizando Oferta de Trabajo...',
+      analyzingDesc: 'Estamos extrayendo los requisitos clave y comparándolos con tu CV',
+      noData: 'No hay datos de análisis disponibles. Por favor regresa e intenta de nuevo.',
+      goBack: '← Regresar',
+      title: 'Análisis Completado',
+      subtitle: 'Revisa la información extraída y el puntaje de coincidencia',
+      jobDetails: 'Detalles del Trabajo',
+      edit: 'Editar',
+      cancel: 'Cancelar',
+      save: 'Guardar',
+      jobTitleLabel: 'Título del Puesto',
+      companyLabel: 'Empresa',
+      locationLabel: 'Ubicación',
+      notSpecified: 'No especificado',
+      keywordsDetected: 'Palabras Clave Detectadas',
+      keyRequirements: 'Requisitos Clave',
+      currentMatchScore: 'Puntaje de Coincidencia Actual',
+      canBeImproved: 'Puede mejorarse con personalización',
+      matchingSkills: 'Habilidades Coincidentes',
+      skillsToHighlight: 'Habilidades a Destacar',
+      aiSuggestions: 'Sugerencias de IA',
+      continueToQuestions: 'Continuar a Preguntas',
+    },
+
+    // Componente ClarificationQuestions
+    questions: {
+      generating: 'Generando Preguntas...',
+      generatingDesc: 'Nuestra IA está creando preguntas personalizadas basadas en los requisitos del trabajo',
+      title: 'Aclaraciones Rápidas',
+      subtitle: 'Ayúdanos a personalizar tu CV respondiendo algunas preguntas sobre tu experiencia',
+      tipsTitle: 'Consejos para mejores resultados:',
+      tips: {
+        specific: 'Sé específico e incluye números cuando sea posible',
+        enhance: 'Usa el botón "Mejorar con IA" para mejorar tus respuestas',
+        skip: 'Puedes omitir preguntas opcionales si no son relevantes',
+      },
+      required: 'Requerido',
+      selectOption: 'Selecciona una opción...',
+      typeAnswer: 'Escribe tu respuesta aquí...',
+      useAiSuggestion: 'Usar Sugerencia IA',
+      enhancing: 'Mejorando...',
+      enhanceWithAi: 'Mejorar con IA',
+      generateWithAi: 'Generar con IA',
+      skip: 'Omitir',
+      aiSuggestion: 'Sugerencia IA',
+      relatedTo: 'Relacionado con:',
+      progress: '{{answered}} de {{total}} preguntas respondidas',
+      completeRequired: 'Completa las preguntas requeridas para continuar',
+      generateTailored: 'Generar CV Personalizado',
+    },
+
+    // Componente ReviewChanges
+    review: {
+      tailoring: 'Personalizando tu CV...',
+      tailoringDesc: 'Nuestra IA está optimizando tu CV para esta oferta específica',
+      progress: {
+        analyzing: 'Analizando requisitos del trabajo',
+        optimizing: 'Optimizando contenido para ATS',
+        keywords: 'Mejorando palabras clave',
+        grammar: 'Verificando gramática',
+      },
+      noResults: 'No hay resultados de personalización disponibles. Por favor regresa e intenta de nuevo.',
+      title: 'Revisar Cambios',
+      subtitle: 'Mira cómo hemos optimizado tu CV para este puesto',
+      before: 'Antes',
+      after: 'Después',
+      atsScore: 'Puntaje ATS',
+      pointsImproved: 'Puntos mejorados',
+      changesMade: 'Cambios Realizados',
+      keywordsAdded: 'Palabras Clave Añadidas',
+      grammarFixes: 'Correcciones de Gramática',
+      matchScore: 'Puntaje de Coincidencia',
+      detailedChanges: 'Cambios Detallados',
+      hideDiff: 'Ocultar Diferencias',
+      showDiff: 'Mostrar Diferencias',
+      original: 'Original',
+      tailored: 'Personalizado',
+      keywordsOptimized: 'Palabras Clave Optimizadas para ATS',
+      grammarImprovements: 'Mejoras de Gramática y Estilo',
+      saveTailoredResume: 'Guardar CV Personalizado',
+      changeTypes: {
+        added: 'añadido',
+        modified: 'modificado',
+        enhanced: 'mejorado',
+      },
+    },
+
+    // Componente SaveTailored
+    save: {
+      successTitle: '¡CV Personalizado Exitosamente!',
+      successDesc: 'Tu CV ha sido optimizado para el puesto de {{jobTitle}} en {{companyName}}',
+      viewResume: 'Ver CV',
+      dashboard: 'Panel',
+      tailorAnother: 'Personalizar para Otro Trabajo',
+      tip: '💡 Consejo: ¡Descarga tu CV personalizado y aplica directamente a la oferta!',
+      title: 'Guarda tu CV Personalizado',
+      subtitle: 'Dale un nombre a tu CV personalizado y guárdalo en tu cuenta',
+      resumeTitle: 'Título del CV',
+      resumeTitlePlaceholder: 'ej., Desarrollador Senior - TechCorp',
+      resumeTitleHint: 'Esto te ayudará a identificar este CV en tu panel',
+      tailoredFor: 'Personalizado para:',
+      position: 'Puesto',
+      improvementsMade: 'Mejoras Realizadas',
+      atsScoreBoost: 'Mejora de Puntaje ATS',
+      optimizations: 'Optimizaciones',
+      keywordsAddedLabel: 'Palabras Clave Añadidas',
+      grammarFixesLabel: 'Correcciones de Gramática',
+      saving: 'Guardando...',
+      saveResume: 'Guardar CV',
+      tailoredBadge: 'Personalizado',
+    },
+
+    // Componente JobApplicationsList (Panel)
+    dashboard: {
+      title: 'Aplicaciones de Trabajo',
+      subtitle: 'CVs personalizados para ofertas específicas',
+      tailoredCount: '{{count}} CV personalizado',
+      tailoredCountPlural: '{{count}} CVs personalizados',
+      new: 'Nuevo',
+      upgrade: 'Actualizar',
+      createFirst: 'Crear CV Primero',
+      createFirstDesc: 'Crea y genera un CV primero, luego podrás personalizarlo para ofertas específicas.',
+      increaseChances: '¡Aumenta tus posibilidades de conseguir entrevistas!',
+      increaseChancesDesc: 'Personaliza tu CV para un trabajo específico para mejorar puntajes ATS y coincidencia de palabras clave.',
+      tailorForJob: 'Personalizar CV para un Trabajo',
+      upgradeForMore: 'Actualiza para Más CVs Personalizados',
+      features: {
+        atsScores: 'Mejores puntajes ATS',
+        keywords: 'Optimización de palabras clave',
+        grammar: 'Gramática verificada',
+      },
+      from: 'De:',
+      view: 'Ver',
+      edit: 'Editar',
+      delete: 'Eliminar',
+      deleteModal: {
+        title: 'Eliminar CV Personalizado',
+        description: '¿Estás seguro de que quieres eliminar este CV personalizado? Esta acción no se puede deshacer.',
+        deleting: 'Eliminando...',
+      },
     },
   },
 };

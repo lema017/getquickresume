@@ -1,12 +1,15 @@
-import { ResumeScore, GeneratedResume } from '@/types';
+import { memo, useState } from 'react';
+import { ResumeScore, GeneratedResume, ChecklistItem, SectionChecklist as SectionChecklistType } from '@/types';
 import { useAuthStore } from '@/stores/authStore';
 import { useResumeStore } from '@/stores/resumeStore';
-import { Lock, TrendingUp, CheckCircle2, AlertCircle, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
+import { Lock, TrendingUp, CheckCircle2, AlertCircle, Sparkles, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 import { GuidedEnhancementModal } from './GuidedEnhancementModal';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import { PremiumActionModal } from '@/components/PremiumActionModal';
+import { SectionChecklist } from './SectionChecklist';
+import { OptimizedBadge, ProgressToOptimized } from './OptimizedBadge';
+import { ATSKeywordCard } from './ATSKeywordCard';
 import toast from 'react-hot-toast';
 
 interface ResumeScoreCardProps {
@@ -18,17 +21,18 @@ interface ResumeScoreCardProps {
   onEnhancementComplete?: (sectionType: string, enhancedText: string) => void;
 }
 
-export function ResumeScoreCard({ score, isLoading, error, onUpgrade, resume, onEnhancementComplete }: ResumeScoreCardProps) {
+// Memoized to prevent re-renders when parent state changes but score data hasn't
+export const ResumeScoreCard = memo(function ResumeScoreCard({ score, isLoading, error, onUpgrade, resume, onEnhancementComplete }: ResumeScoreCardProps) {
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const { setCurrentStep } = useResumeStore();
   const isPremium = user?.isPremium || false;
-  const [isDetailedFeedbackOpen, setIsDetailedFeedbackOpen] = useState(false);
   const [enhancementModal, setEnhancementModal] = useState<{
     isOpen: boolean;
     sectionType: 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language';
     recommendation: string;
     originalText: string;
+    checklistItemId?: string;
   }>({
     isOpen: false,
     sectionType: 'summary',
@@ -45,6 +49,7 @@ export function ResumeScoreCard({ score, isLoading, error, onUpgrade, resume, on
     wizardStep: null,
   });
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [isEnhancing, setIsEnhancing] = useState(false);
 
   const handleUpgrade = () => {
     if (onUpgrade) {
@@ -59,7 +64,7 @@ export function ResumeScoreCard({ score, isLoading, error, onUpgrade, resume, on
     const normalizationMap: Record<string, string> = {
       'achievements': 'achievement',
       'languages': 'language',
-      'skills': 'skills', // Already singular
+      'skills': 'skills',
       'projects': 'project',
     };
     
@@ -73,7 +78,6 @@ export function ResumeScoreCard({ score, isLoading, error, onUpgrade, resume, on
   ): string => {
     if (!generatedResume) return '';
 
-    // Handle both singular and plural forms for compatibility
     const normalizedType = normalizeSectionType(sectionType);
 
     switch (normalizedType) {
@@ -103,7 +107,6 @@ export function ResumeScoreCard({ score, isLoading, error, onUpgrade, resume, on
         return '';
       case 'achievement':
       case 'achievements':
-        // Check the separate achievements array (not achievements within experience entries)
         if (generatedResume.achievements && Array.isArray(generatedResume.achievements) && generatedResume.achievements.length > 0) {
           return generatedResume.achievements.join('\n');
         }
@@ -124,8 +127,6 @@ export function ResumeScoreCard({ score, isLoading, error, onUpgrade, resume, on
         }
         return '';
       case 'contact':
-        // For contact, check if LinkedIn is missing (main enhancement need)
-        // Return empty string if LinkedIn is missing to trigger navigation
         if (generatedResume.contactInfo?.linkedin) {
           return `LinkedIn: ${generatedResume.contactInfo.linkedin}`;
         }
@@ -135,37 +136,33 @@ export function ResumeScoreCard({ score, isLoading, error, onUpgrade, resume, on
     }
   };
 
-  const handleEnhanceSection = (feedback: { section: string; recommendations: string[] }) => {
+  const handleEnhanceChecklistItem = (item: ChecklistItem, sectionKey: string) => {
     if (!isPremium || !resume) return;
 
-    // Normalize section type to singular form for backend compatibility
-    const normalizedSection = normalizeSectionType(feedback.section);
-    const sectionType = normalizedSection as 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language';
-    const originalText = getOriginalTextForSection(feedback.section, resume);
-    const recommendation = feedback.recommendations.join('. '); // Combine all recommendations
+    setIsEnhancing(true);
+
+    const sectionType = normalizeSectionType(sectionKey) as typeof enhancementModal.sectionType;
+    const originalText = getOriginalTextForSection(sectionKey, resume);
 
     // Contact section always navigates to wizard step (can't be AI-enhanced)
-    if (normalizedSection === 'contact') {
-      const sectionName = getSectionDisplayName(feedback.section);
-      const wizardStep = getWizardStepForSection(normalizedSection);
-      
+    if (sectionKey === 'contact') {
+      setIsEnhancing(false);
+      const wizardStep = getWizardStepForSection('contact');
       if (wizardStep) {
         setEmptySectionDialog({
           isOpen: true,
-          sectionName,
+          sectionName: 'Contact Information',
           wizardStep,
         });
-      } else {
-        console.warn(`No wizard step found for section: ${feedback.section}`);
-        toast.error(`Unable to navigate to wizard step for ${sectionName}`);
       }
       return;
     }
 
-    // If section is empty, navigate to wizard step instead of enhancing
+    // If section is empty, navigate to wizard step
     if (!originalText || originalText.trim().length === 0) {
-      const sectionName = getSectionDisplayName(feedback.section);
-      const wizardStep = getWizardStepForSection(normalizedSection);
+      setIsEnhancing(false);
+      const sectionName = getSectionDisplayName(sectionKey);
+      const wizardStep = getWizardStepForSection(sectionKey);
       
       if (wizardStep) {
         setEmptySectionDialog({
@@ -174,8 +171,7 @@ export function ResumeScoreCard({ score, isLoading, error, onUpgrade, resume, on
           wizardStep,
         });
       } else {
-        console.warn(`No wizard step found for section: ${feedback.section}`);
-        toast.error(`Unable to navigate to wizard step for ${sectionName}`);
+        toast.error(`Cannot enhance empty ${sectionName} section`);
       }
       return;
     }
@@ -183,14 +179,17 @@ export function ResumeScoreCard({ score, isLoading, error, onUpgrade, resume, on
     setEnhancementModal({
       isOpen: true,
       sectionType,
-      recommendation,
+      recommendation: `${item.label}: ${item.description}`,
       originalText,
+      checklistItemId: item.id,
     });
+    setIsEnhancing(false);
   };
 
-  // Get display name for section
   const getSectionDisplayName = (section: string): string => {
     const names: Record<string, string> = {
+      'summary': 'Professional Summary',
+      'experience': 'Work Experience',
       'education': 'Education',
       'project': 'Projects',
       'projects': 'Projects',
@@ -198,15 +197,17 @@ export function ResumeScoreCard({ score, isLoading, error, onUpgrade, resume, on
       'achievements': 'Achievements',
       'language': 'Languages',
       'languages': 'Languages',
+      'skills': 'Skills',
       'contact': 'Contact Information',
     };
     return names[section.toLowerCase()] || section;
   };
 
-  // Get wizard step route for section
   const getWizardStepForSection = (section: string): string | null => {
     const sectionLower = section.toLowerCase();
     const stepMap: Record<string, string> = {
+      'summary': '/wizard/manual/step-7',
+      'experience': '/wizard/manual/step-3',
       'education': '/wizard/manual/step-4',
       'project': '/wizard/manual/step-5',
       'projects': '/wizard/manual/step-5',
@@ -214,42 +215,15 @@ export function ResumeScoreCard({ score, isLoading, error, onUpgrade, resume, on
       'achievements': '/wizard/manual/step-6',
       'language': '/wizard/manual/step-5',
       'languages': '/wizard/manual/step-5',
+      'skills': '/wizard/manual/step-2',
       'contact': '/wizard/manual/step-1',
     };
     return stepMap[sectionLower] || null;
   };
 
-  // Get step number from route
   const getStepNumberFromRoute = (route: string): number | null => {
     const match = route.match(/step-(\d+)/);
     return match ? parseInt(match[1], 10) : null;
-  };
-
-  // Check if section is supported by enhancement API
-  const isSectionSupported = (section: string): boolean => {
-    const normalized = normalizeSectionType(section);
-    const supportedSections = ['summary', 'experience', 'education', 'certification', 'project', 'achievement', 'language'];
-    return supportedSections.includes(normalized);
-  };
-
-  // Check if section has perfect/max score (no enhancement needed)
-  const hasPerfectScore = (section: string, currentScore: number): boolean => {
-    const maxScores: Record<string, number> = {
-      'summary': 2.0,
-      'experience': 2.5,
-      'skills': 1.5,
-      'education': 1.0,
-      'projects': 1.0,
-      'project': 1.0,
-      'achievements': 1.0,
-      'achievement': 1.0,
-      'languages': 0.5,
-      'language': 0.5,
-      'contact': 0.5,
-    };
-    const sectionLower = section.toLowerCase();
-    const maxScore = maxScores[sectionLower];
-    return maxScore !== undefined && currentScore >= maxScore;
   };
 
   const handleEnhancementComplete = (enhancedText: string) => {
@@ -264,28 +238,29 @@ export function ResumeScoreCard({ score, isLoading, error, onUpgrade, resume, on
     });
   };
 
+  // Loading state
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+      <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
         <div className="flex items-center justify-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           <span className="ml-3 text-gray-600">
-            {score ? 'Updating score...' : 'Generating score...'}
+            {score ? 'Updating score...' : 'Analyzing your resume...'}
           </span>
         </div>
         {!score && (
           <p className="text-center text-sm text-gray-500 mt-2">
-            This may take a few seconds
+            This uses deterministic evaluation for consistent results
           </p>
         )}
       </div>
     );
   }
 
-  // Don't show error for "Score not found" - it's normal for new/regenerated resumes
+  // Error state
   if (error && !error.includes('Score not found') && !error.includes('not been scored')) {
     return (
-      <div className="bg-white rounded-lg border border-red-200 p-6 shadow-sm">
+      <div className="bg-white rounded-xl border border-red-200 p-6 shadow-sm">
         <div className="flex items-center text-red-600">
           <AlertCircle className="w-5 h-5 mr-2" />
           <span className="font-medium">Error loading score</span>
@@ -295,221 +270,177 @@ export function ResumeScoreCard({ score, isLoading, error, onUpgrade, resume, on
     );
   }
 
-  // Don't show anything if score doesn't exist yet (normal state)
+  // No score state
   if (!score) {
     return null;
   }
 
-  const percentage = Math.round((score.totalScore / 10) * 100);
-  const getScoreColor = (score: number) => {
-    if (score >= 8) return 'text-green-600 bg-green-50';
-    if (score >= 6) return 'text-blue-600 bg-blue-50';
-    if (score >= 4) return 'text-yellow-600 bg-yellow-50';
-    return 'text-red-600 bg-red-50';
-  };
+  // Calculate stats from checklist
+  const hasChecklist = score.checklist && Object.keys(score.checklist).length > 0;
+  let totalRequired = 0;
+  let requiredCompleted = 0;
+  
+  if (hasChecklist) {
+    Object.values(score.checklist).forEach(section => {
+      totalRequired += section.requiredCount;
+      requiredCompleted += section.requiredCompletedCount;
+    });
+  }
 
-  const getScoreLabel = (score: number) => {
-    if (score >= 9) return 'Excellent';
-    if (score >= 7) return 'Good';
-    if (score >= 5) return 'Average';
-    return 'Needs Improvement';
+  const requiredRemaining = totalRequired - requiredCompleted;
+
+  const getScoreColor = (scoreValue: number) => {
+    if (scoreValue >= 8) return 'text-green-600 bg-green-50 border-green-200';
+    if (scoreValue >= 6) return 'text-blue-600 bg-blue-50 border-blue-200';
+    if (scoreValue >= 4) return 'text-amber-600 bg-amber-50 border-amber-200';
+    return 'text-red-600 bg-red-50 border-red-200';
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900">Resume Score</h3>
-          <p className="text-sm text-gray-500">Based on professional standards</p>
-        </div>
-        <div className={`px-4 py-2 rounded-full ${getScoreColor(score.totalScore)}`}>
-          <div className="text-2xl font-bold">{score.totalScore.toFixed(1)}</div>
-          <div className="text-xs font-medium">/ 10</div>
-        </div>
-      </div>
-
-      {/* Score Bar */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-700">{getScoreLabel(score.totalScore)}</span>
-          <span className="text-sm text-gray-500">{percentage}%</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-3">
-          <div
-            className={`h-3 rounded-full transition-all ${
-              percentage >= 80 ? 'bg-green-500' :
-              percentage >= 60 ? 'bg-blue-500' :
-              percentage >= 40 ? 'bg-yellow-500' :
-              'bg-red-500'
-            }`}
-            style={{ width: `${percentage}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Breakdown */}
-      <div className="mb-6">
-        <h4 className="text-sm font-semibold text-gray-900 mb-3">Score Breakdown</h4>
-        <div className="space-y-3">
-          {Object.entries(score.breakdown).map(([key, value]) => {
-            const maxScore = {
-              summary: 2.0,
-              experience: 2.5,
-              skills: 1.5,
-              education: 1.0,
-              projects: 1.0,
-              achievements: 1.0,
-              languages: 0.5,
-              contact: 0.5,
-            }[key] || 1.0;
-            const percentage = Math.round((value / maxScore) * 100);
-            const label = key.charAt(0).toUpperCase() + key.slice(1);
-
-            return (
-              <div key={key}>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm text-gray-600">{label}</span>
-                  <span className="text-sm font-medium text-gray-900">
-                    {value.toFixed(1)}/{maxScore}
-                  </span>
-                </div>
-                <div className="w-full bg-gray-100 rounded-full h-2">
-                  <div
-                    className="bg-blue-500 h-2 rounded-full transition-all"
-                    style={{ width: `${percentage}%` }}
-                  />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Strengths */}
-      {score.strengths && score.strengths.length > 0 && (
-        <div className="mb-6">
-          <div className="flex items-center mb-3">
-            <CheckCircle2 className="w-5 h-5 text-green-600 mr-2" />
-            <h4 className="text-sm font-semibold text-gray-900">Strengths</h4>
-          </div>
-          <ul className="space-y-2">
-            {score.strengths.map((strength, index) => (
-              <li key={index} className="text-sm text-gray-700 flex items-start">
-                <span className="text-green-600 mr-2">•</span>
-                <span>{strength}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+    <div className="space-y-6">
+      {/* Optimized Badge or Progress */}
+      {score.isOptimized ? (
+        <OptimizedBadge 
+          isOptimized={score.isOptimized}
+          completionPercentage={score.completionPercentage}
+          totalScore={score.totalScore}
+        />
+      ) : (
+        <ProgressToOptimized
+          completionPercentage={score.completionPercentage}
+          requiredRemaining={requiredRemaining}
+          totalScore={score.totalScore}
+        />
       )}
 
-      {/* Improvements - Show for ALL users */}
-      {score.improvements && score.improvements.length > 0 && (
-        <div className="mb-6 border-t border-gray-200 pt-6">
-          <div className="flex items-center mb-3">
-            <TrendingUp className="w-5 h-5 text-blue-600 mr-2" />
-            <h4 className="text-sm font-semibold text-gray-900">Improvements</h4>
+      {/* Main Score Card */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">Resume Analysis</h3>
+            <p className="text-sm text-gray-500">
+              {hasChecklist 
+                ? `${score.completionPercentage}% of criteria met` 
+                : 'Based on professional standards'
+              }
+            </p>
           </div>
-          <ul className="space-y-2">
-            {score.improvements.map((improvement, index) => (
-              <li key={index} className="text-sm text-gray-700 flex items-start">
-                <span className="text-blue-600 mr-2">•</span>
-                <span>{improvement}</span>
-              </li>
-            ))}
-          </ul>
+          <div className={`px-4 py-2 rounded-xl border ${getScoreColor(score.totalScore)}`}>
+            <div className="text-2xl font-bold">{score.totalScore.toFixed(1)}</div>
+            <div className="text-xs font-medium opacity-80">/ 10</div>
+          </div>
         </div>
-      )}
 
-      {/* Free users: Prominent Enhance Resume button */}
-      {!isPremium && (
-        <div className="mb-6 border-t border-gray-200 pt-6">
-          <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-5 border border-purple-200">
-            <div className="text-center">
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                Ready to improve your resume?
+        {/* Strengths (always shown) */}
+        {score.strengths && score.strengths.length > 0 && (
+          <div className="mb-6">
+            <div className="flex items-center mb-3">
+              <CheckCircle2 className="w-5 h-5 text-green-600 mr-2" />
+              <h4 className="text-sm font-semibold text-gray-900">Strengths</h4>
+            </div>
+            <ul className="space-y-2">
+              {score.strengths.slice(0, 5).map((strength, index) => (
+                <li key={index} className="text-sm text-gray-700 flex items-start">
+                  <span className="text-green-600 mr-2">•</span>
+                  <span>{strength}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Premium: ATS Keyword Analysis */}
+        {isPremium && score.keywordAnalysis && (
+          <div className="border-t border-gray-200 pt-6">
+            <ATSKeywordCard 
+              keywordAnalysis={score.keywordAnalysis}
+              isPremium={isPremium}
+            />
+          </div>
+        )}
+
+        {/* Premium: Section Checklists */}
+        {isPremium && hasChecklist && (
+          <div className="border-t border-gray-200 pt-6">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-sm font-semibold text-gray-900">
+                Section Checklists
               </h4>
-              <p className="text-sm text-gray-600 mb-4">
-                Use AI to automatically enhance each section based on the recommendations above
-              </p>
-              <button
-                onClick={() => setShowPremiumModal(true)}
-                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-md hover:shadow-lg"
-              >
-                <Sparkles className="w-5 h-5 mr-2" />
-                Enhance My Resume
-              </button>
+              <span className="text-xs text-gray-500">
+                {score.completionPercentage}% complete
+              </span>
+            </div>
+            
+            <div className="space-y-3">
+              {Object.entries(score.checklist)
+                .filter(([sectionKey]) => sectionKey !== 'ats') // ATS is displayed separately above
+                .sort((a, b) => {
+                  // Sort by incomplete required items first
+                  const aIncomplete = a[1].requiredCount - a[1].requiredCompletedCount;
+                  const bIncomplete = b[1].requiredCount - b[1].requiredCompletedCount;
+                  if (aIncomplete !== bIncomplete) return bIncomplete - aIncomplete;
+                  // Then by total incomplete
+                  return (b[1].totalCount - b[1].completedCount) - (a[1].totalCount - a[1].completedCount);
+                })
+                .map(([sectionKey, sectionChecklist]) => (
+                  <SectionChecklist
+                    key={sectionKey}
+                    checklist={sectionChecklist}
+                    onEnhanceItem={(item) => handleEnhanceChecklistItem(item, sectionKey)}
+                    isPremium={isPremium}
+                    isEnhancing={isEnhancing}
+                  />
+                ))
+              }
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Premium: Show Detailed Feedback with Enhance buttons */}
-      {isPremium && score.detailedFeedback && score.detailedFeedback.length > 0 && (
-        <div className="border-t border-gray-200 pt-6">
-          <button
-            onClick={() => setIsDetailedFeedbackOpen(!isDetailedFeedbackOpen)}
-            className="w-full flex items-center justify-between text-left mb-4 hover:text-blue-600 transition-colors"
-          >
-            <h4 className="text-sm font-semibold text-gray-900">Detailed Feedback by Section</h4>
-            {isDetailedFeedbackOpen ? (
-              <ChevronUp className="w-5 h-5 text-gray-500" />
-            ) : (
-              <ChevronDown className="w-5 h-5 text-gray-500" />
-            )}
-          </button>
-          {isDetailedFeedbackOpen && (
-            <div className="space-y-4">
-              {score.detailedFeedback.map((feedback, index) => (
-                <div key={index} className="bg-gray-50 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h5 className="text-sm font-medium text-gray-900 capitalize">
-                      {feedback.section}
-                    </h5>
-                    {hasPerfectScore(feedback.section, feedback.currentScore) ? (
-                      <span className="text-xs font-medium px-2 py-1 rounded bg-green-100 text-green-700">
-                        Good
-                      </span>
-                    ) : (
-                      <span className={`text-xs font-medium px-2 py-1 rounded ${
-                        feedback.priority === 'high' ? 'bg-red-100 text-red-700' :
-                        feedback.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-gray-100 text-gray-700'
-                      }`}>
-                        {feedback.priority} priority
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-xs text-gray-600 mb-2">
-                    Current score: {feedback.currentScore.toFixed(1)}
-                  </div>
-                  {feedback.recommendations && feedback.recommendations.length > 0 && (
-                    <ul className="space-y-1 mb-3">
-                      {feedback.recommendations.map((rec, recIndex) => (
-                        <li key={recIndex} className="text-sm text-gray-700 flex items-start">
-                          <span className="text-blue-600 mr-2">→</span>
-                          <span>{rec}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  {/* Show enhance button if section is supported or has wizard step, and doesn't have perfect score */}
-                  {(isSectionSupported(feedback.section) || getWizardStepForSection(normalizeSectionType(feedback.section))) && !hasPerfectScore(feedback.section, feedback.currentScore) && (
-                    <button
-                      onClick={() => handleEnhanceSection(feedback)}
-                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
-                    >
-                      <Sparkles className="w-4 h-4" />
-                      Enhance Section
-                    </button>
-                  )}
+        {/* Free users: Show improvements teaser and upgrade CTA */}
+        {!isPremium && score.improvements && score.improvements.length > 0 && (
+          <div className="border-t border-gray-200 pt-6">
+            <div className="flex items-center mb-3">
+              <TrendingUp className="w-5 h-5 text-blue-600 mr-2" />
+              <h4 className="text-sm font-semibold text-gray-900">Areas to Improve</h4>
+              <Lock className="w-4 h-4 text-gray-400 ml-2" />
+            </div>
+            
+            {/* Show first 2 improvements blurred */}
+            <div className="space-y-2 mb-4">
+              {score.improvements.slice(0, 2).map((improvement, index) => (
+                <div key={index} className="text-sm text-gray-400 blur-sm select-none">
+                  {improvement}
                 </div>
               ))}
             </div>
-          )}
-        </div>
-      )}
+
+            {/* Upgrade CTA */}
+            <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-4 border border-purple-200">
+              <div className="text-center">
+                <p className="text-sm text-gray-600 mb-3">
+                  Unlock detailed checklists and AI-powered enhancements
+                </p>
+                <button
+                  onClick={() => setShowPremiumModal(true)}
+                  className="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-md hover:shadow-lg"
+                >
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  Upgrade to Premium
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Scoring version footer */}
+        {score.scoringVersion && (
+          <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400">
+            <span>Scoring v{score.scoringVersion}</span>
+            <span>Evaluated: {new Date(score.generatedAt).toLocaleDateString()}</span>
+          </div>
+        )}
+      </div>
 
       {/* Guided Enhancement Modal */}
       {enhancementModal.isOpen && (
@@ -520,6 +451,7 @@ export function ResumeScoreCard({ score, isLoading, error, onUpgrade, resume, on
           recommendation={enhancementModal.recommendation}
           originalText={enhancementModal.originalText}
           onEnhancementComplete={handleEnhancementComplete}
+          checklistItemId={enhancementModal.checklistItemId}
         />
       )}
 
@@ -533,7 +465,6 @@ export function ResumeScoreCard({ score, isLoading, error, onUpgrade, resume, on
         variant="info"
         onConfirm={() => {
           if (emptySectionDialog.wizardStep) {
-            // Update current step before navigating
             const stepNumber = getStepNumberFromRoute(emptySectionDialog.wizardStep);
             if (stepNumber) {
               setCurrentStep(stepNumber);
@@ -556,5 +487,4 @@ export function ResumeScoreCard({ score, isLoading, error, onUpgrade, resume, on
       />
     </div>
   );
-}
-
+});

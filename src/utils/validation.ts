@@ -57,6 +57,49 @@ export const validateAllowedCharacters = (value: string, fieldKey: string): Vali
   return { isValid: true };
 };
 
+// Validate profession format - must be a meaningful profession text
+export const validateProfessionFormat = (value: string): ValidationResult => {
+  if (!value || value.trim() === '') {
+    return { isValid: true }; // Empty is handled by required validation
+  }
+  
+  const trimmedValue = value.trim();
+  
+  // Minimum length check (at least 3 characters)
+  if (trimmedValue.length < 3) {
+    return {
+      isValid: false,
+      messageKey: 'validation.professionTooShort',
+      message: 'Profession must be at least 3 characters'
+    };
+  }
+  
+  // Must contain at least one word with 2+ consecutive letters (prevents "a1b2c3" style input)
+  const hasWord = /[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ]{2,}/i.test(trimmedValue);
+  if (!hasWord) {
+    return {
+      isValid: false,
+      messageKey: 'validation.professionInvalid',
+      message: 'Please enter a valid profession or job title'
+    };
+  }
+  
+  // Check that letters make up at least 50% of non-space characters (prevents mostly numbers/symbols)
+  const nonSpaceChars = trimmedValue.replace(/\s/g, '');
+  const letterCount = (trimmedValue.match(/[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ]/g) || []).length;
+  const letterRatio = letterCount / nonSpaceChars.length;
+  
+  if (letterRatio < 0.5) {
+    return {
+      isValid: false,
+      messageKey: 'validation.professionInvalid',
+      message: 'Please enter a valid profession or job title'
+    };
+  }
+  
+  return { isValid: true };
+};
+
 export const validatePhoneCharacters = (phone: string): ValidationResult => {
   // Solo permitir números, espacios, guiones, paréntesis y el símbolo +
   const phoneRegex = /^[0-9\s\-\(\)\+]+$/;
@@ -232,6 +275,14 @@ export const validateProfile = (formData: any): FieldValidation => {
       }
     }
   });
+  
+  // Validar formato de profesión (must be a meaningful profession, not gibberish)
+  if (formData.profession && !errors.profession) {
+    const professionResult = validateProfessionFormat(formData.profession);
+    if (!professionResult.isValid) {
+      errors.profession = professionResult;
+    }
+  }
   
   // Validar caracteres del teléfono
   if (formData.phone && !errors.phone) {

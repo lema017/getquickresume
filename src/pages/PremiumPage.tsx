@@ -36,7 +36,7 @@ const PADDLE_ENVIRONMENT = import.meta.env.VITE_PADDLE_ENVIRONMENT || 'sandbox';
 export function PremiumPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { user, isAuthenticated, refreshUser } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
   const [loadingPlan, setLoadingPlan] = useState<'monthly' | 'yearly' | null>(null);
   const [showFeatures, setShowFeatures] = useState(false);
   const [paddleReady, setPaddleReady] = useState(false);

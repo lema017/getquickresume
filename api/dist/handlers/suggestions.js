@@ -177,6 +177,25 @@ const getSuggestions = async (event) => {
     }
     catch (error) {
         console.error('Error in getSuggestions handler:', error);
+        // Handle invalid profession error
+        if (error?.code === 'INVALID_PROFESSION') {
+            const errorResponse = {
+                success: false,
+                error: 'INVALID_PROFESSION',
+                message: error.message || 'The provided text does not appear to be a valid profession or job title.',
+                fromCache: false
+            };
+            return {
+                statusCode: 400,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+                    'Access-Control-Allow-Methods': 'GET,OPTIONS',
+                },
+                body: JSON.stringify(errorResponse)
+            };
+        }
         // Refund rate limit on server error - user shouldn't be penalized
         const userId = event.requestContext.authorizer?.userId;
         if (userId) {

@@ -7,9 +7,6 @@ import { useAuthStore } from '@/stores/authStore';
 import { ArrowLeft, Download, Share2, Eye, CheckCircle, Sparkles, RefreshCw, Linkedin, FileText, Zap, Edit3, Globe } from 'lucide-react';
 import { countries } from '@/utils/countries';
 import { ResumeEditModal } from './ResumeEditModal';
-import { FloatingTips } from '@/components/FloatingTips';
-import { TipsButton } from '@/components/TipsButton';
-import { useTips } from '@/hooks/useTips';
 import { templatesService, ResumeTemplate } from '@/services/templatesService';
 import { WebComponentRenderer } from './WebComponentRenderer';
 import { convertResumeDataToTemplateFormat, filterDataForPage, TemplateDataFormat } from '@/utils/resumeDataToTemplateFormat';
@@ -18,7 +15,6 @@ import { ResumeData } from '@/types';
 import { generateResumePDFFromPages } from '@/utils/pdfGenerator';
 import { calculatePagination } from '@/services/paginationService';
 import { calculateAndAssignPageNumbers, extractPaginationFields } from './Step9Preview';
-import { modifyTemplateCodeForMultiPageDisplay } from '@/utils/templateCodeModifier';
 import { downloadService } from '@/services/downloadService';
 import { PremiumDownloadModal } from '@/components/PremiumDownloadModal';
 import { PremiumActionModal } from '@/components/PremiumActionModal';
@@ -32,7 +28,6 @@ export function Step10Final() {
   const navigate = useNavigate();
   const { navigateToStep } = useWizardNavigation();
   const { resumeData: storeResumeData, markStepCompleted, generatedResume, isGenerating, isEditingResume, startEditingResume, selectedTemplateId, updateResumeData, currentResumeId } = useResumeStore();
-  const { areTipsClosed, closeTips, showTips } = useTips();
   const { user } = useAuthStore();
   const [isGenerated, setIsGenerated] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
@@ -85,12 +80,11 @@ export function Step10Final() {
     loadTemplate();
   }, [selectedTemplateId]);
 
-  // Modify template JS code to allow multi-page display
+  // Set template JS code (templates now include multi-page CSS built-in)
   useEffect(() => {
     if (!selectedTemplate?.jsCode) return;
 
-    const modifiedCode = modifyTemplateCodeForMultiPageDisplay(selectedTemplate.jsCode);
-    setModifiedJsCode(modifiedCode);
+    setModifiedJsCode(selectedTemplate.jsCode);
   }, [selectedTemplate?.jsCode]);
 
   // Calculate pagination and convert data when template and resume are available
@@ -380,24 +374,6 @@ export function Step10Final() {
         </p>
       </div>
 
-      {/* Tips Section */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">{t('wizard.steps.final.tips.title')}</h3>
-          {areTipsClosed && (
-            <TipsButton onClick={showTips} />
-          )}
-        </div>
-        
-        {!areTipsClosed && (
-          <FloatingTips
-            title={`💡 ${t('wizard.steps.final.tips.title')}`}
-            tips={t('wizard.steps.final.tips.items', { returnObjects: true }) as unknown as string[]}
-            onClose={closeTips}
-          />
-        )}
-      </div>
-
       {/* Success Message */}
       <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-8">
         <div className="flex items-center justify-center mb-4">
@@ -683,7 +659,7 @@ export function Step10Final() {
           {t('wizard.steps.final.nav.back')}
         </button>
         <button 
-          onClick={() => navigate('/')} 
+          onClick={() => navigate('/dashboard')} 
           className="btn-primary flex items-center"
         >
           {t('wizard.steps.final.nav.goHome')}

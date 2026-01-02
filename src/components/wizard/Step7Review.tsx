@@ -5,9 +5,6 @@ import { useResumeStore } from '@/stores/resumeStore';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { useAuthStore } from '@/stores/authStore';
 import { ArrowLeft, Download, Eye, Globe, Crown, CheckCircle } from 'lucide-react';
-import { FloatingTips } from '@/components/FloatingTips';
-import { TipsButton } from '@/components/TipsButton';
-import { useTips } from '@/hooks/useTips';
 
 export function Step7Review() {
   const { t } = useTranslation();
@@ -15,7 +12,6 @@ export function Step7Review() {
   const { navigateToStep } = useWizardNavigation();
   const { resumeData, calculateCharacters } = useResumeStore();
   const { user } = useAuthStore();
-  const { areTipsClosed, closeTips, showTips } = useTips();  
   const [showTranslationModal, setShowTranslationModal] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('en');
 
@@ -59,19 +55,6 @@ export function Step7Review() {
           {t('wizard.steps.review.description')}
         </p>
       </div>
-
-      {/* Floating Tips */}
-      <FloatingTips
-        title="💡 Tips para la Revisión Final"
-        tips={[
-          "Verifica que no haya errores tipográficos",
-          "Asegúrate de que el formato sea uniforme en todo el CV",
-          "Confirma que todos los datos estén al día",
-          "Respeta el límite de 3,500 caracteres para usuarios gratuitos",
-          "Verifica que toda la información sea pertinente para tu objetivo",
-          "Asegúrate de que el CV sea fácil de leer y atractivo"
-        ]}
-      />
 
       {/* Completion Status */}
       <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-8">
@@ -184,10 +167,7 @@ export function Step7Review() {
               
               <div className="bg-gray-50 p-3 rounded-lg">
                 <p className="text-sm text-gray-600">
-                  <strong>Tokens requeridos:</strong> 50
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong>Tu saldo:</strong> {user?.tokens || 0} tokens
+                  {t('review.translationNote', 'Translation is a premium feature')}
                 </p>
               </div>
             </div>

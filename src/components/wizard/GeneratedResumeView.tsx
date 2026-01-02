@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GeneratedResume } from '@/types';
 import { SectionImprovementModal } from './SectionImprovementModal';
@@ -28,7 +28,8 @@ interface GeneratedResumeViewProps {
   onUpdateResume?: (updatedResume: GeneratedResume) => void;
 }
 
-export function GeneratedResumeView({ resume, onEdit, onUpdateResume }: GeneratedResumeViewProps) {
+// Memoized to prevent re-renders when parent state changes but props don't
+export const GeneratedResumeView = memo(function GeneratedResumeView({ resume, onEdit, onUpdateResume }: GeneratedResumeViewProps) {
   const { t } = useTranslation();
   const { updateResumeSection, setGeneratedResume, currentResumeId } = useResumeStore();
   const { user } = useAuthStore();
@@ -182,7 +183,7 @@ export function GeneratedResumeView({ resume, onEdit, onUpdateResume }: Generate
       />
     </div>
   );
-}
+});
 
 // Contact Info Section
 function ContactInfoSection({ 

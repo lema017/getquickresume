@@ -1,6 +1,7 @@
 import { Resume } from '@/types';
 import { useTranslation } from 'react-i18next';
-import { Edit2, Download, Calendar, FileText, Globe, Share2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Edit2, Download, Calendar, FileText, Globe, Share2, BarChart3 } from 'lucide-react';
 import { formatName, formatProfession } from '@/utils/textFormatting';
 
 interface ResumeHeaderProps {
@@ -14,6 +15,7 @@ interface ResumeHeaderProps {
 
 export function ResumeHeader({ resume, onEdit, onDownload, onTranslate, onShare, isGeneratingPDF = false }: ResumeHeaderProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { resumeData, status, updatedAt, title } = resume;
 
   const formatDate = (date: Date | string) => {
@@ -82,14 +84,27 @@ export function ResumeHeader({ resume, onEdit, onDownload, onTranslate, onShare,
               <span>{t('resumeView.actions.translate')}</span>
             </button>
           )}
-          {onShare && resume.generatedResume && (
+          {resume.generatedResume && (
             <button
-              onClick={onShare}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              aria-label={t('resumeView.actions.share')}
+              onClick={() => navigate(`/resume/${resume.id}/share`)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                resume.isPubliclyShared
+                  ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 shadow-sm'
+                  : 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 shadow-sm'
+              }`}
+              aria-label={t('resumeView.actions.shareAndAnalytics')}
             >
-              <Share2 className="w-4 h-4" />
-              <span>{t('resumeView.actions.share')}</span>
+              {resume.isPubliclyShared ? (
+                <>
+                  <BarChart3 className="w-4 h-4" />
+                  <span>{t('resumeView.actions.analytics') || 'Analytics'}</span>
+                </>
+              ) : (
+                <>
+                  <Share2 className="w-4 h-4" />
+                  <span>{t('resumeView.actions.share')}</span>
+                </>
+              )}
             </button>
           )}
           <button

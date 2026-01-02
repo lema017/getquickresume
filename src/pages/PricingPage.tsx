@@ -35,10 +35,14 @@ export function PricingPage() {
     setLoadingPlan(planType);
 
     try {
-      const checkoutUrl = await checkoutService.createCheckoutTransaction(planType);
+      const { checkoutUrl } = await checkoutService.createCheckoutTransaction(planType);
       
       // Redirect to Paddle hosted checkout
-      window.location.href = checkoutUrl;
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+      } else {
+        throw new Error('No checkout URL received');
+      }
     } catch (error: any) {
       console.error('Checkout error:', error);
       toast.error(error.message || t('checkout.error'));
@@ -54,9 +58,9 @@ export function PricingPage() {
         <link rel="canonical" href={`${BASE_URL}/pricing`} />
         
         {/* hreflang */}
-        <link rel="alternate" hreflang="en" href={`${BASE_URL}/pricing`} />
-        <link rel="alternate" hreflang="es" href={`${BASE_URL}/pricing?lang=es`} />
-        <link rel="alternate" hreflang="x-default" href={`${BASE_URL}/pricing`} />
+        <link rel="alternate" hrefLang="en" href={`${BASE_URL}/pricing`} />
+        <link rel="alternate" hrefLang="es" href={`${BASE_URL}/pricing?lang=es`} />
+        <link rel="alternate" hrefLang="x-default" href={`${BASE_URL}/pricing`} />
         
         {/* Open Graph */}
         <meta property="og:type" content="website" />

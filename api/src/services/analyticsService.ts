@@ -165,6 +165,92 @@ export const getAnalytics = async (shareToken: string): Promise<AnalyticsSummary
   }
 };
 
+// Interface for anonymized recent viewer data
+export interface RecentViewer {
+  id: string;           // Anonymized identifier (hashed from IP + timestamp)
+  viewedAt: string;     // ISO timestamp
+  device: 'mobile' | 'desktop' | 'tablet' | 'unknown';
+  browser: string;
+  os: string;
+  country: string;
+  city: string;
+  referrer?: string;    // Domain only, sanitized for privacy
+}
+
+/**
+ * Create an anonymized but consistent identifier from IP and timestamp
+ * This ensures the same viewer gets the same ID without exposing their IP
+ */
+function anonymizeId(ip: string | undefined, timestamp: string): string {
+  const base = `${ip || 'unknown'}-${timestamp}`;
+  let hash = 0;
+  for (let i = 0; i < base.length; i++) {
+    hash = ((hash << 5) - hash) + base.charCodeAt(i);
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return `v${Math.abs(hash).toString(16).slice(0, 8)}`;
+}
+
+/**
+ * Sanitize referrer URL to only return domain for privacy
+ */
+function sanitizeReferrer(referrer: string | undefined): string | undefined {
+  if (!referrer) return undefined;
+  try {
+    const url = new URL(referrer);
+    return url.hostname; // Only return domain, not full URL with params
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Get recent individual viewer records (anonymized)
+ * @param shareToken - The resume's share token
+ * @param limit - Maximum number of viewers to return (default: 10, max: 50)
+ * @returns Array of anonymized recent viewer records
+ */
+export const getRecentViewers = async (
+  shareToken: string,
+  limit: number = 10
+): Promise<RecentViewer[]> => {
+  try {
+    console.log('[AnalyticsService] Getting recent viewers for shareToken:', shareToken);
+    
+    const cappedLimit = Math.min(Math.max(limit, 1), 50); // Cap between 1 and 50
+    
+    const command = new QueryCommand({
+      TableName: tableName,
+      KeyConditionExpression: 'shareToken = :shareToken',
+      ExpressionAttributeValues: {
+        ':shareToken': shareToken,
+      },
+      ScanIndexForward: false, // Most recent first
+      Limit: cappedLimit,
+    });
+
+    const result = await dynamodb.send(command);
+    const views = (result.Items || []) as ResumeView[];
+    
+    console.log('[AnalyticsService] Found recent viewers:', views.length);
+
+    // Transform to anonymized viewer records
+    return views.map((view) => ({
+      id: anonymizeId(view.ipAddress, view.viewedAt),
+      viewedAt: view.viewedAt,
+      device: view.device || 'unknown',
+      browser: view.browser || 'Unknown',
+      os: view.os || 'Unknown',
+      country: view.country || 'Unknown',
+      city: view.city || 'Unknown',
+      referrer: sanitizeReferrer(view.referrer),
+    }));
+  } catch (error) {
+    console.error('[AnalyticsService] Error getting recent viewers:', error);
+    return [];
+  }
+};
+
 // Helper function to parse user agent and extract device/browser info
 export const parseUserAgent = (userAgent: string): { device: 'mobile' | 'desktop' | 'tablet'; browser: string; os: string } => {
   const ua = userAgent.toLowerCase();

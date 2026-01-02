@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { memo } from 'react';
 import Frame, { FrameContextConsumer } from 'react-frame-component';
 import { LiveProvider, LivePreview } from 'react-live';
 
@@ -12,7 +13,8 @@ type Props = {
 
 const compileCache = new Map<string, string>();
 
-export function TemplatePreview({ code, resumeData, width = '100%', height, className }: Props) {
+// Memoized to prevent re-renders when template code hasn't changed
+export const TemplatePreview = memo(function TemplatePreview({ code, resumeData, width = '100%', height, className }: Props) {
   const cacheKey = React.useMemo(() => `${hashString(code)}`, [code]);
   React.useEffect(() => {
     if (!compileCache.has(cacheKey)) {
@@ -33,7 +35,7 @@ export function TemplatePreview({ code, resumeData, width = '100%', height, clas
       </Frame>
     </div>
   );
-}
+});
 
 function hashString(input: string): string {
   let hash = 0;

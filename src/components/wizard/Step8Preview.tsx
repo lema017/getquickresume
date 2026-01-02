@@ -4,9 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { ArrowRight, ArrowLeft, Edit3, CheckCircle, Linkedin, RefreshCw } from 'lucide-react';
-import { FloatingTips } from '@/components/FloatingTips';
-import { TipsButton } from '@/components/TipsButton';
-import { useTips } from '@/hooks/useTips';
 import { countries } from '@/utils/countries';
 import { resumeService } from '@/services/resumeService';
 import { ResumeGenerationProgress } from './ResumeGenerationProgress';
@@ -22,7 +19,6 @@ export function Step8Preview() {
   const { navigateToStep } = useWizardNavigation();
   const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, setGeneratedResume, setIsGenerating, generatedResume, isGenerating, currentResumeId, setCurrentResumeId, hasLoadedExistingResume, setScore } = useResumeStore();
   const { user } = useAuthStore();
-  const { areTipsClosed, closeTips, showTips } = useTips();  
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [isGeneratingCV, setIsGeneratingCV] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
@@ -326,24 +322,6 @@ export function Step8Preview() {
               </div>
             </div>
           </div>
-        )}
-      </div>
-
-      {/* Tips Section */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">{t('wizard.steps.preview.ui.tips.title')}</h3>
-          {areTipsClosed && (
-            <TipsButton onClick={showTips} />
-          )}
-        </div>
-        
-        {!areTipsClosed && (
-          <FloatingTips
-            title={`💡 ${t('wizard.steps.preview.ui.tips.title')}`}
-            tips={t('wizard.steps.preview.ui.tips.items', { returnObjects: true }) as unknown as string[]}
-            onClose={closeTips}
-          />
         )}
       </div>
 

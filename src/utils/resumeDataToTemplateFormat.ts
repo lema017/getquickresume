@@ -118,8 +118,17 @@ export function convertResumeDataToTemplateFormat(resumeData: ResumeData): Templ
   
   // Convert language pageNumbers to languagesPageNumbers array
   let languagesPageNumbers: number[] | undefined;
-  if (resumeData.languagePageNumber !== null && languages.length > 0) {
-    languagesPageNumbers = languages.map(() => resumeData.languagePageNumber!);
+  if (languages.length > 0) {
+    if (resumeData.languages && resumeData.languages.length === languages.length) {
+      // Use individual page numbers if available
+      languagesPageNumbers = resumeData.languages.map((lang) => lang.pageNumber ?? resumeData.languagePageNumber ?? 1);
+    } else if (resumeData.languagePageNumber !== null) {
+      // Fallback to singular page number
+      languagesPageNumbers = languages.map(() => resumeData.languagePageNumber!);
+    } else {
+      // Default to page 1
+      languagesPageNumbers = languages.map(() => 1);
+    }
   }
 
   // 10. Achievements: Format Achievement[] to string[]
@@ -133,6 +142,7 @@ export function convertResumeDataToTemplateFormat(resumeData: ResumeData): Templ
   // Convert achievement pageNumbers to achievementsPageNumbers array
   let achievementsPageNumbers: number[] | undefined;
   if (achievements.length > 0) {
+    // Map each achievement to its page number from resumeData
     achievementsPageNumbers = resumeData.achievements.map((ach) => ach.pageNumber ?? 1);
   }
 
@@ -144,6 +154,7 @@ export function convertResumeDataToTemplateFormat(resumeData: ResumeData): Templ
   // Convert certification pageNumbers to certificationsPageNumbers array
   let certificationsPageNumbers: number[] | undefined;
   if (certifications.length > 0) {
+    // Map each certification to its page number from resumeData
     certificationsPageNumbers = resumeData.certifications.map((cert) => cert.pageNumber ?? 1);
   }
 
@@ -175,15 +186,18 @@ export function filterDataForPage(
   paginatedData: TemplateDataFormat,
   pageNumber: number
 ): TemplateDataFormat {
+  // Determine which page profile/summary should appear on (respecting pagination calculation)
+  const profileTargetPage = paginatedData.profilePageNumber ?? 1;
+  
   const filtered: TemplateDataFormat = {
     ...paginatedData,
     // Header always on page 1
     name: pageNumber === 1 ? paginatedData.name : undefined,
     title: pageNumber === 1 ? paginatedData.title : undefined,
     contact: pageNumber === 1 ? paginatedData.contact : undefined,
-    // Profile always on page 1
-    profile: pageNumber === 1 ? paginatedData.profile : undefined,
-    profilePageNumber: pageNumber === 1 ? 1 : undefined,
+    // Profile on its assigned page (respecting pagination calculation)
+    profile: pageNumber === profileTargetPage ? paginatedData.profile : undefined,
+    profilePageNumber: pageNumber === profileTargetPage ? profileTargetPage : undefined,
   };
 
   // Filter skills by pageNumber

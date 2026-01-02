@@ -27,9 +27,9 @@ export function BlogPage() {
         <link rel="canonical" href={`${BASE_URL}/blog`} />
         
         {/* hreflang */}
-        <link rel="alternate" hreflang="en" href={`${BASE_URL}/blog`} />
-        <link rel="alternate" hreflang="es" href={`${BASE_URL}/blog?lang=es`} />
-        <link rel="alternate" hreflang="x-default" href={`${BASE_URL}/blog`} />
+        <link rel="alternate" hrefLang="en" href={`${BASE_URL}/blog`} />
+        <link rel="alternate" hrefLang="es" href={`${BASE_URL}/blog?lang=es`} />
+        <link rel="alternate" hrefLang="x-default" href={`${BASE_URL}/blog`} />
         
         {/* Open Graph */}
         <meta property="og:type" content="website" />

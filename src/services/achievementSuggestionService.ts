@@ -1,4 +1,5 @@
 import { AchievementSuggestion, AchievementSuggestionResponse, Project } from '@/types';
+import { handleAuthError } from '@/utils/authErrorHandler';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/dev';
 
@@ -30,11 +31,7 @@ class AchievementSuggestionService {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       
-      if (response.status === 401) {
-        throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
-      }
-      
-      // Handle premium required error (403)
+      // Handle premium required error (403) - do NOT logout
       if (response.status === 403 && errorData.code === 'PREMIUM_REQUIRED') {
         const error = new Error(errorData.message || 'Premium feature required');
         (error as any).code = 'PREMIUM_REQUIRED';
@@ -42,7 +39,9 @@ class AchievementSuggestionService {
         throw error;
       }
       
-      if (response.status === 403) {
+      // Handle auth errors (401/403) - logout and redirect
+      if (response.status === 401 || response.status === 403) {
+        handleAuthError();
         throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
       }
       
