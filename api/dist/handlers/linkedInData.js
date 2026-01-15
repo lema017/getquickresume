@@ -7,6 +7,7 @@ const inputSanitizer_1 = require("../utils/inputSanitizer");
 const rateLimiter_1 = require("../middleware/rateLimiter");
 const dynamodb_1 = require("../services/dynamodb");
 const textFormatting_1 = require("../utils/textFormatting");
+const premiumValidator_1 = require("../utils/premiumValidator");
 const parseLinkedInData = async (event) => {
     try {
         console.log('LinkedIn data parsing request received');
@@ -46,7 +47,8 @@ const parseLinkedInData = async (event) => {
                 })
             };
         }
-        if (!user.isPremium) {
+        const premiumStatus = (0, premiumValidator_1.checkPremiumStatus)(user);
+        if (!premiumStatus.isPremium) {
             return {
                 statusCode: 403,
                 headers: {
@@ -57,13 +59,16 @@ const parseLinkedInData = async (event) => {
                 },
                 body: JSON.stringify({
                     success: false,
-                    error: 'Premium subscription required',
-                    message: 'LinkedIn import is a premium feature. Please upgrade to access this functionality.'
+                    error: premiumStatus.isExpired ? 'Premium subscription expired' : 'Premium subscription required',
+                    message: premiumStatus.isExpired
+                        ? 'Your premium subscription has expired. Please renew to continue using this feature.'
+                        : 'LinkedIn import is a premium feature. Please upgrade to access this functionality.'
                 })
             };
         }
-        // Rate limiting: 5 requests por minuto
-        const rateLimitResult = await (0, rateLimiter_1.checkRateLimit)(userId, 'linkedin-data-parsing', 5, 60000);
+        // Rate limiting: 1 request/minute for free users, 5 requests/minute for premium users
+        const maxRequests = user.isPremium ? 5 : 1;
+        const rateLimitResult = await (0, rateLimiter_1.checkRateLimit)(userId, 'linkedin-data-parsing', maxRequests, 60000);
         if (!rateLimitResult.allowed) {
             return {
                 statusCode: 429,
@@ -76,7 +81,7 @@ const parseLinkedInData = async (event) => {
                 body: JSON.stringify({
                     success: false,
                     error: 'Rate limit exceeded',
-                    message: 'Too many LinkedIn data parsing requests. Please wait before trying again.',
+                    message: `Too many LinkedIn data parsing requests. Please wait before trying again. (Limit: ${maxRequests} per minute)`,
                     resetTime: rateLimitResult.resetTime
                 })
             };

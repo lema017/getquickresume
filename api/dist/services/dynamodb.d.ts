@@ -38,9 +38,10 @@ export interface User {
     subscriptionExpiration?: string;
     planType?: 'monthly' | 'yearly';
     subscriptionStartDate?: string;
-    paddleCustomerId?: string;
-    paddleSubscriptionId?: string;
-    paddleTransactionId?: string;
+    paymentProvider?: 'paypal' | 'stripe' | 'other';
+    paymentCustomerId?: string;
+    paymentSubscriptionId?: string;
+    paymentTransactionId?: string;
     aiUsageStats?: AIUsageStats;
     jobTailoringUsage?: {
         totalUsed: number;
@@ -63,5 +64,5 @@ export declare const updateUser: (id: string, updates: Partial<User>) => Promise
  * Upgrade user to premium status
  * Sets isPremium to true and stores subscription details
  */
-export declare const upgradeUserToPremium: (userId: string, planType: "monthly" | "yearly", paddleCustomerId: string, paddleSubscriptionId?: string, paddleTransactionId?: string) => Promise<User>;
+export declare const upgradeUserToPremium: (userId: string, planType: "monthly" | "yearly", paymentProvider: "paypal" | "stripe" | "other", paymentCustomerId: string, paymentSubscriptionId?: string, paymentTransactionId?: string) => Promise<User>;
 //# sourceMappingURL=dynamodb.d.ts.map

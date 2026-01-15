@@ -6,6 +6,9 @@ import { create } from 'zustand';
 import { ResumeData } from '@/types';
 import { ExtractedResumeData, ValidationError } from '@/services/resumeExtractionService';
 
+// Supported target languages for resume generation
+export type TargetLanguage = 'en' | 'es';
+
 interface UploadResumeState {
   // File state
   selectedFile: File | null;
@@ -18,12 +21,15 @@ interface UploadResumeState {
   isExtractingData: boolean;
   dataExtractionError: string | null;
   
+  // Language selection for AI processing
+  targetLanguage: TargetLanguage;
+  
   // Validation
   validationErrors: ValidationError[];
   validationWarnings: ValidationError[];
   
   // UI state
-  currentStep: 'upload' | 'extracting' | 'review' | 'creating';
+  currentStep: 'upload' | 'language' | 'extracting' | 'review' | 'creating';
   
   // Actions
   setFile: (file: File | null) => void;
@@ -38,7 +44,10 @@ interface UploadResumeState {
   setValidationErrors: (errors: ValidationError[]) => void;
   setValidationWarnings: (warnings: ValidationError[]) => void;
   
-  setCurrentStep: (step: 'upload' | 'extracting' | 'review' | 'creating') => void;
+  setCurrentStep: (step: 'upload' | 'language' | 'extracting' | 'review' | 'creating') => void;
+  
+  // Language selection
+  setTargetLanguage: (language: TargetLanguage) => void;
   
   // Field update for review/edit
   updateField: <K extends keyof ExtractedResumeData>(
@@ -91,6 +100,7 @@ const initialState = {
   extractedData: null,
   isExtractingData: false,
   dataExtractionError: null,
+  targetLanguage: 'en' as TargetLanguage,
   validationErrors: [],
   validationWarnings: [],
   currentStep: 'upload' as const,
@@ -118,6 +128,8 @@ export const useUploadResumeStore = create<UploadResumeState>((set, get) => ({
   setValidationWarnings: (warnings) => set({ validationWarnings: warnings }),
   
   setCurrentStep: (step) => set({ currentStep: step }),
+  
+  setTargetLanguage: (language) => set({ targetLanguage: language }),
 
   updateField: (field, value) => {
     const { extractedData } = get();

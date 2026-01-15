@@ -531,11 +531,26 @@ export const es = {
       processing: {
         processingTitle: 'Procesando tu CV...',
         selectedTitle: 'Archivo seleccionado',
-        message: 'Nuestra IA está extrayendo y analizando la información de tu CV. Esto puede tomar unos momentos.',
+        message: 'Nuestra IA está extrayendo datos de tu CV y categorizándolos en secciones. Esto puede tomar unos momentos.',
         fileName: 'Archivo: {{name}}',
         uploading: 'Procesando...',
         processWithAI: 'Procesar con IA',
-        extractionHint: 'Extrayendo información personal, experiencia laboral, educación y habilidades...'
+        extractionHint: 'Extrayendo información personal, experiencia laboral, educación y habilidades...',
+        title: 'Extrayendo Datos del Currículum',
+        subtitle: 'Extrayendo y organizando los datos de tu CV en {{language}}...',
+        step1: 'Texto del documento extraído',
+        step2: 'Extrayendo y categorizando datos...',
+        step3: 'Organizando en secciones',
+        generatingIn: 'Generando en'
+      },
+      languageSelection: {
+        title: 'Selecciona el Idioma del Currículum',
+        subtitle: 'Elige el idioma en el que quieres generar tu currículum. Todas las sugerencias y contenido de IA estarán en este idioma.',
+        explanation: 'El idioma que selecciones se usará para todo el contenido generado por IA, incluyendo sugerencias, mejoras y el texto final del currículum.',
+        continue: 'Continuar',
+        fileInfo: '{{chars}} caracteres extraídos',
+        englishLabel: 'Inglés',
+        spanishLabel: 'Español'
       },
       preview: {
         title: 'Información extraída',
@@ -589,6 +604,7 @@ export const es = {
       review: {
         title: 'Revisar Datos Extraídos',
         subtitle: 'Verifica y edita la información extraída de tu CV antes de crear tu currículum.',
+        generatingIn: 'Idioma del contenido',
         sections: {
           profile: 'Información del Perfil',
           skills: 'Habilidades',
@@ -609,7 +625,14 @@ export const es = {
         addButton: 'Agregar {{item}}',
         validation: {
           requiredFields: 'Por favor, completa todos los campos requeridos',
-          fixErrors: 'Por favor, corrige los errores a continuación'
+          fixErrors: 'Por favor, corrige los errores a continuación',
+          educationStartDate: 'Educación #{{index}}: Fecha de Inicio es requerida',
+          certificationDate: 'Certificación #{{index}}: Fecha de Obtención es requerida',
+          experienceCompany: 'Experiencia #{{index}}: Empresa es requerida',
+          experienceStartDate: 'Experiencia #{{index}}: Fecha de Inicio es requerida',
+          experienceEndDate: 'Experiencia #{{index}}: Fecha de Fin es requerida',
+          experienceDateRange: 'Experiencia #{{index}}: La fecha de fin debe ser posterior a la fecha de inicio',
+          achievementDescription: 'Logro #{{index}}: Descripción es requerida'
         },
         actions: {
           back: 'Atrás',
@@ -626,7 +649,9 @@ export const es = {
           addAll: 'Agregar Todas',
           enhanced: '¡Texto mejorado!',
           error: 'Error al mejorar texto',
-          premiumRequired: 'Premium requerido para funciones IA'
+          premiumRequired: 'Premium requerido para funciones IA',
+          rateLimitTitle: 'Un momento por favor ⏳',
+          rateLimitMessage: '¡Estás mejorando contenido muy rápido! Por favor espera unos segundos antes de intentar de nuevo. Esto nos ayuda a mantener respuestas de IA de calidad.'
         },
         fields: {
           // Profile fields
@@ -1716,12 +1741,18 @@ export const es = {
       title: 'Límite de uso alcanzado',
       defaultMessage: 'Has realizado demasiadas solicitudes. Por favor, espera antes de intentar de nuevo.',
       freeUserMessage: 'Los usuarios gratuitos tienen un uso limitado de las funciones de IA.',
+      premiumUserMessage: 'Has alcanzado un límite temporal. Como usuario Premium, tienes límites mucho más altos que los usuarios gratuitos. Por favor, espera un momento.',
+      premiumUserBenefit: 'Los usuarios Premium disfrutan de 5x más solicitudes de IA por minuto que los usuarios gratuitos.',
       waitMessage: 'Por favor, espera 1 minuto antes de intentar de nuevo.',
       waitCountdown: 'Podrás intentar de nuevo en {{time}}',
       canRetryNow: '¡Ya puedes intentar de nuevo!',
       upgradeCta: 'Actualizar a Premium',
       premiumBenefit: 'Obtén 10x más sugerencias de IA por minuto',
       retryButton: 'Intentar de nuevo',
+      // Mensajes específicos para recalificar
+      rescoreTitle: 'Límite de Calificación Alcanzado',
+      rescorePremiumMessage: 'La calificación de CVs usa análisis de IA. Para garantizar resultados de calidad para todos, hay un límite de uso justo de 5 calificaciones por minuto. Podrás intentar de nuevo en breve.',
+      premiumLimitExplainer: 'Los usuarios Premium pueden calificar hasta 5 CVs por minuto',
     },
   },
 
@@ -1748,6 +1779,7 @@ export const es = {
       score: 'Puntuacion',
       template: 'Visualizar',
       download: 'Descargar',
+      final: 'Finalizar',
     },
     limitExceeded: '⚠️ Límite excedido. Reduce {{count}} caracteres',
     charactersRemaining: '⚠️ Te quedan {{count}} caracteres',
@@ -2177,7 +2209,7 @@ export const es = {
       title: 'Términos de Servicio',
     },
     refund: {
-      title: 'Política de Reembolsos',
+      title: 'Política de No Reembolsos',
     },
   },
 
@@ -2309,6 +2341,33 @@ export const es = {
           exclusiveDesigns: 'Acceso a diseños premium exclusivos',
           allTemplates: 'Desbloquea todos los diseños de plantillas',
           professionalLook: 'Destaca con plantillas profesionales',
+        },
+      },
+      translate: {
+        title: 'Traducir CV - Función Premium',
+        description: 'Traduce tu CV a más de 10 idiomas con calidad profesional. Perfecto para aplicar a trabajos internacionales.',
+        benefits: {
+          multiLanguage: 'Traduce a más de 10 idiomas',
+          professionalQuality: 'Traducción con calidad profesional',
+          preserveFormatting: 'Mantiene el formato original del CV',
+        },
+      },
+      tailorForJob: {
+        title: 'Adaptar para Empleo - Función Premium',
+        description: 'Optimiza tu CV para una oferta de trabajo específica. Nuestra IA analiza los requisitos y sugiere mejoras personalizadas.',
+        benefits: {
+          aiAnalysis: 'Análisis de requisitos con IA',
+          keywordOptimization: 'Optimización de palabras clave',
+          matchScore: 'Puntuación de coincidencia con el empleo',
+        },
+      },
+      share: {
+        title: 'Compartir y Rastrear - Función Premium',
+        description: 'Comparte tu CV con un enlace único y rastrea quién lo ve. Obtén analíticas detalladas de vistas.',
+        benefits: {
+          trackViews: 'Rastrea quién ve tu CV',
+          qrCode: 'Código QR para compartir fácilmente',
+          analytics: 'Analíticas de dispositivo y ubicación',
         },
       },
     },
@@ -2510,11 +2569,21 @@ export const es = {
       profession: 'Profesión:',
       experience: 'Experiencia:',
       experiences: 'Experiencias:',
+      language: 'Idioma:',
       aiOptimized: 'Optimizado con IA',
       aiEnhanced: 'Mejorado con IA',
       publiclyShared: 'Compartido Públicamente',
       score: 'Puntuación del CV',
       updated: 'Actualizado:',
+    },
+    aiTools: {
+      title: 'Herramientas IA',
+      share: 'Compartir',
+      translate: 'Traducir',
+      tailor: 'Adaptar',
+      enhance: 'Mejorar',
+      rescore: 'Puntuar',
+      premiumBadge: 'PRO',
     },
   },
   resumeView: {
@@ -3220,6 +3289,98 @@ export const es = {
         description: '¿Estás seguro de que quieres eliminar este CV personalizado? Esta acción no se puede deshacer.',
         deleting: 'Eliminando...',
       },
+    },
+  },
+
+  // Premium Modal - Contenido de ventas por funcionalidad
+  premiumModal: {
+    maybeLater: 'Quizás Luego',
+    
+    // Función de Traducción
+    translate: {
+      headline: 'Postúlate a Empleos en Todo el Mundo',
+      subheadline: 'Traduce tu CV instantáneamente a 12 idiomas con calidad profesional impulsada por IA',
+      speed: 'Ultrarrápido',
+      speedDesc: 'Menos de 30 segundos',
+      quality: 'Calidad Profesional',
+      qualityDesc: 'Precisión con IA',
+      format: 'Mantiene Formato',
+      formatDesc: 'Diseño perfecto preservado',
+      unlimited: 'Uso Ilimitado',
+      unlimitedDesc: 'Traduce cuando quieras',
+      cta: 'Desbloquear Empleos Globales',
+    },
+
+    // Función Adaptar para Empleo
+    tailorForJob: {
+      headline: 'Consigue Más Entrevistas',
+      subheadline: 'La IA optimiza tu CV para coincidir perfectamente con cualquier oferta de trabajo',
+      before: 'Antes',
+      after: 'Después',
+      instant: 'Análisis Instantáneo',
+      instantDesc: 'La IA lee la oferta en segundos',
+      ats: 'Supera los Sistemas ATS',
+      atsDesc: 'Palabras clave y formato optimizados',
+      interviews: '3x Más Llamadas',
+      interviewsDesc: 'Los usuarios reportan mejores resultados',
+      socialProof: '✨ Los usuarios reciben 3x más invitaciones a entrevistas',
+      cta: 'Aumentar Mi Puntuación',
+    },
+
+    // Función Mejorar con IA
+    enhance: {
+      headline: 'Haz Tu CV Compatible con ATS',
+      subheadline: 'La IA reescribe y optimiza cada sección para máximo impacto',
+      before: 'Antes',
+      after: 'Después',
+      beforeText: 'Gestioné proyectos del equipo',
+      afterText: 'Lideré equipo multifuncional de 8 personas, entregando 5 proyectos 20% bajo presupuesto',
+      ats: 'Supera 95% de ATS',
+      atsDesc: 'Optimizado para todos los sistemas',
+      rewrite: 'Reescritura con IA',
+      rewriteDesc: 'Frases débiles → Alto impacto',
+      sections: 'Todas las Secciones',
+      sectionsDesc: 'Mejora cada parte individualmente',
+      keywords: 'Palabras Clave Inteligentes',
+      keywordsDesc: 'Términos específicos del sector',
+      cta: 'Mejorar Mi CV',
+    },
+
+    // Función Compartir
+    share: {
+      headline: 'Sabe Quién Ve Tu CV',
+      subheadline: 'Obtén analíticas en tiempo real de cada vista con enlaces compartibles y códigos QR',
+      viewsToday: 'Vistas Hoy',
+      realtime: 'Seguimiento en Tiempo Real',
+      realtimeDesc: 'Sabe cuándo los reclutadores ven tu CV',
+      qrcode: 'Código QR para Compartir',
+      qrcodeDesc: 'Perfecto para eventos de networking',
+      location: 'Información de Ubicación',
+      locationDesc: 'Ve ciudades y países',
+      cta: 'Empezar a Rastrear Vistas',
+    },
+
+    // Función Re-evaluar
+    rescore: {
+      headline: 'Rastrea Tu Mejora',
+      subheadline: 'Obtén puntuaciones detalladas de compatibilidad ATS con retroalimentación accionable',
+      current: 'Actual',
+      potential: 'Potencial',
+      detailed: 'Puntuación ATS Detallada',
+      detailedDesc: 'Sabe exactamente dónde estás',
+      breakdown: 'Desglose por Sección',
+      breakdownDesc: 'Ve qué necesita trabajo',
+      unlimited: 'Re-evaluación Ilimitada',
+      unlimitedDesc: 'Verifica después de cada edición',
+      cta: 'Obtener Mi Puntuación',
+    },
+
+    // Fallback por defecto
+    default: {
+      benefit1: 'Acceso ilimitado a todas las funciones premium',
+      benefit2: 'Herramientas impulsadas por IA para mejores resultados',
+      benefit3: 'Soporte prioritario cuando lo necesites',
+      cta: 'Actualizar a Premium',
     },
   },
 };

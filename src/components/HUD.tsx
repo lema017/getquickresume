@@ -54,7 +54,7 @@ export function HUD() {
     { number: 8, key: 'generate', title: t('hud.stepTitles.generate') },
     { number: 9, key: 'score', title: t('hud.stepTitles.score') },
     { number: 10, key: 'template', title: t('hud.stepTitles.template') },
-    { number: 11, key: 'download', title: t('hud.stepTitles.download') },
+    { number: 11, key: 'final', title: t('hud.stepTitles.final') },
   ];
 
   const handleStepClick = (stepNumber: number) => {

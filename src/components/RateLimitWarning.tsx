@@ -1,24 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Crown, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Crown, Clock, AlertTriangle, CheckCircle, X, Sparkles } from 'lucide-react';
 
 interface RateLimitWarningProps {
   /** Custom error message to display (optional, uses default if not provided) */
   message?: string;
   /** Callback when user clicks retry button */
   onRetry?: () => void;
+  /** Callback when user clicks close button */
+  onClose?: () => void;
   /** Whether to show the retry button */
   showRetry?: boolean;
   /** Countdown duration in seconds (default: 60) */
   countdownSeconds?: number;
+  /** Whether the user is a premium subscriber */
+  isPremium?: boolean;
 }
 
 export function RateLimitWarning({ 
   message, 
   onRetry,
+  onClose,
   showRetry = true,
-  countdownSeconds = 60
+  countdownSeconds = 60,
+  isPremium = false
 }: RateLimitWarningProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -65,27 +71,54 @@ export function RateLimitWarning({
     }
   };
 
+  // Different styling and content for premium vs free users
+  const bgColor = isPremium ? 'bg-blue-50' : 'bg-amber-50';
+  const borderColor = isPremium ? 'border-blue-200' : 'border-amber-200';
+  const iconColor = isPremium ? 'text-blue-600' : 'text-amber-600';
+  const titleColor = isPremium ? 'text-blue-800' : 'text-amber-800';
+  const textColor = isPremium ? 'text-blue-700' : 'text-amber-700';
+  const secondaryTextColor = isPremium ? 'text-blue-600' : 'text-amber-600';
+  const circleColor = isPremium ? 'text-blue-200' : 'text-amber-200';
+  const progressColor = isPremium ? 'text-blue-500' : 'text-amber-500';
+
   return (
-    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+    <div className={`${bgColor} border ${borderColor} rounded-lg p-4 relative`}>
+      {/* Close button for premium users or if onClose is provided */}
+      {onClose && (
+        <button
+          onClick={onClose}
+          className={`absolute top-2 right-2 ${secondaryTextColor} hover:${titleColor} transition-colors`}
+        >
+          <X className="w-4 h-4" />
+        </button>
+      )}
+      
       {/* Header with icon */}
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0">
-          <AlertTriangle className="w-5 h-5 text-amber-600" />
+          {isPremium ? (
+            <Sparkles className={`w-5 h-5 ${iconColor}`} />
+          ) : (
+            <AlertTriangle className={`w-5 h-5 ${iconColor}`} />
+          )}
         </div>
         <div className="flex-1">
           {/* Title */}
-          <h4 className="text-sm font-semibold text-amber-800 mb-1">
+          <h4 className={`text-sm font-semibold ${titleColor} mb-1`}>
             {t('wizard.rateLimit.title')}
           </h4>
           
-          {/* Error message - always use translated message for consistency */}
-          <p className="text-sm text-amber-700 mb-2">
+          {/* Error message - different for premium vs free */}
+          <p className={`text-sm ${textColor} mb-2`}>
             {t('wizard.rateLimit.defaultMessage')}
           </p>
           
-          {/* Free user explanation */}
-          <p className="text-sm text-amber-600 mb-3">
-            {t('wizard.rateLimit.freeUserMessage')}
+          {/* User type explanation */}
+          <p className={`text-sm ${secondaryTextColor} mb-3`}>
+            {isPremium 
+              ? t('wizard.rateLimit.premiumUserMessage')
+              : t('wizard.rateLimit.freeUserMessage')
+            }
           </p>
           
           {/* Countdown Timer */}
@@ -101,7 +134,7 @@ export function RateLimitWarning({
                   stroke="currentColor"
                   strokeWidth="4"
                   fill="none"
-                  className="text-amber-200"
+                  className={circleColor}
                 />
                 {/* Progress circle */}
                 <circle
@@ -112,7 +145,7 @@ export function RateLimitWarning({
                   strokeWidth="4"
                   fill="none"
                   strokeLinecap="round"
-                  className={canRetry ? "text-green-500" : "text-amber-500"}
+                  className={canRetry ? "text-green-500" : progressColor}
                   strokeDasharray={`${2 * Math.PI * 28}`}
                   strokeDashoffset={`${2 * Math.PI * 28 * (1 - progressPercentage / 100)}`}
                   style={{ transition: 'stroke-dashoffset 1s linear' }}
@@ -123,7 +156,7 @@ export function RateLimitWarning({
                 {canRetry ? (
                   <CheckCircle className="w-6 h-6 text-green-500" />
                 ) : (
-                  <span className="text-sm font-bold text-amber-700">
+                  <span className={`text-sm font-bold ${textColor}`}>
                     {formatTime(secondsRemaining)}
                   </span>
                 )}
@@ -141,8 +174,8 @@ export function RateLimitWarning({
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-amber-600" />
-                  <span className="text-sm text-amber-600">
+                  <Clock className={`w-4 h-4 ${secondaryTextColor}`} />
+                  <span className={`text-sm ${secondaryTextColor}`}>
                     {t('wizard.rateLimit.waitCountdown', { time: formatTime(secondsRemaining) })}
                   </span>
                 </div>
@@ -152,14 +185,16 @@ export function RateLimitWarning({
           
           {/* Actions */}
           <div className="flex flex-wrap items-center gap-3">
-            {/* Premium CTA */}
-            <button
-              onClick={handleUpgrade}
-              className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all shadow-sm hover:shadow-md"
-            >
-              <Crown className="w-4 h-4 mr-1.5" />
-              {t('wizard.rateLimit.upgradeCta')}
-            </button>
+            {/* Premium CTA - only show for free users */}
+            {!isPremium && (
+              <button
+                onClick={handleUpgrade}
+                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all shadow-sm hover:shadow-md"
+              >
+                <Crown className="w-4 h-4 mr-1.5" />
+                {t('wizard.rateLimit.upgradeCta')}
+              </button>
+            )}
             
             {/* Retry button */}
             {showRetry && onRetry && (
@@ -177,9 +212,12 @@ export function RateLimitWarning({
             )}
           </div>
           
-          {/* Premium benefit */}
-          <p className="text-xs text-amber-500 mt-3">
-            {t('wizard.rateLimit.premiumBenefit')}
+          {/* Benefit explanation */}
+          <p className={`text-xs ${isPremium ? 'text-blue-500' : 'text-amber-500'} mt-3`}>
+            {isPremium 
+              ? t('wizard.rateLimit.premiumUserBenefit')
+              : t('wizard.rateLimit.premiumBenefit')
+            }
           </p>
         </div>
       </div>

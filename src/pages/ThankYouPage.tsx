@@ -1,18 +1,36 @@
 import { useEffect, useState } from 'react';
-import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/stores/authStore';
-import { Check, Crown, ArrowRight, Loader2 } from 'lucide-react';
+import { Check, Crown, ArrowRight, Loader2, Receipt } from 'lucide-react';
+
+// Type for navigation state from payment flow
+interface PaymentState {
+  transactionId?: string;
+  planType?: 'monthly' | 'yearly';
+  paymentConfirmed?: boolean;
+}
+
+// Plan display names and prices
+const PLAN_DETAILS = {
+  monthly: { name: 'Monthly Premium', price: '$9.99', period: 'month' },
+  yearly: { name: 'Yearly Premium', price: '$59.99', period: 'year' },
+};
 
 export function ThankYouPage() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, isAuthenticated, refreshUserPremiumStatus } = useAuthStore();
   const [isVerifying, setIsVerifying] = useState(true);
   const [isPremium, setIsPremium] = useState(false);
   
-  const transactionId = searchParams.get('transaction_id');
+  // Get payment details from navigation state or URL params
+  const paymentState = location.state as PaymentState | null;
+  const transactionId = paymentState?.transactionId || searchParams.get('transaction_id');
+  const planType = paymentState?.planType;
+  const paymentConfirmed = paymentState?.paymentConfirmed || false;
 
   useEffect(() => {
     // If user is not authenticated, redirect to login
@@ -21,8 +39,14 @@ export function ThankYouPage() {
       return;
     }
 
-    // Check if user is premium (webhook should have processed by now)
-    // Poll for premium status with timeout
+    // If payment was already confirmed (from PayPal synchronous flow), skip polling
+    if (paymentConfirmed) {
+      setIsPremium(true);
+      setIsVerifying(false);
+      return;
+    }
+
+    // Legacy flow: Poll for premium status (for webhook-based payments)
     const checkPremiumStatus = async () => {
       const maxAttempts = 10; // 10 attempts
       const delayMs = 2000; // 2 seconds between attempts
@@ -67,7 +91,7 @@ export function ThankYouPage() {
     };
 
     checkPremiumStatus();
-  }, [isAuthenticated, navigate, refreshUserPremiumStatus]);
+  }, [isAuthenticated, navigate, refreshUserPremiumStatus, paymentConfirmed]);
 
   if (!isAuthenticated) {
     return null; // Will redirect
@@ -101,10 +125,35 @@ export function ThankYouPage() {
               <p className="text-xl text-blue-100 mb-4">
                 {t('thankYou.subtitle')}
               </p>
-              {transactionId && (
-                <p className="text-sm text-blue-200">
-                  {t('thankYou.transactionId')}: {transactionId}
-                </p>
+              
+              {/* Payment Details Card */}
+              {(transactionId || planType) && (
+                <div className="mt-8 inline-block bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-left">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Receipt className="w-6 h-6 text-blue-200" />
+                    <span className="text-lg font-semibold text-white">Payment Details</span>
+                  </div>
+                  <div className="space-y-2 text-blue-100">
+                    {planType && PLAN_DETAILS[planType] && (
+                      <>
+                        <div className="flex justify-between gap-8">
+                          <span className="text-blue-200">Plan:</span>
+                          <span className="font-medium text-white">{PLAN_DETAILS[planType].name}</span>
+                        </div>
+                        <div className="flex justify-between gap-8">
+                          <span className="text-blue-200">Amount:</span>
+                          <span className="font-medium text-white">{PLAN_DETAILS[planType].price}/{PLAN_DETAILS[planType].period}</span>
+                        </div>
+                      </>
+                    )}
+                    {transactionId && (
+                      <div className="flex justify-between gap-8 pt-2 border-t border-white/20">
+                        <span className="text-blue-200">Transaction ID:</span>
+                        <span className="font-mono text-sm text-white">{transactionId}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
               )}
             </>
           )}

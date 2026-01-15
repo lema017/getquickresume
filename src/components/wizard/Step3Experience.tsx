@@ -15,7 +15,7 @@ import { Tooltip } from '@/components/ui/Tooltip';
 export function Step3Experience() {
   const { t } = useTranslation();
   const { navigateToStep } = useWizardNavigation();
-  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, addWorkExperience, currentResumeId } = useResumeStore();
+  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep, addWorkExperience, currentResumeId } = useResumeStore();
   const { user } = useAuthStore();
   const [experiences, setExperiences] = useState(resumeData.experience);
 
@@ -219,7 +219,7 @@ export function Step3Experience() {
     return errors;
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     const errors = computeValidationErrors();
     
     if (errors.length > 0) {
@@ -235,6 +235,13 @@ export function Step3Experience() {
     
     setShowErrors(false);
     updateResumeData({ experience: experiences });
+    // Save immediately before navigation to ensure data is persisted
+    try {
+      await saveResumeDataImmediately();
+    } catch (error) {
+      console.error('Error saving experience data:', error);
+      // Continue with navigation even if save fails - data is in store
+    }
     markStepCompleted(3);
     setCurrentStep(4);
     navigateToStep(4);

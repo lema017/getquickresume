@@ -135,9 +135,20 @@ export const useAuthStore = create<AuthStore>()(
           // Fetch fresh user data from backend (not from stale JWT)
           const user = await authService.getCurrentUser(token);
           if (user) {
+            // Check if subscription has expired locally (defensive check)
+            // The backend should have already updated isPremium, but this ensures UI sync
+            if (user.subscriptionExpiration && user.isPremium) {
+              const expDate = new Date(user.subscriptionExpiration);
+              if (expDate <= new Date()) {
+                console.log('[AuthStore] Subscription expired, syncing UI state');
+                user.isPremium = false;
+              }
+            }
+            
             console.log('[AuthStore] Premium status refreshed from backend:', {
               userId: user.id,
-              isPremium: user.isPremium
+              isPremium: user.isPremium,
+              subscriptionExpiration: user.subscriptionExpiration
             });
             set({ user, isAuthenticated: true });
           } else {

@@ -489,9 +489,7 @@ export function AccountPage() {
                     </div>
                   )}
                   <a
-                    href="https://customer-portal.paddle.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href="/support"
                     className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-white border border-amber-300 rounded-lg text-amber-700 font-medium hover:bg-amber-50 transition-colors mt-2"
                   >
                     {t('account.subscription.manageSubscription')}

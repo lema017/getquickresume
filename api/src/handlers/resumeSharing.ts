@@ -4,6 +4,7 @@ import { getResumeById, updateResume, getResumeByShareToken } from '../services/
 import { getUserById } from '../services/dynamodb';
 import { getAnalytics, getRecentViewers } from '../services/analyticsService';
 import { checkRateLimit, getClientIP } from '../utils/rateLimiter';
+import { checkPremiumStatus } from '../utils/premiumValidator';
 
 // Generate a secure 12-character alphanumeric token
 const generateShareToken = (): string => {
@@ -56,7 +57,24 @@ export const enableSharing = async (
 
     // Check if user is premium
     const user = await getUserById(userId);
-    if (!user || !user.isPremium) {
+    if (!user) {
+      return {
+        statusCode: 404,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+          'Access-Control-Allow-Methods': 'POST,OPTIONS'
+        },
+        body: JSON.stringify({
+          success: false,
+          error: 'User not found'
+        })
+      };
+    }
+    
+    const premiumStatus = checkPremiumStatus(user);
+    if (!premiumStatus.isPremium) {
       return {
         statusCode: 403,
         headers: {
@@ -67,8 +85,10 @@ export const enableSharing = async (
         },
         body: JSON.stringify({
           success: false,
-          error: 'Premium subscription required',
-          message: 'This feature is only available for premium users'
+          error: premiumStatus.isExpired ? 'Premium subscription expired' : 'Premium subscription required',
+          message: premiumStatus.isExpired 
+            ? 'Your premium subscription has expired. Please renew to continue using this feature.'
+            : 'This feature is only available for premium users'
         })
       };
     }

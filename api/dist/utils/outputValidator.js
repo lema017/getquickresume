@@ -3,12 +3,69 @@
  * Utilidades de validación de output del AI para prevenir contenido malicioso
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.detectOutputInjection = detectOutputInjection;
 exports.validateImprovedText = validateImprovedText;
 exports.validateMechanicalEnhancement = validateMechanicalEnhancement;
 exports.validateSectionType = validateSectionType;
 exports.validateTextLength = validateTextLength;
 exports.validateLanguage = validateLanguage;
 exports.validateResumeScore = validateResumeScore;
+/**
+ * Comprehensive output injection detection patterns
+ * Detects when AI output contains prompt injection attempts or system markers
+ */
+const OUTPUT_INJECTION_PATTERNS = [
+    // Role/instruction markers that shouldn't appear in output
+    /ignore\s+previous\s+instructions/i,
+    /ignore\s+all\s+previous/i,
+    /disregard\s+(your\s+)?instructions/i,
+    /override\s+(your\s+)?instructions/i,
+    /system\s*:/i,
+    /assistant\s*:/i,
+    /user\s*:/i,
+    /\binstruction[s]?\s*:/i,
+    // Special tokens that indicate injection attempts
+    /<\|.*?\|>/i,
+    /<\|endoftext\|>/i,
+    /<\|im_start\|>/i,
+    /<\|im_end\|>/i,
+    /<\|pad\|>/i,
+    // Model-specific markers
+    /\[INST\]/i,
+    /\[\/INST\]/i,
+    /<<SYS>>/i,
+    /<<\/SYS>>/i,
+    /\[SYSTEM\]/i,
+    /\[\/SYSTEM\]/i,
+    // Code blocks with system content
+    /```system/i,
+    /```instruction/i,
+    /```prompt/i,
+    // Jailbreak indicators in output
+    /\bDAN\s+mode/i,
+    /do\s+anything\s+now/i,
+    /jailbreak\s+(successful|enabled|activated)/i,
+    // Indicators that the AI is exposing internal instructions
+    /my\s+(system\s+)?instructions\s+are/i,
+    /here\s+are\s+my\s+instructions/i,
+    /my\s+prompt\s+is/i,
+    /i\s+was\s+instructed\s+to/i,
+];
+/**
+ * Detect output injection attempts in AI-generated content
+ */
+function detectOutputInjection(output) {
+    if (!output || typeof output !== 'string') {
+        return { isValid: true }; // Empty output is handled elsewhere
+    }
+    for (const pattern of OUTPUT_INJECTION_PATTERNS) {
+        if (pattern.test(output)) {
+            console.warn('[OutputValidator] Injection pattern detected in output:', pattern.source);
+            return { isValid: false, reason: 'Output contains injection attempts or system markers' };
+        }
+    }
+    return { isValid: true };
+}
 function validateImprovedText(improved, original, sectionType) {
     if (!improved || typeof improved !== 'string') {
         return { isValid: false, reason: 'Improved text is required' };
@@ -77,19 +134,9 @@ function validateImprovedText(improved, original, sectionType) {
         }
     }
     // 7. Verificar que no contiene intentos de prompt injection en el output
-    const injectionPatterns = [
-        /ignore\s+previous\s+instructions/i,
-        /system\s*:/i,
-        /assistant\s*:/i,
-        /<\|.*?\|>/i,
-        /```.*?```/s,
-        /\[INST\]/i,
-        /\[\/INST\]/i,
-    ];
-    for (const pattern of injectionPatterns) {
-        if (pattern.test(improved)) {
-            return { isValid: false, reason: 'Improved text contains injection attempts' };
-        }
+    const outputInjectionResult = detectOutputInjection(improved);
+    if (!outputInjectionResult.isValid) {
+        return outputInjectionResult;
     }
     return { isValid: true };
 }
@@ -157,19 +204,9 @@ function validateMechanicalEnhancement(improved, original) {
         }
     }
     // 6. Verify it doesn't contain prompt injection attempts
-    const injectionPatterns = [
-        /ignore\s+previous\s+instructions/i,
-        /system\s*:/i,
-        /assistant\s*:/i,
-        /<\|.*?\|>/i,
-        /```.*?```/s,
-        /\[INST\]/i,
-        /\[\/INST\]/i,
-    ];
-    for (const pattern of injectionPatterns) {
-        if (pattern.test(improved)) {
-            return { isValid: false, reason: 'Improved text contains injection attempts' };
-        }
+    const outputInjectionResult = detectOutputInjection(improved);
+    if (!outputInjectionResult.isValid) {
+        return outputInjectionResult;
     }
     // NOTE: We intentionally skip the similarity check here because mechanical fixes
     // like removing first-person pronouns will legitimately change the word structure

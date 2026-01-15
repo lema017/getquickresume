@@ -3,6 +3,7 @@ import { aiService } from '../services/aiService';
 import { checkRateLimit, refundRateLimit } from '../middleware/rateLimiter';
 import { getUserById } from '../services/dynamodb';
 import { verifyResumeOwnership } from '../services/resumeService';
+import { checkPremiumStatus } from '../utils/premiumValidator';
 
 interface DirectEnhanceRequest {
   checklistItemId: string;
@@ -71,15 +72,18 @@ export const directEnhance = async (
     }
 
     // Premium check: Direct enhancement is a premium-only feature
-    if (!user.isPremium) {
+    const premiumStatus = checkPremiumStatus(user);
+    if (!premiumStatus.isPremium) {
       return {
         statusCode: 403,
         headers: CORS_HEADERS,
         body: JSON.stringify({
           success: false,
-          error: 'Premium feature required',
-          message: 'Direct enhancement is only available for premium users.',
-          code: 'PREMIUM_REQUIRED'
+          error: premiumStatus.isExpired ? 'Premium subscription expired' : 'Premium feature required',
+          message: premiumStatus.isExpired 
+            ? 'Your premium subscription has expired. Please renew to continue using this feature.'
+            : 'Direct enhancement is only available for premium users.',
+          code: premiumStatus.isExpired ? 'PREMIUM_EXPIRED' : 'PREMIUM_REQUIRED'
         } as DirectEnhanceResponse)
       };
     }

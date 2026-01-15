@@ -13,7 +13,7 @@ import { Project, Language } from '@/types';
 export function Step5Projects() {
   const { t } = useTranslation();
   const { navigateToStep } = useWizardNavigation();
-  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, currentResumeId } = useResumeStore();
+  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep, currentResumeId } = useResumeStore();
   const [projects, setProjects] = useState(resumeData.projects);
   const [languages, setLanguages] = useState(resumeData.languages);
 
@@ -94,7 +94,7 @@ export function Step5Projects() {
   // Validation errors state
   const [showErrors, setShowErrors] = useState(false);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     // Projects are optional, but if any are added, they must be complete
     const incompleteProjects = projects.filter(project => 
       !project.name.trim() || !project.description.trim()
@@ -112,6 +112,13 @@ export function Step5Projects() {
     
     setShowErrors(false);
     updateResumeData({ projects, languages });
+    // Save immediately before navigation to ensure data is persisted
+    try {
+      await saveResumeDataImmediately();
+    } catch (error) {
+      console.error('Error saving projects data:', error);
+      // Continue with navigation even if save fails - data is in store
+    }
     markStepCompleted(5);
     setCurrentStep(6);
     navigateToStep(6);

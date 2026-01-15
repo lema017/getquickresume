@@ -1,6 +1,13 @@
 /**
  * Utilidades de validación de output del AI para prevenir contenido malicioso
  */
+/**
+ * Detect output injection attempts in AI-generated content
+ */
+export declare function detectOutputInjection(output: string): {
+    isValid: boolean;
+    reason?: string;
+};
 export declare function validateImprovedText(improved: string, original: string, sectionType: string): {
     isValid: boolean;
     reason?: string;

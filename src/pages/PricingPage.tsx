@@ -1,12 +1,38 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Check, ArrowRight, Crown, Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
-import { checkoutService } from '@/services/checkoutService';
 import toast from 'react-hot-toast';
 import { getPageSEO, generateFAQSchema, commonFAQs, BASE_URL } from '@/utils/seoConfig';
+import { paypalService } from '@/services/paypalService';
+
+// PayPal SDK types
+declare global {
+  interface Window {
+    paypal?: {
+      Buttons: (config: {
+        style?: {
+          layout?: 'vertical' | 'horizontal';
+          color?: 'gold' | 'blue' | 'silver' | 'white' | 'black';
+          shape?: 'rect' | 'pill';
+          label?: 'paypal' | 'checkout' | 'buynow' | 'pay';
+          height?: number;
+        };
+        createOrder: () => Promise<string>;
+        onApprove: (data: { orderID: string }) => Promise<void>;
+        onError?: (err: Error) => void;
+        onCancel?: () => void;
+      }) => {
+        render: (element: HTMLElement | string) => Promise<void>;
+      };
+    };
+  }
+}
+
+// Get PayPal Client ID from environment
+const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID || '';
 
 export function PricingPage() {
   const { t, i18n } = useTranslation();
@@ -14,8 +40,135 @@ export function PricingPage() {
   const seo = getPageSEO('pricing', lang);
   const faqSchema = generateFAQSchema(commonFAQs[lang]);
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, refreshUserPremiumStatus } = useAuthStore();
   const [loadingPlan, setLoadingPlan] = useState<'monthly' | 'yearly' | null>(null);
+  const [paypalReady, setPaypalReady] = useState(false);
+  const [showPayPalButtons, setShowPayPalButtons] = useState<'monthly' | 'yearly' | null>(null);
+
+  // Refs for PayPal button containers
+  const monthlyButtonRef = useRef<HTMLDivElement>(null);
+  const yearlyButtonRef = useRef<HTMLDivElement>(null);
+  const paypalButtonsRendered = useRef<{ monthly: boolean; yearly: boolean }>({ monthly: false, yearly: false });
+
+  // Load PayPal SDK
+  useEffect(() => {
+    if (!PAYPAL_CLIENT_ID) {
+      console.warn('PayPal Client ID not configured');
+      return;
+    }
+
+    // Check if PayPal SDK is already loaded
+    if (window.paypal) {
+      setPaypalReady(true);
+      return;
+    }
+
+    // Check if script is already being loaded
+    const existingScript = document.querySelector('script[src*="paypal.com/sdk/js"]');
+    if (existingScript) {
+      existingScript.addEventListener('load', () => setPaypalReady(true));
+      return;
+    }
+
+    // Load PayPal SDK script
+    const script = document.createElement('script');
+    script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=USD`;
+    script.async = true;
+    script.onload = () => {
+      console.log('PayPal SDK loaded');
+      setPaypalReady(true);
+    };
+    script.onerror = () => {
+      console.error('Failed to load PayPal SDK');
+      toast.error('Failed to load payment system');
+    };
+    document.body.appendChild(script);
+  }, []);
+
+  // Render PayPal buttons when ready and selected
+  useEffect(() => {
+    if (!paypalReady || !window.paypal || !showPayPalButtons) return;
+    if (!isAuthenticated || !user) return;
+
+    const planType = showPayPalButtons;
+    const buttonRef = planType === 'monthly' ? monthlyButtonRef : yearlyButtonRef;
+    
+    if (!buttonRef.current) return;
+    if (paypalButtonsRendered.current[planType]) return;
+
+    // Clear any existing buttons
+    buttonRef.current.innerHTML = '';
+
+    window.paypal.Buttons({
+      style: {
+        layout: 'vertical',
+        color: planType === 'yearly' ? 'gold' : 'blue',
+        shape: 'rect',
+        label: 'pay',
+        height: 45,
+      },
+      createOrder: async () => {
+        try {
+          setLoadingPlan(planType);
+          const response = await paypalService.createOrder(planType);
+          setLoadingPlan(null);
+          return response.orderId;
+        } catch (error) {
+          setLoadingPlan(null);
+          console.error('Error creating PayPal order:', error);
+          toast.error(error instanceof Error ? error.message : 'Failed to create order');
+          throw error;
+        }
+      },
+      onApprove: async (data: { orderID: string }) => {
+        try {
+          setLoadingPlan(planType);
+          const response = await paypalService.captureOrder(data.orderID);
+          
+          if (response.success) {
+            toast.success('Payment successful! Welcome to Premium!');
+            
+            // Refresh user data to update premium status
+            await refreshUserPremiumStatus();
+            
+            // Navigate to thank you page with payment details
+            navigate('/thank-you', { 
+              state: { 
+                transactionId: response.transactionId,
+                planType: response.planType,
+                paymentConfirmed: true
+              }
+            });
+          }
+        } catch (error) {
+          console.error('Error capturing PayPal order:', error);
+          toast.error(error instanceof Error ? error.message : 'Payment failed');
+        } finally {
+          setLoadingPlan(null);
+          setShowPayPalButtons(null);
+        }
+      },
+      onError: (err: Error) => {
+        console.error('PayPal error:', err);
+        toast.error('Payment error occurred. Please try again.');
+        setLoadingPlan(null);
+      },
+      onCancel: () => {
+        toast.error('Payment cancelled');
+        setLoadingPlan(null);
+        setShowPayPalButtons(null);
+      },
+    }).render(buttonRef.current);
+
+    paypalButtonsRendered.current[planType] = true;
+  }, [paypalReady, showPayPalButtons, isAuthenticated, user, navigate, refreshUserPremiumStatus]);
+
+  // Reset button render state when hiding
+  useEffect(() => {
+    if (!showPayPalButtons) {
+      paypalButtonsRendered.current = { monthly: false, yearly: false };
+    }
+  }, [showPayPalButtons]);
 
   const handleCheckout = async (planType: 'monthly' | 'yearly') => {
     // Check if user is authenticated
@@ -32,22 +185,14 @@ export function PricingPage() {
       return;
     }
 
-    setLoadingPlan(planType);
-
-    try {
-      const { checkoutUrl } = await checkoutService.createCheckoutTransaction(planType);
-      
-      // Redirect to Paddle hosted checkout
-      if (checkoutUrl) {
-        window.location.href = checkoutUrl;
-      } else {
-        throw new Error('No checkout URL received');
-      }
-    } catch (error: any) {
-      console.error('Checkout error:', error);
-      toast.error(error.message || t('checkout.error'));
-      setLoadingPlan(null);
+    // Check if PayPal is ready
+    if (!paypalReady || !PAYPAL_CLIENT_ID) {
+      toast.error('Payment system is not available. Please try again later.');
+      return;
     }
+
+    // Show PayPal buttons for this plan
+    setShowPayPalButtons(planType);
   };
 
   return (
@@ -184,23 +329,43 @@ export function PricingPage() {
                 ))}
               </ul>
               
-              <button
-                onClick={() => handleCheckout('monthly')}
-                disabled={loadingPlan !== null}
-                className="mt-auto w-full py-3 rounded-lg font-semibold text-center transition-all duration-300 bg-blue-600 text-white hover:bg-blue-700 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loadingPlan === 'monthly' ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    {t('checkout.processing')}
-                  </>
-                ) : (
-                  <>
-                <Crown className="w-4 h-4" />
-                {t('landing.plans.monthly.cta')}
-                  </>
-                )}
-              </button>
+              {showPayPalButtons === 'monthly' ? (
+                <div className="mt-auto">
+                  <div 
+                    ref={monthlyButtonRef}
+                    className="paypal-button-container min-h-[45px]"
+                  />
+                  <button
+                    onClick={() => setShowPayPalButtons(null)}
+                    className="w-full mt-3 py-2 text-sm text-slate-600 text-center opacity-70 hover:opacity-100 transition-opacity"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => handleCheckout('monthly')}
+                  disabled={loadingPlan !== null || !paypalReady}
+                  className="mt-auto w-full py-3 rounded-lg font-semibold text-center transition-all duration-300 bg-blue-600 text-white hover:bg-blue-700 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loadingPlan === 'monthly' ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      {t('checkout.processing')}
+                    </>
+                  ) : !paypalReady ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Loading...
+                    </>
+                  ) : (
+                    <>
+                      <Crown className="w-4 h-4" />
+                      {t('landing.plans.monthly.cta')}
+                    </>
+                  )}
+                </button>
+              )}
             </div>
 
             {/* Premium Yearly - Best Value */}
@@ -231,23 +396,43 @@ export function PricingPage() {
                 ))}
               </ul>
               
-              <button
-                onClick={() => handleCheckout('yearly')}
-                disabled={loadingPlan !== null}
-                className="mt-auto w-full py-3 rounded-lg font-semibold text-center transition-all duration-300 bg-white text-blue-700 hover:bg-blue-50 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loadingPlan === 'yearly' ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    {t('checkout.processing')}
-                  </>
-                ) : (
-                  <>
-                <Crown className="w-4 h-4" />
-                {t('landing.plans.yearly.cta')}
-                  </>
-                )}
-              </button>
+              {showPayPalButtons === 'yearly' ? (
+                <div className="mt-auto">
+                  <div 
+                    ref={yearlyButtonRef}
+                    className="paypal-button-container min-h-[45px]"
+                  />
+                  <button
+                    onClick={() => setShowPayPalButtons(null)}
+                    className="w-full mt-3 py-2 text-sm text-blue-100 text-center opacity-70 hover:opacity-100 transition-opacity"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => handleCheckout('yearly')}
+                  disabled={loadingPlan !== null || !paypalReady}
+                  className="mt-auto w-full py-3 rounded-lg font-semibold text-center transition-all duration-300 bg-white text-blue-700 hover:bg-blue-50 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loadingPlan === 'yearly' ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      {t('checkout.processing')}
+                    </>
+                  ) : !paypalReady ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Loading...
+                    </>
+                  ) : (
+                    <>
+                      <Crown className="w-4 h-4" />
+                      {t('landing.plans.yearly.cta')}
+                    </>
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </div>

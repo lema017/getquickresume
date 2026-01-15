@@ -7,15 +7,18 @@ import { useAuthStore } from '@/stores/authStore';
 import { templatesService, ResumeTemplate } from '@/services/templatesService';
 import { TemplatePreviewModal } from './TemplatePreviewModal';
 import { PremiumActionModal } from '@/components/PremiumActionModal';
+import { PremiumDownloadModal } from '@/components/PremiumDownloadModal';
 import { WebComponentRenderer } from './WebComponentRenderer';
-import { ArrowLeft, ArrowRight, Crown, Eye } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Crown, Eye, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { convertGeneratedResumeToResumeData } from './TemplatePreviewModal';
-import { calculateA4PreviewScale, getA4ContainerStyles, getA4WrapperSize } from '@/utils/a4Dimensions';
+import { calculateA4PreviewScale, getA4ContainerStyles, getA4WrapperSize, A4_DIMENSIONS } from '@/utils/a4Dimensions';
 import { ResumeData, SkillPageRange } from '@/types';
 import { calculatePagination } from '@/services/paginationService';
-import { convertResumeDataToTemplateFormat } from '@/utils/resumeDataToTemplateFormat';
+import { convertResumeDataToTemplateFormat, filterDataForPage, TemplateDataFormat } from '@/utils/resumeDataToTemplateFormat';
 import { generateSmallMockResumeData } from '@/utils/mockResumeData';
+import { generateResumePDFFromPages } from '@/utils/pdfGenerator';
+import { downloadService } from '@/services/downloadService';
 
 // Helper interface for PaginationInfo (matching templates/client structure)
 interface PageContentSections {
@@ -237,7 +240,7 @@ export function Step9Preview() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { navigateToStep } = useWizardNavigation();
-  const { generatedResume, markStepCompleted, setCurrentStep, selectedTemplateId, setSelectedTemplate, resumeData: storeResumeData, updateResumeData } = useResumeStore();
+  const { generatedResume, markStepCompleted, setCurrentStep, selectedTemplateId, setSelectedTemplate, resumeData: storeResumeData, updateResumeData, currentResumeId } = useResumeStore();
   const { user } = useAuthStore();
 
   const [templates, setTemplates] = useState<ResumeTemplate[]>([]);
@@ -246,7 +249,12 @@ export function Step9Preview() {
   const [selectedTemplate, setSelectedTemplateState] = useState<ResumeTemplate | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [showDownloadPremiumModal, setShowDownloadPremiumModal] = useState(false);
   const [calculatingPagination, setCalculatingPagination] = useState(false);
+  const [generatingPDF, setGeneratingPDF] = useState(false);
+  const [templateData, setTemplateData] = useState<TemplateDataFormat | null>(null);
+  const [paginatedPages, setPaginatedPages] = useState<TemplateDataFormat[]>([]);
+  const templateContainerRef = useRef<HTMLDivElement>(null);
 
   // Validate that generatedResume exists
   useEffect(() => {
@@ -312,6 +320,51 @@ export function Step9Preview() {
         // Update store with only pagination fields (preserves profession, targetLevel, etc.)
         updateResumeData(paginationFields);
         console.log('🔍 [DEBUG] Store updated with pagination fields only');
+        
+        // Convert to template format for preview/download
+        const converted = convertResumeDataToTemplateFormat(paginatedResumeData);
+        setTemplateData(converted);
+        
+        // Calculate total pages and create paginated pages array
+        const allPageNumbers = new Set<number>();
+        if (converted.profilePageNumber) allPageNumbers.add(converted.profilePageNumber);
+        if (converted.experience) {
+          converted.experience.forEach(exp => {
+            if (exp.pageNumber) allPageNumbers.add(exp.pageNumber);
+          });
+        }
+        if (converted.projects) {
+          converted.projects.forEach(proj => {
+            if (proj.pageNumber) allPageNumbers.add(proj.pageNumber);
+          });
+        }
+        if (converted.education) {
+          converted.education.forEach(edu => {
+            if (edu.pageNumber) allPageNumbers.add(edu.pageNumber);
+          });
+        }
+        if (converted.skillsPageNumbers) {
+          converted.skillsPageNumbers.forEach(pn => allPageNumbers.add(pn));
+        }
+        if (converted.languagesPageNumbers) {
+          converted.languagesPageNumbers.forEach(pn => allPageNumbers.add(pn));
+        }
+        if (converted.achievementsPageNumbers) {
+          converted.achievementsPageNumbers.forEach(pn => allPageNumbers.add(pn));
+        }
+        if (converted.certificationsPageNumbers) {
+          converted.certificationsPageNumbers.forEach(pn => allPageNumbers.add(pn));
+        }
+        
+        const calculatedTotalPages = Math.max(...Array.from(allPageNumbers), 1);
+        
+        // Create paginated pages array
+        const pages: TemplateDataFormat[] = [];
+        for (let pageNum = 1; pageNum <= calculatedTotalPages; pageNum++) {
+          pages.push(filterDataForPage(converted, pageNum));
+        }
+        setPaginatedPages(pages);
+        
       } catch (error) {
         console.error('🔍 [DEBUG] Error calculating pagination:', error);
         toast.error('Error al calcular la paginación del template');
@@ -339,7 +392,17 @@ export function Step9Preview() {
 
   const handleNext = () => {
     if (!selectedTemplateId) {
-      toast.error('Debes seleccionar un template antes de continuar');
+      toast.error(t('wizard.steps.preview.selectTemplateFirst') || 'Please select a template first');
+      return;
+    }
+    markStepCompleted(10);
+    setCurrentStep(11);
+    navigateToStep(11);
+  };
+
+  const handleDownload = async () => {
+    if (!selectedTemplateId || !selectedTemplate) {
+      toast.error('Debes seleccionar un template antes de descargar');
       return;
     }
     
@@ -348,9 +411,101 @@ export function Step9Preview() {
       return;
     }
 
-    markStepCompleted(10);
-    setCurrentStep(11);
-    navigateToStep(11);
+    if (!templateContainerRef.current) {
+      toast.error('Template no disponible para descargar');
+      return;
+    }
+
+    // Check download limits before generating PDF
+    if (currentResumeId) {
+      try {
+        const downloadResult = await downloadService.trackDownload(currentResumeId);
+        
+        if (!downloadResult.allowed) {
+          setShowDownloadPremiumModal(true);
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking download limits:', error);
+        if (error instanceof Error) {
+          if (error.message.includes('Unauthorized')) {
+            toast.error('Please log in again');
+            navigate('/login');
+            return;
+          }
+          if (error.message.includes('not found')) {
+            toast.error('Resume not found');
+            return;
+          }
+        }
+        toast.error('Error checking download limits. Please try again.');
+        return;
+      }
+    }
+
+    setGeneratingPDF(true);
+    try {
+      const container = templateContainerRef.current;
+      
+      // Wait for all content to be fully rendered
+      container.scrollTop = 0;
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Verify all page containers are present
+      const pageContainers = container.querySelectorAll('.a4-page-container');
+      if (pageContainers.length === 0) {
+        toast.error('No se encontraron páginas para generar el PDF');
+        return;
+      }
+
+      // Wait for all WebComponentRenderer instances to finish loading
+      const maxWaitTime = 5000;
+      const pollInterval = 200;
+      const startTime = Date.now();
+      
+      while (Date.now() - startTime < maxWaitTime) {
+        const customElements = container.querySelectorAll(selectedTemplate.tagName);
+        let allRendered = true;
+        
+        if (customElements.length === 0) {
+          await new Promise(resolve => setTimeout(resolve, pollInterval));
+          continue;
+        }
+        
+        for (const element of customElements) {
+          if (!(element as any).data || (element as HTMLElement).offsetHeight === 0) {
+            allRendered = false;
+            break;
+          }
+        }
+        
+        if (allRendered) {
+          break;
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, pollInterval));
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      // Generate PDF filename
+      const userName = user?.fullName?.replace(/\s+/g, '_') || 'Usuario';
+      const templateName = selectedTemplate.name.replace(/\s+/g, '_');
+      const fileName = `CV_${userName}_${templateName}.pdf`;
+
+      // Generate PDF
+      await generateResumePDFFromPages(container as HTMLElement, fileName);
+      
+      // Mark step as completed after successful download
+      markStepCompleted(10);
+      
+      toast.success('PDF generado exitosamente');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error('Error al generar el PDF');
+    } finally {
+      setGeneratingPDF(false);
+    }
   };
 
   if (!generatedResume) {
@@ -427,13 +582,68 @@ export function Step9Preview() {
         </div>
       )}
 
+      {/* Hidden Template Container for PDF Generation */}
+      {selectedTemplate && paginatedPages.length > 0 && (
+        <div
+          ref={templateContainerRef}
+          className="absolute left-[-9999px] top-0"
+          style={{ width: `${A4_DIMENSIONS.widthPX}px` }}
+        >
+          <style>{`
+            .a4-page-container {
+              width: ${A4_DIMENSIONS.widthPX}px;
+              min-height: ${A4_DIMENSIONS.heightPX}px;
+              height: auto;
+              background: white;
+              margin: 0 auto 20px auto;
+              padding-bottom: ${A4_DIMENSIONS.marginBottom}px;
+              padding-right: ${A4_DIMENSIONS.marginRight}px;
+              page-break-after: always;
+              break-after: page;
+              overflow: visible;
+              position: relative;
+            }
+            .a4-page-container:last-child {
+              margin-bottom: 0;
+            }
+          `}</style>
+          {paginatedPages.map((pageData, pageIndex) => (
+            <div
+              key={`page-${pageIndex + 1}`}
+              className="a4-page-container"
+              data-page-number={pageIndex + 1}
+            >
+              <WebComponentRenderer
+                key={`step10-${selectedTemplate.id}-${selectedTemplate.tagName}-page-${pageIndex + 1}`}
+                tagName={selectedTemplate.tagName}
+                jsCode={selectedTemplate.jsCode}
+                data={pageData as any}
+                language={(storeResumeData?.language as 'en' | 'es') || 'en'}
+                style={{ 
+                  width: `${A4_DIMENSIONS.contentWidth}px`, 
+                  minHeight: `${A4_DIMENSIONS.contentHeight}px`,
+                  height: 'auto',
+                  display: 'block',
+                  overflow: 'visible',
+                  position: 'relative',
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Navigation */}
       <div className="flex justify-between">
         <button onClick={handleBack} className="btn-outline flex items-center">
           <ArrowLeft className="w-4 h-4 mr-2" />
           {t('common.back')}
         </button>
-        <button onClick={handleNext} className="btn-primary flex items-center" disabled={!selectedTemplateId}>
+        <button 
+          onClick={handleNext} 
+          className="btn-primary flex items-center" 
+          disabled={!selectedTemplateId || calculatingPagination}
+        >
           {t('common.next')}
           <ArrowRight className="w-4 h-4 ml-2" />
         </button>
@@ -458,6 +668,12 @@ export function Step9Preview() {
         isOpen={showPremiumModal}
         onClose={() => setShowPremiumModal(false)}
         feature="premiumTemplate"
+      />
+
+      {/* Premium Download Modal for download limits */}
+      <PremiumDownloadModal
+        isOpen={showDownloadPremiumModal}
+        onClose={() => setShowDownloadPremiumModal(false)}
       />
 
     </div>

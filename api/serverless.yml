@@ -30,14 +30,13 @@ provider:
     OPENAI_API_KEY: ${ssm:/getquickresume/${self:provider.stage}/openai-api-key}
     GROQ_API_KEY: ${ssm:/getquickresume/${self:provider.stage}/groq-api-key}
     PREMIUM_AI_PROVIDER: ${ssm:/getquickresume/${self:provider.stage}/premium-ai-provider, 'openai'}
-    PADDLE_API_KEY: ${ssm:/getquickresume/${self:provider.stage}/paddle-api-key}
-    PADDLE_WEBHOOK_SECRET: ${ssm:/getquickresume/${self:provider.stage}/paddle-webhook-secret}
-    PADDLE_ENVIRONMENT: ${ssm:/getquickresume/${self:provider.stage}/paddle-environment}
-    PADDLE_MONTHLY_PRICE_ID: ${ssm:/getquickresume/${self:provider.stage}/paddle-monthly-price-id}
-    PADDLE_YEARLY_PRICE_ID: ${ssm:/getquickresume/${self:provider.stage}/paddle-yearly-price-id}
     SES_FROM_EMAIL: ${env:SES_FROM_EMAIL, 'noreply@getquickresume.com'}
     FRONTEND_URL: ${self:custom.stages.${self:provider.stage}.FRONTEND_URL}
     API_URL: ${self:custom.stages.${self:provider.stage}.API_URL}
+    # PayPal integration
+    PAYPAL_CLIENT_ID: ${ssm:/getquickresume/${self:provider.stage}/paypal-client-id}
+    PAYPAL_CLIENT_SECRET: ${ssm:/getquickresume/${self:provider.stage}/paypal-client-secret}
+    PAYPAL_ENVIRONMENT: ${ssm:/getquickresume/${self:provider.stage}/paypal-environment}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -1044,55 +1043,6 @@ functions:
               - Authorization
             allowCredentials: false
 
-  # Paddle Checkout endpoint
-  createCheckoutTransaction:
-    handler: dist/handlers/paddleCheckout.createCheckoutTransaction
-    timeout: 30
-    environment:
-      PADDLE_API_KEY: ${self:provider.environment.PADDLE_API_KEY}
-      PADDLE_MONTHLY_PRICE_ID: ${self:provider.environment.PADDLE_MONTHLY_PRICE_ID}
-      PADDLE_YEARLY_PRICE_ID: ${self:provider.environment.PADDLE_YEARLY_PRICE_ID}
-      PADDLE_ENVIRONMENT: ${self:provider.environment.PADDLE_ENVIRONMENT}
-      FRONTEND_URL: ${self:provider.environment.FRONTEND_URL}
-    events:
-      - http:
-          path: api/checkout/create-transaction
-          method: post
-          authorizer:
-            name: authorize
-            type: token
-            identitySource: method.request.header.Authorization
-            resultTtlInSeconds: 0
-          cors:
-            origin: '*'
-            headers:
-              - Content-Type
-              - Authorization
-            allowCredentials: false
-
-  # Paddle Webhook endpoint (no authentication required - uses signature verification)
-  handlePaddleWebhook:
-    handler: dist/handlers/paddleWebhook.handlePaddleWebhook
-    timeout: 30
-    environment:
-      PADDLE_WEBHOOK_SECRET: ${self:provider.environment.PADDLE_WEBHOOK_SECRET}
-      PADDLE_ENVIRONMENT: ${self:provider.environment.PADDLE_ENVIRONMENT}
-      PADDLE_MONTHLY_PRICE_ID: ${self:provider.environment.PADDLE_MONTHLY_PRICE_ID}
-      PADDLE_YEARLY_PRICE_ID: ${self:provider.environment.PADDLE_YEARLY_PRICE_ID}
-      SES_FROM_EMAIL: ${self:provider.environment.SES_FROM_EMAIL}
-      FRONTEND_URL: ${self:provider.environment.FRONTEND_URL}
-      DYNAMODB_TABLE: ${self:provider.environment.DYNAMODB_TABLE}
-    events:
-      - http:
-          path: api/webhooks/paddle
-          method: post
-          cors:
-            origin: '*'
-            headers:
-              - Content-Type
-              - Paddle-Signature
-            allowCredentials: false
-
   # ============================================================================
   # Job Tailoring API Endpoints
   # ============================================================================
@@ -1294,6 +1244,93 @@ functions:
               - Content-Type
               - Authorization
             allowCredentials: false
+
+  # ==========================================================================
+  # Section Validation (Pre-save AI validation for data quality)
+  # ==========================================================================
+
+  # Validate section data using AI before saving
+  validateSection:
+    handler: dist/handlers/validateSection.validateSection
+    timeout: 30
+    environment:
+      GROQ_API_KEY: ${self:provider.environment.GROQ_API_KEY}
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+      AI_USAGE_LOGS_TABLE: ${self:service}-ai-usage-logs-${self:provider.stage}
+    events:
+      - http:
+          path: api/resume/validate-section
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # ==========================================================================
+  # PayPal Checkout Endpoints
+  # ==========================================================================
+
+  # Create PayPal order for checkout
+  createPayPalOrder:
+    handler: dist/handlers/paypalCheckout.createPayPalOrder
+    timeout: 30
+    environment:
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+    events:
+      - http:
+          path: api/paypal/create-order
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: ${self:custom.stages.${self:provider.stage}.FRONTEND_URL}
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Capture PayPal order after approval
+  capturePayPalOrder:
+    handler: dist/handlers/paypalCheckout.capturePayPalOrder
+    timeout: 30
+    environment:
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+    events:
+      - http:
+          path: api/paypal/capture-order
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: ${self:custom.stages.${self:provider.stage}.FRONTEND_URL}
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Scheduled task to expire premium subscriptions
+  expireSubscriptions:
+    handler: dist/handlers/scheduledTasks.expireSubscriptions
+    timeout: 60
+    description: Daily cleanup of expired premium subscriptions
+    events:
+      - schedule:
+          rate: rate(1 day)
+          enabled: true
+          description: "Expire premium subscriptions that have passed their expiration date"
 
 resources:
   Resources:
@@ -1535,6 +1572,22 @@ resources:
         TimeToLiveSpecification:
           AttributeName: ttl
           Enabled: true
+        BillingMode: PAY_PER_REQUEST
+
+    CoverLettersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-cover-letters-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: coverLetterId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: coverLetterId
+            KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
 
 plugins:

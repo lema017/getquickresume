@@ -1,9 +1,11 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, FileText, Download, Edit, Trash2, Eye, MoreVertical, Globe, Share2, Target, Sparkles, RefreshCw, BarChart3 } from 'lucide-react';
+import { Calendar, FileText, Download, Edit, Trash2, Eye, MoreVertical, Globe, Share2, Target, Sparkles, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Resume } from '@/types';
 import { IconWrapper } from '../IconWrapper';
+import { useAuthStore } from '@/stores/authStore';
+import { PremiumActionModal } from '../PremiumActionModal';
 
 // Helper function to get score color based on value
 const getScoreColor = (score: number): string => {
@@ -11,6 +13,11 @@ const getScoreColor = (score: number): string => {
   if (score >= 6) return 'text-blue-600 bg-blue-50 border-blue-200';
   if (score >= 4) return 'text-amber-600 bg-amber-50 border-amber-200';
   return 'text-red-600 bg-red-50 border-red-200';
+};
+
+// Helper function to get language label with flag
+const getLanguageLabel = (lang: string): string => {
+  return lang === 'es' ? '🇪🇸 Español' : '🇺🇸 English';
 };
 
 interface ResumeCardProps {
@@ -45,6 +52,26 @@ export const ResumeCard = memo(function ResumeCard({
 }: ResumeCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useAuthStore();
+  const isPremium = user?.isPremium || false;
+  
+  // State for premium modal
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [premiumFeature, setPremiumFeature] = useState<'translate' | 'tailorForJob' | 'share' | 'enhance' | 'rescore'>('translate');
+
+  // Handler for AI tool clicks - checks premium status
+  const handleAIToolClick = (
+    feature: 'translate' | 'tailorForJob' | 'share' | 'enhance' | 'rescore',
+    action: () => void
+  ) => {
+    if (isPremium) {
+      action();
+    } else {
+      setPremiumFeature(feature);
+      setShowPremiumModal(true);
+    }
+  };
+
   const formatDate = (date: Date | string) => {
     try {
       const dateObj = typeof date === 'string' ? new Date(date) : date;
@@ -224,11 +251,15 @@ export const ResumeCard = memo(function ResumeCard({
             </div>
             <div className="flex justify-between">
               <span>{t('resumeCard.info.experience')}</span>
-              <span className="font-medium">{t(`targetLevel.${resume.resumeData.targetLevel}`)}</span>
+              <span className="font-medium">{t(`resumeView.metadata.targetLevel.${resume.resumeData.targetLevel}`)}</span>
             </div>
             <div className="flex justify-between">
               <span>{t('resumeCard.info.experiences')}</span>
               <span className="font-medium">{resume.resumeData.experience.length}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>{t('resumeCard.info.language')}</span>
+              <span className="font-medium">{getLanguageLabel(resume.resumeData.language)}</span>
             </div>
           </div>
         </div>
@@ -259,7 +290,19 @@ export const ResumeCard = memo(function ResumeCard({
 
         {/* Resume Score */}
         {resume.score && (
-          <div className={`flex items-center justify-between px-3 py-2 rounded-lg border ${getScoreColor(resume.score.totalScore)}`}>
+          <button
+            onClick={() => {
+              if (isPremium) {
+                // Premium users can view full score details
+                onView(resume);
+              } else {
+                // Free users see the scoring CTA modal
+                setPremiumFeature('rescore');
+                setShowPremiumModal(true);
+              }
+            }}
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg border transition-all hover:shadow-md cursor-pointer ${getScoreColor(resume.score.totalScore)}`}
+          >
             <div className="flex items-center gap-2">
               <Target className="w-4 h-4" />
               <span className="text-xs font-medium">{t('resumeCard.info.score')}</span>
@@ -268,7 +311,7 @@ export const ResumeCard = memo(function ResumeCard({
               <span className="text-lg font-bold">{resume.score.totalScore.toFixed(1)}</span>
               <span className="text-xs opacity-70">/10</span>
             </div>
-          </div>
+          </button>
         )}
 
         {/* Last Updated */}
@@ -278,7 +321,7 @@ export const ResumeCard = memo(function ResumeCard({
       </div>
 
       {/* Quick Actions */}
-      <div className="mt-4 pt-4 border-t border-gray-100 space-y-2">
+      <div className="mt-4 pt-4 border-t border-gray-100 space-y-3">
         <div className="flex gap-2">
           <button
             onClick={() => onView(resume)}
@@ -294,35 +337,94 @@ export const ResumeCard = memo(function ResumeCard({
           </button>
         </div>
         
-        {/* Prominent Share Button */}
+        {/* AI Tools Action Bar */}
         {resume.generatedResume && (
-          <button
-            onClick={() => navigate(`/resume/${resume.id}/share`)}
-            className={`w-full px-3 py-2.5 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${
-              resume.isPubliclyShared
-                ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 shadow-sm'
-                : 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 shadow-sm'
-            }`}
-          >
-            {resume.isPubliclyShared ? (
-              <>
-                <BarChart3 className="w-4 h-4" />
-                {t('resumeCard.actions.viewAnalytics') || 'View Analytics'}
-                {resume.score?.totalScore && (
-                  <span className="ml-1 px-2 py-0.5 bg-white/20 rounded-full text-xs">
-                    {resume.score.totalScore.toFixed(0)}+ views
+          <div className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-purple-500" />
+              <span className="text-xs font-medium text-gray-500">{t('resumeCard.aiTools.title')}</span>
+            </div>
+            
+            <div className="grid grid-cols-5 gap-1.5">
+              {/* Share & Track - Blue */}
+              <button
+                onClick={() => handleAIToolClick('share', () => navigate(`/resume/${resume.id}/share`))}
+                className="group flex flex-col items-center gap-1 p-2 rounded-lg transition-all bg-blue-50 hover:bg-blue-100 text-blue-700"
+                title={t('resumeCard.actions.shareAndTrack')}
+              >
+                <Share2 className="w-4 h-4 text-blue-600" />
+                <span className="text-[10px] font-medium leading-tight text-center">
+                  {t('resumeCard.aiTools.share')}
+                </span>
+              </button>
+
+              {/* Translate - Green */}
+              {onTranslate && (
+                <button
+                  onClick={() => handleAIToolClick('translate', () => onTranslate(resume))}
+                  className="group flex flex-col items-center gap-1 p-2 rounded-lg transition-all bg-green-50 hover:bg-green-100 text-green-700"
+                  title={t('resumeCard.actions.translate')}
+                >
+                  <Globe className="w-4 h-4 text-green-600" />
+                  <span className="text-[10px] font-medium leading-tight text-center">
+                    {t('resumeCard.aiTools.translate')}
                   </span>
-                )}
-              </>
-            ) : (
-              <>
-                <Share2 className="w-4 h-4" />
-                {t('resumeCard.actions.shareAndTrack') || 'Share & Track Views'}
-              </>
-            )}
-          </button>
+                </button>
+              )}
+
+              {/* Tailor for Job - Orange */}
+              {onTailorForJob && (
+                <button
+                  onClick={() => handleAIToolClick('tailorForJob', () => onTailorForJob(resume))}
+                  className="group flex flex-col items-center gap-1 p-2 rounded-lg transition-all bg-orange-50 hover:bg-orange-100 text-orange-700"
+                  title={t('resumeCard.actions.tailorForJob')}
+                >
+                  <Target className="w-4 h-4 text-orange-600" />
+                  <span className="text-[10px] font-medium leading-tight text-center">
+                    {t('resumeCard.aiTools.tailor')}
+                  </span>
+                </button>
+              )}
+
+              {/* AI Enhance - Purple */}
+              {onEnhance && (
+                <button
+                  onClick={() => handleAIToolClick('enhance', () => onEnhance(resume))}
+                  className="group flex flex-col items-center gap-1 p-2 rounded-lg transition-all bg-purple-50 hover:bg-purple-100 text-purple-700"
+                  title={t('resumeCard.actions.enhance')}
+                >
+                  <Sparkles className="w-4 h-4 text-purple-600" />
+                  <span className="text-[10px] font-medium leading-tight text-center">
+                    {t('resumeCard.aiTools.enhance')}
+                  </span>
+                </button>
+              )}
+
+              {/* Re-score - Indigo */}
+              {onRescore && (
+                <button
+                  onClick={() => handleAIToolClick('rescore', () => onRescore(resume))}
+                  disabled={isRescoring}
+                  className="group flex flex-col items-center gap-1 p-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-indigo-50 hover:bg-indigo-100 text-indigo-700"
+                  title={t('resumeCard.actions.rescore')}
+                >
+                  <RefreshCw className={`w-4 h-4 text-indigo-600 ${isRescoring ? 'animate-spin' : ''}`} />
+                  <span className="text-[10px] font-medium leading-tight text-center">
+                    {t('resumeCard.aiTools.rescore')}
+                  </span>
+                </button>
+              )}
+            </div>
+          </div>
         )}
       </div>
+
+      {/* Premium Action Modal */}
+      <PremiumActionModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        feature={premiumFeature}
+      />
     </div>
   );
 });

@@ -4,6 +4,7 @@ import { resumeScoringService } from '../services/resumeScoringService';
 import { getUserById } from '../services/dynamodb';
 import { getResumeById, updateResumeWithScore, getResumeScore } from '../services/resumeService';
 import { checkRateLimit, refundRateLimit } from '../middleware/rateLimiter';
+import { checkPremiumStatus } from '../utils/premiumValidator';
 /**
  * POST /api/resumes/{id}/score
  * On-demand scoring (premium feature)
@@ -52,7 +53,8 @@ export const scoreResume = async (
     }
 
     // Premium check - on-demand scoring is premium only
-    if (!user.isPremium) {
+    const premiumStatus = checkPremiumStatus(user);
+    if (!premiumStatus.isPremium) {
       return {
         statusCode: 403,
         headers: {
@@ -63,14 +65,17 @@ export const scoreResume = async (
         },
         body: JSON.stringify({
           success: false,
-          error: 'Premium feature',
-          message: 'On-demand resume scoring is a premium feature. Please upgrade to premium to use this feature.'
+          error: premiumStatus.isExpired ? 'Premium subscription expired' : 'Premium feature',
+          message: premiumStatus.isExpired 
+            ? 'Your premium subscription has expired. Please renew to continue using this feature.'
+            : 'On-demand resume scoring is a premium feature. Please upgrade to premium to use this feature.'
         } as ScoreResumeResponse)
       };
     }
 
-    // Rate limiting: 10 requests per minute for premium users
-    const rateLimitResult = await checkRateLimit(userId, 'score-resume', 10, 60000);
+    // Rate limiting: 1 request/minute for free users, 5 requests/minute for premium users
+    const maxRequests = user.isPremium ? 5 : 1;
+    const rateLimitResult = await checkRateLimit(userId, 'score-resume', maxRequests, 60000);
     if (!rateLimitResult.allowed) {
       return {
         statusCode: 429,
@@ -83,7 +88,7 @@ export const scoreResume = async (
         body: JSON.stringify({
           success: false,
           error: 'Rate limit exceeded',
-          message: `Too many scoring requests. Please wait before trying again. (Limit: 10 per minute)`,
+          message: `Too many scoring requests. Please wait before trying again. (Limit: ${maxRequests} per minute)`,
           resetTime: rateLimitResult.resetTime
         } as ScoreResumeResponse)
       };

@@ -42,9 +42,11 @@ export interface User {
   subscriptionExpiration?: string; // ISO date
   planType?: 'monthly' | 'yearly';
   subscriptionStartDate?: string; // ISO date
-  paddleCustomerId?: string;
-  paddleSubscriptionId?: string;
-  paddleTransactionId?: string;
+  // Payment provider fields (generic for PayPal or other providers)
+  paymentProvider?: 'paypal' | 'stripe' | 'other';
+  paymentCustomerId?: string;
+  paymentSubscriptionId?: string;
+  paymentTransactionId?: string;
   aiUsageStats?: AIUsageStats; // AI usage tracking for cost analysis
   // Job Tailoring usage tracking
   jobTailoringUsage?: {
@@ -789,36 +791,6 @@ export interface LinkedInDataResponse {
   error?: string;
   remainingRequests?: number;
   resetTime?: number;
-}
-
-// Paddle Payment Types
-export interface CreateCheckoutRequest {
-  planType: 'monthly' | 'yearly';
-}
-
-export interface CreateCheckoutResponse {
-  success: boolean;
-  checkoutUrl?: string;
-  transactionId?: string;
-  error?: string;
-  message?: string;
-}
-
-export interface PaddleWebhookPayload {
-  event_id: string;
-  event_type: string;
-  occurred_at: string;
-  data: {
-    id: string;
-    status: string;
-    customer_id: string;
-    subscription_id?: string;
-    items: Array<{
-      price_id: string;
-      quantity: number;
-    }>;
-    custom_data?: Record<string, string>;
-  };
 }
 
 // ============================================================================

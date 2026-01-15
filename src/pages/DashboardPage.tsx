@@ -12,8 +12,10 @@ import { CoverLetterList } from '@/components/dashboard/CoverLetterList';
 import { JobApplicationsList } from '@/components/dashboard/JobApplicationsList';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import { useConfirmation } from '@/hooks/useConfirmation';
-import { resumeScoringService } from '@/services/resumeScoringService';
+import { resumeScoringService, RateLimitError } from '@/services/resumeScoringService';
+import { RateLimitWarning } from '@/components/RateLimitWarning';
 import toast from 'react-hot-toast';
+import { X } from 'lucide-react';
 import { formatName } from '@/utils/textFormatting';
 import { 
   FileText, 
@@ -43,6 +45,11 @@ export function DashboardPage() {
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [premiumFeature, setPremiumFeature] = useState<'enhance' | 'rescore' | 'edit'>('enhance');
   const [rescoringResumeId, setRescoringResumeId] = useState<string | null>(null);
+  
+  // Rate limit modal state
+  const [showRateLimitModal, setShowRateLimitModal] = useState(false);
+  const [rateLimitResetTime, setRateLimitResetTime] = useState<number>(0);
+  const [rateLimitResumeId, setRateLimitResumeId] = useState<string | null>(null);
 
   const { refreshUserPremiumStatus } = useAuthStore();
 
@@ -150,6 +157,16 @@ export function DashboardPage() {
       await loadDashboard();
     } catch (error) {
       console.error('Error rescoring resume:', error);
+      toast.dismiss('rescore');
+      
+      // Handle rate limit error - show modal with countdown
+      if (error instanceof RateLimitError) {
+        setRateLimitResetTime(error.resetTime);
+        setRateLimitResumeId(resume.id);
+        setShowRateLimitModal(true);
+        return;
+      }
+      
       if (error instanceof Error) {
         if (error.message.includes('Premium') || error.message.includes('premium')) {
           setPremiumFeature('rescore');
@@ -163,6 +180,27 @@ export function DashboardPage() {
     } finally {
       setRescoringResumeId(null);
     }
+  };
+
+  // Handle retry from rate limit modal
+  const handleRateLimitRetry = async () => {
+    if (!rateLimitResumeId) return;
+    
+    setShowRateLimitModal(false);
+    
+    // Find the resume and retry rescoring
+    const resume = resumes.find(r => r.id === rateLimitResumeId);
+    if (resume) {
+      await handleRescoreResume(resume);
+    }
+    
+    setRateLimitResumeId(null);
+  };
+
+  // Close rate limit modal
+  const handleCloseRateLimitModal = () => {
+    setShowRateLimitModal(false);
+    setRateLimitResumeId(null);
   };
 
   const handleDeleteResume = async (resume: Resume) => {
@@ -388,6 +426,37 @@ export function DashboardPage() {
         onClose={() => setShowPremiumModal(false)}
         feature={premiumFeature}
       />
+
+      {/* Rate Limit Modal for Rescore */}
+      {showRateLimitModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {t('wizard.rateLimit.rescoreTitle', 'Scoring Limit Reached')}
+              </h3>
+              <button
+                onClick={handleCloseRateLimitModal}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {/* Modal Content */}
+            <div className="p-6">
+              <RateLimitWarning
+                onRetry={handleRateLimitRetry}
+                onClose={handleCloseRateLimitModal}
+                showRetry={true}
+                countdownSeconds={Math.max(1, Math.ceil((rateLimitResetTime - Date.now()) / 1000))}
+                isPremium={user?.isPremium}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

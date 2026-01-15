@@ -14,7 +14,7 @@ import { summarySuggestionService } from '@/services/summarySuggestionService';
 export function Step7Summary() {
   const { t } = useTranslation();
   const { navigateToStep } = useWizardNavigation();
-  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, calculateCharacters, currentResumeId } = useResumeStore();
+  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep, calculateCharacters, currentResumeId } = useResumeStore();
   const { user } = useAuthStore();
   const [summary, setSummary] = useState(resumeData.summary);
   const [jobDescription, setJobDescription] = useState(resumeData.jobDescription);
@@ -72,7 +72,7 @@ export function Step7Summary() {
   // Validation errors state for the error box display
   const [showErrors, setShowErrors] = useState(false);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     setHasAttemptedSubmit(true);
     // Validate before proceeding
     const errors = validateSummary(summary || '', jobDescription || '');
@@ -88,6 +88,13 @@ export function Step7Summary() {
     
     setShowErrors(false);
     updateResumeData({ summary, jobDescription });
+    // Save immediately before navigation to ensure data is persisted
+    try {
+      await saveResumeDataImmediately();
+    } catch (error) {
+      console.error('Error saving summary data:', error);
+      // Continue with navigation even if save fails - data is in store
+    }
     markStepCompleted(7);
     setCurrentStep(8);
     navigateToStep(8);

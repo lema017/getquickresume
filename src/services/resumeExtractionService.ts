@@ -178,6 +178,46 @@ class ResumeExtractionService {
   }
 
   /**
+   * Normalizes date from various formats to YYYY-MM format
+   * Handles: MM/YYYY, YYYY-MM, YYYY, MM-YYYY, etc.
+   */
+  private normalizeDate(dateStr: string | undefined | null): string {
+    if (!dateStr || typeof dateStr !== 'string') return '';
+    
+    const trimmed = dateStr.trim();
+    if (!trimmed) return '';
+    
+    // Already in YYYY-MM format
+    if (/^\d{4}-\d{2}$/.test(trimmed)) {
+      return trimmed;
+    }
+    
+    // MM/YYYY format (e.g., "01/2020") -> convert to YYYY-MM
+    const mmYYYYSlash = trimmed.match(/^(\d{1,2})\/(\d{4})$/);
+    if (mmYYYYSlash) {
+      const month = mmYYYYSlash[1].padStart(2, '0');
+      const year = mmYYYYSlash[2];
+      return `${year}-${month}`;
+    }
+    
+    // MM-YYYY format (e.g., "01-2020") -> convert to YYYY-MM
+    const mmYYYYDash = trimmed.match(/^(\d{1,2})-(\d{4})$/);
+    if (mmYYYYDash) {
+      const month = mmYYYYDash[1].padStart(2, '0');
+      const year = mmYYYYDash[2];
+      return `${year}-${month}`;
+    }
+    
+    // YYYY only (e.g., "2020") -> default to January
+    if (/^\d{4}$/.test(trimmed)) {
+      return `${trimmed}-01`;
+    }
+    
+    // Return as-is if we can't parse it
+    return trimmed;
+  }
+
+  /**
    * Transform API response to match frontend ExtractedResumeData format
    */
   private transformApiResponse(apiData: any, language: 'es' | 'en'): ExtractedResumeData {
@@ -199,8 +239,8 @@ class ResumeExtractionService {
         id: exp.id || `exp-${idx + 1}`,
         title: exp.title || '',
         company: exp.company || '',
-        startDate: exp.startDate || '',
-        endDate: exp.endDate || '',
+        startDate: this.normalizeDate(exp.startDate),
+        endDate: this.normalizeDate(exp.endDate),
         isCurrent: Boolean(exp.isCurrent),
         achievements: ensureArray(exp.achievements),
         responsibilities: ensureArray(exp.responsibilities),
@@ -211,8 +251,8 @@ class ResumeExtractionService {
         degree: edu.degree || '',
         institution: edu.institution || '',
         field: edu.field || '',
-        startDate: edu.startDate || '',
-        endDate: edu.endDate || '',
+        startDate: this.normalizeDate(edu.startDate),
+        endDate: this.normalizeDate(edu.endDate),
         isCompleted: edu.isCompleted !== false,
         pageNumber: null,
       })),
@@ -381,7 +421,7 @@ class ResumeExtractionService {
    * Converts extracted data to ResumeData format for the wizard
    */
   convertToResumeData(extracted: ExtractedResumeData): Partial<ResumeData> {
-    return {
+    const result = {
       firstName: extracted.firstName,
       lastName: extracted.lastName,
       email: extracted.email,
@@ -402,6 +442,8 @@ class ResumeExtractionService {
       jobDescription: extracted.jobDescription || '',
       language: extracted.language,
     };
+    
+    return result;
   }
 }
 

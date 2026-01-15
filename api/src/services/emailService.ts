@@ -9,15 +9,60 @@ const FROM_EMAIL = process.env.SES_FROM_EMAIL || 'noreply@getquickresume.com';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 /**
- * Send premium welcome email to user
+ * Invoice details for premium purchase receipt
+ */
+export interface InvoiceDetails {
+  transactionId: string;
+  amount: string;
+  currency: string;
+  paymentDate: string;
+  subscriptionExpiration: string;
+}
+
+/**
+ * Format date for display in emails
+ */
+function formatDate(isoDate: string): string {
+  try {
+    const date = new Date(isoDate);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  } catch {
+    return isoDate;
+  }
+}
+
+/**
+ * Format currency for display
+ */
+function formatCurrency(amount: string, currency: string): string {
+  const symbols: Record<string, string> = {
+    USD: '$',
+    EUR: '€',
+    GBP: '£',
+  };
+  const symbol = symbols[currency] || currency + ' ';
+  return `${symbol}${amount}`;
+}
+
+/**
+ * Send premium welcome email with purchase invoice to user
  */
 export async function sendPremiumWelcomeEmail(
   user: User,
-  planType: 'monthly' | 'yearly'
+  planType: 'monthly' | 'yearly',
+  invoiceDetails: InvoiceDetails
 ): Promise<void> {
   try {
     const planName = planType === 'monthly' ? 'Premium Monthly' : 'Premium Yearly';
     const billingPeriod = planType === 'monthly' ? 'month' : 'year';
+    const formattedAmount = formatCurrency(invoiceDetails.amount, invoiceDetails.currency);
+    const formattedPaymentDate = formatDate(invoiceDetails.paymentDate);
+    const formattedExpiration = formatDate(invoiceDetails.subscriptionExpiration);
+    const invoiceNumber = `INV-${invoiceDetails.transactionId.substring(0, 12).toUpperCase()}`;
     
     const htmlBody = `
 <!DOCTYPE html>
@@ -39,6 +84,42 @@ export async function sendPremiumWelcomeEmail(
       Thank you for upgrading to <strong>${planName}</strong>! Your subscription is now active and you have access to all premium features.
     </p>
     
+    <!-- Purchase Receipt Section -->
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea;">
+      <h2 style="margin-top: 0; font-size: 18px; color: #333;">📄 Purchase Receipt</h2>
+      <table style="width: 100%; font-size: 14px; border-collapse: collapse;">
+        <tr>
+          <td style="padding: 8px 0; color: #666;">Invoice Number:</td>
+          <td style="padding: 8px 0; text-align: right;"><strong>${invoiceNumber}</strong></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; color: #666;">Transaction ID:</td>
+          <td style="padding: 8px 0; text-align: right; font-family: monospace; font-size: 12px;">${invoiceDetails.transactionId}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; color: #666;">Plan:</td>
+          <td style="padding: 8px 0; text-align: right;">${planName}</td>
+        </tr>
+        <tr style="border-top: 1px solid #e0e0e0;">
+          <td style="padding: 8px 0; color: #666;">Amount Paid:</td>
+          <td style="padding: 8px 0; text-align: right; font-size: 16px;"><strong style="color: #667eea;">${formattedAmount}</strong></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; color: #666;">Payment Date:</td>
+          <td style="padding: 8px 0; text-align: right;">${formattedPaymentDate}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; color: #666;">Valid Until:</td>
+          <td style="padding: 8px 0; text-align: right;">${formattedExpiration}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; color: #666;">Payment Method:</td>
+          <td style="padding: 8px 0; text-align: right;">PayPal</td>
+        </tr>
+      </table>
+    </div>
+    
+    <!-- Features Section -->
     <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
       <h2 style="color: #667eea; margin-top: 0; font-size: 20px;">What's included:</h2>
       <ul style="margin: 0; padding-left: 20px;">
@@ -88,6 +169,18 @@ Hi ${user.firstName || 'there'},
 
 Thank you for upgrading to ${planName}! Your subscription is now active and you have access to all premium features.
 
+-----------------------------------------
+PURCHASE RECEIPT
+-----------------------------------------
+Invoice Number: ${invoiceNumber}
+Transaction ID: ${invoiceDetails.transactionId}
+Plan: ${planName}
+Amount Paid: ${formattedAmount}
+Payment Date: ${formattedPaymentDate}
+Valid Until: ${formattedExpiration}
+Payment Method: PayPal
+-----------------------------------------
+
 What's included:
 - 40 resume generations per ${billingPeriod}
 - Unlimited downloads
@@ -113,7 +206,7 @@ The GetQuickResume Team
       },
       Message: {
         Subject: {
-          Data: `Welcome to Premium! 🎉`,
+          Data: `Welcome to Premium! Your receipt is inside 🎉`,
           Charset: 'UTF-8',
         },
         Body: {
@@ -130,7 +223,7 @@ The GetQuickResume Team
     });
 
     await sesClient.send(command);
-    console.log(`Premium welcome email sent to ${user.email}`);
+    console.log(`Premium welcome email with invoice sent to ${user.email}`);
   } catch (error) {
     console.error('Error sending premium welcome email:', error);
     // Don't throw - email failures shouldn't break the upgrade process

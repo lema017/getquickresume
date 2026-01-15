@@ -104,7 +104,9 @@ export type AIEndpointType =
   | 'jobTailoredResume'
   | 'jobUrlExtraction'
   // Resume Extraction endpoint
-  | 'resumeExtraction';
+  | 'resumeExtraction'
+  // Section Validation endpoint
+  | 'validate-section';
 
 export interface AIUsageLog {
   id: string;

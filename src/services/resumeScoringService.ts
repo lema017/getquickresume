@@ -3,6 +3,22 @@ import { handleAuthError } from '@/utils/authErrorHandler';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/dev';
 
+/**
+ * Custom error for rate limit exceeded (HTTP 429)
+ * Contains resetTime for countdown display in UI
+ */
+export class RateLimitError extends Error {
+  resetTime: number;
+  maxRequests: number;
+  
+  constructor(message: string, resetTime: number, maxRequests: number = 5) {
+    super(message);
+    this.name = 'RateLimitError';
+    this.resetTime = resetTime;
+    this.maxRequests = maxRequests;
+  }
+}
+
 class ResumeScoringService {
   private async getAuthToken(): Promise<string> {
     const token = localStorage.getItem('auth-token');
@@ -29,6 +45,17 @@ class ResumeScoringService {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
+      
+      // Handle rate limit exceeded (429) - throw RateLimitError with reset time
+      if (response.status === 429) {
+        const resetTime = errorData.resetTime || (Date.now() + 60000); // Default to 1 minute if not provided
+        const maxRequests = errorData.maxRequests || 5;
+        throw new RateLimitError(
+          errorData.message || 'Rate limit exceeded. Please wait before trying again.',
+          resetTime,
+          maxRequests
+        );
+      }
       
       // Handle premium required error (403) - do NOT logout
       if (response.status === 403 && errorData.code === 'PREMIUM_REQUIRED') {

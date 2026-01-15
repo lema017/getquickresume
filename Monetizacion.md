@@ -84,7 +84,7 @@ Los créditos se almacenan en el perfil del usuario y pueden usarse en cualquier
 - **Frontend:** muestra saldo y botones “Usar crédito” / “Comprar créditos”.  
 - **Backend/API:**  
   - Endpoints: `/credits/balance`, `/credits/use`, `/credits/purchase`, `/credits/history`  
-  - Stripe o Paddle para pagos  
+  - PayPal para pagos  
   - Asociación de transacciones ↔ créditos  
 - **Base de datos:** tabla `user_credits` con `(user_id, balance, history, expiry_date)`  
 - **Capa IA aislada:** backend modular para poder alternar entre GPT, Gemini, Claude, etc.  

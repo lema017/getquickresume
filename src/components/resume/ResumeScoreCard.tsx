@@ -1,15 +1,17 @@
 import { memo, useState } from 'react';
-import { ResumeScore, GeneratedResume, ChecklistItem, SectionChecklist as SectionChecklistType } from '@/types';
+import { ResumeScore, GeneratedResume, ChecklistItem, SectionChecklist as SectionChecklistType, ResumeData } from '@/types';
 import { useAuthStore } from '@/stores/authStore';
 import { useResumeStore } from '@/stores/resumeStore';
 import { Lock, TrendingUp, CheckCircle2, AlertCircle, Sparkles, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { GuidedEnhancementModal } from './GuidedEnhancementModal';
-import { ConfirmationDialog } from '@/components/ConfirmationDialog';
+import { DataEditModal, EditableSection } from './DataEditModal';
 import { PremiumActionModal } from '@/components/PremiumActionModal';
 import { SectionChecklist } from './SectionChecklist';
 import { OptimizedBadge, ProgressToOptimized } from './OptimizedBadge';
 import { ATSKeywordCard } from './ATSKeywordCard';
+import { isStructuralFix } from '@/config/enhancementTypes';
+import { FieldError } from '@/services/sectionValidationService';
 import toast from 'react-hot-toast';
 
 interface ResumeScoreCardProps {
@@ -25,7 +27,7 @@ interface ResumeScoreCardProps {
 export const ResumeScoreCard = memo(function ResumeScoreCard({ score, isLoading, error, onUpgrade, resume, onEnhancementComplete }: ResumeScoreCardProps) {
   const { user } = useAuthStore();
   const navigate = useNavigate();
-  const { setCurrentStep } = useResumeStore();
+  const { resumeData, updateSectionAndSync, generatedResume, currentResumeId, currentScore, scoreResume } = useResumeStore();
   const isPremium = user?.isPremium || false;
   const [enhancementModal, setEnhancementModal] = useState<{
     isOpen: boolean;
@@ -39,14 +41,16 @@ export const ResumeScoreCard = memo(function ResumeScoreCard({ score, isLoading,
     recommendation: '',
     originalText: '',
   });
-  const [emptySectionDialog, setEmptySectionDialog] = useState<{
+  // DataEditModal state for in-place editing
+  const [dataEditModal, setDataEditModal] = useState<{
     isOpen: boolean;
-    sectionName: string;
-    wizardStep: string | null;
+    section: EditableSection;
+    checklistItemId?: string;
+    checklistItemLabel?: string;
+    initialValidationErrors?: FieldError[];
   }>({
     isOpen: false,
-    sectionName: '',
-    wizardStep: null,
+    section: 'contact',
   });
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [isEnhancing, setIsEnhancing] = useState(false);
@@ -136,46 +140,229 @@ export const ResumeScoreCard = memo(function ResumeScoreCard({ score, isLoading,
     }
   };
 
+  // Map section keys to EditableSection types for DataEditModal
+  const mapToEditableSection = (sectionKey: string): EditableSection | null => {
+    const map: Record<string, EditableSection> = {
+      'contact': 'contact',
+      'education': 'education',
+      'skills': 'skills',
+      'projects': 'projects',
+      'project': 'projects',
+      'languages': 'languages',
+      'language': 'languages',
+      'achievements': 'achievements',
+      'achievement': 'achievements',
+    };
+    return map[sectionKey.toLowerCase()] || null;
+  };
+
+  // Map data quality item IDs to their target editable sections
+  const mapDataQualityToSection = (itemId: string): EditableSection | null => {
+    const map: Record<string, EditableSection> = {
+      'data-quality-education': 'education',
+      'data-quality-skills': 'skills',
+      'data-quality-profile': 'contact',
+      'data-quality-languages': 'languages',
+    };
+    return map[itemId] || null;
+  };
+
+  // Parse section names from evidence string (e.g., "Sections needing attention: education, skills")
+  const parseSectionsFromEvidence = (evidence: string): EditableSection[] => {
+    const match = evidence.match(/Sections needing attention:\s*(.+)/i);
+    if (!match) return [];
+    
+    const sectionNames = match[1].split(',').map(s => s.trim().toLowerCase());
+    const sectionMap: Record<string, EditableSection> = {
+      'education': 'education',
+      'skills': 'skills',
+      'profile': 'contact',
+      'contact': 'contact',
+      'languages': 'languages',
+    };
+    
+    return sectionNames
+      .map(name => sectionMap[name])
+      .filter((s): s is EditableSection => !!s);
+  };
+
+  // Parse field-level errors from checklist item evidence
+  // Evidence format examples: "field: invalid", "institution: placeholder value", etc.
+  const parseFieldErrorsFromEvidence = (evidence: string | undefined, details: string | undefined): FieldError[] => {
+    const errors: FieldError[] = [];
+    
+    // Try to parse evidence for specific field errors
+    if (evidence) {
+      // Pattern: "fieldName: reason" or "fieldName[index]: reason"
+      const fieldPatterns = evidence.split(/[;,]/).map(s => s.trim()).filter(Boolean);
+      
+      for (const pattern of fieldPatterns) {
+        const match = pattern.match(/^(\w+)(?:\[(\d+)\])?:\s*(.+)$/);
+        if (match) {
+          const [, field, indexStr, reason] = match;
+          errors.push({
+            index: indexStr ? parseInt(indexStr, 10) : undefined,
+            field: field.toLowerCase(),
+            value: '',
+            reason: reason.trim()
+          });
+        }
+      }
+    }
+    
+    // If no specific field errors found, create a general error from details
+    if (errors.length === 0 && details) {
+      // Extract any mentioned fields from details text
+      const commonFields = ['institution', 'degree', 'field', 'name', 'email', 'phone', 'language', 'level'];
+      for (const f of commonFields) {
+        if (details.toLowerCase().includes(f)) {
+          errors.push({
+            field: f,
+            value: '',
+            reason: details
+          });
+          break;
+        }
+      }
+    }
+    
+    return errors;
+  };
+
   const handleEnhanceChecklistItem = (item: ChecklistItem, sectionKey: string) => {
     if (!isPremium || !resume) return;
 
     setIsEnhancing(true);
 
+    // Special handling for Data Quality section items
+    if (sectionKey.toLowerCase() === 'dataquality') {
+      setIsEnhancing(false);
+      
+      // Handle overall data quality - parse evidence and open modal for first affected section
+      if (item.id === 'data-quality-overall') {
+        const sectionsNeedingFix = parseSectionsFromEvidence(item.evidence || '');
+        
+        if (sectionsNeedingFix.length > 0) {
+          // Try to get field-level errors from other data quality checklist items
+          const sectionToCheck = sectionsNeedingFix[0];
+          const dataQualitySection = score?.checklist?.dataQuality;
+          const sectionItem = dataQualitySection?.items?.find(i => 
+            i.id === `data-quality-${sectionToCheck}` || 
+            (sectionToCheck === 'contact' && i.id === 'data-quality-profile')
+          );
+          
+          const fieldErrors = sectionItem 
+            ? parseFieldErrorsFromEvidence(sectionItem.evidence, sectionItem.details)
+            : parseFieldErrorsFromEvidence(item.evidence, item.details);
+          
+          // Open modal for first section with issues
+          setDataEditModal({
+            isOpen: true,
+            section: sectionsNeedingFix[0],
+            checklistItemId: item.id,
+            checklistItemLabel: `${item.label} - Fix ${sectionsNeedingFix[0]} data`,
+            initialValidationErrors: fieldErrors,
+          });
+        } else {
+          // Fallback if we can't parse sections
+          toast.error('Data quality issues found. Please review and fix invalid entries in the sections below.', { duration: 5000 });
+        }
+        return;
+      }
+      
+      // Handle experience and certifications - not directly editable via DataEditModal
+      if (item.id === 'data-quality-experience') {
+        toast.error('To fix experience data quality issues, go back to the Experience step and edit the entries with invalid values.', { duration: 5000 });
+        return;
+      }
+      if (item.id === 'data-quality-certifications') {
+        toast.error('To fix certifications data quality issues, go back to the Education & Certifications step and edit the entries with invalid values.', { duration: 5000 });
+        return;
+      }
+      
+      // Map to target editable section
+      const targetSection = mapDataQualityToSection(item.id);
+      if (targetSection) {
+        const fieldErrors = parseFieldErrorsFromEvidence(item.evidence, item.details);
+        setDataEditModal({
+          isOpen: true,
+          section: targetSection,
+          checklistItemId: item.id,
+          checklistItemLabel: item.label,
+          initialValidationErrors: fieldErrors,
+        });
+        return;
+      }
+      
+      // Fallback for unknown data quality items
+      toast.error(`To fix this data quality issue, edit the relevant section with valid, meaningful data.`, { duration: 4000 });
+      return;
+    }
+
     const sectionType = normalizeSectionType(sectionKey) as typeof enhancementModal.sectionType;
     const originalText = getOriginalTextForSection(sectionKey, resume);
 
-    // Contact section always navigates to wizard step (can't be AI-enhanced)
-    if (sectionKey === 'contact') {
-      setIsEnhancing(false);
-      const wizardStep = getWizardStepForSection('contact');
-      if (wizardStep) {
-        setEmptySectionDialog({
-          isOpen: true,
-          sectionName: 'Contact Information',
-          wizardStep,
-        });
-      }
-      return;
-    }
+    // Pure data-entry sections - always use DataEditModal (can't be AI-enhanced)
+    // These are tag-based or simple data fields, not prose text
+    const dataOnlySections = ['contact', 'skills', 'languages', 'language'];
+    const isDataOnlySection = dataOnlySections.includes(sectionKey.toLowerCase());
 
-    // If section is empty, navigate to wizard step
-    if (!originalText || originalText.trim().length === 0) {
+    if (isDataOnlySection) {
       setIsEnhancing(false);
-      const sectionName = getSectionDisplayName(sectionKey);
-      const wizardStep = getWizardStepForSection(sectionKey);
+      const editableSection = mapToEditableSection(sectionKey);
       
-      if (wizardStep) {
-        setEmptySectionDialog({
+      if (editableSection) {
+        setDataEditModal({
           isOpen: true,
-          sectionName,
-          wizardStep,
+          section: editableSection,
+          checklistItemId: item.id,
+          checklistItemLabel: item.label,
         });
       } else {
-        toast.error(`Cannot enhance empty ${sectionName} section`);
+        toast.error(`Cannot edit ${getSectionDisplayName(sectionKey)} section`);
       }
       return;
     }
 
+    // Structural fixes - route to DataEditModal for in-place editing
+    // These items require form editing (education dates, institution names, etc.)
+    if (isStructuralFix(item.id)) {
+      setIsEnhancing(false);
+      const editableSection = mapToEditableSection(sectionKey);
+      
+      if (editableSection) {
+        setDataEditModal({
+          isOpen: true,
+          section: editableSection,
+          checklistItemId: item.id,
+          checklistItemLabel: item.label,
+        });
+      } else {
+        toast.error(`Cannot edit ${getSectionDisplayName(sectionKey)} section`);
+      }
+      return;
+    }
+
+    // Text-based sections (summary, experience, achievements, projects, education)
+    // If empty, use DataEditModal to add initial data
+    if (!originalText || originalText.trim().length === 0) {
+      setIsEnhancing(false);
+      const editableSection = mapToEditableSection(sectionKey);
+      
+      if (editableSection) {
+        setDataEditModal({
+          isOpen: true,
+          section: editableSection,
+          checklistItemId: item.id,
+          checklistItemLabel: item.label,
+        });
+      } else {
+        toast.error(`Cannot enhance empty ${getSectionDisplayName(sectionKey)} section`);
+      }
+      return;
+    }
+
+    // Section has content - use AI enhancement modal (context questions → improvement)
     setEnhancementModal({
       isOpen: true,
       sectionType,
@@ -184,6 +371,37 @@ export const ResumeScoreCard = memo(function ResumeScoreCard({ score, isLoading,
       checklistItemId: item.id,
     });
     setIsEnhancing(false);
+  };
+
+  // Handle DataEditModal save
+  const handleDataEditSave = async (
+    generatedResumeUpdates: Partial<GeneratedResume>,
+    resumeDataUpdates: Partial<ResumeData>
+  ) => {
+    try {
+      await updateSectionAndSync(generatedResumeUpdates, resumeDataUpdates);
+      toast.success('Changes saved and score updated!');
+    } catch (err: any) {
+      console.error('Error saving data edit:', err);
+      toast.error(err.message || 'Failed to save changes');
+      throw err;
+    }
+  };
+
+  // Handle re-scoring for AI validation after save
+  const handleRescore = async () => {
+    if (!currentResumeId) return null;
+    
+    try {
+      await scoreResume(currentResumeId);
+      // Return the updated score from the store
+      // Using a small delay to ensure store is updated
+      await new Promise(resolve => setTimeout(resolve, 100));
+      return useResumeStore.getState().currentScore;
+    } catch (error) {
+      console.error('Error re-scoring resume:', error);
+      return null;
+    }
   };
 
   const getSectionDisplayName = (section: string): string => {
@@ -199,31 +417,9 @@ export const ResumeScoreCard = memo(function ResumeScoreCard({ score, isLoading,
       'languages': 'Languages',
       'skills': 'Skills',
       'contact': 'Contact Information',
+      'dataquality': 'Data Quality',
     };
     return names[section.toLowerCase()] || section;
-  };
-
-  const getWizardStepForSection = (section: string): string | null => {
-    const sectionLower = section.toLowerCase();
-    const stepMap: Record<string, string> = {
-      'summary': '/wizard/manual/step-7',
-      'experience': '/wizard/manual/step-3',
-      'education': '/wizard/manual/step-4',
-      'project': '/wizard/manual/step-5',
-      'projects': '/wizard/manual/step-5',
-      'achievement': '/wizard/manual/step-6',
-      'achievements': '/wizard/manual/step-6',
-      'language': '/wizard/manual/step-5',
-      'languages': '/wizard/manual/step-5',
-      'skills': '/wizard/manual/step-2',
-      'contact': '/wizard/manual/step-1',
-    };
-    return stepMap[sectionLower] || null;
-  };
-
-  const getStepNumberFromRoute = (route: string): number | null => {
-    const match = route.match(/step-(\d+)/);
-    return match ? parseInt(match[1], 10) : null;
   };
 
   const handleEnhancementComplete = (enhancedText: string) => {
@@ -442,7 +638,7 @@ export const ResumeScoreCard = memo(function ResumeScoreCard({ score, isLoading,
         )}
       </div>
 
-      {/* Guided Enhancement Modal */}
+      {/* Guided Enhancement Modal - for AI-powered fixes */}
       {enhancementModal.isOpen && (
         <GuidedEnhancementModal
           isOpen={enhancementModal.isOpen}
@@ -455,28 +651,18 @@ export const ResumeScoreCard = memo(function ResumeScoreCard({ score, isLoading,
         />
       )}
 
-      {/* Empty Section Confirmation Dialog */}
-      <ConfirmationDialog
-        isOpen={emptySectionDialog.isOpen}
-        title="Empty Section"
-        message={`This section is empty. Would you like to go to the wizard step to add ${emptySectionDialog.sectionName}?`}
-        confirmText="Go to Step"
-        cancelText="Cancel"
-        variant="info"
-        onConfirm={() => {
-          if (emptySectionDialog.wizardStep) {
-            const stepNumber = getStepNumberFromRoute(emptySectionDialog.wizardStep);
-            if (stepNumber) {
-              setCurrentStep(stepNumber);
-            }
-            navigate(emptySectionDialog.wizardStep);
-            toast.success(`You can add ${emptySectionDialog.sectionName} here, then return to scoring to see your updated score`);
-          }
-          setEmptySectionDialog({ isOpen: false, sectionName: '', wizardStep: null });
-        }}
-        onCancel={() => {
-          setEmptySectionDialog({ isOpen: false, sectionName: '', wizardStep: null });
-        }}
+      {/* DataEditModal - for in-place manual editing (contact, empty sections) */}
+      <DataEditModal
+        isOpen={dataEditModal.isOpen}
+        onClose={() => setDataEditModal({ isOpen: false, section: 'contact' })}
+        section={dataEditModal.section}
+        generatedResume={generatedResume || resume || null}
+        resumeData={resumeData}
+        onSave={handleDataEditSave}
+        checklistItemId={dataEditModal.checklistItemId}
+        checklistItemLabel={dataEditModal.checklistItemLabel}
+        onRescore={handleRescore}
+        initialValidationErrors={dataEditModal.initialValidationErrors}
       />
 
       {/* Premium Action Modal for free users */}

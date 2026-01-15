@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
-import { ArrowRight, ArrowLeft } from 'lucide-react';
+import { ArrowRight, ArrowLeft, X } from 'lucide-react';
 import { ResumeScoreCard } from '@/components/resume/ResumeScoreCard';
+import { RateLimitWarning } from '@/components/RateLimitWarning';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '@/stores/authStore';
 import { resumeService } from '@/services/resumeService';
@@ -24,15 +25,93 @@ export function Step9Score() {
     scoreResume,
     pollForScore,
     updateResumeSection,
-    setGeneratedResume
+    setGeneratedResume,
+    syncResumeDataToGeneratedResume,
+    syncGeneratedResumeToResumeData,
+    resumeData,
+    rateLimitInfo,
+    clearRateLimitInfo
   } = useResumeStore();
   const { user } = useAuthStore();
   const [hasStartedPolling, setHasStartedPolling] = useState(false);
+  const hasSyncedResumeData = useRef(false);
+  const [showRateLimitModal, setShowRateLimitModal] = useState(false);
+
+  // Show rate limit modal when rateLimitInfo is set
+  useEffect(() => {
+    if (rateLimitInfo) {
+      setShowRateLimitModal(true);
+    }
+  }, [rateLimitInfo]);
+
+  // Handle retry from rate limit modal
+  const handleRateLimitRetry = async () => {
+    setShowRateLimitModal(false);
+    clearRateLimitInfo();
+    
+    if (currentResumeId) {
+      await handleScoreResume();
+    }
+  };
+
+  // Close rate limit modal
+  const handleCloseRateLimitModal = () => {
+    setShowRateLimitModal(false);
+    clearRateLimitInfo();
+  };
 
   // Reset polling flag when resumeId changes
   useEffect(() => {
     setHasStartedPolling(false);
+    hasSyncedResumeData.current = false;
   }, [currentResumeId]);
+
+  // Reset sync flag on unmount so sync runs again when user returns to Step 9
+  // This is important for the "Fix" flow: user goes to Step 1, edits data, returns to Step 9
+  useEffect(() => {
+    return () => {
+      hasSyncedResumeData.current = false;
+    };
+  }, []);
+
+  // Sync ALL resume data from resumeData to generatedResume on mount
+  // This handles the case where user edited ANY section via wizard steps (profile, education, experience, etc.)
+  // and returned to Step 9 to see their updated score.
+  // 
+  // NOTE: This sync is only needed for wizard step edits (Steps 1-8).
+  // Edits made via DataEditModal in Step 9 use updateSectionAndSync() which updates both stores directly.
+  // The sync runs once per mount. If the user makes changes in DataEditModal, those changes
+  // are saved directly to both stores, so they won't be overwritten by this sync.
+  useEffect(() => {
+    const syncAndRescore = async () => {
+      if (!currentResumeId || !generatedResume || hasSyncedResumeData.current) return;
+      
+      hasSyncedResumeData.current = true;
+      
+      // Try to sync ALL sections from resumeData to generatedResume
+      // syncResumeDataToGeneratedResume() only updates fields where resumeData differs from generatedResume
+      // If user made edits in DataEditModal, both stores are already in sync, so nothing will change
+      const updatedResume = syncResumeDataToGeneratedResume();
+      
+      if (updatedResume) {
+        // Resume data was synced - save to API and re-score
+        try {
+          await resumeService.updateResume(currentResumeId, {
+            generatedResume: updatedResume
+          });
+          
+          // Trigger re-score to update checklist with synced data
+          if (user?.isPremium) {
+            await scoreResume(currentResumeId);
+          }
+        } catch (error) {
+          console.error('Error syncing resume data:', error);
+        }
+      }
+    };
+    
+    syncAndRescore();
+  }, [currentResumeId, generatedResume, syncResumeDataToGeneratedResume, scoreResume, user?.isPremium]);
 
   // Fetch score when component mounts or resumeId changes
   useEffect(() => {
@@ -60,24 +139,37 @@ export function Step9Score() {
       try {
         await scoreResume(currentResumeId);
         toast.success('Resume scored successfully!');
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to score resume:', error);
-        toast.error('Failed to score resume. Please try again.');
+        // Don't show toast for rate limit errors - modal will be shown instead
+        if (error?.name !== 'RateLimitError') {
+          toast.error('Failed to score resume. Please try again.');
+        }
       }
     }
   };
 
   const handleEnhancementComplete = async (sectionType: string, enhancedText: string) => {
     try {
-      // Update the resume section in the store
+      // Update the resume section in the store (updates generatedResume)
       const updatedResume = updateResumeSection(sectionType, enhancedText);
       if (updatedResume) {
         setGeneratedResume(updatedResume);
         
+        // Sync enhanced content back to resumeData to keep both stores in sync
+        // This prevents data loss when user returns to edit later
+        syncGeneratedResumeToResumeData();
+        
         // Save the enhanced resume to the database
         if (currentResumeId) {
+          // Get the updated resumeData after sync
+          const currentResumeData = useResumeStore.getState().resumeData;
+          
+          // Save BOTH generatedResume AND resumeData to API
+          // This ensures enhancements persist when user returns to edit
           await resumeService.updateResume(currentResumeId, {
-            generatedResume: updatedResume
+            generatedResume: updatedResume,
+            resumeData: currentResumeData
           });
           toast.success('Section enhanced! Re-scoring to update checklist...');
           
@@ -180,6 +272,37 @@ export function Step9Score() {
           <ArrowRight className="w-4 h-4 ml-2" />
         </button>
       </div>
+
+      {/* Rate Limit Modal */}
+      {showRateLimitModal && rateLimitInfo && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {t('wizard.rateLimit.rescoreTitle', 'Scoring Limit Reached')}
+              </h3>
+              <button
+                onClick={handleCloseRateLimitModal}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {/* Modal Content */}
+            <div className="p-6">
+              <RateLimitWarning
+                onRetry={handleRateLimitRetry}
+                onClose={handleCloseRateLimitModal}
+                showRetry={true}
+                countdownSeconds={Math.max(1, Math.ceil((rateLimitInfo.resetTime - Date.now()) / 1000))}
+                isPremium={user?.isPremium}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -152,8 +152,6 @@ create_frontend_env() {
         echo "   - VITE_API_URL=http://localhost:3001/dev"
         echo "   - VITE_GOOGLE_CLIENT_ID=<tu-google-client-id>"
         echo "   - VITE_LINKEDIN_CLIENT_ID=<tu-linkedin-client-id>"
-        echo "   - VITE_PADDLE_CLIENT_TOKEN=<tu-paddle-client-token>"
-        echo "   - VITE_PADDLE_ENVIRONMENT=<sandbox|production>"
         echo ""
         return 1
     fi
@@ -172,8 +170,7 @@ create_frontend_env() {
     
     local google_client_id=$(fetch_ssm_parameter "google-client-id")
     local linkedin_client_id=$(fetch_ssm_parameter "linkedin-client-id")
-    local paddle_client_token=$(fetch_ssm_parameter "paddle-client-token")
-    local paddle_environment=$(fetch_ssm_parameter "paddle-environment")
+    local paypal_client_id=$(fetch_ssm_parameter "paypal-client-id")
     
     # Validar parámetros críticos
     local has_errors=false
@@ -188,13 +185,6 @@ create_frontend_env() {
         echo "⚠️  Advertencia: No se pudo obtener LINKEDIN_CLIENT_ID de SSM"
         echo "   Parámetro: /getquickresume/dev/linkedin-client-id"
         echo "   Continuando sin este parámetro..."
-    fi
-    
-    if [ -z "$paddle_environment" ]; then
-        echo "⚠️  Advertencia: No se pudo obtener PADDLE_ENVIRONMENT de SSM"
-        echo "   Parámetro: /getquickresume/dev/paddle-environment"
-        echo "   Usando valor por defecto: sandbox"
-        paddle_environment="sandbox"
     fi
     
     if [ "$has_errors" = true ]; then
@@ -224,11 +214,9 @@ EOF
         echo "VITE_LINKEDIN_CLIENT_ID=$linkedin_client_id" >> "$env_file"
     fi
     
-    if [ ! -z "$paddle_client_token" ]; then
-        echo "VITE_PADDLE_CLIENT_TOKEN=$paddle_client_token" >> "$env_file"
+    if [ ! -z "$paypal_client_id" ]; then
+        echo "VITE_PAYPAL_CLIENT_ID=$paypal_client_id" >> "$env_file"
     fi
-    
-    echo "VITE_PADDLE_ENVIRONMENT=$paddle_environment" >> "$env_file"
     
     echo "✅ Archivo .env creado exitosamente"
     echo "   Ubicación: $(pwd)/$env_file"

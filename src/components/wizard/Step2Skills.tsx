@@ -14,7 +14,7 @@ import { suggestionService } from '@/services/suggestionService';
 export function Step2Skills() {
   const { t } = useTranslation();
   const { navigateToStep } = useWizardNavigation();
-  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, calculateCharacters, currentResumeId } = useResumeStore();
+  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep, calculateCharacters, currentResumeId } = useResumeStore();
   const { user } = useAuthStore();
   const [errors, setErrors] = useState<FieldValidation>({});
   const [skills, setSkills] = useState(resumeData.skillsRaw || []);
@@ -200,7 +200,7 @@ export function Step2Skills() {
   // State to show validation errors
   const [showErrors, setShowErrors] = useState(false);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     // Validar habilidades (mínimo 5)
     const validationErrors = validateSkills(skills);
     
@@ -218,6 +218,13 @@ export function Step2Skills() {
     // Si no hay errores, continuar
     setShowErrors(false);
     updateResumeData({ skillsRaw: skills });
+    // Save immediately before navigation to ensure data is persisted
+    try {
+      await saveResumeDataImmediately();
+    } catch (error) {
+      console.error('Error saving skills data:', error);
+      // Continue with navigation even if save fails - data is in store
+    }
     markStepCompleted(2);
     setCurrentStep(3);
     navigateToStep(3);

@@ -17,13 +17,14 @@ export function Step8Preview() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { navigateToStep } = useWizardNavigation();
-  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, setGeneratedResume, setIsGenerating, generatedResume, isGenerating, currentResumeId, setCurrentResumeId, hasLoadedExistingResume, setScore } = useResumeStore();
+  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, setGeneratedResume, setIsGenerating, generatedResume, isGenerating, currentResumeId, setCurrentResumeId, hasLoadedExistingResume, setScore, syncResumeDataToGeneratedResume } = useResumeStore();
   const { user } = useAuthStore();
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [isGeneratingCV, setIsGeneratingCV] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [backendError, setBackendError] = useState<string | null>(null);
-
+  
+  // Debug logging for education data
   // Generar CV automáticamente cuando se carga el componente (solo para nuevos CVs)
   // Flag to prevent multiple generation attempts
   const [hasAttemptedGeneration, setHasAttemptedGeneration] = useState(false);
@@ -88,6 +89,10 @@ export function Step8Preview() {
           
           // Guardar en el store
           setGeneratedResume(response.data!);
+          
+          // Sync resumeData to generatedResume to ensure all education entries are included
+          // The AI might not include all entries, so we need to sync manually
+          setTimeout(() => syncResumeDataToGeneratedResume(), 100);
           
           // Si no tenemos resumeId, guardarlo del response (esto solo pasa en la primera generación)
           if (!currentResumeId && response.resumeId) {
@@ -182,6 +187,9 @@ export function Step8Preview() {
       
       // Guardar en el store
       setGeneratedResume(response.data!);
+      
+      // Sync resumeData to generatedResume to ensure all education entries are included
+      setTimeout(() => syncResumeDataToGeneratedResume(), 100);
       
       // Use the score from the response if available (scoring is now synchronous)
       if (response.score) {

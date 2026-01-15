@@ -529,13 +529,28 @@ export const en = {
         txt: 'Plain text (.txt)'
       },
       processing: {
-        processingTitle: 'Processing your CV...'
-        ,selectedTitle: 'File selected',
-        message: 'Our AI is extracting and analyzing the information from your CV. This may take a few moments.',
+        processingTitle: 'Processing your CV...',
+        selectedTitle: 'File selected',
+        message: 'Our AI is extracting data from your resume and categorizing it into sections. This may take a few moments.',
         fileName: 'File: {{name}}',
         uploading: 'Processing...',
         processWithAI: 'Process with AI',
-        extractionHint: 'Extracting personal information, work experience, education and skills...'
+        extractionHint: 'Extracting personal information, work experience, education and skills...',
+        title: 'Extracting Resume Data',
+        subtitle: 'Extracting and organizing your resume data in {{language}}...',
+        step1: 'Document text extracted',
+        step2: 'Extracting and categorizing data...',
+        step3: 'Organizing into sections',
+        generatingIn: 'Generating in'
+      },
+      languageSelection: {
+        title: 'Select Resume Language',
+        subtitle: 'Choose the language in which you want to generate your resume. All AI suggestions and content will be in this language.',
+        explanation: 'The language you select will be used for all AI-generated content, including suggestions, enhancements, and the final resume text.',
+        continue: 'Continue',
+        fileInfo: '{{chars}} characters extracted',
+        englishLabel: 'English',
+        spanishLabel: 'Spanish'
       },
       preview: {
         title: 'Extracted information',
@@ -589,6 +604,7 @@ export const en = {
       review: {
         title: 'Review Extracted Data',
         subtitle: 'Verify and edit the information extracted from your CV before creating your resume.',
+        generatingIn: 'Content language',
         sections: {
           profile: 'Profile Information',
           skills: 'Skills',
@@ -609,7 +625,14 @@ export const en = {
         addButton: 'Add {{item}}',
         validation: {
           requiredFields: 'Please complete all required fields',
-          fixErrors: 'Please fix the errors below'
+          fixErrors: 'Please fix the errors below',
+          educationStartDate: 'Education #{{index}}: Start Date is required',
+          certificationDate: 'Certification #{{index}}: Date Obtained is required',
+          experienceCompany: 'Experience #{{index}}: Company is required',
+          experienceStartDate: 'Experience #{{index}}: Start Date is required',
+          experienceEndDate: 'Experience #{{index}}: End Date is required',
+          experienceDateRange: 'Experience #{{index}}: End date must be later than start date',
+          achievementDescription: 'Achievement #{{index}}: Description is required'
         },
         actions: {
           back: 'Back',
@@ -626,7 +649,9 @@ export const en = {
           addAll: 'Add All',
           enhanced: 'Text enhanced!',
           error: 'Error enhancing text',
-          premiumRequired: 'Premium required for AI features'
+          premiumRequired: 'Premium required for AI features',
+          rateLimitTitle: 'Slow down a moment ⏳',
+          rateLimitMessage: "You're enhancing content quickly! Please wait a few seconds before trying again. This helps us maintain quality AI responses."
         },
         fields: {
           // Profile fields
@@ -1671,12 +1696,18 @@ export const en = {
       title: 'Usage limit reached',
       defaultMessage: 'Too many requests. Please wait before trying again.',
       freeUserMessage: 'Free users have limited access to AI features.',
+      premiumUserMessage: "You've hit a temporary rate limit. As a premium user, you have much higher limits than free users. Please wait a moment.",
+      premiumUserBenefit: 'Premium users enjoy 5x more AI requests per minute than free users.',
       waitMessage: 'Please wait 1 minute before trying again.',
       waitCountdown: 'You can try again in {{time}}',
       canRetryNow: 'You can try again now!',
       upgradeCta: 'Upgrade to Premium',
       premiumBenefit: 'Get 10x more AI suggestions per minute',
       retryButton: 'Try again',
+      // Rescore-specific messages
+      rescoreTitle: 'Scoring Limit Reached',
+      rescorePremiumMessage: "Resume scoring uses AI analysis. To ensure quality results for all users, there's a fair usage limit of 5 scores per minute. You can try again shortly.",
+      premiumLimitExplainer: 'Premium users can score up to 5 resumes per minute',
     },
   },
 
@@ -1703,6 +1734,7 @@ export const en = {
       score: 'Scoring',
       template: 'Preview',
       download: 'Download',
+      final: 'Finish',
     },
     limitExceeded: '⚠️ Limit exceeded. Reduce {{count}} characters',
     charactersRemaining: '⚠️ You have {{count}} characters remaining',
@@ -2132,7 +2164,7 @@ export const en = {
       title: 'Terms of Service',
     },
     refund: {
-      title: 'Refund Policy',
+      title: 'No Refund Policy',
     },
   },
 
@@ -2264,6 +2296,33 @@ export const en = {
           exclusiveDesigns: 'Access to exclusive premium designs',
           allTemplates: 'Unlock all template designs',
           professionalLook: 'Stand out with professional templates',
+        },
+      },
+      translate: {
+        title: 'Translate Resume - Premium Feature',
+        description: 'Translate your resume to 10+ languages with professional quality. Perfect for applying to international jobs.',
+        benefits: {
+          multiLanguage: 'Translate to 10+ languages',
+          professionalQuality: 'Professional translation quality',
+          preserveFormatting: 'Preserves original resume formatting',
+        },
+      },
+      tailorForJob: {
+        title: 'Tailor for Job - Premium Feature',
+        description: 'Optimize your resume for a specific job posting. Our AI analyzes requirements and suggests personalized improvements.',
+        benefits: {
+          aiAnalysis: 'AI-powered requirements analysis',
+          keywordOptimization: 'Keyword optimization',
+          matchScore: 'Job match score',
+        },
+      },
+      share: {
+        title: 'Share & Track - Premium Feature',
+        description: 'Share your resume with a unique link and track who views it. Get detailed view analytics.',
+        benefits: {
+          trackViews: 'Track who views your resume',
+          qrCode: 'QR code for easy sharing',
+          analytics: 'Device and location analytics',
         },
       },
     },
@@ -2455,11 +2514,21 @@ export const en = {
       profession: 'Profession:',
       experience: 'Experience:',
       experiences: 'Experiences:',
+      language: 'Language:',
       aiOptimized: 'AI Optimized',
       aiEnhanced: 'AI Enhanced',
       publiclyShared: 'Publicly Shared',
       score: 'Resume Score',
       updated: 'Updated:',
+    },
+    aiTools: {
+      title: 'AI Tools',
+      share: 'Share',
+      translate: 'Translate',
+      tailor: 'Tailor',
+      enhance: 'Enhance',
+      rescore: 'Score',
+      premiumBadge: 'PRO',
     },
   },
   resumeView: {
@@ -3165,6 +3234,98 @@ export const en = {
         description: 'Are you sure you want to delete this tailored resume? This action cannot be undone.',
         deleting: 'Deleting...',
       },
+    },
+  },
+
+  // Premium Modal - Feature-specific sales content
+  premiumModal: {
+    maybeLater: 'Maybe Later',
+    
+    // Translate Feature
+    translate: {
+      headline: 'Apply to Jobs Worldwide',
+      subheadline: 'Instantly translate your resume to 12 languages with AI-powered professional quality',
+      speed: 'Lightning Fast',
+      speedDesc: 'Under 30 seconds',
+      quality: 'Professional Quality',
+      qualityDesc: 'AI-powered accuracy',
+      format: 'Keeps Formatting',
+      formatDesc: 'Perfect layout preserved',
+      unlimited: 'Unlimited Use',
+      unlimitedDesc: 'Translate anytime',
+      cta: 'Unlock Global Jobs',
+    },
+
+    // Tailor for Job Feature
+    tailorForJob: {
+      headline: 'Land More Interviews',
+      subheadline: 'AI optimizes your resume to match any job posting perfectly',
+      before: 'Before',
+      after: 'After',
+      instant: 'Instant Analysis',
+      instantDesc: 'AI reads job posting in seconds',
+      ats: 'Beat ATS Systems',
+      atsDesc: 'Optimized keywords & formatting',
+      interviews: '3x More Callbacks',
+      interviewsDesc: 'Users report better results',
+      socialProof: '✨ Users see 3x more interview invitations',
+      cta: 'Boost My Match Score',
+    },
+
+    // AI Enhance Feature
+    enhance: {
+      headline: 'Make Your Resume ATS-Ready',
+      subheadline: 'AI rewrites and optimizes every section for maximum impact',
+      before: 'Before',
+      after: 'After',
+      beforeText: 'Managed team projects',
+      afterText: 'Led cross-functional team of 8, delivering 5 projects 20% under budget',
+      ats: 'Beat 95% of ATS',
+      atsDesc: 'Optimized for all systems',
+      rewrite: 'AI Rewrites',
+      rewriteDesc: 'Weak bullets → Strong impact',
+      sections: 'All Sections',
+      sectionsDesc: 'Enhance any part individually',
+      keywords: 'Smart Keywords',
+      keywordsDesc: 'Industry-specific terms added',
+      cta: 'Enhance My Resume',
+    },
+
+    // Share Feature
+    share: {
+      headline: 'Know Who Views Your Resume',
+      subheadline: 'Get real-time analytics on every view with shareable links & QR codes',
+      viewsToday: 'Views Today',
+      realtime: 'Real-Time Tracking',
+      realtimeDesc: 'Know when recruiters view',
+      qrcode: 'QR Code Sharing',
+      qrcodeDesc: 'Perfect for networking events',
+      location: 'Location Insights',
+      locationDesc: 'See cities & countries',
+      cta: 'Start Tracking Views',
+    },
+
+    // Rescore Feature
+    rescore: {
+      headline: 'Track Your Improvement',
+      subheadline: 'Get detailed ATS compatibility scores with actionable feedback',
+      current: 'Current',
+      potential: 'Potential',
+      detailed: 'Detailed ATS Score',
+      detailedDesc: 'Know exactly where you stand',
+      breakdown: 'Section Breakdown',
+      breakdownDesc: 'See what needs work',
+      unlimited: 'Unlimited Rescoring',
+      unlimitedDesc: 'Check after every edit',
+      cta: 'Get My Score',
+    },
+
+    // Default fallback
+    default: {
+      benefit1: 'Unlimited access to all premium features',
+      benefit2: 'AI-powered tools for better results',
+      benefit3: 'Priority support when you need help',
+      cta: 'Upgrade to Premium',
     },
   },
 };

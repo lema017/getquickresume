@@ -21,7 +21,15 @@ export const SUPPORTED_FILE_TYPES = {
 } as const;
 
 export const SUPPORTED_EXTENSIONS = ['.pdf', '.docx', '.doc', '.txt'];
-export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+// Tiered file size limits
+export const FILE_SIZE_LIMITS = {
+  FREE: 2 * 1024 * 1024,      // 2 MB for free users
+  PREMIUM: 10 * 1024 * 1024,  // 10 MB for premium users
+};
+
+// Keep for backwards compatibility
+export const MAX_FILE_SIZE = FILE_SIZE_LIMITS.PREMIUM;
 export const MAX_TEXT_LENGTH = 50 * 1024; // 50KB of text
 
 export interface ExtractionResult {
@@ -33,15 +41,32 @@ export interface ExtractionResult {
   characterCount: number;
 }
 
+export interface FileValidationResult {
+  valid: boolean;
+  error?: string;
+  fileSizeMB?: number;
+  maxSizeMB?: number;
+  showFileSizeModal?: boolean;
+}
+
 /**
  * Validates the file type and size before extraction
+ * @param file - The file to validate
+ * @param isPremium - Whether the user has a premium account (affects file size limit)
  */
-export function validateFile(file: File): { valid: boolean; error?: string } {
-  // Check file size
-  if (file.size > MAX_FILE_SIZE) {
+export function validateFile(file: File, isPremium: boolean = false): FileValidationResult {
+  const maxFileSize = isPremium ? FILE_SIZE_LIMITS.PREMIUM : FILE_SIZE_LIMITS.FREE;
+  const fileSizeMB = file.size / (1024 * 1024);
+  const maxSizeMB = maxFileSize / (1024 * 1024);
+
+  // Check file size with tiered limits
+  if (file.size > maxFileSize) {
     return {
       valid: false,
-      error: `File too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB`,
+      error: `File too large. Maximum size is ${maxSizeMB}MB`,
+      fileSizeMB,
+      maxSizeMB,
+      showFileSizeModal: true,
     };
   }
 
@@ -138,10 +163,12 @@ async function extractTextFromTXT(file: File): Promise<string> {
 
 /**
  * Main function to extract text from any supported file type
+ * @param file - The file to extract text from
+ * @param isPremium - Whether the user has a premium account (affects file size limit)
  */
-export async function extractTextFromFile(file: File): Promise<ExtractionResult> {
+export async function extractTextFromFile(file: File, isPremium: boolean = false): Promise<ExtractionResult> {
   // Validate file first
-  const validation = validateFile(file);
+  const validation = validateFile(file, isPremium);
   if (!validation.valid) {
     return {
       success: false,

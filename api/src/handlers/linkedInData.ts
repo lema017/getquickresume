@@ -6,6 +6,7 @@ import { sanitizeUserInput, validateInput, sanitizeUserMultiline, validateInputL
 import { checkRateLimit } from '../middleware/rateLimiter';
 import { getUserById } from '../services/dynamodb';
 import { formatProfession } from '../utils/textFormatting';
+import { checkPremiumStatus } from '../utils/premiumValidator';
 
 export const parseLinkedInData = async (
   event: APIGatewayProxyEvent
@@ -52,7 +53,8 @@ export const parseLinkedInData = async (
       };
     }
 
-    if (!user.isPremium) {
+    const premiumStatus = checkPremiumStatus(user);
+    if (!premiumStatus.isPremium) {
       return {
         statusCode: 403,
         headers: {
@@ -63,14 +65,17 @@ export const parseLinkedInData = async (
         },
         body: JSON.stringify({
           success: false,
-          error: 'Premium subscription required',
-          message: 'LinkedIn import is a premium feature. Please upgrade to access this functionality.'
+          error: premiumStatus.isExpired ? 'Premium subscription expired' : 'Premium subscription required',
+          message: premiumStatus.isExpired 
+            ? 'Your premium subscription has expired. Please renew to continue using this feature.'
+            : 'LinkedIn import is a premium feature. Please upgrade to access this functionality.'
         } as LinkedInDataResponse)
       };
     }
 
-    // Rate limiting: 5 requests por minuto
-    const rateLimitResult = await checkRateLimit(userId, 'linkedin-data-parsing', 5, 60000);
+    // Rate limiting: 1 request/minute for free users, 5 requests/minute for premium users
+    const maxRequests = user.isPremium ? 5 : 1;
+    const rateLimitResult = await checkRateLimit(userId, 'linkedin-data-parsing', maxRequests, 60000);
     if (!rateLimitResult.allowed) {
       return {
         statusCode: 429,
@@ -83,7 +88,7 @@ export const parseLinkedInData = async (
         body: JSON.stringify({
           success: false,
           error: 'Rate limit exceeded',
-          message: 'Too many LinkedIn data parsing requests. Please wait before trying again.',
+          message: `Too many LinkedIn data parsing requests. Please wait before trying again. (Limit: ${maxRequests} per minute)`,
           resetTime: rateLimitResult.resetTime
         } as LinkedInDataResponse)
       };

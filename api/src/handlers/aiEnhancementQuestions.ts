@@ -4,6 +4,7 @@ import { checkRateLimit, logSuspiciousActivity, refundRateLimit } from '../middl
 import { sanitizeUserInput, sanitizeSectionType, sanitizeLanguage } from '../utils/inputSanitizer';
 import { getUserById } from '../services/dynamodb';
 import { verifyResumeOwnership } from '../services/resumeService';
+import { checkPremiumStatus } from '../utils/premiumValidator';
 
 export interface GenerateQuestionsRequest {
   sectionType: 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language';
@@ -75,7 +76,8 @@ export const generateEnhancementQuestions = async (
       };
     }
 
-    if (!user.isPremium) {
+    const premiumStatus = checkPremiumStatus(user);
+    if (!premiumStatus.isPremium) {
       return {
         statusCode: 403,
         headers: {
@@ -86,8 +88,10 @@ export const generateEnhancementQuestions = async (
         },
         body: JSON.stringify({
           success: false,
-          error: 'Premium required',
-          message: 'This feature is available only for premium users. Please upgrade to access guided enhancement.'
+          error: premiumStatus.isExpired ? 'Premium subscription expired' : 'Premium required',
+          message: premiumStatus.isExpired 
+            ? 'Your premium subscription has expired. Please renew to continue using this feature.'
+            : 'This feature is available only for premium users. Please upgrade to access guided enhancement.'
         } as GenerateQuestionsResponse)
       };
     }

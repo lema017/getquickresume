@@ -4,8 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { resumeService } from '@/services/resumeService';
+import { resumeScoringService } from '@/services/resumeScoringService';
 import { downloadService } from '@/services/downloadService';
-import { Resume, ResumeData } from '@/types';
+import { Resume, ResumeData, ResumeScore } from '@/types';
+import { ResumeScoreCard } from '@/components/resume/ResumeScoreCard';
 import { ResumeHeader } from '@/components/resume-view/ResumeHeader';
 import { ContactSection } from '@/components/resume-view/ContactSection';
 import { SummarySection } from '@/components/resume-view/SummarySection';
@@ -40,6 +42,11 @@ export function ResumeViewPage() {
   const [resume, setResume] = useState<Resume | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Score state
+  const [currentScore, setCurrentScore] = useState<ResumeScore | null>(null);
+  const [isLoadingScore, setIsLoadingScore] = useState(false);
+  const [scoreError, setScoreError] = useState<string | null>(null);
 
   // Template selection state
   const [isSelectingTemplate, setIsSelectingTemplate] = useState(false);
@@ -99,6 +106,31 @@ export function ResumeViewPage() {
 
     loadResume();
   }, [id, navigate, t]);
+
+  // Fetch score when resume is loaded (for premium users)
+  useEffect(() => {
+    const fetchScore = async () => {
+      if (!resume || !id || !user?.isPremium) {
+        return;
+      }
+
+      try {
+        setIsLoadingScore(true);
+        setScoreError(null);
+        const score = await resumeScoringService.getResumeScore(id);
+        setCurrentScore(score);
+      } catch (err) {
+        console.error('Error fetching score:', err);
+        if (err instanceof Error) {
+          setScoreError(err.message);
+        }
+      } finally {
+        setIsLoadingScore(false);
+      }
+    };
+
+    fetchScore();
+  }, [resume, id, user?.isPremium]);
 
   const handleBack = () => {
     navigate('/dashboard');
@@ -340,6 +372,18 @@ export function ResumeViewPage() {
           onShare={resume.generatedResume ? () => setShowShareModal(true) : undefined}
           isGeneratingPDF={isGeneratingPDF}
         />
+
+        {/* Resume Score Card (Premium users only) */}
+        {user?.isPremium && (currentScore || isLoadingScore) && (
+          <div className="mt-8">
+            <ResumeScoreCard
+              score={currentScore}
+              isLoading={isLoadingScore}
+              error={scoreError}
+              resume={resume.generatedResume}
+            />
+          </div>
+        )}
 
         {/* Resume Content */}
         <div className="mt-8 space-y-6">

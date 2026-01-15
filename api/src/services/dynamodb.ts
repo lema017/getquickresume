@@ -60,9 +60,11 @@ export interface User {
   subscriptionExpiration?: string; // ISO date
   planType?: 'monthly' | 'yearly';
   subscriptionStartDate?: string; // ISO date
-  paddleCustomerId?: string;
-  paddleSubscriptionId?: string;
-  paddleTransactionId?: string;
+  // Payment provider fields (generic for PayPal or other providers)
+  paymentProvider?: 'paypal' | 'stripe' | 'other';
+  paymentCustomerId?: string;
+  paymentSubscriptionId?: string;
+  paymentTransactionId?: string;
   aiUsageStats?: AIUsageStats; // AI usage tracking for cost analysis
   // Job Tailoring usage tracking
   jobTailoringUsage?: {
@@ -157,7 +159,19 @@ export const getUserById = async (id: string): Promise<User | null> => {
     const result = await dynamodb.send(command);
     
     if (result.Item) {
-      return result.Item as User;
+      const user = result.Item as User;
+      
+      // Auto-downgrade expired premium subscriptions
+      if (user.isPremium && user.subscriptionExpiration) {
+        const expirationDate = new Date(user.subscriptionExpiration);
+        if (expirationDate <= new Date()) {
+          console.log(`[Premium] Auto-downgrading expired user: ${user.id.substring(0, 8)}...`);
+          const updatedUser = await updateUser(user.id, { isPremium: false });
+          return updatedUser;
+        }
+      }
+      
+      return user;
     }
     
     return null;
@@ -356,9 +370,10 @@ export const updateUser = async (id: string, updates: Partial<User>): Promise<Us
 export const upgradeUserToPremium = async (
   userId: string,
   planType: 'monthly' | 'yearly',
-  paddleCustomerId: string,
-  paddleSubscriptionId?: string,
-  paddleTransactionId?: string
+  paymentProvider: 'paypal' | 'stripe' | 'other',
+  paymentCustomerId: string,
+  paymentSubscriptionId?: string,
+  paymentTransactionId?: string
 ): Promise<User> => {
   try {
     const now = new Date().toISOString();
@@ -380,9 +395,10 @@ export const upgradeUserToPremium = async (
             planType = :planType,
             subscriptionStartDate = :startDate,
             subscriptionExpiration = :expiration,
-            paddleCustomerId = :customerId,
-            paddleSubscriptionId = :subscriptionId,
-            paddleTransactionId = :transactionId,
+            paymentProvider = :provider,
+            paymentCustomerId = :customerId,
+            paymentSubscriptionId = :subscriptionId,
+            paymentTransactionId = :transactionId,
             updatedAt = :updatedAt
       `,
       ExpressionAttributeValues: {
@@ -390,9 +406,10 @@ export const upgradeUserToPremium = async (
         ':planType': planType,
         ':startDate': startDate,
         ':expiration': expirationDate.toISOString(),
-        ':customerId': paddleCustomerId,
-        ':subscriptionId': paddleSubscriptionId || null,
-        ':transactionId': paddleTransactionId || null,
+        ':provider': paymentProvider,
+        ':customerId': paymentCustomerId,
+        ':subscriptionId': paymentSubscriptionId || null,
+        ':transactionId': paymentTransactionId || null,
         ':updatedAt': now,
       },
       ReturnValues: 'ALL_NEW',

@@ -92,7 +92,17 @@ const getUserById = async (id) => {
         });
         const result = await dynamodb.send(command);
         if (result.Item) {
-            return result.Item;
+            const user = result.Item;
+            // Auto-downgrade expired premium subscriptions
+            if (user.isPremium && user.subscriptionExpiration) {
+                const expirationDate = new Date(user.subscriptionExpiration);
+                if (expirationDate <= new Date()) {
+                    console.log(`[Premium] Auto-downgrading expired user: ${user.id.substring(0, 8)}...`);
+                    const updatedUser = await (0, exports.updateUser)(user.id, { isPremium: false });
+                    return updatedUser;
+                }
+            }
+            return user;
         }
         return null;
     }
@@ -282,7 +292,7 @@ exports.updateUser = updateUser;
  * Upgrade user to premium status
  * Sets isPremium to true and stores subscription details
  */
-const upgradeUserToPremium = async (userId, planType, paddleCustomerId, paddleSubscriptionId, paddleTransactionId) => {
+const upgradeUserToPremium = async (userId, planType, paymentProvider, paymentCustomerId, paymentSubscriptionId, paymentTransactionId) => {
     try {
         const now = new Date().toISOString();
         const startDate = now;
@@ -302,9 +312,10 @@ const upgradeUserToPremium = async (userId, planType, paddleCustomerId, paddleSu
             planType = :planType,
             subscriptionStartDate = :startDate,
             subscriptionExpiration = :expiration,
-            paddleCustomerId = :customerId,
-            paddleSubscriptionId = :subscriptionId,
-            paddleTransactionId = :transactionId,
+            paymentProvider = :provider,
+            paymentCustomerId = :customerId,
+            paymentSubscriptionId = :subscriptionId,
+            paymentTransactionId = :transactionId,
             updatedAt = :updatedAt
       `,
             ExpressionAttributeValues: {
@@ -312,9 +323,10 @@ const upgradeUserToPremium = async (userId, planType, paddleCustomerId, paddleSu
                 ':planType': planType,
                 ':startDate': startDate,
                 ':expiration': expirationDate.toISOString(),
-                ':customerId': paddleCustomerId,
-                ':subscriptionId': paddleSubscriptionId || null,
-                ':transactionId': paddleTransactionId || null,
+                ':provider': paymentProvider,
+                ':customerId': paymentCustomerId,
+                ':subscriptionId': paymentSubscriptionId || null,
+                ':transactionId': paymentTransactionId || null,
                 ':updatedAt': now,
             },
             ReturnValues: 'ALL_NEW',

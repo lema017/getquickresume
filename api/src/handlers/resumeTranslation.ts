@@ -3,6 +3,7 @@ import { AuthorizedEvent, ResumeResponse } from '../types';
 import { getUserById } from '../services/dynamodb';
 import { getResumeById, createResume, updateResumeWithGenerated } from '../services/resumeService';
 import { translationService } from '../services/translationService';
+import { checkPremiumStatus } from '../utils/premiumValidator';
 
 interface TranslateResumeRequest {
   targetLanguage: string;
@@ -71,7 +72,8 @@ export const translateResume = async (
     }
 
     // Premium-only feature
-    if (!user.isPremium) {
+    const premiumStatus = checkPremiumStatus(user);
+    if (!premiumStatus.isPremium) {
       return {
         statusCode: 403,
         headers: {
@@ -82,8 +84,10 @@ export const translateResume = async (
         },
         body: JSON.stringify({
           success: false,
-          error: 'Premium feature',
-          message: 'Resume translation is a premium feature. Please upgrade to premium to use this feature.'
+          error: premiumStatus.isExpired ? 'Premium subscription expired' : 'Premium feature',
+          message: premiumStatus.isExpired 
+            ? 'Your premium subscription has expired. Please renew to continue using this feature.'
+            : 'Resume translation is a premium feature. Please upgrade to premium to use this feature.'
         })
       };
     }

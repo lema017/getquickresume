@@ -45,8 +45,18 @@ import {
   verifyContactHasLinkedIn,
   verifyContactHasProfessionalEmail,
   verifyContactHasPhone,
-  VerificationResult
+  VerificationResult,
+  // Data quality verifiers (AI-powered)
+  verifyEducationDataQuality,
+  verifyExperienceDataQuality,
+  verifySkillsDataQuality,
+  verifyProfileDataQuality,
+  verifyCertificationsDataQuality,
+  verifyLanguagesDataQuality,
+  verifyOverallDataQuality,
+  ContentValidationContext
 } from '../utils/resumeVerifiers';
+import { ContentValidationResult } from './contentValidatorService';
 
 // ============================================================================
 // Types for Deterministic Scoring
@@ -341,6 +351,50 @@ const CONTACT_CHECKLIST: ChecklistDefinition[] = [
   },
 ];
 
+// Data Quality section (AI-powered content validation)
+const DATA_QUALITY_CHECKLIST: ChecklistDefinition[] = [
+  {
+    id: 'data-quality-overall',
+    label: 'Content Authenticity',
+    description: 'Resume contains meaningful, authentic data (not placeholder/test values)',
+    priority: 'required',
+    verifierId: 'verifyOverallDataQuality',
+    pointValue: 0.5,
+  },
+  {
+    id: 'data-quality-education',
+    label: 'Valid Education Data',
+    description: 'Education entries have real institution names, valid degrees, and actual fields of study',
+    priority: 'required',
+    verifierId: 'verifyEducationDataQuality',
+    pointValue: 0.3,
+  },
+  {
+    id: 'data-quality-experience',
+    label: 'Valid Experience Data',
+    description: 'Work experience has real company names and meaningful job titles',
+    priority: 'required',
+    verifierId: 'verifyExperienceDataQuality',
+    pointValue: 0.3,
+  },
+  {
+    id: 'data-quality-skills',
+    label: 'Valid Skills Data',
+    description: 'Skills section contains actual, recognizable skills (not placeholder values)',
+    priority: 'required',
+    verifierId: 'verifySkillsDataQuality',
+    pointValue: 0.2,
+  },
+  {
+    id: 'data-quality-profile',
+    label: 'Valid Profile Data',
+    description: 'Contact info contains realistic name and valid contact details',
+    priority: 'required',
+    verifierId: 'verifyProfileDataQuality',
+    pointValue: 0.2,
+  },
+];
+
 // Map verifier IDs to actual functions
 const VERIFIER_MAP: Record<string, (data: any, context?: any) => VerificationResult> = {
   verifySummaryHasAdequateLength: (data) => verifySummaryHasAdequateLength(data.summary),
@@ -368,6 +422,14 @@ const VERIFIER_MAP: Record<string, (data: any, context?: any) => VerificationRes
   verifyContactHasLinkedIn: (data) => verifyContactHasLinkedIn(data.contactInfo),
   verifyContactHasProfessionalEmail: (data) => verifyContactHasProfessionalEmail(data.contactInfo),
   verifyContactHasPhone: (data) => verifyContactHasPhone(data.contactInfo),
+  // Data quality verifiers (AI-powered content validation)
+  verifyOverallDataQuality: (data, ctx) => verifyOverallDataQuality(data, ctx as ContentValidationContext),
+  verifyEducationDataQuality: (data, ctx) => verifyEducationDataQuality(data.education, ctx as ContentValidationContext),
+  verifyExperienceDataQuality: (data, ctx) => verifyExperienceDataQuality(data.experience, ctx as ContentValidationContext),
+  verifySkillsDataQuality: (data, ctx) => verifySkillsDataQuality(data.skills, ctx as ContentValidationContext),
+  verifyProfileDataQuality: (data, ctx) => verifyProfileDataQuality(data.contactInfo, ctx as ContentValidationContext),
+  verifyCertificationsDataQuality: (data, ctx) => verifyCertificationsDataQuality(data.certifications, ctx as ContentValidationContext),
+  verifyLanguagesDataQuality: (data, ctx) => verifyLanguagesDataQuality(data.languages, ctx as ContentValidationContext),
 };
 
 // ============================================================================
@@ -382,16 +444,22 @@ class DeterministicScoringService {
    * @param generatedResume - The generated resume to score
    * @param resumeData - Optional resume input data for context
    * @param keywordAnalysis - Optional pre-analyzed keyword data from AI
+   * @param contentValidation - Optional AI-powered content validation results
    */
   scoreResume(
     generatedResume: GeneratedResume,
     resumeData?: ResumeData,
-    keywordAnalysis?: KeywordAnalysisData | null
+    keywordAnalysis?: KeywordAnalysisData | null,
+    contentValidation?: ContentValidationResult | null
   ): DeterministicScore {
     const now = new Date().toISOString();
-    const context = {
+    const context: ContentValidationContext & { profession: string; keywordAnalysis: KeywordAnalysisData | null } = {
       profession: resumeData?.profession || '',
       keywordAnalysis: keywordAnalysis || null,
+      contentValidation: contentValidation ? {
+        overall: contentValidation.overall,
+        sections: contentValidation.sections
+      } : undefined,
     };
 
     // Prepare data for verifiers
@@ -421,6 +489,11 @@ class DeterministicScoringService {
       ? this.evaluateSection('ats', 'ATS Optimization', ATS_CHECKLIST, verifierData, context)
       : null;
 
+    // Data Quality section (only if content validation is available)
+    const dataQualityChecklist = contentValidation
+      ? this.evaluateSection('dataQuality', 'Data Quality', DATA_QUALITY_CHECKLIST, verifierData, context)
+      : null;
+
     const checklist: Record<string, SectionChecklist> = {
       summary: summaryChecklist,
       experience: experienceChecklist,
@@ -431,6 +504,7 @@ class DeterministicScoringService {
       languages: languagesChecklist,
       contact: contactChecklist,
       ...(atsChecklist && { ats: atsChecklist }),
+      ...(dataQualityChecklist && { dataQuality: dataQualityChecklist }),
     };
 
     // Calculate total score
@@ -620,6 +694,7 @@ class DeterministicScoringService {
       ...LANGUAGES_CHECKLIST.map(d => ({ def: d, section: 'languages' })),
       ...CONTACT_CHECKLIST.map(d => ({ def: d, section: 'contact' })),
       ...ATS_CHECKLIST.map(d => ({ def: d, section: 'ats' })),
+      ...DATA_QUALITY_CHECKLIST.map(d => ({ def: d, section: 'dataQuality' })),
     ];
 
     const found = allDefinitions.find(({ def }) => def.id === itemId);
@@ -680,6 +755,7 @@ class DeterministicScoringService {
       languages: LANGUAGES_CHECKLIST,
       contact: CONTACT_CHECKLIST,
       ats: ATS_CHECKLIST,
+      dataQuality: DATA_QUALITY_CHECKLIST,
     };
 
     for (const [section, definitions] of Object.entries(sectionMap)) {
@@ -705,6 +781,7 @@ class DeterministicScoringService {
       languages: LANGUAGES_CHECKLIST,
       contact: CONTACT_CHECKLIST,
       ats: ATS_CHECKLIST,
+      dataQuality: DATA_QUALITY_CHECKLIST,
     };
   }
 }

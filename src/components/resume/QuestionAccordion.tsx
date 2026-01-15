@@ -115,12 +115,27 @@ export function QuestionAccordion({
         const allRequiredAnswered = categoryQuestions
           .filter(q => q.required)
           .every(q => answers[q.id] && answers[q.id].trim().length > 0);
+        const unansweredRequiredCount = categoryQuestions
+          .filter(q => q.required && (!answers[q.id] || !answers[q.id].trim()))
+          .length;
 
         return (
-          <div key={category} className="border border-gray-200 rounded-lg overflow-hidden">
+          <div key={category} className={`border rounded-lg overflow-hidden ${
+            unansweredRequiredCount > 0 
+              ? 'border-amber-300' 
+              : allRequiredAnswered && requiredCount > 0 
+                ? 'border-green-300' 
+                : 'border-gray-200'
+          }`}>
             <button
               onClick={() => toggleCategory(category)}
-              className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+              className={`w-full flex items-center justify-between p-4 transition-colors ${
+                unansweredRequiredCount > 0
+                  ? 'bg-amber-50 hover:bg-amber-100'
+                  : allRequiredAnswered && requiredCount > 0
+                    ? 'bg-green-50 hover:bg-green-100'
+                    : 'bg-gray-50 hover:bg-gray-100'
+              }`}
             >
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
@@ -135,6 +150,11 @@ export function QuestionAccordion({
                   ({answeredCount}/{categoryQuestions.length} answered
                   {requiredCount > 0 && `, ${requiredCount} required`})
                 </span>
+                {unansweredRequiredCount > 0 && (
+                  <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-medium">
+                    {unansweredRequiredCount} required missing
+                  </span>
+                )}
                 {allRequiredAnswered && requiredCount > 0 && (
                   <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
                     Complete
@@ -155,7 +175,9 @@ export function QuestionAccordion({
                       <label className="block text-sm font-medium text-gray-700">
                         {question.question}
                         {question.required && (
-                          <span className="text-red-500 ml-1">*</span>
+                          <span className="text-xs font-medium text-red-600 ml-2 bg-red-50 px-1.5 py-0.5 rounded inline-block">
+                            Required
+                          </span>
                         )}
                       </label>
                       <div className="space-y-2">

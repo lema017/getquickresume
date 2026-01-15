@@ -68,8 +68,6 @@ The `build:prod` script injects these variables at build time:
 | `VITE_API_URL` | Backend API URL (`https://api.getquickresume.com`) |
 | `VITE_GOOGLE_CLIENT_ID` | Google OAuth Client ID |
 | `VITE_LINKEDIN_CLIENT_ID` | LinkedIn OAuth Client ID |
-| `VITE_PADDLE_CLIENT_TOKEN` | Paddle payment client token |
-| `VITE_PADDLE_ENVIRONMENT` | Paddle environment (`sandbox` or `production`) |
 
 > ⚠️ **Important:** Always use `npm run build:prod` instead of `npx vite build` directly. The latter will NOT include environment variables and will break authentication!
 

@@ -3,17 +3,18 @@ import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { useAuthStore } from '@/stores/authStore';
-import { ArrowRight, ArrowLeft, Plus, X, CheckCircle, Trophy, Sparkles, Loader2 } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Plus, X, CheckCircle, Trophy, Sparkles, Loader2, Wand2 } from 'lucide-react';
 import { MandatoryFieldLabel } from '@/components/MandatoryFieldLabel';
 import { PremiumActionModal } from '@/components/PremiumActionModal';
 import { RateLimitWarning } from '@/components/RateLimitWarning';
 import { achievementSuggestionService } from '@/services/achievementSuggestionService';
+import { experienceAchievementService } from '@/services/experienceAchievementService';
 import { AchievementSuggestion } from '@/types';
 
 export function Step6Achievements() {
   const { t } = useTranslation();
   const { navigateToStep } = useWizardNavigation();
-  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, currentResumeId } = useResumeStore();
+  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep, currentResumeId } = useResumeStore();
   const { user } = useAuthStore();
   const [achievements, setAchievements] = useState(resumeData.achievements || []);
 
@@ -30,6 +31,9 @@ export function Step6Achievements() {
   const [usedSuggestions, setUsedSuggestions] = useState<Set<string>>(new Set());
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [isRateLimited, setIsRateLimited] = useState(false);
+  
+  // AI Enhancement state for individual achievements
+  const [enhancingId, setEnhancingId] = useState<string | null>(null);
 
   // Check if user can use AI features (premium OR free user who hasn't used their quota)
   const canUseAIFeatures = user?.isPremium || !user?.freeResumeUsed;
@@ -124,6 +128,52 @@ export function Step6Achievements() {
     setUsedSuggestions(prev => new Set([...prev, suggestion.title]));
   };
 
+  // AI Enhancement for individual achievement descriptions
+  const handleEnhanceDescription = async (achievementId: string) => {
+    // Check if user can use AI features
+    if (!canUseAIFeatures) {
+      setShowPremiumModal(true);
+      return;
+    }
+
+    const achievement = achievements.find(a => a.id === achievementId);
+    if (!achievement) return;
+
+    // Use description if available, otherwise use title as fallback
+    const textToEnhance = achievement.description.trim() || achievement.title.trim();
+    if (!textToEnhance) return;
+
+    setEnhancingId(achievementId);
+
+    try {
+      const enhancedText = await experienceAchievementService.enhanceAchievement(
+        textToEnhance,
+        resumeData.profession,
+        resumeData.language,
+        currentResumeId || undefined
+      );
+
+      // Update the achievement's description with the enhanced text
+      setAchievements(prev => prev.map(a => 
+        a.id === achievementId ? { ...a, description: enhancedText } : a
+      ));
+    } catch (error: any) {
+      console.error('Error enhancing achievement:', error);
+      // Handle premium required error
+      if (error?.code === 'PREMIUM_REQUIRED' || error?.status === 403) {
+        setShowPremiumModal(true);
+        return;
+      }
+      // Handle rate limit error
+      if (error?.code === 'RATE_LIMIT_EXCEEDED' || error?.status === 429) {
+        setIsRateLimited(true);
+        setSuggestionsError(error.message || 'Too many requests. Please wait before trying again.');
+      }
+    } finally {
+      setEnhancingId(null);
+    }
+  };
+
   // Validation errors state
   const [showErrors, setShowErrors] = useState(false);
 
@@ -132,7 +182,7 @@ export function Step6Achievements() {
     achievement.title.trim() !== '' && achievement.description.trim() !== ''
   );
 
-  const handleNext = () => {
+  const handleNext = async () => {
     // Validate that if any achievements are added, they must be complete
     if (!isFormValid) {
       setShowErrors(true);
@@ -146,6 +196,13 @@ export function Step6Achievements() {
     
     setShowErrors(false);
     updateResumeData({ achievements });
+    // Save immediately before navigation to ensure data is persisted
+    try {
+      await saveResumeDataImmediately();
+    } catch (error) {
+      console.error('Error saving achievements data:', error);
+      // Continue with navigation even if save fails - data is in store
+    }
     markStepCompleted(6);
     setCurrentStep(7);
     navigateToStep(7);
@@ -327,10 +384,40 @@ export function Step6Achievements() {
               </div>
               
               <div>
-                <MandatoryFieldLabel
-                  label={t('wizard.steps.achievements.ui.list.labels.description')}
-                  required={false}
-                />
+                <div className="flex items-center justify-between mb-1">
+                  <MandatoryFieldLabel
+                    label={t('wizard.steps.achievements.ui.list.labels.description')}
+                    required={false}
+                  />
+                  <button
+                    onClick={() => handleEnhanceDescription(achievement.id)}
+                    disabled={
+                      enhancingId === achievement.id || 
+                      (!achievement.title.trim() && !achievement.description.trim())
+                    }
+                    className={`inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md transition-all duration-200 ${
+                      enhancingId === achievement.id
+                        ? 'bg-purple-100 text-purple-400 cursor-wait'
+                        : (!achievement.title.trim() && !achievement.description.trim())
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : canUseAIFeatures
+                        ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 shadow-sm hover:shadow-md'
+                        : 'bg-gradient-to-r from-amber-500 to-yellow-600 text-white hover:from-amber-600 hover:to-yellow-700 shadow-sm hover:shadow-md'
+                    }`}
+                    title={
+                      (!achievement.title.trim() && !achievement.description.trim())
+                        ? t('wizard.steps.achievements.ui.ai.enhanceDisabledTooltip', 'Add a title or description first')
+                        : t('wizard.steps.achievements.ui.ai.enhanceTooltip', 'Enhance with AI')
+                    }
+                  >
+                    {enhancingId === achievement.id ? (
+                      <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                    ) : (
+                      <Wand2 className="w-3 h-3 mr-1" />
+                    )}
+                    <span>{enhancingId === achievement.id ? t('common.enhancing', 'Enhancing...') : t('common.enhance', 'Enhance')}</span>
+                  </button>
+                </div>
                 <textarea
                   value={achievement.description}
                   onChange={(e) => updateAchievement(achievement.id, 'description', e.target.value)}

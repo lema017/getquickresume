@@ -9,7 +9,6 @@ import { convertResumeDataToTemplateFormat, filterDataForPage, TemplateDataForma
 import { calculatePagination } from '@/services/paginationService';
 import { calculateAndAssignPageNumbers, extractPaginationFields } from './Step9Preview';
 import { useResumeStore } from '@/stores/resumeStore';
-import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 
 interface TemplatePreviewModalProps {
   template: ResumeTemplate;
@@ -171,7 +170,6 @@ export function TemplatePreviewModal({
   onClose,
   onSelect,
 }: TemplatePreviewModalProps) {
-  const { navigateToStep } = useWizardNavigation();
   const { setSelectedTemplate, updateResumeData, resumeData: storeResumeData } = useResumeStore();
   const containerRef = useRef<HTMLDivElement>(null);
   const templateWrapperRef = useRef<HTMLDivElement>(null);
@@ -393,15 +391,12 @@ export function TemplatePreviewModal({
     // Set selected template in store
     setSelectedTemplate(template.id, template.category);
     
-    // Navigate to Step 11 (Final Download)
-    navigateToStep(11);
-    
-    // Call optional callback
+    // Call optional callback (parent Step9Preview will handle template selection)
     if (onSelect) {
       onSelect();
     }
     
-    // Close modal
+    // Close modal - user stays on step 10 which now has download functionality
     onClose();
   };
 

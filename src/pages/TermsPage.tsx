@@ -102,11 +102,11 @@ export function TermsPage() {
               <ul className="list-disc list-inside text-gray-600 space-y-2">
                 <li>Los servicios básicos son gratuitos con limitaciones</li>
                 <li>Los servicios Premium requieren una suscripción mensual ($9.99/mes) o anual ($59.99/año)</li>
-                <li>Los pagos son procesados de forma segura por Paddle, nuestro proveedor de pagos</li>
+                <li>Los pagos son procesados de forma segura por PayPal, nuestro proveedor de pagos</li>
                 <li>Las suscripciones se renuevan automáticamente al final de cada período de facturación</li>
                 <li>Puedes cancelar tu suscripción en cualquier momento desde la página de tu cuenta</li>
                 <li>Al cancelar, mantendrás acceso a las funciones Premium hasta el final del período de facturación actual</li>
-                <li>No ofrecemos reembolsos por períodos de suscripción ya transcurridos</li>
+                <li>No ofrecemos reembolsos. Al cancelar, mantendrás acceso hasta el final del período de facturación actual</li>
                 <li>Nos reservamos el derecho de cambiar precios con notificación previa de al menos 30 días</li>
               </ul>
             </section>

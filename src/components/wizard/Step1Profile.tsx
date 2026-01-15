@@ -18,7 +18,7 @@ export function Step1Profile() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { navigateToStep } = useWizardNavigation();
-  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep } = useResumeStore();
+  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep } = useResumeStore();
   const { user } = useAuthStore();
   const [errors, setErrors] = useState<FieldValidation>({});
   const [formData, setFormData] = useState({
@@ -91,7 +91,7 @@ export function Step1Profile() {
     });
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     // Validar formulario
     const currentValidationErrors = validateProfile(formData);
     
@@ -110,7 +110,18 @@ export function Step1Profile() {
     
     // Si no hay errores, continuar
     setShowErrors(false);
+    
+    // Update resume data in store first
     updateResumeData(formData);
+    
+    // Save immediately before navigating to ensure data is persisted
+    try {
+      await saveResumeDataImmediately();
+    } catch (error) {
+      console.error('Error saving resume data:', error);
+      // Continue navigation even if save fails - data is still in store
+    }
+    
     markStepCompleted(1);
     setCurrentStep(2);
     navigateToStep(2);

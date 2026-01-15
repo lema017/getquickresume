@@ -7,9 +7,10 @@ import {
   extractTextFromFile, 
   validateFile, 
   looksLikeResume,
-  SUPPORTED_EXTENSIONS 
+  SUPPORTED_EXTENSIONS,
+  FILE_SIZE_LIMITS
 } from '@/utils/documentTextExtractor';
-import { resumeExtractionService } from '@/services/resumeExtractionService';
+import { FileSizeLimitModal } from '@/components/FileSizeLimitModal';
 import { 
   Upload, 
   FileText, 
@@ -26,10 +27,9 @@ import {
   Crown,
   File
 } from 'lucide-react';
-import toast from 'react-hot-toast';
 
 export function UploadResume() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -39,22 +39,26 @@ export function UploadResume() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [extractedText, setExtractedText] = useState<string | null>(null);
   const [isExtractingText, setIsExtractingText] = useState(false);
-  const [isExtractingData, setIsExtractingData] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showFullText, setShowFullText] = useState(false);
+  
+  // File size limit modal state
+  const [showFileSizeModal, setShowFileSizeModal] = useState(false);
+  const [fileSizeModalData, setFileSizeModalData] = useState<{
+    fileSizeMB: number;
+    maxSizeMB: number;
+  } | null>(null);
   
   // Store for persisting data across steps
   const { 
     setFile, 
     setExtractedText: storeSetExtractedText,
-    setExtractedData,
     setCurrentStep
   } = useUploadResumeStore();
 
   // Check if user can create a resume (free users need available quota)
   const canCreateResume = user?.isPremium || !user?.freeResumeUsed;
   const isFreeUser = !user?.isPremium;
-  const language = (i18n.language === 'es' ? 'es' : 'en') as 'es' | 'en';
 
   // Handle drag events
   const handleDragEnter = useCallback((e: React.DragEvent) => {
@@ -95,9 +99,22 @@ export function UploadResume() {
   const handleFileSelection = async (file: File) => {
     setError(null);
     
-    // Validate file
-    const validation = validateFile(file);
+    // Validate file with user's premium status
+    const isPremium = user?.isPremium || false;
+    const validation = validateFile(file, isPremium);
+    
     if (!validation.valid) {
+      // Show file size modal if it's a size limit issue
+      if (validation.showFileSizeModal && validation.fileSizeMB && validation.maxSizeMB) {
+        setFileSizeModalData({
+          fileSizeMB: validation.fileSizeMB,
+          maxSizeMB: validation.maxSizeMB,
+        });
+        setShowFileSizeModal(true);
+        return;
+      }
+      
+      // Show regular error for other validation issues
       setError(validation.error || t('wizard.uploadPage.toasts.invalidType'));
       return;
     }
@@ -114,7 +131,8 @@ export function UploadResume() {
     setError(null);
 
     try {
-      const result = await extractTextFromFile(file);
+      const isPremium = user?.isPremium || false;
+      const result = await extractTextFromFile(file, isPremium);
       
       if (!result.success) {
         setError(result.error || t('wizard.uploadPage.extraction.extractionFailed'));
@@ -140,7 +158,7 @@ export function UploadResume() {
     }
   };
 
-  const handleProcessWithAI = async () => {
+  const handleProcessWithAI = () => {
     if (!extractedText) return;
 
     // Check if user can create resume before processing
@@ -149,34 +167,9 @@ export function UploadResume() {
       return;
     }
 
-    setIsExtractingData(true);
-    setError(null);
-
-    try {
-      // Step 1: Extract structured data from text via API
-      const response = await resumeExtractionService.extractResumeDataFromText(
-        extractedText,
-        language
-      );
-
-      if (!response.success || !response.data) {
-        setError(response.error || t('wizard.uploadPage.toasts.processError'));
-        setIsExtractingData(false);
-        return;
-      }
-
-      // Step 2: Store extracted data in the upload store
-      setExtractedData(response.data);
-      setCurrentStep('review');
-
-      // Step 3: Navigate to the review page
-      navigate('/wizard/upload/review');
-      
-    } catch (err) {
-      console.error('AI extraction error:', err);
-      setError(t('wizard.uploadPage.toasts.processError'));
-      setIsExtractingData(false);
-    }
+    // Navigate to language selection step
+    setCurrentStep('language');
+    navigate('/wizard/upload/language');
   };
 
   const handleBack = () => {
@@ -397,7 +390,7 @@ export function UploadResume() {
           )}
 
           {/* File Selected & Text Extracted */}
-          {selectedFile && extractedText && !isExtractingText && !isExtractingData && (
+          {selectedFile && extractedText && !isExtractingText && (
             <div className="space-y-6">
               {/* File Info Card */}
               <div className="bg-green-50 rounded-xl p-4">
@@ -471,27 +464,20 @@ export function UploadResume() {
             </div>
           )}
 
-          {/* Extracting Data State */}
-          {isExtractingData && (
-            <div className="text-center py-12">
-              <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-6">
-                <Sparkles className="w-8 h-8 text-purple-600 animate-pulse" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                {t('wizard.uploadPage.extraction.analyzingContent')}
-              </h3>
-              <p className="text-gray-600">
-                {t('wizard.uploadPage.processing.message')}
-              </p>
-              <div className="mt-6 flex items-center justify-center gap-2">
-                <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
+
+      {/* File Size Limit Modal */}
+      <FileSizeLimitModal
+        isOpen={showFileSizeModal}
+        onClose={() => {
+          setShowFileSizeModal(false);
+          setFileSizeModalData(null);
+        }}
+        fileSizeMB={fileSizeModalData?.fileSizeMB || 0}
+        maxSizeMB={fileSizeModalData?.maxSizeMB || 0}
+        isPremium={user?.isPremium || false}
+      />
     </div>
   );
 }

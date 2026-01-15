@@ -1858,9 +1858,15 @@ function App() {
         }
         console.log('[Preview] Iframe document accessible');
 
-        // Clear iframe content
-        console.log('[Preview] Writing HTML to iframe...');
+        // Clear iframe content completely to prevent stale custom element registrations
+        console.log('[Preview] Clearing and writing HTML to iframe...');
         
+        // Completely clear the iframe document to reset custom element registry
+        iframeDoc.open();
+        iframeDoc.write('<!DOCTYPE html><html><head></head><body></body></html>');
+        iframeDoc.close();
+        
+        // Re-open for writing new content
         iframeDoc.open();
         
         // Build HTML content using safer method - create script element separately
@@ -2112,13 +2118,19 @@ function App() {
         // Match customElements.define with the actual tagName (dynamic)
         // Escape special regex characters in tagName
         const escapedTagName = tagName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const tagNamePattern = new RegExp(`customElements\\.define\\s*\\(\\s*['"]${escapedTagName}['"]`, 'g');
+        // Use non-global regex for testing to avoid lastIndex issues
+        const tagNamePatternTest = new RegExp(`customElements\\.define\\s*\\(\\s*['"]${escapedTagName}['"]`);
+        // Global regex for replacement
+        const tagNamePatternReplace = new RegExp(`customElements\\.define\\s*\\(\\s*['"]${escapedTagName}['"]\\s*,\\s*([^)]+)\\)`, 'g');
         
-        if (tagNamePattern.test(code)) {
+        const patternMatches = tagNamePatternTest.test(code);
+        
+        if (patternMatches) {
           // Replace all occurrences of customElements.define with tagName
+          // Use a more flexible regex that handles various whitespace and quote styles
           wrappedCode = code.replace(
-            new RegExp(`customElements\\.define\\s*\\(\\s*['"]${escapedTagName}['"]\\s*,\\s*([^)]+)\\)`, 'g'),
-            (match, className) => {
+            tagNamePatternReplace,
+            (_match, className) => {
               return `(function() {
                 try {
                   if (!customElements.get('${tagName}')) {
@@ -2133,8 +2145,54 @@ function App() {
               })()`;
             }
           );
+          
+          // If replacement didn't work (code unchanged), try a more permissive pattern
+          if (wrappedCode === code) {
+            // Try a more permissive pattern that handles different quote styles and whitespace
+            const permissivePattern = new RegExp(`customElements\\.define\\s*\\(\\s*['"]${escapedTagName}['"]\\s*,\\s*([^)]+)\\)`, 'g');
+            wrappedCode = code.replace(permissivePattern, (_match, className) => {
+              return `(function() {
+                try {
+                  if (!customElements.get('${tagName}')) {
+                    customElements.define('${tagName}', ${className});
+                    console.log('[Iframe] Successfully registered ${tagName}');
+                  } else {
+                    console.log('[Iframe] ${tagName} already registered, skipping');
+                  }
+                } catch (e) {
+                  console.log('[Iframe] Error registering component (may already be registered):', e.message);
+                }
+              })()`;
+            });
+          }
         } else {
           console.warn('[Iframe] TagName', tagName, 'not found in code. Code may use different tagName.');
+          // Even if pattern doesn't match, try to wrap any customElements.define calls as a safety measure
+          wrappedCode = code.replace(
+            /customElements\.define\s*\([^)]+\)/g,
+            (defineCall) => {
+              // Check if this define call matches our tagName
+              const matchTagName = defineCall.match(/customElements\.define\s*\(['"]([^'"]+)['"]/);
+              if (matchTagName && matchTagName[1] === tagName) {
+                const classNameMatch = defineCall.match(/customElements\.define\s*\(['"][^'"]+['"]\s*,\s*([^)]+)\)/);
+                if (classNameMatch) {
+                  return `(function() {
+                    try {
+                      if (!customElements.get('${tagName}')) {
+                        customElements.define('${tagName}', ${classNameMatch[1]});
+                        console.log('[Iframe] Successfully registered ${tagName}');
+                      } else {
+                        console.log('[Iframe] ${tagName} already registered, skipping');
+                      }
+                    } catch (e) {
+                      console.log('[Iframe] Error registering component (may already be registered):', e.message);
+                    }
+                  })()`;
+                }
+              }
+              return defineCall;
+            }
+          );
         }
         
         // Write HTML in parts to avoid template literal issues

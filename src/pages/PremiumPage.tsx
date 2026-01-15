@@ -1,83 +1,174 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/stores/authStore';
 import { Check, Crown, Loader2, ArrowDown, ChevronDown, ChevronUp } from 'lucide-react';
-import { checkoutService } from '@/services/checkoutService';
 import toast from 'react-hot-toast';
+import { paypalService, PlanType } from '@/services/paypalService';
 
-// Declare Paddle types for TypeScript
+// PayPal SDK types
 declare global {
   interface Window {
-    Paddle?: {
-      Environment: {
-        set: (env: 'sandbox' | 'production') => void;
-      };
-      Initialize: (options: { token: string }) => void;
-      Checkout: {
-        open: (options: {
-          transactionId: string;
-          settings?: {
-            displayMode?: 'overlay' | 'inline';
-            theme?: 'light' | 'dark';
-            locale?: string;
-            successUrl?: string;
-          };
-        }) => void;
+    paypal?: {
+      Buttons: (config: {
+        style?: {
+          layout?: 'vertical' | 'horizontal';
+          color?: 'gold' | 'blue' | 'silver' | 'white' | 'black';
+          shape?: 'rect' | 'pill';
+          label?: 'paypal' | 'checkout' | 'buynow' | 'pay';
+          height?: number;
+        };
+        createOrder: () => Promise<string>;
+        onApprove: (data: { orderID: string }) => Promise<void>;
+        onError?: (err: Error) => void;
+        onCancel?: () => void;
+      }) => {
+        render: (element: HTMLElement | string) => Promise<void>;
       };
     };
   }
 }
 
-// Paddle client token (from environment variables)
-const PADDLE_CLIENT_TOKEN = import.meta.env.VITE_PADDLE_CLIENT_TOKEN || '';
-const PADDLE_ENVIRONMENT = import.meta.env.VITE_PADDLE_ENVIRONMENT || 'sandbox';
+// Get PayPal Client ID from environment
+const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID || '';
 
 export function PremiumPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, refreshUserPremiumStatus } = useAuthStore();
   const [loadingPlan, setLoadingPlan] = useState<'monthly' | 'yearly' | null>(null);
   const [showFeatures, setShowFeatures] = useState(false);
-  const [paddleReady, setPaddleReady] = useState(false);
+  const [paypalReady, setPaypalReady] = useState(false);
+  const [showPayPalButtons, setShowPayPalButtons] = useState<'monthly' | 'yearly' | null>(null);
+  
+  // Refs for PayPal button containers
+  const monthlyButtonRef = useRef<HTMLDivElement>(null);
+  const yearlyButtonRef = useRef<HTMLDivElement>(null);
+  const paypalButtonsRendered = useRef<{ monthly: boolean; yearly: boolean }>({ monthly: false, yearly: false });
 
-  // Initialize Paddle.js on mount
+  // Load PayPal SDK
   useEffect(() => {
-    const initPaddle = () => {
-      if (window.Paddle) {
-        try {
-          // Set environment (sandbox or production)
-          window.Paddle.Environment.set(PADDLE_ENVIRONMENT as 'sandbox' | 'production');
-          
-          // Initialize with client token
-          window.Paddle.Initialize({
-            token: PADDLE_CLIENT_TOKEN,
-          });
-          
-          setPaddleReady(true);
-          console.log('Paddle.js initialized successfully');
-        } catch (error) {
-          console.error('Error initializing Paddle:', error);
-        }
-      }
-    };
-
-    // Check if Paddle is already loaded
-    if (window.Paddle) {
-      initPaddle();
-    } else {
-      // Wait for Paddle to load
-      const checkPaddle = setInterval(() => {
-        if (window.Paddle) {
-          clearInterval(checkPaddle);
-          initPaddle();
-        }
-      }, 100);
-
-      // Cleanup
-      return () => clearInterval(checkPaddle);
+    if (!PAYPAL_CLIENT_ID) {
+      console.warn('PayPal Client ID not configured');
+      return;
     }
+
+    // Check if PayPal SDK is already loaded
+    if (window.paypal) {
+      setPaypalReady(true);
+      return;
+    }
+
+    // Check if script is already being loaded
+    const existingScript = document.querySelector('script[src*="paypal.com/sdk/js"]');
+    if (existingScript) {
+      existingScript.addEventListener('load', () => setPaypalReady(true));
+      return;
+    }
+
+    // Load PayPal SDK script
+    const script = document.createElement('script');
+    script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=USD`;
+    script.async = true;
+    script.onload = () => {
+      console.log('PayPal SDK loaded');
+      setPaypalReady(true);
+    };
+    script.onerror = () => {
+      console.error('Failed to load PayPal SDK');
+      toast.error('Failed to load payment system');
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      // Cleanup: Don't remove the script as other components might need it
+    };
   }, []);
+
+  // Render PayPal buttons when ready and selected
+  useEffect(() => {
+    if (!paypalReady || !window.paypal || !showPayPalButtons) return;
+    if (!isAuthenticated || !user) return;
+
+    const planType = showPayPalButtons;
+    const buttonRef = planType === 'monthly' ? monthlyButtonRef : yearlyButtonRef;
+    
+    if (!buttonRef.current) return;
+    if (paypalButtonsRendered.current[planType]) return;
+
+    // Clear any existing buttons
+    buttonRef.current.innerHTML = '';
+
+    window.paypal.Buttons({
+      style: {
+        layout: 'vertical',
+        color: planType === 'yearly' ? 'gold' : 'blue',
+        shape: 'rect',
+        label: 'pay',
+        height: 45,
+      },
+      createOrder: async () => {
+        try {
+          setLoadingPlan(planType);
+          const response = await paypalService.createOrder(planType);
+          setLoadingPlan(null);
+          return response.orderId;
+        } catch (error) {
+          setLoadingPlan(null);
+          console.error('Error creating PayPal order:', error);
+          toast.error(error instanceof Error ? error.message : 'Failed to create order');
+          throw error;
+        }
+      },
+      onApprove: async (data: { orderID: string }) => {
+        try {
+          setLoadingPlan(planType);
+          const response = await paypalService.captureOrder(data.orderID);
+          
+          if (response.success) {
+            toast.success('Payment successful! Welcome to Premium!');
+            
+            // Refresh user data to update premium status
+            await refreshUserPremiumStatus();
+            
+            // Navigate to thank you page with payment details
+            navigate('/thank-you', { 
+              state: { 
+                transactionId: response.transactionId,
+                planType: response.planType,
+                paymentConfirmed: true
+              }
+            });
+          }
+        } catch (error) {
+          console.error('Error capturing PayPal order:', error);
+          toast.error(error instanceof Error ? error.message : 'Payment failed');
+        } finally {
+          setLoadingPlan(null);
+          setShowPayPalButtons(null);
+        }
+      },
+      onError: (err: Error) => {
+        console.error('PayPal error:', err);
+        toast.error('Payment error occurred. Please try again.');
+        setLoadingPlan(null);
+      },
+      onCancel: () => {
+        toast.error('Payment cancelled');
+        setLoadingPlan(null);
+        setShowPayPalButtons(null);
+      },
+    }).render(buttonRef.current);
+
+    paypalButtonsRendered.current[planType] = true;
+  }, [paypalReady, showPayPalButtons, isAuthenticated, user, navigate, refreshUserPremiumStatus]);
+
+  // Reset button render state when hiding
+  useEffect(() => {
+    if (!showPayPalButtons) {
+      paypalButtonsRendered.current = { monthly: false, yearly: false };
+    }
+  }, [showPayPalButtons]);
 
   const handleCheckout = async (planType: 'monthly' | 'yearly') => {
     // Check if user is authenticated
@@ -94,37 +185,14 @@ export function PremiumPage() {
       return;
     }
 
-    // Check if Paddle is ready
-    if (!paddleReady || !window.Paddle) {
-      toast.error('Payment system is loading. Please try again.');
+    // Check if PayPal is ready
+    if (!paypalReady || !PAYPAL_CLIENT_ID) {
+      toast.error('Payment system is not available. Please try again later.');
       return;
     }
 
-    setLoadingPlan(planType);
-
-    try {
-      // Create transaction on backend
-      const { transactionId } = await checkoutService.createCheckoutTransaction(planType);
-      
-      console.log('Opening Paddle checkout for transaction:', transactionId);
-
-      // Open Paddle overlay checkout
-      window.Paddle.Checkout.open({
-        transactionId: transactionId,
-        settings: {
-          displayMode: 'overlay',
-          theme: 'light',
-          successUrl: `${window.location.origin}/thank-you?transaction_id=${transactionId}`,
-        },
-      });
-
-      // Reset loading state after opening (overlay handles the rest)
-      setLoadingPlan(null);
-    } catch (error: any) {
-      console.error('Checkout error:', error);
-      toast.error(error.message || t('checkout.error'));
-      setLoadingPlan(null);
-    }
+    // Show PayPal buttons for this plan
+    setShowPayPalButtons(planType);
   };
 
   const scrollToPlans = () => {
@@ -297,27 +365,48 @@ export function PremiumPage() {
                     ))}
                   </ul>
                   
-                  <button
-                    onClick={() => handleCheckout(plan.id as 'monthly' | 'yearly')}
-                    disabled={loadingPlan !== null || !paddleReady}
-                    className={`mt-auto w-full py-4 rounded-lg font-semibold text-center transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${
-                        isYearly
-                          ? 'bg-white text-blue-700 hover:bg-blue-50'
-                          : 'bg-blue-600 text-white hover:bg-blue-700'
-                      }`}
-                    >
-                    {loadingPlan === plan.id ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        {t('checkout.processing')}
-                      </>
-                    ) : (
-                      <>
-                        <Crown className="w-5 h-5" />
-                        Upgrade Now
-                      </>
+                  {/* Show PayPal buttons when this plan is selected */}
+                  {showPayPalButtons === plan.id ? (
+                    <div className="mt-auto">
+                      <div 
+                        ref={plan.id === 'monthly' ? monthlyButtonRef : yearlyButtonRef}
+                        className="paypal-button-container min-h-[45px]"
+                      />
+                      <button
+                        onClick={() => setShowPayPalButtons(null)}
+                        className="w-full mt-3 py-2 text-sm text-center opacity-70 hover:opacity-100 transition-opacity"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleCheckout(plan.id as 'monthly' | 'yearly')}
+                      disabled={loadingPlan !== null || !paypalReady}
+                      className={`mt-auto w-full py-4 rounded-lg font-semibold text-center transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${
+                          isYearly
+                            ? 'bg-white text-blue-700 hover:bg-blue-50'
+                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                        }`}
+                      >
+                      {loadingPlan === plan.id ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          {t('checkout.processing')}
+                        </>
+                      ) : !paypalReady ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          Loading...
+                        </>
+                      ) : (
+                        <>
+                          <Crown className="w-5 h-5" />
+                          Upgrade Now
+                        </>
+                    )}
+                    </button>
                   )}
-                  </button>
                 </div>
               );
             })}

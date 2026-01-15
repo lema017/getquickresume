@@ -839,3 +839,269 @@ export function verifyContactHasPhone(contactInfo: GeneratedResume['contactInfo'
   };
 }
 
+// ============================================================================
+// Data Quality Verifiers (AI-Powered)
+// These verifiers use ContentValidationResult from the contentValidatorService
+// ============================================================================
+
+export interface ContentValidationContext {
+  contentValidation?: {
+    overall: number;
+    sections: {
+      profile: { score: number; invalidFields: { field: string; reason?: string }[] };
+      education: { score: number; invalidFields: { field: string; reason?: string }[] };
+      experience: { score: number; invalidFields: { field: string; reason?: string }[] };
+      skills: { score: number; invalidFields: { field: string; reason?: string }[] };
+      certifications: { score: number; invalidFields: { field: string; reason?: string }[] };
+      languages: { score: number; invalidFields: { field: string; reason?: string }[] };
+    };
+  };
+}
+
+/**
+ * Verify education data quality using AI validation results
+ * Checks if education entries contain valid, meaningful data (not placeholder/test values)
+ */
+export function verifyEducationDataQuality(
+  education: GeneratedResume['education'],
+  context?: ContentValidationContext
+): VerificationResult {
+  // If no content validation available, pass by default
+  if (!context?.contentValidation) {
+    return { 
+      passed: true, 
+      details: 'Data quality validation not performed'
+    };
+  }
+
+  // If no education entries, pass (optional section)
+  if (!education || education.length === 0) {
+    return { 
+      passed: true, 
+      details: 'No education entries (optional section)'
+    };
+  }
+
+  const { score, invalidFields } = context.contentValidation.sections.education;
+  const passed = score >= 60;
+  
+  const invalidFieldNames = invalidFields.map(f => f.field).join(', ');
+  const reasons = invalidFields
+    .filter(f => f.reason)
+    .map(f => f.reason)
+    .slice(0, 2)
+    .join('; ');
+  
+  return {
+    passed,
+    details: passed 
+      ? `Education data quality: ${score}%`
+      : `Education contains invalid/placeholder data (${score}%). ${invalidFieldNames ? `Invalid: ${invalidFieldNames}` : ''}`,
+    evidence: reasons || undefined
+  };
+}
+
+/**
+ * Verify experience data quality using AI validation results
+ */
+export function verifyExperienceDataQuality(
+  experience: GeneratedResume['experience'],
+  context?: ContentValidationContext
+): VerificationResult {
+  if (!context?.contentValidation) {
+    return { 
+      passed: true, 
+      details: 'Data quality validation not performed'
+    };
+  }
+
+  if (!experience || experience.length === 0) {
+    return { 
+      passed: true, 
+      details: 'No experience entries (optional section)'
+    };
+  }
+
+  const { score, invalidFields } = context.contentValidation.sections.experience;
+  const passed = score >= 60;
+  
+  const invalidFieldNames = invalidFields.map(f => f.field).join(', ');
+  
+  return {
+    passed,
+    details: passed 
+      ? `Experience data quality: ${score}%`
+      : `Experience contains invalid/placeholder data (${score}%). ${invalidFieldNames ? `Invalid: ${invalidFieldNames}` : ''}`,
+    evidence: invalidFields.slice(0, 2).map(f => f.reason).filter(Boolean).join('; ') || undefined
+  };
+}
+
+/**
+ * Verify skills data quality using AI validation results
+ */
+export function verifySkillsDataQuality(
+  skills: GeneratedResume['skills'],
+  context?: ContentValidationContext
+): VerificationResult {
+  if (!context?.contentValidation) {
+    return { 
+      passed: true, 
+      details: 'Data quality validation not performed'
+    };
+  }
+
+  const allSkills = [
+    ...(skills?.technical || []),
+    ...(skills?.soft || []),
+    ...(skills?.tools || [])
+  ];
+
+  if (allSkills.length === 0) {
+    return { 
+      passed: true, 
+      details: 'No skills listed'
+    };
+  }
+
+  const { score, invalidFields } = context.contentValidation.sections.skills;
+  const passed = score >= 60;
+  
+  return {
+    passed,
+    details: passed 
+      ? `Skills data quality: ${score}%`
+      : `Skills contain invalid/placeholder data (${score}%)`,
+    evidence: invalidFields.slice(0, 3).map(f => f.field).join(', ') || undefined
+  };
+}
+
+/**
+ * Verify profile/contact data quality using AI validation results
+ */
+export function verifyProfileDataQuality(
+  contactInfo: GeneratedResume['contactInfo'],
+  context?: ContentValidationContext
+): VerificationResult {
+  if (!context?.contentValidation) {
+    return { 
+      passed: true, 
+      details: 'Data quality validation not performed'
+    };
+  }
+
+  if (!contactInfo) {
+    return { 
+      passed: false, 
+      details: 'No contact information provided'
+    };
+  }
+
+  const { score, invalidFields } = context.contentValidation.sections.profile;
+  const passed = score >= 60;
+  
+  return {
+    passed,
+    details: passed 
+      ? `Profile data quality: ${score}%`
+      : `Profile contains invalid/placeholder data (${score}%)`,
+    evidence: invalidFields.slice(0, 2).map(f => `${f.field}: ${f.reason || 'invalid'}`).join('; ') || undefined
+  };
+}
+
+/**
+ * Verify certifications data quality using AI validation results
+ */
+export function verifyCertificationsDataQuality(
+  certifications: GeneratedResume['certifications'],
+  context?: ContentValidationContext
+): VerificationResult {
+  if (!context?.contentValidation) {
+    return { 
+      passed: true, 
+      details: 'Data quality validation not performed'
+    };
+  }
+
+  if (!certifications || certifications.length === 0) {
+    return { 
+      passed: true, 
+      details: 'No certifications listed (optional section)'
+    };
+  }
+
+  const { score, invalidFields } = context.contentValidation.sections.certifications;
+  const passed = score >= 60;
+  
+  return {
+    passed,
+    details: passed 
+      ? `Certifications data quality: ${score}%`
+      : `Certifications contain invalid/placeholder data (${score}%)`,
+    evidence: invalidFields.slice(0, 2).map(f => f.field).join(', ') || undefined
+  };
+}
+
+/**
+ * Verify languages data quality using AI validation results
+ */
+export function verifyLanguagesDataQuality(
+  languages: GeneratedResume['languages'],
+  context?: ContentValidationContext
+): VerificationResult {
+  if (!context?.contentValidation) {
+    return { 
+      passed: true, 
+      details: 'Data quality validation not performed'
+    };
+  }
+
+  if (!languages || languages.length === 0) {
+    return { 
+      passed: true, 
+      details: 'No languages listed (optional section)'
+    };
+  }
+
+  const { score, invalidFields } = context.contentValidation.sections.languages;
+  const passed = score >= 60;
+  
+  return {
+    passed,
+    details: passed 
+      ? `Languages data quality: ${score}%`
+      : `Languages contain invalid/placeholder data (${score}%)`,
+    evidence: invalidFields.slice(0, 2).map(f => f.field).join(', ') || undefined
+  };
+}
+
+/**
+ * Verify overall content data quality
+ * This is a summary verifier that checks all sections
+ */
+export function verifyOverallDataQuality(
+  _data: any,
+  context?: ContentValidationContext
+): VerificationResult {
+  if (!context?.contentValidation) {
+    return { 
+      passed: true, 
+      details: 'Data quality validation not performed'
+    };
+  }
+
+  const { overall } = context.contentValidation;
+  const passed = overall >= 60;
+  
+  // Collect all sections with issues
+  const sectionsWithIssues = Object.entries(context.contentValidation.sections)
+    .filter(([_, section]) => section.score < 60)
+    .map(([name, _]) => name);
+  
+  return {
+    passed,
+    details: passed 
+      ? `Overall data quality: ${overall}%`
+      : `Resume contains invalid/placeholder data (${overall}%). Issues in: ${sectionsWithIssues.join(', ')}`,
+    evidence: sectionsWithIssues.length > 0 ? `Sections needing attention: ${sectionsWithIssues.join(', ')}` : undefined
+  };
+}

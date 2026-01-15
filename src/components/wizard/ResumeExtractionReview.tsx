@@ -33,6 +33,10 @@ import {
   X,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { RateLimitWarning } from '@/components/RateLimitWarning';
+import { YearPicker } from '@/components/YearPicker';
+import { TagInput } from '@/components/TagInput';
+import { MonthYearPicker } from '@/components/MonthYearPicker';
 
 // Simple AI Enhance Button component
 const AIEnhanceButton: React.FC<{
@@ -60,7 +64,7 @@ const AIEnhanceButton: React.FC<{
 };
 
 export function ResumeExtractionReview() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, refreshUserPremiumStatus } = useAuthStore();
   const { updateResumeData, setCurrentResumeId, markStepCompleted, setCurrentStep: setWizardStep } = useResumeStore();
@@ -90,10 +94,22 @@ export function ResumeExtractionReview() {
     addLanguage,
     removeLanguage,
     resetUpload,
+    targetLanguage,
   } = useUploadResumeStore();
 
   const [isCreating, setIsCreating] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [fieldErrors, setFieldErrors] = useState<{
+    profile: string[];
+    education: number[];
+    educationDateRange: number[];
+    experience: number[];
+    experienceCompany: number[];
+    experienceStartDate: number[];
+    experienceEndDate: number[];
+    certifications: number[];
+    achievementDescription: number[];
+  }>({ profile: [], education: [], educationDateRange: [], experience: [], experienceCompany: [], experienceStartDate: [], experienceEndDate: [], certifications: [], achievementDescription: [] });
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     profile: true,
     summary: true,
@@ -110,8 +126,27 @@ export function ResumeExtractionReview() {
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const [suggestedSkills, setSuggestedSkills] = useState<string[]>([]);
   const [enhancingFields, setEnhancingFields] = useState<Record<string, boolean>>({});
+  
+  // Rate limit modal state
+  const [showRateLimitModal, setShowRateLimitModal] = useState(false);
+  const [rateLimitRetryFn, setRateLimitRetryFn] = useState<(() => void) | null>(null);
 
-  const language = (i18n.language === 'es' ? 'es' : 'en') as 'es' | 'en';
+  // Handle retry from rate limit modal
+  const handleRateLimitRetry = () => {
+    setShowRateLimitModal(false);
+    if (rateLimitRetryFn) {
+      rateLimitRetryFn();
+    }
+  };
+
+  // Close rate limit modal
+  const handleCloseRateLimitModal = () => {
+    setShowRateLimitModal(false);
+    setRateLimitRetryFn(null);
+  };
+
+  // Use the target language selected by the user for all AI operations
+  const language = targetLanguage;
   const isFreeUser = !user?.isPremium;
   const canCreateResume = user?.isPremium || !user?.freeResumeUsed;
   
@@ -137,18 +172,136 @@ export function ResumeExtractionReview() {
     if (!extractedData) return false;
 
     const errors: string[] = [];
+    const profileErrorFields: string[] = [];
+    const educationErrorIndices: number[] = [];
+    const educationDateRangeErrors: number[] = [];
+    const experienceErrorIndices: number[] = [];
+    const experienceCompanyErrors: number[] = [];
+    const experienceStartDateErrors: number[] = [];
+    const experienceEndDateErrors: number[] = [];
+    const certificationErrorIndices: number[] = [];
+    const achievementDescriptionErrors: number[] = [];
 
+    // Validate mandatory profile fields
     if (!extractedData.firstName?.trim()) {
       errors.push(t('wizard.uploadPage.review.fields.firstName'));
+      profileErrorFields.push('firstName');
     }
     if (!extractedData.lastName?.trim()) {
       errors.push(t('wizard.uploadPage.review.fields.lastName'));
+      profileErrorFields.push('lastName');
     }
     if (!extractedData.email?.trim()) {
       errors.push(t('wizard.uploadPage.review.fields.email'));
+      profileErrorFields.push('email');
+    }
+    if (!extractedData.phone?.trim()) {
+      errors.push(t('wizard.uploadPage.review.fields.phone'));
+      profileErrorFields.push('phone');
     }
     if (!extractedData.profession?.trim()) {
       errors.push(t('wizard.uploadPage.review.fields.profession'));
+      profileErrorFields.push('profession');
+    }
+    if (!extractedData.country?.trim()) {
+      errors.push(t('wizard.uploadPage.review.fields.country'));
+      profileErrorFields.push('country');
+    }
+
+    // Validate education dates
+    extractedData.education.forEach((edu, idx) => {
+      // Determine if currently studying: either isCurrentlyStudying is true OR isCompleted is false
+      const isCurrentlyStudying = edu.isCurrentlyStudying === true || edu.isCompleted === false;
+      
+      // Validate start date is required
+      if (!edu.startDate?.trim()) {
+        errors.push(t('wizard.uploadPage.review.validation.educationStartDate', { index: idx + 1 }));
+        educationErrorIndices.push(idx);
+      }
+      // Validate end date is required when not currently studying (isCompleted=true OR isCurrentlyStudying=false)
+      if (!isCurrentlyStudying && !edu.endDate?.trim()) {
+        errors.push(t('wizard.uploadPage.review.validation.educationEndDate', { index: idx + 1, defaultValue: `Education #${idx + 1}: End date is required` }));
+        educationErrorIndices.push(idx);
+      }
+      // Validate education date range (end date must be >= start date)
+      if (!isCurrentlyStudying && edu.startDate && edu.endDate) {
+        // YYYY-MM or YYYY format allows string comparison
+        if (edu.endDate < edu.startDate) {
+          errors.push(t('wizard.uploadPage.review.validation.educationDateRange', { index: idx + 1, defaultValue: `Education #${idx + 1}: End date must be later than start date` }));
+          educationDateRangeErrors.push(idx);
+        }
+      }
+    });
+
+    // Validate experience fields
+    extractedData.experiences.forEach((exp, idx) => {
+      // Validate company is required
+      if (!exp.company?.trim()) {
+        errors.push(t('wizard.uploadPage.review.validation.experienceCompany', { index: idx + 1 }));
+        experienceCompanyErrors.push(idx);
+      }
+      // Validate start date is required
+      if (!exp.startDate?.trim()) {
+        errors.push(t('wizard.uploadPage.review.validation.experienceStartDate', { index: idx + 1 }));
+        experienceStartDateErrors.push(idx);
+      }
+      // Validate end date is required when not current job
+      if (!exp.isCurrent && !exp.endDate?.trim()) {
+        errors.push(t('wizard.uploadPage.review.validation.experienceEndDate', { index: idx + 1 }));
+        experienceEndDateErrors.push(idx);
+      }
+      // Validate date range (end date must be >= start date)
+      if (!exp.isCurrent && exp.startDate && exp.endDate) {
+        // YYYY-MM format allows direct string comparison
+        if (exp.endDate < exp.startDate) {
+          errors.push(t('wizard.uploadPage.review.validation.experienceDateRange', { index: idx + 1 }));
+          experienceErrorIndices.push(idx);
+        }
+      }
+    });
+
+    // Validate achievement descriptions
+    extractedData.achievements.forEach((ach, idx) => {
+      if (!ach.description?.trim()) {
+        errors.push(t('wizard.uploadPage.review.validation.achievementDescription', { index: idx + 1 }));
+        achievementDescriptionErrors.push(idx);
+      }
+    });
+
+    // Validate certification dates
+    extractedData.certifications.forEach((cert, idx) => {
+      if (!cert.date?.trim()) {
+        errors.push(t('wizard.uploadPage.review.validation.certificationDate', { index: idx + 1 }));
+        certificationErrorIndices.push(idx);
+      }
+    });
+
+    // Update field-level errors
+    setFieldErrors({
+      profile: profileErrorFields,
+      education: educationErrorIndices,
+      educationDateRange: educationDateRangeErrors,
+      experience: experienceErrorIndices,
+      experienceCompany: experienceCompanyErrors,
+      experienceStartDate: experienceStartDateErrors,
+      experienceEndDate: experienceEndDateErrors,
+      certifications: certificationErrorIndices,
+      achievementDescription: achievementDescriptionErrors,
+    });
+
+    // Auto-expand sections with errors
+    const hasExperienceErrors = experienceErrorIndices.length > 0 || experienceCompanyErrors.length > 0 || experienceStartDateErrors.length > 0 || experienceEndDateErrors.length > 0;
+    const hasAchievementErrors = achievementDescriptionErrors.length > 0;
+    
+    if (profileErrorFields.length > 0 || educationErrorIndices.length > 0 || educationDateRangeErrors.length > 0 || hasExperienceErrors || certificationErrorIndices.length > 0 || hasAchievementErrors) {
+      setExpandedSections(prev => ({
+        ...prev,
+        ...(profileErrorFields.length > 0 && { profile: true }),
+        ...((educationErrorIndices.length > 0 || educationDateRangeErrors.length > 0) && { education: true }),
+        ...(hasExperienceErrors && { experience: true }),
+        ...(certificationErrorIndices.length > 0 && { certifications: true }),
+        ...(hasAchievementErrors && { achievements: true }),
+      }));
     }
 
     setValidationErrors(errors);
@@ -172,9 +325,14 @@ export function ResumeExtractionReview() {
       if (suggestions && suggestions.length > 0) {
         setSuggestedSkills(suggestions.filter((s: string) => !extractedData.skills.includes(s)));
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error getting skill suggestions:', err);
-      toast.error(t('wizard.uploadPage.review.ai.error'));
+      if (err?.code === 'RATE_LIMIT_EXCEEDED') {
+        setRateLimitRetryFn(() => handleGetSkillSuggestions);
+        setShowRateLimitModal(true);
+      } else {
+        toast.error(t('wizard.uploadPage.review.ai.error'));
+      }
     } finally {
       setLoadingSuggestions(false);
     }
@@ -204,12 +362,17 @@ export function ResumeExtractionReview() {
 
     setEnhancingFields(prev => ({ ...prev, [fieldKey]: true }));
     try {
-      const enhanced = await experienceAchievementService.enhanceAchievement(text, language);
+      const enhanced = await experienceAchievementService.enhanceAchievement(text, undefined, language);
       updateFn(enhanced);
       toast.success(t('wizard.uploadPage.review.ai.enhanced'));
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error enhancing text:', err);
-      toast.error(t('wizard.uploadPage.review.ai.error'));
+      if (err?.code === 'RATE_LIMIT_EXCEEDED') {
+        setRateLimitRetryFn(() => () => handleEnhanceText(fieldKey, text, context, updateFn));
+        setShowRateLimitModal(true);
+      } else {
+        toast.error(t('wizard.uploadPage.review.ai.error'));
+      }
     } finally {
       setEnhancingFields(prev => ({ ...prev, [fieldKey]: false }));
     }
@@ -279,9 +442,10 @@ export function ResumeExtractionReview() {
         `${resumeData.firstName} ${resumeData.lastName} - ${resumeData.profession || 'Resume'}`.trim()
       );
 
-      // Update stores
-      updateResumeData(resumeData);
+      // Update stores - SET resumeId FIRST to prevent auto-save race condition
+      // This ensures the debounced auto-save knows which resume to update
       setCurrentResumeId(createdResume.id);
+      updateResumeData(resumeData);
 
       // Mark steps 1-6 as completed
       [1, 2, 3, 4, 5, 6].forEach(step => markStepCompleted(step));
@@ -348,9 +512,17 @@ export function ResumeExtractionReview() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             {t('wizard.uploadPage.review.title')}
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 mb-3">
             {t('wizard.uploadPage.review.subtitle')}
           </p>
+          
+          {/* Language indicator */}
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
+            <span>{targetLanguage === 'es' ? '🇪🇸' : '🇺🇸'}</span>
+            <span>
+              {t('wizard.uploadPage.review.generatingIn')}: {targetLanguage === 'es' ? 'Español' : 'English'}
+            </span>
+          </div>
         </div>
 
         {/* Validation Errors */}
@@ -437,70 +609,142 @@ export function ResumeExtractionReview() {
               <div className="p-4 pt-0 border-t border-gray-100">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className={`block text-sm font-medium mb-1 ${fieldErrors.profile.includes('firstName') ? 'text-red-600' : 'text-gray-700'}`}>
                       {t('wizard.uploadPage.review.fields.firstName')} *
                     </label>
                     <input
                       type="text"
                       value={extractedData.firstName}
-                      onChange={(e) => updateField('firstName', e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      onChange={(e) => {
+                        updateField('firstName', e.target.value);
+                        if (e.target.value.trim() && fieldErrors.profile.includes('firstName')) {
+                          setFieldErrors(prev => ({ ...prev, profile: prev.profile.filter(f => f !== 'firstName') }));
+                        }
+                      }}
+                      className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:border-transparent ${
+                        fieldErrors.profile.includes('firstName')
+                          ? 'border-red-500 focus:ring-red-500'
+                          : 'border-gray-300 focus:ring-blue-500'
+                      }`}
                     />
+                    {fieldErrors.profile.includes('firstName') && (
+                      <p className="mt-1 text-sm text-red-600">{t('validation.required')}</p>
+                    )}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className={`block text-sm font-medium mb-1 ${fieldErrors.profile.includes('lastName') ? 'text-red-600' : 'text-gray-700'}`}>
                       {t('wizard.uploadPage.review.fields.lastName')} *
                     </label>
                     <input
                       type="text"
                       value={extractedData.lastName}
-                      onChange={(e) => updateField('lastName', e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      onChange={(e) => {
+                        updateField('lastName', e.target.value);
+                        if (e.target.value.trim() && fieldErrors.profile.includes('lastName')) {
+                          setFieldErrors(prev => ({ ...prev, profile: prev.profile.filter(f => f !== 'lastName') }));
+                        }
+                      }}
+                      className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:border-transparent ${
+                        fieldErrors.profile.includes('lastName')
+                          ? 'border-red-500 focus:ring-red-500'
+                          : 'border-gray-300 focus:ring-blue-500'
+                      }`}
                     />
+                    {fieldErrors.profile.includes('lastName') && (
+                      <p className="mt-1 text-sm text-red-600">{t('validation.required')}</p>
+                    )}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className={`block text-sm font-medium mb-1 ${fieldErrors.profile.includes('email') ? 'text-red-600' : 'text-gray-700'}`}>
                       {t('wizard.uploadPage.review.fields.email')} *
                     </label>
                     <input
                       type="email"
                       value={extractedData.email}
-                      onChange={(e) => updateField('email', e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      onChange={(e) => {
+                        updateField('email', e.target.value);
+                        if (e.target.value.trim() && fieldErrors.profile.includes('email')) {
+                          setFieldErrors(prev => ({ ...prev, profile: prev.profile.filter(f => f !== 'email') }));
+                        }
+                      }}
+                      className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:border-transparent ${
+                        fieldErrors.profile.includes('email')
+                          ? 'border-red-500 focus:ring-red-500'
+                          : 'border-gray-300 focus:ring-blue-500'
+                      }`}
                     />
+                    {fieldErrors.profile.includes('email') && (
+                      <p className="mt-1 text-sm text-red-600">{t('validation.required')}</p>
+                    )}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t('wizard.uploadPage.review.fields.phone')}
+                    <label className={`block text-sm font-medium mb-1 ${fieldErrors.profile.includes('phone') ? 'text-red-600' : 'text-gray-700'}`}>
+                      {t('wizard.uploadPage.review.fields.phone')} *
                     </label>
                     <input
                       type="tel"
                       value={extractedData.phone}
-                      onChange={(e) => updateField('phone', e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      onChange={(e) => {
+                        updateField('phone', e.target.value);
+                        if (e.target.value.trim() && fieldErrors.profile.includes('phone')) {
+                          setFieldErrors(prev => ({ ...prev, profile: prev.profile.filter(f => f !== 'phone') }));
+                        }
+                      }}
+                      className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:border-transparent ${
+                        fieldErrors.profile.includes('phone')
+                          ? 'border-red-500 focus:ring-red-500'
+                          : 'border-gray-300 focus:ring-blue-500'
+                      }`}
                     />
+                    {fieldErrors.profile.includes('phone') && (
+                      <p className="mt-1 text-sm text-red-600">{t('validation.required')}</p>
+                    )}
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className={`block text-sm font-medium mb-1 ${fieldErrors.profile.includes('profession') ? 'text-red-600' : 'text-gray-700'}`}>
                       {t('wizard.uploadPage.review.fields.profession')} *
                     </label>
                     <input
                       type="text"
                       value={extractedData.profession}
-                      onChange={(e) => updateField('profession', e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      onChange={(e) => {
+                        updateField('profession', e.target.value);
+                        if (e.target.value.trim() && fieldErrors.profile.includes('profession')) {
+                          setFieldErrors(prev => ({ ...prev, profile: prev.profile.filter(f => f !== 'profession') }));
+                        }
+                      }}
+                      className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:border-transparent ${
+                        fieldErrors.profile.includes('profession')
+                          ? 'border-red-500 focus:ring-red-500'
+                          : 'border-gray-300 focus:ring-blue-500'
+                      }`}
                     />
+                    {fieldErrors.profile.includes('profession') && (
+                      <p className="mt-1 text-sm text-red-600">{t('validation.required')}</p>
+                    )}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t('wizard.uploadPage.review.fields.country')}
+                    <label className={`block text-sm font-medium mb-1 ${fieldErrors.profile.includes('country') ? 'text-red-600' : 'text-gray-700'}`}>
+                      {t('wizard.uploadPage.review.fields.country')} *
                     </label>
                     <input
                       type="text"
                       value={extractedData.country}
-                      onChange={(e) => updateField('country', e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      onChange={(e) => {
+                        updateField('country', e.target.value);
+                        if (e.target.value.trim() && fieldErrors.profile.includes('country')) {
+                          setFieldErrors(prev => ({ ...prev, profile: prev.profile.filter(f => f !== 'country') }));
+                        }
+                      }}
+                      className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:border-transparent ${
+                        fieldErrors.profile.includes('country')
+                          ? 'border-red-500 focus:ring-red-500'
+                          : 'border-gray-300 focus:ring-blue-500'
+                      }`}
                     />
+                    {fieldErrors.profile.includes('country') && (
+                      <p className="mt-1 text-sm text-red-600">{t('validation.required')}</p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -756,40 +1000,70 @@ export function ResumeExtractionReview() {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className={`block text-sm font-medium mb-1 ${fieldErrors.experienceCompany.includes(idx) ? 'text-red-600' : 'text-gray-700'}`}>
                               {t('wizard.uploadPage.review.fields.company')} *
                             </label>
                             <input
                               type="text"
                               value={exp.company}
-                              onChange={(e) => updateExperience(idx, { company: e.target.value })}
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              onChange={(e) => {
+                                updateExperience(idx, { company: e.target.value });
+                                if (e.target.value.trim() && fieldErrors.experienceCompany.includes(idx)) {
+                                  setFieldErrors(prev => ({ ...prev, experienceCompany: prev.experienceCompany.filter(i => i !== idx) }));
+                                }
+                              }}
+                              className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:border-transparent ${
+                                fieldErrors.experienceCompany.includes(idx)
+                                  ? 'border-red-500 focus:ring-red-500'
+                                  : 'border-gray-300 focus:ring-blue-500'
+                              }`}
                             />
+                            {fieldErrors.experienceCompany.includes(idx) && (
+                              <p className="mt-1 text-sm text-red-600">{t('validation.required')}</p>
+                            )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              {t('wizard.uploadPage.review.fields.startDate')}
+                            <label className={`block text-sm font-medium mb-1 ${fieldErrors.experienceStartDate.includes(idx) ? 'text-red-600' : 'text-gray-700'}`}>
+                              {t('wizard.uploadPage.review.fields.startDate')} *
                             </label>
-                            <input
-                              type="text"
-                              value={exp.startDate}
-                              onChange={(e) => updateExperience(idx, { startDate: e.target.value })}
-                              placeholder="MM/YYYY"
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            <MonthYearPicker
+                              value={exp.startDate || ''}
+                              onChange={(value) => {
+                                updateExperience(idx, { startDate: value });
+                                if (value && fieldErrors.experienceStartDate.includes(idx)) {
+                                  setFieldErrors(prev => ({ ...prev, experienceStartDate: prev.experienceStartDate.filter(i => i !== idx) }));
+                                }
+                              }}
+                              error={fieldErrors.experienceStartDate.includes(idx)}
                             />
+                            {fieldErrors.experienceStartDate.includes(idx) && (
+                              <p className="mt-1 text-sm text-red-600">{t('validation.required')}</p>
+                            )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              {t('wizard.uploadPage.review.fields.endDate')}
+                            <label className={`block text-sm font-medium mb-1 ${(fieldErrors.experience.includes(idx) || fieldErrors.experienceEndDate.includes(idx)) ? 'text-red-600' : 'text-gray-700'}`}>
+                              {t('wizard.uploadPage.review.fields.endDate')} {!exp.isCurrent && '*'}
                             </label>
-                            <input
-                              type="text"
-                              value={exp.isCurrent ? '' : exp.endDate}
-                              onChange={(e) => updateExperience(idx, { endDate: e.target.value })}
-                              placeholder="MM/YYYY"
+                            <MonthYearPicker
+                              value={exp.isCurrent ? '' : (exp.endDate || '')}
+                              onChange={(value) => {
+                                updateExperience(idx, { endDate: value });
+                                if (fieldErrors.experience.includes(idx)) {
+                                  setFieldErrors(prev => ({ ...prev, experience: prev.experience.filter(i => i !== idx) }));
+                                }
+                                if (value && fieldErrors.experienceEndDate.includes(idx)) {
+                                  setFieldErrors(prev => ({ ...prev, experienceEndDate: prev.experienceEndDate.filter(i => i !== idx) }));
+                                }
+                              }}
                               disabled={exp.isCurrent}
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                              error={fieldErrors.experience.includes(idx) || fieldErrors.experienceEndDate.includes(idx)}
                             />
+                            {fieldErrors.experienceEndDate.includes(idx) && (
+                              <p className="mt-1 text-sm text-red-600">{t('validation.required')}</p>
+                            )}
+                            {fieldErrors.experience.includes(idx) && !fieldErrors.experienceEndDate.includes(idx) && (
+                              <p className="mt-1 text-sm text-red-600">{t('wizard.uploadPage.review.validation.experienceDateRange', { index: idx + 1 })}</p>
+                            )}
                           </div>
                           <div className="md:col-span-2">
                             <label className="flex items-center gap-2">
@@ -919,29 +1193,47 @@ export function ResumeExtractionReview() {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              {t('wizard.uploadPage.review.fields.startDate')}
+                            <label className={`block text-sm font-medium mb-1 ${fieldErrors.education.includes(idx) ? 'text-red-600' : 'text-gray-700'}`}>
+                              {t('wizard.uploadPage.review.fields.startDate')} *
                             </label>
-                            <input
-                              type="text"
+                            <YearPicker
                               value={edu.startDate || ''}
-                              onChange={(e) => updateEducation(idx, { startDate: e.target.value })}
-                              placeholder="YYYY"
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              onChange={(value) => {
+                                updateEducation(idx, { startDate: value });
+                                // Clear field error when user selects a year
+                                if (value && fieldErrors.education.includes(idx)) {
+                                  setFieldErrors(prev => ({
+                                    ...prev,
+                                    education: prev.education.filter(i => i !== idx)
+                                  }));
+                                }
+                              }}
+                              error={fieldErrors.education.includes(idx)}
                             />
+                            {fieldErrors.education.includes(idx) && (
+                              <p className="mt-1 text-sm text-red-600">
+                                {t('validation.required')}
+                              </p>
+                            )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className={`block text-sm font-medium mb-1 ${fieldErrors.educationDateRange.includes(idx) ? 'text-red-600' : 'text-gray-700'}`}>
                               {t('wizard.uploadPage.review.fields.endDate')}
                             </label>
-                            <input
-                              type="text"
+                            <YearPicker
                               value={edu.isCurrentlyStudying ? '' : (edu.endDate || '')}
-                              onChange={(e) => updateEducation(idx, { endDate: e.target.value })}
-                              placeholder="YYYY"
+                              onChange={(value) => {
+                                updateEducation(idx, { endDate: value });
+                                if (fieldErrors.educationDateRange.includes(idx)) {
+                                  setFieldErrors(prev => ({ ...prev, educationDateRange: prev.educationDateRange.filter(i => i !== idx) }));
+                                }
+                              }}
                               disabled={edu.isCurrentlyStudying}
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                              error={fieldErrors.educationDateRange.includes(idx)}
                             />
+                            {fieldErrors.educationDateRange.includes(idx) && (
+                              <p className="mt-1 text-sm text-red-600">{t('wizard.uploadPage.review.validation.endDateBeforeStart', 'End date must be later than start date')}</p>
+                            )}
                           </div>
                           <div className="md:col-span-2">
                             <label className="flex items-center gap-2">
@@ -1063,11 +1355,9 @@ export function ResumeExtractionReview() {
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                               {t('wizard.uploadPage.review.fields.technologies')}
                             </label>
-                            <input
-                              type="text"
-                              value={proj.technologies?.join(', ') || ''}
-                              onChange={(e) => updateProject(idx, { technologies: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })}
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            <TagInput
+                              values={proj.technologies || []}
+                              onChange={(techs) => updateProject(idx, { technologies: techs })}
                               placeholder="React, Node.js, PostgreSQL..."
                             />
                           </div>
@@ -1155,23 +1445,20 @@ export function ResumeExtractionReview() {
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                               {t('wizard.uploadPage.review.fields.year')}
                             </label>
-                            <input
-                              type="text"
+                            <YearPicker
                               value={ach.year || ''}
-                              onChange={(e) => updateAchievement(idx, { year: e.target.value })}
-                              placeholder="YYYY"
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              onChange={(value) => updateAchievement(idx, { year: value })}
                             />
                           </div>
                           <div className="md:col-span-2">
                             <div className="flex items-center justify-between mb-1">
-                              <label className="block text-sm font-medium text-gray-700">
-                                {t('wizard.uploadPage.review.fields.description')}
+                              <label className={`block text-sm font-medium ${fieldErrors.achievementDescription.includes(idx) ? 'text-red-600' : 'text-gray-700'}`}>
+                                {t('wizard.uploadPage.review.fields.description')} *
                               </label>
                               <AIEnhanceButton
                                 onClick={() => handleEnhanceText(
                                   `ach-${idx}`,
-                                  ach.description,
+                                  ach.description?.trim() || ach.title,
                                   'achievement',
                                   (enhanced) => updateAchievement(idx, { description: enhanced })
                                 )}
@@ -1180,10 +1467,22 @@ export function ResumeExtractionReview() {
                             </div>
                             <textarea
                               value={ach.description}
-                              onChange={(e) => updateAchievement(idx, { description: e.target.value })}
+                              onChange={(e) => {
+                                updateAchievement(idx, { description: e.target.value });
+                                if (e.target.value.trim() && fieldErrors.achievementDescription.includes(idx)) {
+                                  setFieldErrors(prev => ({ ...prev, achievementDescription: prev.achievementDescription.filter(i => i !== idx) }));
+                                }
+                              }}
                               rows={2}
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:border-transparent ${
+                                fieldErrors.achievementDescription.includes(idx)
+                                  ? 'border-red-500 focus:ring-red-500'
+                                  : 'border-gray-300 focus:ring-blue-500'
+                              }`}
                             />
+                            {fieldErrors.achievementDescription.includes(idx) && (
+                              <p className="mt-1 text-sm text-red-600">{t('validation.required')}</p>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -1264,16 +1563,28 @@ export function ResumeExtractionReview() {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              {t('wizard.uploadPage.review.fields.certDate')}
+                            <label className={`block text-sm font-medium mb-1 ${fieldErrors.certifications.includes(idx) ? 'text-red-600' : 'text-gray-700'}`}>
+                              {t('wizard.uploadPage.review.fields.certDate')} *
                             </label>
-                            <input
-                              type="text"
+                            <YearPicker
                               value={cert.date || ''}
-                              onChange={(e) => updateCertification(idx, { date: e.target.value })}
-                              placeholder="MM/YYYY"
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              onChange={(value) => {
+                                updateCertification(idx, { date: value });
+                                // Clear field error when user selects a year
+                                if (value && fieldErrors.certifications.includes(idx)) {
+                                  setFieldErrors(prev => ({
+                                    ...prev,
+                                    certifications: prev.certifications.filter(i => i !== idx)
+                                  }));
+                                }
+                              }}
+                              error={fieldErrors.certifications.includes(idx)}
                             />
+                            {fieldErrors.certifications.includes(idx) && (
+                              <p className="mt-1 text-sm text-red-600">
+                                {t('validation.required')}
+                              </p>
+                            )}
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1428,6 +1739,37 @@ export function ResumeExtractionReview() {
           </div>
         </div>
       </div>
+
+      {/* Rate Limit Modal */}
+      {showRateLimitModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {t('wizard.uploadPage.review.ai.rateLimitTitle')}
+              </h3>
+              <button
+                onClick={handleCloseRateLimitModal}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {/* Modal Content */}
+            <div className="p-6">
+              <RateLimitWarning
+                onRetry={handleRateLimitRetry}
+                onClose={() => setShowRateLimitModal(false)}
+                showRetry={true}
+                countdownSeconds={30}
+                isPremium={user?.isPremium}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

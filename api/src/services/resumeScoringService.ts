@@ -11,6 +11,7 @@ import { GeneratedResume, ResumeData, ResumeScore, SectionChecklist } from '../t
 import { deterministicScoringService, DeterministicScore } from './deterministicScoringService';
 import { keywordAnalyzerService, KeywordAnalysis } from './keywordAnalyzerService';
 import { KeywordAnalysisData } from '../utils/resumeVerifiers';
+import { contentValidatorService, ContentValidationResult } from './contentValidatorService';
 
 interface ScoringTrackingContext {
   userId: string;
@@ -63,12 +64,68 @@ class ResumeScoringService {
         console.warn('[Scoring] Keyword analysis failed, continuing without it:', keywordError);
         // Continue without keyword analysis - the ATS section will be skipped
       }
+
+      // Perform AI-powered content validation (for data quality scoring)
+      let contentValidation: ContentValidationResult | null = null;
       
-      // Use deterministic scoring with keyword analysis data
+      // Merge resumeData into generatedResume for validation
+      // This ensures manually added entries are validated, not just AI-generated ones
+      const resumeForValidation: GeneratedResume = {
+        ...generatedResume,
+        education: resumeData?.education?.length ? resumeData.education.map(edu => ({
+          degree: edu.degree || '',
+          institution: edu.institution || '',
+          field: edu.field || '',
+          duration: `${edu.startDate || ''} - ${edu.endDate || 'Present'}`,
+          gpa: edu.gpa,
+        })) : generatedResume.education,
+        experience: resumeData?.experience?.length ? resumeData.experience.map(exp => ({
+          title: exp.title || '',
+          company: exp.company || '',
+          duration: `${exp.startDate || ''} - ${exp.endDate || 'Present'}`,
+          description: exp.responsibilities?.join('. ') || '',
+          achievements: exp.achievements || [],
+          skills: [],
+          impact: [],
+        })) : generatedResume.experience,
+        certifications: resumeData?.certifications?.length ? resumeData.certifications.map(cert => ({
+          name: cert.name || '',
+          issuer: cert.issuer || '',
+          date: cert.date || '',
+          credentialId: cert.credentialId,
+          skills: [],
+        })) : generatedResume.certifications,
+        languages: resumeData?.languages?.length ? resumeData.languages.map(lang => ({
+          language: lang.name || '',  // ResumeData.Language uses 'name', not 'language'
+          level: lang.level || '',
+        })) : generatedResume.languages,
+      };
+      
+      try {
+        if (contentValidatorService.shouldValidate(resumeForValidation)) {
+          contentValidation = await contentValidatorService.validateContent(
+            resumeForValidation,
+            trackingContext?.userId,
+            isPremium
+          );
+          
+          console.log(`[Scoring] Content validation complete: overall quality ${contentValidation.overall}%, isValid: ${contentValidation.isValid}`);
+          
+          if (!contentValidation.isValid) {
+            console.warn(`[Scoring] Content quality issues detected: ${contentValidation.summary}`);
+          }
+        }
+      } catch (validationError) {
+        console.warn('[Scoring] Content validation failed, continuing without it:', validationError);
+        // Continue without content validation - the data quality section will be skipped
+      }
+      
+      // Use deterministic scoring with keyword analysis and content validation data
       const deterministicScore = deterministicScoringService.scoreResume(
         generatedResume,
         resumeData,
-        keywordAnalysis
+        keywordAnalysis,
+        contentValidation
       );
 
       // Convert to ResumeScore format with backward compatibility

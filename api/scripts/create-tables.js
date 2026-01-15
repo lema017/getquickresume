@@ -266,6 +266,22 @@ async function createJobTitleAchievementsTable() {
   }
 }
 
+/**
+ * Creates the Rate Limits table
+ * 
+ * This table is used for multiple purposes:
+ * - API rate limiting (per user/endpoint)
+ * - PayPal order creation rate limiting (key: paypal-order:{userId})
+ * - PayPal payment idempotency tracking (key: paypal-processed:{orderId})
+ * 
+ * Schema:
+ * - key (String, HASH) - Composite key for different use cases
+ * - ttl (Number) - TTL timestamp for automatic cleanup
+ * 
+ * Additional fields vary by use case:
+ * - Rate limiting: requestCount, windowStart
+ * - PayPal idempotency: orderId, userId, transactionId, processedAt
+ */
 async function createRateLimitsTable() {
   try {
     console.log(`Creating table: ${rateLimitsTableName}`);

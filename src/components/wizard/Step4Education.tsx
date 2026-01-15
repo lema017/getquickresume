@@ -9,7 +9,7 @@ import { Education, Certification } from '@/types';
 export function Step4Education() {
   const { t } = useTranslation();
   const { navigateToStep } = useWizardNavigation();
-  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep } = useResumeStore();
+  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep } = useResumeStore();
   const [education, setEducation] = useState(resumeData.education);
   const [certifications, setCertifications] = useState(resumeData.certifications);
   const [isSkipped, setIsSkipped] = useState(false);
@@ -55,8 +55,15 @@ export function Step4Education() {
     navigateToStep(5);
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     updateResumeData({ education, certifications });
+    // Save immediately before navigation to ensure data is persisted
+    try {
+      await saveResumeDataImmediately();
+    } catch (error) {
+      console.error('Error saving education data:', error);
+      // Continue with navigation even if save fails - data is in store
+    }
     markStepCompleted(4);
     setCurrentStep(5);
     navigateToStep(5);

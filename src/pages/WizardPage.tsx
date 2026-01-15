@@ -9,6 +9,8 @@ import toast from 'react-hot-toast';
 // Wizard Components
 import { ResumeCreationMode } from '@/components/wizard/ResumeCreationMode';
 import { UploadResume } from '@/components/wizard/UploadResume';
+import { UploadLanguageSelection } from '@/components/wizard/UploadLanguageSelection';
+import { UploadProcessing } from '@/components/wizard/UploadProcessing';
 import { ResumeExtractionReview } from '@/components/wizard/ResumeExtractionReview';
 import { LinkedInImport } from '@/components/wizard/LinkedInImport';
 
@@ -70,7 +72,18 @@ function ManualWizardStep({ stepComponent: StepComponent }: ManualWizardStepProp
       
       // Check if we already loaded this resume using the ref
       if (currentResumeId === resumeId && lastLoadedResumeIdRef.current === resumeId) {
-        console.log('🔧 ManualWizardStep - Resume already loaded, skipping reload');
+        return;
+      }
+      
+      // IMPROVED CHECK: Also skip reload if resumeId matches and we have meaningful data in store
+      // This prevents unnecessary reloads when navigating between wizard steps
+      const hasResumeDataInStore = resumeData && 
+        currentResumeId === resumeId &&
+        (resumeData.firstName || resumeData.education?.length > 0 || resumeData.experience?.length > 0);
+      
+      if (hasResumeDataInStore) {
+        // Update ref to prevent future reloads
+        lastLoadedResumeIdRef.current = resumeId;
         return;
       }
       
@@ -110,7 +123,7 @@ function ManualWizardStep({ stepComponent: StepComponent }: ManualWizardStepProp
     };
 
     loadResumeFromUrl();
-  }, [location.search, currentResumeId, resetResume, setCurrentResumeId, setGeneratedResume, setHasLoadedExistingResume, loadResumeData]);
+  }, [location.search, currentResumeId, resetResume, setCurrentResumeId, setGeneratedResume, setHasLoadedExistingResume, loadResumeData, resumeData]);
 
   const handleSaveAndExit = async () => {
     try {
@@ -332,6 +345,8 @@ export function WizardPage() {
           {/* Main wizard routes */}
           <Route path="/" element={<ResumeCreationMode />} />
           <Route path="/upload" element={<UploadResume />} />
+          <Route path="/upload/language" element={<UploadLanguageSelection />} />
+          <Route path="/upload/processing" element={<UploadProcessing />} />
           <Route path="/upload/review" element={<ResumeExtractionReview />} />
           <Route path="/linkedin" element={<LinkedInImport />} />
           

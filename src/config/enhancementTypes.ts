@@ -71,6 +71,15 @@ export const CHECKLIST_ENHANCEMENT_TYPES: Record<string, EnhancementType> = {
   'contact-linkedin': 'structural',
   'contact-email': 'structural',
   'contact-phone': 'structural',
+  
+  // Data Quality (requires manual editing of source sections)
+  'data-quality-overall': 'structural',
+  'data-quality-education': 'structural',
+  'data-quality-experience': 'structural',
+  'data-quality-skills': 'structural',
+  'data-quality-profile': 'structural',
+  'data-quality-certifications': 'structural',
+  'data-quality-languages': 'structural',
 };
 
 /**
