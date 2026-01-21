@@ -365,11 +365,12 @@ Ensure all text fields are translated to ${targetLanguageName}.`;
     const data = await response.json() as any;
     const content = data.choices[0]?.message?.content || '';
     
-    // Extract usage data
+    // Extract usage data including Groq prompt caching info
     const usage: TokenUsage = {
       promptTokens: data.usage?.prompt_tokens || 0,
       completionTokens: data.usage?.completion_tokens || 0,
-      totalTokens: data.usage?.total_tokens || 0
+      totalTokens: data.usage?.total_tokens || 0,
+      cachedTokens: data.usage?.prompt_tokens_details?.cached_tokens || 0
     };
     
     if (!content || content.trim().length === 0) {
@@ -394,7 +395,7 @@ Ensure all text fields are translated to ${targetLanguageName}.`;
       }
 
       // Update language field in resumeData
-      parsed.translatedResumeData.language = targetLanguage as 'es' | 'en';
+      parsed.translatedResumeData.language = targetLanguage as ResumeData['language'];
 
       return {
         translatedResumeData: parsed.translatedResumeData as ResumeData,

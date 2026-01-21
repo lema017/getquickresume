@@ -46,6 +46,7 @@ function ManualWizardStep({ stepComponent: StepComponent }: ManualWizardStepProp
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
   const [isLoadingResume, setIsLoadingResume] = useState(false);
   const lastLoadedResumeIdRef = useRef<string | null>(null);
+  const hasInitializedNoIdRef = useRef(false);
 
   // Detect if this is Step 9 to apply wider container using route path
   const isStep10 = location.pathname.includes('/step-10');
@@ -61,10 +62,15 @@ function ManualWizardStep({ stepComponent: StepComponent }: ManualWizardStepProp
       
       // If no resumeId, this is a new resume - clear everything
       if (!resumeId) {
+        // Prevent wiping in-progress data on step navigation
+        if (hasInitializedNoIdRef.current) {
+          return;
+        }
         // Only reset if we're not already in edit mode
         if (!currentResumeId) {
           resetResume();
         }
+        hasInitializedNoIdRef.current = true;
         // Reset the ref when there's no resumeId
         lastLoadedResumeIdRef.current = null;
         return;
@@ -327,7 +333,16 @@ function BasicStep2() {
 
 export function WizardPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { wizardState, setCurrentStep } = useResumeStore();
+  const { user } = useAuthStore();
+
+  // Check if user can create new resume (premium OR free user who hasn't used their quota)
+  const canCreateResume = user?.isPremium || !user?.freeResumeUsed;
+  
+  // Check if this is an edit (has resumeId in URL) - editing existing resumes is always allowed
+  const isEditingExistingResume = location.search.includes('resumeId');
 
   useEffect(() => {
     // Auto-save every 30 seconds
@@ -337,6 +352,19 @@ export function WizardPage() {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Route guard: redirect free users who have used their quota and are not editing
+  useEffect(() => {
+    if (!canCreateResume && !isEditingExistingResume) {
+      toast.error(t('wizard.errors.freeQuotaUsed') || 'You have already used your free resume. Please upgrade to premium to create more resumes.');
+      navigate('/dashboard');
+    }
+  }, [canCreateResume, isEditingExistingResume, navigate, t]);
+
+  // Don't render anything while redirecting
+  if (!canCreateResume && !isEditingExistingResume) {
+    return null;
+  }
 
   return (
     <div className="bg-gray-50 min-h-full">

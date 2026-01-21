@@ -11,6 +11,7 @@ import { AchievementSuggestionsModal } from './AchievementSuggestionsModal';
 import { EnhanceTextModal } from './EnhanceTextModal';
 import { PremiumActionModal } from '@/components/PremiumActionModal';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { ValidationError } from '@/components/ValidationError';
 
 export function Step3Experience() {
   const { t } = useTranslation();
@@ -41,6 +42,9 @@ export function Step3Experience() {
 
   const [showPremiumModal, setShowPremiumModal] = useState(false);
 
+  // AI validation error state - tracks which experience has a missing job title error
+  const [aiValidationError, setAiValidationError] = useState<string | null>(null);
+
   // Check if user can use AI features (premium OR free user who hasn't used their quota)
   const canUseAIFeatures = user?.isPremium || !user?.freeResumeUsed;
 
@@ -65,7 +69,11 @@ export function Step3Experience() {
         exp.id === id ? { ...exp, [field]: value } : exp
       )
     );
-  }, []);
+    // Clear AI validation error when title field is updated
+    if (field === 'title' && aiValidationError === id) {
+      setAiValidationError(null);
+    }
+  }, [aiValidationError]);
 
   const removeExperience = (id: string) => {
     setExperiences(experiences.filter(exp => exp.id !== id));
@@ -116,9 +124,10 @@ export function Step3Experience() {
     }
 
     if (!jobTitle.trim()) {
-      alert('Por favor, ingresa el título del puesto para obtener sugerencias de IA');
+      setAiValidationError(expId);
       return;
     }
+    setAiValidationError(null);
     setSuggestionsModal({ isOpen: true, jobTitle: jobTitle.trim(), expId });
   }, [canUseAIFeatures]);
 
@@ -343,6 +352,9 @@ export function Step3Experience() {
                   onChange={(e) => updateExperience(exp.id, 'title', e.target.value)}
                   className="input-field"
                   placeholder={t('wizard.steps.experience.ui.placeholders.position')}
+                />
+                <ValidationError 
+                  message={aiValidationError === exp.id ? t('wizard.steps.experience.ui.ai.jobTitleRequired') : ''} 
                 />
               </div>
               <div>

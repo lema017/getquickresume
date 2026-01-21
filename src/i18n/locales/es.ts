@@ -463,6 +463,9 @@ export const es = {
       loadError: 'Error al cargar el resume',
       saveError: 'Error al guardar el resume. Inténtalo de nuevo.'
     },
+    errors: {
+      freeQuotaUsed: 'Ya has utilizado tu CV gratuito. Por favor actualiza a premium para crear más CVs.',
+    },
     uploadPage: {
       header: {
         backToDashboard: 'Volver al Dashboard',
@@ -627,6 +630,7 @@ export const es = {
           requiredFields: 'Por favor, completa todos los campos requeridos',
           fixErrors: 'Por favor, corrige los errores a continuación',
           educationStartDate: 'Educación #{{index}}: Fecha de Inicio es requerida',
+          educationEndDate: 'Educación #{{index}}: Fecha de Fin es requerida',
           certificationDate: 'Certificación #{{index}}: Fecha de Obtención es requerida',
           experienceCompany: 'Experiencia #{{index}}: Empresa es requerida',
           experienceStartDate: 'Experiencia #{{index}}: Fecha de Inicio es requerida',
@@ -1165,7 +1169,8 @@ export const es = {
             addExperience: 'Agregar experiencia laboral'
           },
           ai: {
-            suggestionsButton: 'Sugerencias con IA'
+            suggestionsButton: 'Sugerencias con IA',
+            jobTitleRequired: 'Por favor, ingresa el título del puesto para obtener sugerencias de IA.'
           },
           alerts: {
             invalidDatesTitle: 'Fechas inválidas',
@@ -1649,7 +1654,46 @@ export const es = {
         nav: {
           back: 'Anterior',
           goHome: 'Volver al Inicio'
-        }
+        },
+        features: {
+          title: 'Qué Puedes Hacer',
+          subtitle: 'Herramientas poderosas para maximizar tu búsqueda de empleo',
+          editButton: 'Editar CV',
+          cards: {
+            download: {
+              title: 'Descargar PDF',
+              description: 'Guarda tu currículum como archivo PDF',
+            },
+            translate: {
+              title: 'Traducir',
+              description: 'Convierte a más de 12 idiomas al instante',
+            },
+            share: {
+              title: 'Compartir CV',
+              description: 'Obtén enlace y código QR para compartir',
+            },
+            trackViews: {
+              title: 'Ver Visitas',
+              description: 'Mira quién vió tu currículum',
+            },
+            tailor: {
+              title: 'Personalizar para Trabajo',
+              description: 'Optimiza para ofertas de trabajo específicas',
+            },
+            rescore: {
+              title: 'Re-evaluar',
+              description: 'Obtén puntuación ATS actualizada',
+            },
+            enhance: {
+              title: 'Mejorar con IA',
+              description: 'Mejora el contenido con sugerencias de IA',
+            },
+          },
+        },
+        errors: {
+          noResumeId: 'No se encontró ID del currículum. Por favor guarda tu currículum primero.',
+          loadResumeFailed: 'Error al cargar datos del currículum.',
+        },
       },
     },
     linkedinImport: {
@@ -2312,6 +2356,16 @@ export const es = {
           smartSuggestions: 'Sugerencias inteligentes de mejora con IA',
           sectionOptimization: 'Optimiza cualquier sección de tu CV',
           unlimitedUse: 'Sugerencias con IA ilimitadas',
+        },
+      },
+      createResume: {
+        title: 'Límite de CV Gratuito Alcanzado',
+        description: 'Ya has utilizado tu único CV gratuito generado con IA. Actualiza a Premium para crear CVs profesionales ilimitados.',
+        cta: 'Actualizar para Crear Más',
+        benefits: {
+          unlimitedResumes: 'Crea CVs profesionales ilimitados',
+          allFeatures: 'Accede a todas las funciones con IA',
+          unlimitedEdits: 'Edita y regenera cuando quieras',
         },
       },
       regenerate: {
@@ -3375,12 +3429,58 @@ export const es = {
       cta: 'Obtener Mi Puntuación',
     },
 
+    // Función Sugerencias con IA
+    aiSuggestions: {
+      cta: 'Desbloquear Sugerencias con IA',
+    },
+
+    // Función Regenerar
+    regenerate: {
+      cta: 'Actualizar para Regenerar',
+    },
+
+    // Función Crear CV (para usuarios gratuitos que han usado su cuota)
+    createResume: {
+      headline: 'Límite de CV Gratuito Alcanzado',
+      subheadline: 'Ya has utilizado tu único CV gratuito generado con IA',
+      cta: 'Actualizar para CVs Ilimitados',
+    },
+
     // Fallback por defecto
     default: {
       benefit1: 'Acceso ilimitado a todas las funciones premium',
       benefit2: 'Herramientas impulsadas por IA para mejores resultados',
       benefit3: 'Soporte prioritario cuando lo necesites',
       cta: 'Actualizar a Premium',
+    },
+  },
+
+  // Tarjeta de Puntuación - Sección Usuario Gratuito
+  scoreCard: {
+    freeUser: {
+      areasToImprove: 'Áreas a Mejorar',
+      detailsLocked: 'Detalles bloqueados',
+      fix: 'Corregir',
+      scorePotential: 'Tu puntuación podría llegar a',
+      withImprovements: 'con mejoras',
+      enhanceTitle: 'Mejora Tu Currículum',
+      enhanceDescription: 'Desbloquea checklists detallados, mejoras con IA y optimización ATS',
+      enhanceButton: 'Mejorar Mi Currículum',
+      socialProof: 'Únete a miles de buscadores de empleo con currículums optimizados',
+    },
+    hints: {
+      summaryNeedsAttention: 'El resumen podría ser más fuerte',
+      experienceNeedsAttention: 'Los detalles de experiencia necesitan atención',
+      skillsNeedEnhancement: 'La sección de habilidades podría mejorarse',
+      educationIncomplete: 'Información de educación incompleta',
+      contactMissing: 'Falta información de contacto clave',
+      considerAchievements: 'Considera agregar logros',
+      projectsNeedImprovement: 'Los detalles de proyectos podrían mejorarse',
+      languagesNeedReview: 'La información de idiomas necesita revisión',
+      entriesNeedCorrections: 'Algunas entradas necesitan correcciones',
+      atsCouldBeBetter: 'La compatibilidad ATS podría ser mejor',
+      multipleAreasNeedWork: 'Múltiples áreas necesitan mejoras',
+      fewSectionsNeedWork: 'Algunas secciones podrían mejorarse',
     },
   },
 };

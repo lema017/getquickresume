@@ -158,7 +158,7 @@ export const extractResumeData = async (
         403,
         'Free quota exceeded',
         'You have already used your free resume. Upgrade to premium to continue.',
-        'QUOTA_EXCEEDED'
+        'PREMIUM_REQUIRED'
       );
     }
 

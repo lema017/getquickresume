@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { useAuthStore } from '@/stores/authStore';
-import { ArrowLeft, Download, Share2, Eye, CheckCircle, Sparkles, RefreshCw, Linkedin, FileText, Zap, Edit3, Globe } from 'lucide-react';
+import { ArrowLeft, Download, Share2, Eye, CheckCircle, Sparkles, RefreshCw, Linkedin, FileText, Zap, Edit3, Globe, Target, Crown, BarChart3, LucideIcon } from 'lucide-react';
 import { countries } from '@/utils/countries';
 import { ResumeEditModal } from './ResumeEditModal';
 import { templatesService, ResumeTemplate } from '@/services/templatesService';
@@ -16,6 +16,7 @@ import { generateResumePDFFromPages } from '@/utils/pdfGenerator';
 import { calculatePagination } from '@/services/paginationService';
 import { calculateAndAssignPageNumbers, extractPaginationFields } from './Step9Preview';
 import { downloadService } from '@/services/downloadService';
+import { resumeScoringService } from '@/services/resumeScoringService';
 import { PremiumDownloadModal } from '@/components/PremiumDownloadModal';
 import { PremiumActionModal } from '@/components/PremiumActionModal';
 import { ResumeTranslationModal } from '@/components/ResumeTranslationModal';
@@ -31,13 +32,16 @@ export function Step10Final() {
   const { user } = useAuthStore();
   const [isGenerated, setIsGenerated] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
-  const [showRegeneratePremiumModal, setShowRegeneratePremiumModal] = useState(false);
+  const [showFeaturePremiumModal, setShowFeaturePremiumModal] = useState(false);
+  const [premiumFeature, setPremiumFeature] = useState<'enhance' | 'rescore' | 'edit' | 'aiSuggestions' | 'regenerate' | 'createResume' | 'premiumTemplate' | 'translate' | 'tailorForJob' | 'share'>('enhance');
   const [showEditModal, setShowEditModal] = useState(false);
   const [showTranslationModal, setShowTranslationModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [rescoringResume, setRescoringResume] = useState(false);
 
   // Check if user can use AI features (premium OR free user who hasn't used their quota)
   const canUseAIFeatures = user?.isPremium || !user?.freeResumeUsed;
+  const isPremium = user?.isPremium || false;
   const [resumeShareData, setResumeShareData] = useState<{ shareToken?: string; isPubliclyShared?: boolean } | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<ResumeTemplate | null>(null);
   const [loadingTemplate, setLoadingTemplate] = useState(false);
@@ -359,6 +363,77 @@ export function Step10Final() {
     }
   };
 
+  // Handler for Translate feature
+  const handleTranslate = () => {
+    if (!isPremium) {
+      setPremiumFeature('translate');
+      setShowFeaturePremiumModal(true);
+      return;
+    }
+    setShowTranslationModal(true);
+  };
+
+  // Handler for Track Views feature (premium share analytics)
+  const handleTrackViews = () => {
+    if (!isPremium) {
+      setPremiumFeature('share');
+      setShowFeaturePremiumModal(true);
+      return;
+    }
+    // For premium users, open share modal which shows analytics
+    handleShare();
+  };
+
+  // Handler for Tailor for Job feature
+  const handleTailorForJob = () => {
+    if (!currentResumeId) {
+      toast.error(t('wizard.steps.final.errors.noResumeId'));
+      return;
+    }
+    navigate(`/job-tailoring/${currentResumeId}`);
+  };
+
+  // Handler for Rescore feature
+  const handleRescore = async () => {
+    if (!isPremium) {
+      setPremiumFeature('rescore');
+      setShowFeaturePremiumModal(true);
+      return;
+    }
+
+    if (!currentResumeId) {
+      toast.error(t('wizard.steps.final.errors.noResumeId'));
+      return;
+    }
+
+    try {
+      setRescoringResume(true);
+      toast.loading(t('dashboard.actions.rescoring') || 'Rescoring...', { id: 'rescore' });
+      
+      await resumeScoringService.scoreResume(currentResumeId);
+      
+      toast.success(t('dashboard.actions.rescoreSuccess') || 'Resume rescored!', { id: 'rescore' });
+    } catch (error) {
+      console.error('Error rescoring resume:', error);
+      toast.error(t('dashboard.actions.rescoreError') || 'Error rescoring resume', { id: 'rescore' });
+    } finally {
+      setRescoringResume(false);
+    }
+  };
+
+  // Handler for Enhance with AI feature
+  const handleEnhance = () => {
+    if (!isPremium) {
+      setPremiumFeature('enhance');
+      setShowFeaturePremiumModal(true);
+      return;
+    }
+    // For premium users, navigate to resume view page with enhancement options
+    if (currentResumeId) {
+      navigate(`/resume/${currentResumeId}`);
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto">
       {/* Header */}
@@ -544,111 +619,109 @@ export function Step10Final() {
         )}
       </div>
 
-      {/* Action Buttons */}
+      {/* What You Can Do - Unified Features Section */}
       <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
         <div className="text-center mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Acciones Disponibles</h3>
-          <p className="text-gray-600">Edita, descarga, comparte o regenera tu CV</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            {t('wizard.steps.final.features.title')}
+          </h3>
+          <p className="text-gray-600">
+            {t('wizard.steps.final.features.subtitle')}
+          </p>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+        {/* Edit CV Button - Prominent */}
+        <div className="mb-6">
           <button
             onClick={handleEditCV}
-            className="bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center"
+            className="w-full bg-gray-900 hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center"
           >
             <Edit3 className="w-5 h-5 mr-2" />
-            {t('wizard.steps.final.actions.edit')}
+            {t('wizard.steps.final.features.editButton')}
           </button>
-          
-          <button
+        </div>
+
+        {/* Features Grid - 3x2 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Download PDF - Always available */}
+          <FeatureCard
+            icon={Download}
+            title={t('wizard.steps.final.features.cards.download.title')}
+            description={t('wizard.steps.final.features.cards.download.description')}
             onClick={handleDownload}
+            colorScheme="gray"
             disabled={generatingPDF || !selectedTemplate || !generatedResume}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {generatingPDF ? (
-              <>
-                <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
-                Generando PDF...
-              </>
-            ) : (
-              <>
-            <Download className="w-5 h-5 mr-2" />
-            {t('wizard.steps.final.actions.downloadPdf')}
-              </>
-            )}
-          </button>
-          
-          <button
+            loading={generatingPDF}
+          />
+
+          {/* Translate - Premium */}
+          <FeatureCard
+            icon={Globe}
+            title={t('wizard.steps.final.features.cards.translate.title')}
+            description={t('wizard.steps.final.features.cards.translate.description')}
+            onClick={handleTranslate}
+            colorScheme="green"
+            isPremiumFeature={true}
+            isUserPremium={isPremium}
+            disabled={!currentResumeId}
+          />
+
+          {/* Share Resume */}
+          <FeatureCard
+            icon={Share2}
+            title={t('wizard.steps.final.features.cards.share.title')}
+            description={t('wizard.steps.final.features.cards.share.description')}
             onClick={handleShare}
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center"
-          >
-            <Share2 className="w-5 h-5 mr-2" />
-            {t('wizard.steps.final.actions.share')}
-          </button>
-          
-          <button
-            onClick={handleRegenerateCV}
-            className={`font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center ${
-              canUseAIFeatures
-                ? 'bg-purple-600 hover:bg-purple-700 text-white'
-                : 'bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white'
-            }`}
-          >
-            <Sparkles className="w-5 h-5 mr-2" />
-            {canUseAIFeatures ? t('wizard.steps.final.actions.regenerate') : t('dashboard.premiumAction.regenerate.cta')}
-          </button>
-        </div>
-      </div>
+            colorScheme="blue"
+            disabled={!currentResumeId}
+          />
 
-      {/* Translation CTA Section */}
-      {generatedResume && currentResumeId && (
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6 mb-8">
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <div className="flex items-center mb-2">
-                <Globe className="w-6 h-6 text-blue-600 mr-2" />
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {t('resumeTranslation.cta.title')}
-                </h3>
-                {!user?.isPremium && (
-                  <span className="ml-2 px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded">
-                    {t('common.premium')}
-                  </span>
-                )}
-              </div>
-              <p className="text-gray-600 text-sm mb-4">
-                {t('resumeTranslation.cta.description')}
-              </p>
-              <button
-                onClick={() => setShowTranslationModal(true)}
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-              >
-                <Globe className="w-4 h-4 mr-2" />
-                {t('resumeTranslation.cta.button')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          {/* Track Views - Premium */}
+          <FeatureCard
+            icon={Eye}
+            title={t('wizard.steps.final.features.cards.trackViews.title')}
+            description={t('wizard.steps.final.features.cards.trackViews.description')}
+            onClick={handleTrackViews}
+            colorScheme="blue"
+            isPremiumFeature={true}
+            isUserPremium={isPremium}
+            disabled={!currentResumeId}
+          />
 
-      {/* Next Steps */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6 mb-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">{t('wizard.steps.final.nextSteps.title')}</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="text-center">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <Share2 className="w-6 h-6 text-blue-600" />
-            </div>
-            <h4 className="font-semibold text-gray-900 mb-2">{t('wizard.steps.final.nextSteps.share.title')}</h4>
-            <p className="text-gray-600 text-sm">{t('wizard.steps.final.nextSteps.share.description')}</p>
-          </div>
-          <div className="text-center">
-            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <RefreshCw className="w-6 h-6 text-purple-600" />
-            </div>
-            <h4 className="font-semibold text-gray-900 mb-2">{t('wizard.steps.final.nextSteps.update.title')}</h4>
-            <p className="text-gray-600 text-sm">{t('wizard.steps.final.nextSteps.update.description')}</p>
-          </div>
+          {/* Tailor for Job */}
+          <FeatureCard
+            icon={Target}
+            title={t('wizard.steps.final.features.cards.tailor.title')}
+            description={t('wizard.steps.final.features.cards.tailor.description')}
+            onClick={handleTailorForJob}
+            colorScheme="orange"
+            disabled={!currentResumeId}
+          />
+
+          {/* Rescore - Premium */}
+          <FeatureCard
+            icon={BarChart3}
+            title={t('wizard.steps.final.features.cards.rescore.title')}
+            description={t('wizard.steps.final.features.cards.rescore.description')}
+            onClick={handleRescore}
+            colorScheme="indigo"
+            isPremiumFeature={true}
+            isUserPremium={isPremium}
+            disabled={!currentResumeId}
+            loading={rescoringResume}
+          />
+
+          {/* Enhance with AI - Premium */}
+          <FeatureCard
+            icon={Sparkles}
+            title={t('wizard.steps.final.features.cards.enhance.title')}
+            description={t('wizard.steps.final.features.cards.enhance.description')}
+            onClick={handleEnhance}
+            colorScheme="purple"
+            isPremiumFeature={true}
+            isUserPremium={isPremium}
+            disabled={!currentResumeId}
+          />
         </div>
       </div>
 
@@ -711,12 +784,133 @@ export function Step10Final() {
         </>
       )}
 
-      {/* Premium Action Modal for regenerate */}
+      {/* Premium Action Modal for features */}
       <PremiumActionModal
-        isOpen={showRegeneratePremiumModal}
-        onClose={() => setShowRegeneratePremiumModal(false)}
-        feature="regenerate"
+        isOpen={showFeaturePremiumModal}
+        onClose={() => setShowFeaturePremiumModal(false)}
+        feature={premiumFeature}
       />
     </div>
+  );
+}
+
+// Feature Card Component
+interface FeatureCardProps {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  onClick: () => void;
+  colorScheme: 'gray' | 'green' | 'blue' | 'orange' | 'indigo' | 'purple';
+  isPremiumFeature?: boolean;
+  isUserPremium?: boolean;
+  disabled?: boolean;
+  loading?: boolean;
+}
+
+const colorSchemes = {
+  gray: {
+    bg: 'bg-gray-50',
+    hoverBg: 'hover:bg-gray-100',
+    iconBg: 'bg-gray-100',
+    iconColor: 'text-gray-600',
+    border: 'border-gray-200',
+    hoverBorder: 'hover:border-gray-300',
+  },
+  green: {
+    bg: 'bg-green-50',
+    hoverBg: 'hover:bg-green-100',
+    iconBg: 'bg-green-100',
+    iconColor: 'text-green-600',
+    border: 'border-green-200',
+    hoverBorder: 'hover:border-green-300',
+  },
+  blue: {
+    bg: 'bg-blue-50',
+    hoverBg: 'hover:bg-blue-100',
+    iconBg: 'bg-blue-100',
+    iconColor: 'text-blue-600',
+    border: 'border-blue-200',
+    hoverBorder: 'hover:border-blue-300',
+  },
+  orange: {
+    bg: 'bg-orange-50',
+    hoverBg: 'hover:bg-orange-100',
+    iconBg: 'bg-orange-100',
+    iconColor: 'text-orange-600',
+    border: 'border-orange-200',
+    hoverBorder: 'hover:border-orange-300',
+  },
+  indigo: {
+    bg: 'bg-indigo-50',
+    hoverBg: 'hover:bg-indigo-100',
+    iconBg: 'bg-indigo-100',
+    iconColor: 'text-indigo-600',
+    border: 'border-indigo-200',
+    hoverBorder: 'hover:border-indigo-300',
+  },
+  purple: {
+    bg: 'bg-purple-50',
+    hoverBg: 'hover:bg-purple-100',
+    iconBg: 'bg-purple-100',
+    iconColor: 'text-purple-600',
+    border: 'border-purple-200',
+    hoverBorder: 'hover:border-purple-300',
+  },
+};
+
+function FeatureCard({
+  icon: Icon,
+  title,
+  description,
+  onClick,
+  colorScheme,
+  isPremiumFeature = false,
+  isUserPremium = false,
+  disabled = false,
+  loading = false,
+}: FeatureCardProps) {
+  const colors = colorSchemes[colorScheme];
+  const showPremiumBadge = isPremiumFeature && !isUserPremium;
+
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled || loading}
+      className={`
+        relative p-4 rounded-xl border transition-all duration-200
+        ${colors.bg} ${colors.border} ${colors.hoverBg} ${colors.hoverBorder}
+        ${disabled || loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:shadow-md'}
+        text-left w-full
+      `}
+    >
+      {/* Premium Badge */}
+      {showPremiumBadge && (
+        <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-amber-400 to-yellow-500 text-white text-xs font-semibold rounded-full">
+          <Crown className="w-3 h-3" />
+          <span>Premium</span>
+        </div>
+      )}
+
+      <div className="flex items-start gap-3">
+        {/* Icon */}
+        <div className={`flex-shrink-0 w-10 h-10 ${colors.iconBg} rounded-lg flex items-center justify-center`}>
+          {loading ? (
+            <RefreshCw className={`w-5 h-5 ${colors.iconColor} animate-spin`} />
+          ) : (
+            <Icon className={`w-5 h-5 ${colors.iconColor}`} />
+          )}
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <h4 className="font-semibold text-gray-900 text-sm mb-1">
+            {title}
+          </h4>
+          <p className="text-gray-600 text-xs leading-relaxed">
+            {description}
+          </p>
+        </div>
+      </div>
+    </button>
   );
 }

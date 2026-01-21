@@ -43,8 +43,21 @@ export function DashboardPage() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [selectedResumeForSharing, setSelectedResumeForSharing] = useState<Resume | null>(null);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
-  const [premiumFeature, setPremiumFeature] = useState<'enhance' | 'rescore' | 'edit'>('enhance');
+  const [premiumFeature, setPremiumFeature] = useState<'enhance' | 'rescore' | 'edit' | 'createResume'>('enhance');
   const [rescoringResumeId, setRescoringResumeId] = useState<string | null>(null);
+
+  // Check if user can create new resume (premium OR free user who hasn't used their quota)
+  const canCreateResume = user?.isPremium || !user?.freeResumeUsed;
+
+  // Handler for creating new resume from empty state
+  const handleCreateResumeFromEmptyState = () => {
+    if (canCreateResume) {
+      navigate('/wizard');
+    } else {
+      setPremiumFeature('createResume');
+      setShowPremiumModal(true);
+    }
+  };
   
   // Rate limit modal state
   const [showRateLimitModal, setShowRateLimitModal] = useState(false);
@@ -273,11 +286,17 @@ export function DashboardPage() {
 
             <div className="space-y-4">
               <button
-                onClick={() => navigate('/wizard')}
-                className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                onClick={handleCreateResumeFromEmptyState}
+                className={`inline-flex items-center gap-3 px-8 py-4 text-white text-lg font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 ${
+                  canCreateResume 
+                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700' 
+                    : 'bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700'
+                }`}
               >
                 <Plus className="w-6 h-6" />
-                {t('dashboard.emptyState.createButton')}
+                {canCreateResume 
+                  ? t('dashboard.emptyState.createButton') 
+                  : t('dashboard.premiumAction.createResume.cta') || 'Upgrade to Create More'}
               </button>
               
               <div className="flex items-center justify-center gap-8 text-sm text-gray-500">
@@ -324,6 +343,13 @@ export function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Premium Modal for free users who have used their quota */}
+        <PremiumActionModal
+          isOpen={showPremiumModal}
+          onClose={() => setShowPremiumModal(false)}
+          feature="createResume"
+        />
       </div>
     );
   }

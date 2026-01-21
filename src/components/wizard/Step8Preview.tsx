@@ -111,7 +111,14 @@ export function Step8Preview() {
           toast.success('¡CV generado y analizado exitosamente!');
         } catch (error: any) {
           console.error('Error generating CV:', error);
-          // Check for limit errors
+          // Check for premium required error (from API protection)
+          if (error?.code === 'PREMIUM_REQUIRED') {
+            setLimitReached(true);
+            setPremiumFeature('regenerate');
+            setShowPremiumModal(true);
+            return;
+          }
+          // Check for limit errors (legacy format)
           if (error?.response?.data?.error === 'Free resume limit reached' || 
               error?.response?.data?.error === 'Monthly limit reached') {
             setLimitReached(true);

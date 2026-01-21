@@ -88,7 +88,7 @@ export interface ResumeData {
     lastName: string;
     country: string;
     linkedin: string;
-    language: 'es' | 'en';
+    language: 'en' | 'es' | 'zh' | 'hi' | 'fr' | 'ar' | 'bn' | 'pt' | 'ru' | 'ja';
     targetLevel: 'entry' | 'mid' | 'senior' | 'executive';
     profession: string;
     tone: 'professional' | 'creative' | 'technical' | 'friendly';
@@ -301,6 +301,7 @@ export interface ResumeScore {
     keywordAnalysis?: KeywordAnalysisData;
     strengths: string[];
     improvements: string[];
+    improvementHints?: string[];
     generatedAt: string;
     scoringVersion: string;
     aiProvider?: string;

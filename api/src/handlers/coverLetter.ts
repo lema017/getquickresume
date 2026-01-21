@@ -22,6 +22,7 @@ import {
 } from '../services/coverLetterService';
 import { checkRateLimit } from '../middleware/rateLimiter';
 import { SECURITY_PREAMBLE } from '../utils/inputSanitizer';
+import { getAIConfigForUser } from '../utils/aiProviderSelector';
 
 // CORS headers for all responses
 const corsHeaders = {
@@ -167,9 +168,9 @@ IMPORTANT:
 };
 
 // Call Groq API for cover letter generation
-const callGroqForCoverLetter = async (prompt: string): Promise<string> => {
+const callGroqForCoverLetter = async (prompt: string, isPremium: boolean): Promise<string> => {
   const groqApiKey = process.env.GROQ_API_KEY || '';
-  const groqModel = 'llama-3.3-70b-versatile'; // Use more capable model for cover letter generation
+  const { model: groqModel } = getAIConfigForUser(isPremium);
 
   const requestBody = {
     model: groqModel,
@@ -255,11 +256,11 @@ const generateFallbackParagraphs = (data: CoverLetterData): CoverLetterParagraph
 };
 
 // Main AI-powered generation function
-const generateCoverLetterWithAI = async (data: CoverLetterData): Promise<GeneratedCoverLetter> => {
+const generateCoverLetterWithAI = async (data: CoverLetterData, isPremium: boolean): Promise<GeneratedCoverLetter> => {
   const prompt = buildCoverLetterPrompt(data);
-  console.log('Generating cover letter with AI, tone:', data.tone, 'length:', data.length);
+  console.log('Generating cover letter with AI, tone:', data.tone, 'length:', data.length, 'isPremium:', isPremium);
   
-  const aiResponse = await callGroqForCoverLetter(prompt);
+  const aiResponse = await callGroqForCoverLetter(prompt, isPremium);
   const paragraphs = parseAICoverLetterResponse(aiResponse, data);
   
   const now = new Date().toISOString();
@@ -406,7 +407,7 @@ export const generateCoverLetterHandler = async (
     }
 
     // Generate cover letter content with AI
-    const generatedContent = await generateCoverLetterWithAI(requestBody.data);
+    const generatedContent = await generateCoverLetterWithAI(requestBody.data, user.isPremium);
 
     // Update with generated content
     await updateCoverLetterWithGenerated(userId, savedCoverLetter.id, generatedContent);
@@ -501,7 +502,7 @@ export const regenerateParagraphHandler = async (
     let newContent: string;
     
     try {
-      newContent = await callGroqForCoverLetter(prompt);
+      newContent = await callGroqForCoverLetter(prompt, user.isPremium);
       // Clean up the response - remove any quotes or extra formatting
       newContent = newContent.trim().replace(/^["']|["']$/g, '');
     } catch (aiError) {

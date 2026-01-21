@@ -401,12 +401,14 @@ Respond with ONLY valid JSON in this exact format:
     
     const data = await response.json();
     
+    // Extract usage data including Groq prompt caching info
     return {
       content: data.choices[0]?.message?.content || '{}',
       usage: {
         promptTokens: data.usage?.prompt_tokens || 0,
         completionTokens: data.usage?.completion_tokens || 0,
         totalTokens: data.usage?.total_tokens || 0,
+        cachedTokens: data.usage?.prompt_tokens_details?.cached_tokens || 0,
       },
     };
   }

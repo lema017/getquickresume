@@ -17,8 +17,9 @@ export function LanguagesSection({ languages }: LanguagesSectionProps) {
   const normalizeProficiencyLevel = (level: string): string => {
     const normalized = level.toLowerCase().trim();
     
-    // Map Spanish values to English keys
-    const spanishToEnglish: Record<string, string> = {
+    // Map non-English values to English keys
+    const toEnglish: Record<string, string> = {
+      // Spanish
       'nativo': 'native',
       'nativa': 'native',
       'avanzado': 'advanced',
@@ -32,15 +33,56 @@ export function LanguagesSection({ languages }: LanguagesSectionProps) {
       'basica': 'basic',
       'fluido': 'fluent',
       'fluida': 'fluent',
+      // Russian/Cyrillic
+      'родной': 'native',
+      'родная': 'native',
+      'свободно': 'fluent',
+      'свободный': 'fluent',
+      'продвинутый': 'advanced',
+      'средний': 'intermediate',
+      'сред': 'intermediate',
+      'сре': 'intermediate',
+      'начинающий': 'beginner',
+      'базовый': 'basic',
+      'начальный': 'basic',
+      // Portuguese
+      'nativo': 'native',
+      'fluente': 'fluent',
+      'avançado': 'advanced',
+      'intermediário': 'intermediate',
+      'iniciante': 'beginner',
+      'básico': 'basic',
+      // French
+      'natif': 'native',
+      'native': 'native',
+      'courant': 'fluent',
+      'avancé': 'advanced',
+      'intermédiaire': 'intermediate',
+      'débutant': 'beginner',
+      'basique': 'basic',
+      // German
+      'muttersprache': 'native',
+      'fließend': 'fluent',
+      'fortgeschritten': 'advanced',
+      'mittelstufe': 'intermediate',
+      'anfänger': 'beginner',
+      'grundkenntnisse': 'basic',
     };
     
     // Return mapped value or original if already in English
-    return spanishToEnglish[normalized] || normalized;
+    return toEnglish[normalized] || normalized;
   };
 
   const getProficiencyLabel = (level: string) => {
     const normalizedLevel = normalizeProficiencyLevel(level);
-    return t(`resumeView.metadata.proficiency.${normalizedLevel}`);
+    const validLevels = ['native', 'fluent', 'advanced', 'intermediate', 'beginner', 'basic'];
+    
+    // If the normalized level is valid, use translation; otherwise return the original level
+    if (validLevels.includes(normalizedLevel)) {
+      return t(`resumeView.metadata.proficiency.${normalizedLevel}`);
+    }
+    // Fallback: return the original level capitalized
+    return level.charAt(0).toUpperCase() + level.slice(1);
   };
 
   const getProficiencyColor = (level: string) => {

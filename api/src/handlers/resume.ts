@@ -130,7 +130,8 @@ export const generateResume = async (
           body: JSON.stringify({
             success: false,
             error: 'Free resume limit reached',
-            message: 'You have already used your free resume. Please upgrade to premium to generate more resumes.'
+            message: 'You have already used your free resume. Please upgrade to premium to generate more resumes.',
+            code: 'PREMIUM_REQUIRED'
           })
         };
       }

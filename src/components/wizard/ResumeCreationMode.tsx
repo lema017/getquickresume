@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { useAuthStore } from '@/stores/authStore';
+import { PremiumActionModal } from '@/components/PremiumActionModal';
 import { 
   FileText, 
   Upload, 
@@ -23,6 +24,10 @@ export function ResumeCreationMode() {
   const { navigateToStep, navigateToWizardPath } = useWizardNavigation();
   const { resetResume } = useResumeStore();
   const { user } = useAuthStore();
+  
+  // Check if user can create new resume (premium OR free user who hasn't used their quota)
+  const canCreateResume = user?.isPremium || !user?.freeResumeUsed;
+  const [showBlockedModal, setShowBlockedModal] = useState(false);
 
   useEffect(() => {
     // Clear wizard data and localStorage when entering creation mode
@@ -30,6 +35,13 @@ export function ResumeCreationMode() {
     localStorage.removeItem('resume_wizard_v1');
     localStorage.removeItem('generated-resume');
   }, [resetResume]);
+
+  // Show blocking modal if free user has already used their quota
+  useEffect(() => {
+    if (!canCreateResume) {
+      setShowBlockedModal(true);
+    }
+  }, [canCreateResume]);
 
   const handleManualCreation = () => {
     navigateToStep(1);
@@ -261,6 +273,16 @@ export function ResumeCreationMode() {
           </div>
         </div>
 
+        {/* Blocking Modal for free users who have used their quota */}
+        <PremiumActionModal
+          isOpen={showBlockedModal}
+          onClose={() => {
+            setShowBlockedModal(false);
+            // Redirect to dashboard when closing the modal since they can't create
+            navigate('/dashboard');
+          }}
+          feature="createResume"
+        />
       </div>
     </div>
   );

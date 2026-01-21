@@ -6,6 +6,7 @@ import { Resume } from '@/types';
 import { IconWrapper } from '../IconWrapper';
 import { useAuthStore } from '@/stores/authStore';
 import { PremiumActionModal } from '../PremiumActionModal';
+import { SUPPORTED_LANGUAGES } from '@/services/resumeTranslationService';
 
 // Helper function to get score color based on value
 const getScoreColor = (score: number): string => {
@@ -17,7 +18,33 @@ const getScoreColor = (score: number): string => {
 
 // Helper function to get language label with flag
 const getLanguageLabel = (lang: string): string => {
-  return lang === 'es' ? '🇪🇸 Español' : '🇺🇸 English';
+  const language = SUPPORTED_LANGUAGES.find(l => l.code === lang);
+  return language ? `${language.flag} ${language.name}` : '🇺🇸 English';
+};
+
+// Helper function to normalize target level for translation
+const normalizeTargetLevel = (level: string): string => {
+  const validLevels = ['entry', 'mid', 'senior', 'executive'];
+  const levelMap: Record<string, string> = {
+    'junior': 'entry',
+    'junior level': 'entry',
+    'entry level': 'entry',
+    'entry-level': 'entry',
+    'mid level': 'mid',
+    'mid-level': 'mid',
+    'middle': 'mid',
+    'senior level': 'senior',
+    'senior-level': 'senior',
+    'lead': 'senior',
+    'principal': 'executive',
+    'director': 'executive',
+    'manager': 'senior',
+    'c-level': 'executive',
+    'vp': 'executive',
+  };
+  
+  const normalizedLevel = levelMap[level.toLowerCase()] || level;
+  return validLevels.includes(normalizedLevel) ? normalizedLevel : null as any;
 };
 
 interface ResumeCardProps {
@@ -251,7 +278,11 @@ export const ResumeCard = memo(function ResumeCard({
             </div>
             <div className="flex justify-between">
               <span>{t('resumeCard.info.experience')}</span>
-              <span className="font-medium">{t(`resumeView.metadata.targetLevel.${resume.resumeData.targetLevel}`)}</span>
+              <span className="font-medium">
+                {normalizeTargetLevel(resume.resumeData.targetLevel)
+                  ? t(`resumeView.metadata.targetLevel.${normalizeTargetLevel(resume.resumeData.targetLevel)}`)
+                  : resume.resumeData.targetLevel.charAt(0).toUpperCase() + resume.resumeData.targetLevel.slice(1)}
+              </span>
             </div>
             <div className="flex justify-between">
               <span>{t('resumeCard.info.experiences')}</span>

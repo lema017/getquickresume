@@ -103,7 +103,7 @@ export interface ResumeData {
   lastName: string;
   country: string;
   linkedin: string;
-  language: 'es' | 'en';
+  language: 'en' | 'es' | 'zh' | 'hi' | 'fr' | 'ar' | 'bn' | 'pt' | 'ru' | 'ja';
   targetLevel: 'entry' | 'mid' | 'senior' | 'executive';
   profession: string;
   tone: 'professional' | 'creative' | 'technical' | 'friendly';
@@ -361,6 +361,7 @@ export interface ResumeScore {
   
   strengths: string[];  // Auto-generated from completed items
   improvements: string[];  // Auto-generated from incomplete items (prioritized)
+  improvementHints?: string[];  // High-level hints for free users (vague, no specific details)
   
   generatedAt: string;
   scoringVersion: string;  // Version of scoring algorithm

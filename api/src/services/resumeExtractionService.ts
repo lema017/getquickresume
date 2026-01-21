@@ -112,7 +112,6 @@ export interface ExtractionResult {
 // ============================================================================
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
-const GROQ_MODEL = 'llama-3.3-70b-versatile';
 const MAX_TEXT_LENGTH = 50000; // 50k characters max
 
 // ============================================================================
@@ -310,12 +309,12 @@ Return the JSON object now:`;
   /**
    * Call Groq API for extraction
    */
-  private async callGroqAPI(prompt: string): Promise<AIResponse> {
+  private async callGroqAPI(prompt: string, model: string): Promise<AIResponse> {
     const apiStartTime = Date.now();
     const promptLength = prompt.length;
     
     console.log('[ResumeExtractionService] Calling Groq API', {
-      model: GROQ_MODEL,
+      model,
       promptLength,
       hasApiKey: !!GROQ_API_KEY,
     });
@@ -328,7 +327,7 @@ Return the JSON object now:`;
           'Authorization': `Bearer ${GROQ_API_KEY}`,
         },
         body: JSON.stringify({
-          model: GROQ_MODEL,
+          model,
           messages: [
             {
               role: 'system',
@@ -360,16 +359,19 @@ Return the JSON object now:`;
 
       const data = await response.json();
       const contentLength = data.choices[0]?.message?.content?.length || 0;
+      // Extract usage data including Groq prompt caching info
       const usage = {
         promptTokens: data.usage?.prompt_tokens || 0,
         completionTokens: data.usage?.completion_tokens || 0,
-        totalTokens: data.usage?.total_tokens || 0
+        totalTokens: data.usage?.total_tokens || 0,
+        cachedTokens: data.usage?.prompt_tokens_details?.cached_tokens || 0
       };
 
       console.log('[ResumeExtractionService] Groq API response received', {
         status: response.status,
         contentLength,
         usage,
+        cachedTokens: usage.cachedTokens,
         apiDurationMs: apiDuration,
         hasContent: !!data.choices[0]?.message?.content,
       });
@@ -659,14 +661,14 @@ Return the JSON object now:`;
         isPremium,
       });
       
-      // Call Groq API (using Groq for all extraction as it's more cost-effective)
-      const aiResponse = await this.callGroqAPI(prompt);
+      // Call Groq API with user-appropriate model
+      const aiResponse = await this.callGroqAPI(prompt, model);
       
       console.log('[ResumeExtractionService] AI usage tracking', {
         userId,
         endpoint: 'resumeExtraction',
         provider: 'groq',
-        model: GROQ_MODEL,
+        model,
         usage: aiResponse.usage,
         isPremium,
       });
@@ -676,7 +678,7 @@ Return the JSON object now:`;
         userId,
         endpoint: 'resumeExtraction',
         provider: 'groq',
-        model: GROQ_MODEL,
+        model,
         usage: aiResponse.usage,
         isPremium
       });

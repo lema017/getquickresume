@@ -10,6 +10,7 @@ import { checkRateLimit } from '../middleware/rateLimiter';
 import { getUserById } from '../services/dynamodb';
 import { SECURITY_PREAMBLE, sanitizeForPrompt } from '../utils/inputSanitizer';
 import { trackAIUsage } from '../services/aiUsageService';
+import { getAIConfigForUser } from '../utils/aiProviderSelector';
 
 // ============================================================================
 // Types
@@ -52,7 +53,6 @@ const CORS_HEADERS = {
 };
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
-const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
 // Rate limits: Premium users get more requests
 const RATE_LIMITS = {
@@ -188,7 +188,7 @@ Rules:
 /**
  * Call Groq API for validation
  */
-async function callGroqAPI(prompt: string): Promise<{ content: string; usage: any }> {
+async function callGroqAPI(prompt: string, model: string): Promise<{ content: string; usage: any }> {
   const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -196,7 +196,7 @@ async function callGroqAPI(prompt: string): Promise<{ content: string; usage: an
       'Authorization': `Bearer ${GROQ_API_KEY}`,
     },
     body: JSON.stringify({
-      model: GROQ_MODEL,
+      model,
       messages: [
         {
           role: 'system',
@@ -223,12 +223,14 @@ async function callGroqAPI(prompt: string): Promise<{ content: string; usage: an
   }
 
   const data = await response.json();
+  // Extract usage data including Groq prompt caching info
   return {
     content: data.choices[0]?.message?.content || '',
     usage: {
       promptTokens: data.usage?.prompt_tokens || 0,
       completionTokens: data.usage?.completion_tokens || 0,
-      totalTokens: data.usage?.total_tokens || 0
+      totalTokens: data.usage?.total_tokens || 0,
+      cachedTokens: data.usage?.prompt_tokens_details?.cached_tokens || 0
     }
   };
 }
@@ -390,14 +392,17 @@ export const validateSection = async (
     // ========================================================================
     const prompt = buildValidationPrompt(section, data);
     
-    const aiResponse = await callGroqAPI(prompt);
+    // Get AI config based on user premium status
+    const { model } = getAIConfigForUser(user.isPremium);
+    
+    const aiResponse = await callGroqAPI(prompt, model);
 
     // Track AI usage
     await trackAIUsage({
       userId,
       endpoint: 'validate-section',
       provider: 'groq',
-      model: GROQ_MODEL,
+      model,
       usage: aiResponse.usage,
       isPremium: user.isPremium
     });

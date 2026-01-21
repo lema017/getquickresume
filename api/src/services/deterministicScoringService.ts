@@ -634,7 +634,7 @@ class DeterministicScoringService {
       // Add specific completed required items
       for (const item of section.items) {
         if (item.isCompleted && item.priority === 'required') {
-          strengths.push(`✓ ${item.label}: ${item.details || item.description}`);
+          strengths.push(`${item.label}: ${item.details || item.description}`);
         }
       }
     }

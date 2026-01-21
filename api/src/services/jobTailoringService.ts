@@ -92,14 +92,24 @@ const DEFAULT_SYSTEM_MESSAGE = 'You are an expert ATS optimization specialist, c
 
 async function callGroqWithUsage(
   prompt: string,
-  options: { temperature?: number; max_tokens?: number; responseFormatJson?: boolean; systemMessage?: string; model?: string } = {}
+  options: { 
+    temperature?: number; 
+    max_tokens?: number; 
+    responseFormatJson?: boolean; 
+    systemMessage?: string; 
+    model?: string 
+  } = {}
 ): Promise<AIResponse> {
+  // Use custom system message if provided (for prompt caching optimization)
+  // Groq caches prefixes across requests with matching message arrays
+  const systemContent = options.systemMessage || DEFAULT_SYSTEM_MESSAGE;
+  
   const requestBody: any = {
     model: options.model || GROQ_MODEL,
     messages: [
       {
         role: 'system',
-        content: options.systemMessage || DEFAULT_SYSTEM_MESSAGE
+        content: systemContent
       },
       {
         role: 'user',
@@ -143,10 +153,12 @@ async function callGroqWithUsage(
   const data = await response.json() as any;
   const content = data.choices[0]?.message?.content || '';
   
+  // Extract usage data including Groq prompt caching info
   const usage: TokenUsage = {
     promptTokens: data.usage?.prompt_tokens || 0,
     completionTokens: data.usage?.completion_tokens || 0,
-    totalTokens: data.usage?.total_tokens || 0
+    totalTokens: data.usage?.total_tokens || 0,
+    cachedTokens: data.usage?.prompt_tokens_details?.cached_tokens || 0
   };
 
   if (!content || content.trim().length === 0) {
@@ -280,7 +292,7 @@ export async function extractJobFromUrl(
 
   // 4. Use Groq AI to extract job posting data
   const prompt = buildUrlExtractionPrompt(cleanHtml, url);
-  const EXTRACTION_MODEL = 'llama-3.3-70b-versatile'; // More capable model for JSON extraction from messy HTML
+  const extractionModel = getGroqModelForUser(isPremium); // Use appropriate model based on user premium status
   
   // Helper function to process AI response
   const processExtractionResponse = (content: string): {
@@ -305,12 +317,12 @@ export async function extractJobFromUrl(
   let usedFallback = false;
 
   try {
-    // First attempt: JSON mode with llama-3.3-70b-versatile
+    // First attempt: JSON mode with user-appropriate model
     aiResponse = await callGroqWithUsage(prompt, {
       temperature: 0.1,
       max_tokens: 2000,
       responseFormatJson: true,
-      model: EXTRACTION_MODEL,
+      model: extractionModel,
       systemMessage: 'You are a job posting data extraction assistant. You analyze webpage content and extract structured job posting information. Always respond with valid JSON only.'
     });
   } catch (jsonModeError) {
@@ -323,7 +335,7 @@ export async function extractJobFromUrl(
         temperature: 0.1,
         max_tokens: 2000,
         responseFormatJson: false, // No JSON mode
-        model: EXTRACTION_MODEL,
+        model: extractionModel,
         systemMessage: 'You are a job posting data extraction assistant. Extract job information and respond with valid JSON only. No markdown, no explanation, just the JSON object.'
       });
     } catch (fallbackError) {
@@ -346,7 +358,7 @@ export async function extractJobFromUrl(
       userId,
       endpoint: 'jobUrlExtraction',
       provider: 'groq',
-      model: EXTRACTION_MODEL,
+      model: extractionModel,
       usage: aiResponse.usage,
       isPremium
     });

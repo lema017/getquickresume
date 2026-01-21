@@ -102,6 +102,7 @@ export function ResumeExtractionReview() {
   const [fieldErrors, setFieldErrors] = useState<{
     profile: string[];
     education: number[];
+    educationEndDate: number[];
     educationDateRange: number[];
     experience: number[];
     experienceCompany: number[];
@@ -109,7 +110,7 @@ export function ResumeExtractionReview() {
     experienceEndDate: number[];
     certifications: number[];
     achievementDescription: number[];
-  }>({ profile: [], education: [], educationDateRange: [], experience: [], experienceCompany: [], experienceStartDate: [], experienceEndDate: [], certifications: [], achievementDescription: [] });
+  }>({ profile: [], education: [], educationEndDate: [], educationDateRange: [], experience: [], experienceCompany: [], experienceStartDate: [], experienceEndDate: [], certifications: [], achievementDescription: [] });
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     profile: true,
     summary: true,
@@ -174,6 +175,7 @@ export function ResumeExtractionReview() {
     const errors: string[] = [];
     const profileErrorFields: string[] = [];
     const educationErrorIndices: number[] = [];
+    const educationEndDateErrors: number[] = [];
     const educationDateRangeErrors: number[] = [];
     const experienceErrorIndices: number[] = [];
     const experienceCompanyErrors: number[] = [];
@@ -221,7 +223,7 @@ export function ResumeExtractionReview() {
       // Validate end date is required when not currently studying (isCompleted=true OR isCurrentlyStudying=false)
       if (!isCurrentlyStudying && !edu.endDate?.trim()) {
         errors.push(t('wizard.uploadPage.review.validation.educationEndDate', { index: idx + 1, defaultValue: `Education #${idx + 1}: End date is required` }));
-        educationErrorIndices.push(idx);
+        educationEndDateErrors.push(idx);
       }
       // Validate education date range (end date must be >= start date)
       if (!isCurrentlyStudying && edu.startDate && edu.endDate) {
@@ -280,6 +282,7 @@ export function ResumeExtractionReview() {
     setFieldErrors({
       profile: profileErrorFields,
       education: educationErrorIndices,
+      educationEndDate: educationEndDateErrors,
       educationDateRange: educationDateRangeErrors,
       experience: experienceErrorIndices,
       experienceCompany: experienceCompanyErrors,
@@ -292,12 +295,13 @@ export function ResumeExtractionReview() {
     // Auto-expand sections with errors
     const hasExperienceErrors = experienceErrorIndices.length > 0 || experienceCompanyErrors.length > 0 || experienceStartDateErrors.length > 0 || experienceEndDateErrors.length > 0;
     const hasAchievementErrors = achievementDescriptionErrors.length > 0;
+    const hasEducationErrors = educationErrorIndices.length > 0 || educationEndDateErrors.length > 0 || educationDateRangeErrors.length > 0;
     
-    if (profileErrorFields.length > 0 || educationErrorIndices.length > 0 || educationDateRangeErrors.length > 0 || hasExperienceErrors || certificationErrorIndices.length > 0 || hasAchievementErrors) {
+    if (profileErrorFields.length > 0 || hasEducationErrors || hasExperienceErrors || certificationErrorIndices.length > 0 || hasAchievementErrors) {
       setExpandedSections(prev => ({
         ...prev,
         ...(profileErrorFields.length > 0 && { profile: true }),
-        ...((educationErrorIndices.length > 0 || educationDateRangeErrors.length > 0) && { education: true }),
+        ...(hasEducationErrors && { education: true }),
         ...(hasExperienceErrors && { experience: true }),
         ...(certificationErrorIndices.length > 0 && { certifications: true }),
         ...(hasAchievementErrors && { achievements: true }),
@@ -1217,21 +1221,27 @@ export function ResumeExtractionReview() {
                             )}
                           </div>
                           <div>
-                            <label className={`block text-sm font-medium mb-1 ${fieldErrors.educationDateRange.includes(idx) ? 'text-red-600' : 'text-gray-700'}`}>
-                              {t('wizard.uploadPage.review.fields.endDate')}
+                            <label className={`block text-sm font-medium mb-1 ${(fieldErrors.educationEndDate.includes(idx) || fieldErrors.educationDateRange.includes(idx)) ? 'text-red-600' : 'text-gray-700'}`}>
+                              {t('wizard.uploadPage.review.fields.endDate')} {!edu.isCurrentlyStudying && '*'}
                             </label>
                             <YearPicker
                               value={edu.isCurrentlyStudying ? '' : (edu.endDate || '')}
                               onChange={(value) => {
                                 updateEducation(idx, { endDate: value });
+                                if (fieldErrors.educationEndDate.includes(idx)) {
+                                  setFieldErrors(prev => ({ ...prev, educationEndDate: prev.educationEndDate.filter(i => i !== idx) }));
+                                }
                                 if (fieldErrors.educationDateRange.includes(idx)) {
                                   setFieldErrors(prev => ({ ...prev, educationDateRange: prev.educationDateRange.filter(i => i !== idx) }));
                                 }
                               }}
                               disabled={edu.isCurrentlyStudying}
-                              error={fieldErrors.educationDateRange.includes(idx)}
+                              error={fieldErrors.educationEndDate.includes(idx) || fieldErrors.educationDateRange.includes(idx)}
                             />
-                            {fieldErrors.educationDateRange.includes(idx) && (
+                            {fieldErrors.educationEndDate.includes(idx) && (
+                              <p className="mt-1 text-sm text-red-600">{t('validation.required')}</p>
+                            )}
+                            {fieldErrors.educationDateRange.includes(idx) && !fieldErrors.educationEndDate.includes(idx) && (
                               <p className="mt-1 text-sm text-red-600">{t('wizard.uploadPage.review.validation.endDateBeforeStart', 'End date must be later than start date')}</p>
                             )}
                           </div>

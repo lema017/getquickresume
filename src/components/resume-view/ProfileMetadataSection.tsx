@@ -17,11 +17,43 @@ export function ProfileMetadataSection({ resumeData }: ProfileMetadataSectionPro
   }
 
   const getTargetLevelLabel = (level: string) => {
-    return t(`resumeView.metadata.targetLevel.${level}`);
+    const validLevels = ['entry', 'mid', 'senior', 'executive'];
+    // Map common alternatives
+    const levelMap: Record<string, string> = {
+      'junior': 'entry',
+      'junior level': 'entry',
+      'entry level': 'entry',
+      'entry-level': 'entry',
+      'mid level': 'mid',
+      'mid-level': 'mid',
+      'middle': 'mid',
+      'senior level': 'senior',
+      'senior-level': 'senior',
+      'lead': 'senior',
+      'principal': 'executive',
+      'director': 'executive',
+      'manager': 'senior',
+      'c-level': 'executive',
+      'vp': 'executive',
+    };
+    
+    const normalizedLevel = levelMap[level.toLowerCase()] || level;
+    
+    if (validLevels.includes(normalizedLevel)) {
+      return t(`resumeView.metadata.targetLevel.${normalizedLevel}`);
+    }
+    // Fallback: return the original level capitalized
+    return level.charAt(0).toUpperCase() + level.slice(1);
   };
 
   const getToneLabel = (toneValue: string) => {
-    return t(`resumeView.metadata.tone.${toneValue}`);
+    const validTones = ['professional', 'creative', 'technical', 'friendly'];
+    
+    if (validTones.includes(toneValue)) {
+      return t(`resumeView.metadata.tone.${toneValue}`);
+    }
+    // Fallback: return the original tone capitalized
+    return toneValue.charAt(0).toUpperCase() + toneValue.slice(1);
   };
 
   const getLanguageLabel = (lang: string) => {

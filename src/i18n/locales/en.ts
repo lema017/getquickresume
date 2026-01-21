@@ -463,6 +463,9 @@ export const en = {
       loadError: 'Error loading resume',
       saveError: 'Error saving resume. Please try again.'
     },
+    errors: {
+      freeQuotaUsed: 'You have already used your free resume. Please upgrade to premium to create more resumes.',
+    },
     uploadPage: {
       header: {
         backToDashboard: 'Back to Dashboard',
@@ -627,6 +630,7 @@ export const en = {
           requiredFields: 'Please complete all required fields',
           fixErrors: 'Please fix the errors below',
           educationStartDate: 'Education #{{index}}: Start Date is required',
+          educationEndDate: 'Education #{{index}}: End Date is required',
           certificationDate: 'Certification #{{index}}: Date Obtained is required',
           experienceCompany: 'Experience #{{index}}: Company is required',
           experienceStartDate: 'Experience #{{index}}: Start Date is required',
@@ -1166,7 +1170,8 @@ export const en = {
             addExperience: 'Add work experience'
           },
           ai: {
-            suggestionsButton: 'AI Suggestions'
+            suggestionsButton: 'AI Suggestions',
+            jobTitleRequired: 'Please enter the job title to get AI suggestions.'
           },
           alerts: {
             invalidDatesTitle: 'Invalid dates',
@@ -1604,7 +1609,46 @@ export const en = {
         nav: {
           back: 'Back',
           goHome: 'Go to Home'
-        }
+        },
+        features: {
+          title: 'What You Can Do',
+          subtitle: 'Powerful tools to maximize your job search success',
+          editButton: 'Edit CV',
+          cards: {
+            download: {
+              title: 'Download PDF',
+              description: 'Save your resume as a PDF file',
+            },
+            translate: {
+              title: 'Translate',
+              description: 'Convert to 12+ languages instantly',
+            },
+            share: {
+              title: 'Share Resume',
+              description: 'Get shareable link & QR code',
+            },
+            trackViews: {
+              title: 'Track Views',
+              description: 'See who viewed your resume',
+            },
+            tailor: {
+              title: 'Tailor for Job',
+              description: 'Optimize for specific job postings',
+            },
+            rescore: {
+              title: 'Rescore',
+              description: 'Get updated ATS compatibility score',
+            },
+            enhance: {
+              title: 'Enhance with AI',
+              description: 'Improve content with AI suggestions',
+            },
+          },
+        },
+        errors: {
+          noResumeId: 'No resume ID found. Please save your resume first.',
+          loadResumeFailed: 'Failed to load resume data.',
+        },
       },
     },
     linkedinImport: {
@@ -2267,6 +2311,16 @@ export const en = {
           smartSuggestions: 'Smart AI-powered improvement suggestions',
           sectionOptimization: 'Optimize any section of your resume',
           unlimitedUse: 'Unlimited AI suggestions',
+        },
+      },
+      createResume: {
+        title: 'Free Resume Limit Reached',
+        description: 'You have already used your one free AI-generated resume. Upgrade to Premium to create unlimited professional resumes.',
+        cta: 'Upgrade to Create More',
+        benefits: {
+          unlimitedResumes: 'Create unlimited professional resumes',
+          allFeatures: 'Access all AI-powered features',
+          unlimitedEdits: 'Edit and regenerate anytime',
         },
       },
       regenerate: {
@@ -3320,12 +3374,58 @@ export const en = {
       cta: 'Get My Score',
     },
 
+    // AI Suggestions Feature
+    aiSuggestions: {
+      cta: 'Unlock AI Suggestions',
+    },
+
+    // Regenerate Feature
+    regenerate: {
+      cta: 'Upgrade to Regenerate',
+    },
+
+    // Create Resume Feature (for free users who have used their quota)
+    createResume: {
+      headline: 'Free Resume Limit Reached',
+      subheadline: 'You have already used your one free AI-generated resume',
+      cta: 'Upgrade for Unlimited Resumes',
+    },
+
     // Default fallback
     default: {
       benefit1: 'Unlimited access to all premium features',
       benefit2: 'AI-powered tools for better results',
       benefit3: 'Priority support when you need help',
       cta: 'Upgrade to Premium',
+    },
+  },
+
+  // Score Card - Free User Section
+  scoreCard: {
+    freeUser: {
+      areasToImprove: 'Areas to Improve',
+      detailsLocked: 'Details locked',
+      fix: 'Fix',
+      scorePotential: 'Your score could reach',
+      withImprovements: 'with improvements',
+      enhanceTitle: 'Enhance Your Resume',
+      enhanceDescription: 'Unlock detailed checklists, AI-powered improvements, and ATS optimization',
+      enhanceButton: 'Enhance My Resume',
+      socialProof: 'Join thousands of job seekers with optimized resumes',
+    },
+    hints: {
+      summaryNeedsAttention: 'Summary could be stronger',
+      experienceNeedsAttention: 'Experience details need attention',
+      skillsNeedEnhancement: 'Skills section could be enhanced',
+      educationIncomplete: 'Education information incomplete',
+      contactMissing: 'Missing key contact information',
+      considerAchievements: 'Consider adding achievements',
+      projectsNeedImprovement: 'Project details could be improved',
+      languagesNeedReview: 'Language information needs review',
+      entriesNeedCorrections: 'Some entries need corrections',
+      atsCouldBeBetter: 'ATS compatibility could be better',
+      multipleAreasNeedWork: 'Multiple areas need improvement',
+      fewSectionsNeedWork: 'A few sections could be enhanced',
     },
   },
 };

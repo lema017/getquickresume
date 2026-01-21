@@ -73,6 +73,7 @@ export interface TokenUsage {
   promptTokens: number;
   completionTokens: number;
   totalTokens: number;
+  cachedTokens?: number; // Groq prompt caching: tokens served from cache (50% cost reduction)
 }
 
 export interface AIResponse {
@@ -119,6 +120,7 @@ export interface AIUsageLog {
   inputTokens: number;
   outputTokens: number;
   totalTokens: number;
+  cachedTokens?: number; // Groq prompt caching: tokens served from cache
   costUSD: number;
   isPremium: boolean;
   ttl?: number;
@@ -159,6 +161,7 @@ export interface ResumeAICost {
 
 /**
  * Calculate cost in USD based on provider, model, and token usage
+ * Groq prompt caching: cached tokens get 50% discount on input cost
  */
 export function calculateCost(
   provider: AIProvider,
@@ -194,7 +197,13 @@ export function calculateCost(
   }
 
   // Calculate cost (prices are per 1M tokens)
-  const inputCost = (usage.promptTokens / 1_000_000) * modelPricing!.input;
+  // Groq prompt caching: cached tokens get 50% discount
+  const cachedTokens = usage.cachedTokens || 0;
+  const nonCachedInputTokens = usage.promptTokens - cachedTokens;
+  
+  // Full price for non-cached input tokens + 50% price for cached tokens
+  const inputCost = ((nonCachedInputTokens / 1_000_000) * modelPricing!.input) + 
+                    ((cachedTokens / 1_000_000) * modelPricing!.input * 0.5);
   const outputCost = (usage.completionTokens / 1_000_000) * modelPricing!.output;
   
   return Number((inputCost + outputCost).toFixed(8));
@@ -239,6 +248,7 @@ export async function logAIUsage(params: {
     inputTokens: usage.promptTokens,
     outputTokens: usage.completionTokens,
     totalTokens: usage.totalTokens,
+    cachedTokens: usage.cachedTokens,
     costUSD,
     isPremium,
     ttl
@@ -259,6 +269,7 @@ export async function logAIUsage(params: {
       provider,
       model,
       tokens: usage.totalTokens,
+      cachedTokens: usage.cachedTokens || 0,
       costUSD,
       isPremium
     });

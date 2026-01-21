@@ -1,9 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useUploadResumeStore } from '@/stores/uploadResumeStore';
 import { useAuthStore } from '@/stores/authStore';
 import { resumeExtractionService } from '@/services/resumeExtractionService';
+import { PremiumActionModal } from '@/components/PremiumActionModal';
 import { 
   Loader2,
   Sparkles,
@@ -17,6 +18,7 @@ export function UploadProcessing() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const hasStartedProcessing = useRef(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
   
   const { 
     extractedText,
@@ -70,8 +72,13 @@ export function UploadProcessing() {
         // Navigate to the review page
         navigate('/wizard/upload/review');
         
-      } catch (err) {
+      } catch (err: any) {
         console.error('AI extraction error:', err);
+        // Check for premium required error (from API protection)
+        if (err?.code === 'PREMIUM_REQUIRED') {
+          setShowPremiumModal(true);
+          return;
+        }
         toast.error(t('wizard.uploadPage.toasts.processError'));
         navigate('/wizard/upload');
       }
@@ -156,6 +163,16 @@ export function UploadProcessing() {
           </div>
         </div>
       </div>
+
+      {/* Premium Modal for free users who have used their quota */}
+      <PremiumActionModal
+        isOpen={showPremiumModal}
+        onClose={() => {
+          setShowPremiumModal(false);
+          navigate('/dashboard');
+        }}
+        feature="createResume"
+      />
     </div>
   );
 }

@@ -1511,12 +1511,16 @@ Improve the text according to the instructions and user-provided context, mainta
         const groqApiKey = process.env.GROQ_API_KEY || '';
         const groqModel = options.model || aiProviderSelector_1.GROQ_FREE_MODEL;
         const maxTokensValue = options.max_tokens || 20000;
+        // Use custom system message if provided (for prompt caching optimization)
+        // Otherwise use default generic message
+        const systemContent = options.systemMessage ||
+            'You are an expert in human resources and professional resume writing. Generate optimized and structured CVs.';
         const requestBody = {
             model: groqModel,
             messages: [
                 {
                     role: 'system',
-                    content: 'You are an expert in human resources and professional resume writing. Generate optimized and structured CVs.'
+                    content: systemContent
                 },
                 {
                     role: 'user',
@@ -1561,11 +1565,12 @@ Improve the text according to the instructions and user-provided context, mainta
         }
         const data = await response.json();
         const content = data.choices[0]?.message?.content || '';
-        // Extract usage data
+        // Extract usage data including Groq prompt caching info
         const usage = {
             promptTokens: data.usage?.prompt_tokens || 0,
             completionTokens: data.usage?.completion_tokens || 0,
-            totalTokens: data.usage?.total_tokens || 0
+            totalTokens: data.usage?.total_tokens || 0,
+            cachedTokens: data.usage?.prompt_tokens_details?.cached_tokens || 0
         };
         // Log response details for debugging
         console.log('Groq API response details:', {
@@ -1573,6 +1578,7 @@ Improve the text according to the instructions and user-provided context, mainta
             responseLength: content.length,
             finishReason: data.choices[0]?.finish_reason,
             usage,
+            cachedTokens: usage.cachedTokens,
             hasContent: !!content
         });
         if (!content || content.trim().length === 0) {

@@ -38,7 +38,12 @@ class ResumeService {
         }
       }
       
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      // Create error with code property for premium requirement detection
+      const error = new Error(errorData.message || `HTTP error! status: ${response.status}`) as Error & { code?: string };
+      if (errorData.code) {
+        error.code = errorData.code;
+      }
+      throw error;
     }
 
     return response.json();

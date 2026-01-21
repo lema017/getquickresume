@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
@@ -34,6 +34,11 @@ export function Step6Achievements() {
   
   // AI Enhancement state for individual achievements
   const [enhancingId, setEnhancingId] = useState<string | null>(null);
+  
+  // Rate limit modal state
+  const [showRateLimitModal, setShowRateLimitModal] = useState(false);
+  // Track which action triggered rate limit for retry functionality
+  const lastRateLimitedActionRef = useRef<{ type: 'suggestions' | 'enhance'; achievementId?: string } | null>(null);
 
   // Check if user can use AI features (premium OR free user who hasn't used their quota)
   const canUseAIFeatures = user?.isPremium || !user?.freeResumeUsed;
@@ -102,9 +107,12 @@ export function Step6Achievements() {
         setShowPremiumModal(true);
         return;
       }
-      // Check if it's a rate limit error
+      // Check if it's a rate limit error - show modal instead of inline warning
       if (error?.code === 'RATE_LIMIT_EXCEEDED' || error?.status === 429) {
         setIsRateLimited(true);
+        lastRateLimitedActionRef.current = { type: 'suggestions' };
+        setShowRateLimitModal(true);
+        return;
       }
       setSuggestionsError(error instanceof Error ? error.message : 'Error al cargar sugerencias de IA');
     } finally {
@@ -164,10 +172,12 @@ export function Step6Achievements() {
         setShowPremiumModal(true);
         return;
       }
-      // Handle rate limit error
+      // Handle rate limit error - show modal instead of inline warning
       if (error?.code === 'RATE_LIMIT_EXCEEDED' || error?.status === 429) {
         setIsRateLimited(true);
-        setSuggestionsError(error.message || 'Too many requests. Please wait before trying again.');
+        lastRateLimitedActionRef.current = { type: 'enhance', achievementId };
+        setShowRateLimitModal(true);
+        return;
       }
     } finally {
       setEnhancingId(null);
@@ -210,6 +220,27 @@ export function Step6Achievements() {
 
   const handleBack = () => {
     navigateToStep(5);
+  };
+
+  // Handle retry from rate limit modal
+  const handleRateLimitRetry = () => {
+    setShowRateLimitModal(false);
+    setIsRateLimited(false);
+    
+    const lastAction = lastRateLimitedActionRef.current;
+    if (lastAction?.type === 'suggestions') {
+      loadAISuggestions();
+    } else if (lastAction?.type === 'enhance' && lastAction.achievementId) {
+      handleEnhanceDescription(lastAction.achievementId);
+    }
+    lastRateLimitedActionRef.current = null;
+  };
+
+  // Close rate limit modal
+  const handleCloseRateLimitModal = () => {
+    setShowRateLimitModal(false);
+    setIsRateLimited(false);
+    lastRateLimitedActionRef.current = null;
   };
 
   return (
@@ -295,15 +326,6 @@ export function Step6Achievements() {
                 <Loader2 className="w-6 h-6 animate-spin text-purple-600 mr-2" />
                 <span className="text-purple-700">{t('wizard.steps.achievements.ui.ai.generating')}</span>
               </div>
-            ) : isRateLimited && suggestionsError ? (
-              <RateLimitWarning 
-                message={suggestionsError}
-                onRetry={() => {
-                  setIsRateLimited(false);
-                  setSuggestionsError(null);
-                  loadAISuggestions();
-                }}
-              />
             ) : suggestionsError ? (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <p className="text-red-800 text-sm">{suggestionsError || t('wizard.steps.achievements.ui.ai.errorLoading')}</p>
@@ -500,6 +522,37 @@ export function Step6Achievements() {
         onClose={() => setShowPremiumModal(false)}
         feature="aiSuggestions"
       />
+
+      {/* Rate Limit Modal */}
+      {showRateLimitModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {t('wizard.rateLimit.title', 'Usage limit reached')}
+              </h3>
+              <button
+                onClick={handleCloseRateLimitModal}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {/* Modal Content */}
+            <div className="p-6">
+              <RateLimitWarning
+                onRetry={handleRateLimitRetry}
+                onClose={handleCloseRateLimitModal}
+                showRetry={true}
+                countdownSeconds={30}
+                isPremium={user?.isPremium}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

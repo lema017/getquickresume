@@ -12,6 +12,7 @@
 import { TokenUsage, AIResponse, trackAIUsage } from './aiUsageService';
 import { SECURITY_PREAMBLE, sanitizeForPrompt } from '../utils/inputSanitizer';
 import { GeneratedResume } from '../types';
+import { getAIConfigForUser } from '../utils/aiProviderSelector';
 
 // ============================================================================
 // TYPES
@@ -51,7 +52,6 @@ export interface ContentValidationResult {
 // ============================================================================
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
-const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
 // ============================================================================
 // CONTENT VALIDATOR SERVICE
@@ -256,12 +256,14 @@ FINAL REMINDER:
   /**
    * Call Groq API for validation
    */
-  private async callGroqAPI(prompt: string): Promise<AIResponse> {
+  private async callGroqAPI(prompt: string, isPremium: boolean): Promise<AIResponse> {
     const apiStartTime = Date.now();
+    const { model } = getAIConfigForUser(isPremium);
     
     console.log('[ContentValidatorService] Calling Groq API for validation', {
-      model: GROQ_MODEL,
+      model,
       promptLength: prompt.length,
+      isPremium,
     });
 
     try {
@@ -272,7 +274,7 @@ FINAL REMINDER:
           'Authorization': `Bearer ${GROQ_API_KEY}`,
         },
         body: JSON.stringify({
-          model: GROQ_MODEL,
+          model,
           messages: [
             {
               role: 'system',
@@ -302,15 +304,18 @@ FINAL REMINDER:
       }
 
       const data = await response.json();
+      // Extract usage data including Groq prompt caching info
       const usage = {
         promptTokens: data.usage?.prompt_tokens || 0,
         completionTokens: data.usage?.completion_tokens || 0,
-        totalTokens: data.usage?.total_tokens || 0
+        totalTokens: data.usage?.total_tokens || 0,
+        cachedTokens: data.usage?.prompt_tokens_details?.cached_tokens || 0
       };
 
       console.log('[ContentValidatorService] Groq API response received', {
         apiDurationMs: apiDuration,
         usage,
+        cachedTokens: usage.cachedTokens,
       });
       
       return {
@@ -415,7 +420,9 @@ FINAL REMINDER:
     try {
       // Build and send validation prompt
       const prompt = this.buildValidationPrompt(resumeData);
-      const aiResponse = await this.callGroqAPI(prompt);
+      const userIsPremium = isPremium || false;
+      const { model } = getAIConfigForUser(userIsPremium);
+      const aiResponse = await this.callGroqAPI(prompt, userIsPremium);
       
       // Track AI usage (using 'scoreResume' as content validation is part of scoring)
       if (userId) {
@@ -423,9 +430,9 @@ FINAL REMINDER:
           userId,
           endpoint: 'scoreResume',
           provider: 'groq',
-          model: GROQ_MODEL,
+          model,
           usage: aiResponse.usage,
-          isPremium: isPremium || false
+          isPremium: userIsPremium
         });
       }
 
