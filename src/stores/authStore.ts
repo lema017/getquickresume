@@ -101,7 +101,11 @@ export const useAuthStore = create<AuthStore>()(
 
       validateSession: async () => {
         const token = localStorage.getItem('auth-token');
-        if (!token) return;
+        if (!token) {
+          // Clear persisted state if token is missing
+          set({ user: null, isAuthenticated: false });
+          return;
+        }
 
         try {
           const user = await authService.getUserFromToken(token);

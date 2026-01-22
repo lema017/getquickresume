@@ -3,6 +3,7 @@ import {
   Gift, 
   Brain, 
   Sparkles, 
+  BarChart,
   BarChart2, 
   ShieldCheck, 
   Download, 
@@ -23,7 +24,11 @@ import {
   Layout,
   QrCode,
   Coins,
-  Briefcase
+  Briefcase,
+  SpellCheck,
+  LineChart,
+  Share2,
+  TrendingUp
 } from 'lucide-react';
 
 interface IconWrapperProps {
@@ -36,7 +41,8 @@ const iconMap = {
   'brain': Brain,
   'sparkles': Sparkles,
   'chart-bar': BarChart2,
-  'bar-chart-2': BarChart2, // Alias para bar-chart-2
+  'bar-chart': BarChart,
+  'bar-chart-2': BarChart2,
   'shield-check': ShieldCheck,
   'download': Download,
   'file-text': FileText,
@@ -57,6 +63,10 @@ const iconMap = {
   'qr-code': QrCode,
   'coins': Coins,
   'briefcase': Briefcase,
+  'spell-check': SpellCheck,
+  'line-chart': LineChart,
+  'share-2': Share2,
+  'trending-up': TrendingUp,
 };
 
 export function IconWrapper({ name, className = "w-6 h-6" }: IconWrapperProps) {
