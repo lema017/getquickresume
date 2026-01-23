@@ -12,10 +12,12 @@ import {
   ExternalLink,
   SkipForward,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  Clock
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { linkedInProfileService } from '@/services/linkedInProfileService';
+import { RateLimitWarning } from '@/components/RateLimitWarning';
 
 interface LinkedInWizardState {
   profession: string;
@@ -53,6 +55,9 @@ export function LinkedInDataWizard({ onBack }: LinkedInDataWizardProps) {
   const [processingStep, setProcessingStep] = useState(0);
   const [processingMessage, setProcessingMessage] = useState('');
   const [rotatingMessageIndex, setRotatingMessageIndex] = useState(0);
+  const [isValidatingProfession, setIsValidatingProfession] = useState(false);
+  const [professionError, setProfessionError] = useState<string | null>(null);
+  const [showRateLimitModal, setShowRateLimitModal] = useState(false);
 
   const totalSteps = 7;
   const requiredSteps = [0, 1, 2, 3]; // Profesión, Acerca de, Experiencia, Educación
@@ -144,6 +149,11 @@ export function LinkedInDataWizard({ onBack }: LinkedInDataWizardProps) {
   const isCurrentStepCompleted = (typeof currentFieldValue === 'string' ? currentFieldValue.trim().length : String(currentFieldValue).trim().length) > 0;
 
   const handleInputChange = (value: string) => {
+    // Clear profession error when user starts typing in profession field
+    if (currentStepConfig.field === 'profession' && professionError) {
+      setProfessionError(null);
+    }
+    
     // Sanitizar contenido según el paso
     let sanitizedValue = value;
     if (currentStepConfig.field === 'skills') {
@@ -289,8 +299,12 @@ export function LinkedInDataWizard({ onBack }: LinkedInDataWizardProps) {
       return line;
     });
     
-    // Eliminar duplicados manteniendo el orden
-    const uniqueLines = [...new Set(processedLines)];
+    // Eliminar solo duplicados consecutivos (no globales)
+    // Esto preserva múltiples certificaciones del mismo proveedor (ej: varios cursos de Udemy)
+    const uniqueLines = processedLines.filter((line, index) => {
+      // Keep the line if it's the first one or different from the previous
+      return index === 0 || line !== processedLines[index - 1];
+    });
     
     // Unir las líneas únicas con saltos de línea
     return uniqueLines.join('\n');
@@ -360,7 +374,39 @@ export function LinkedInDataWizard({ onBack }: LinkedInDataWizardProps) {
     return uniqueLines.join('\n');
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    // On step 0 (profession), validate before proceeding
+    if (wizardState.currentStep === 0 && wizardState.profession.trim()) {
+      setIsValidatingProfession(true);
+      setProfessionError(null); // Clear any previous error
+      try {
+        const result = await linkedInProfileService.validateProfession(wizardState.profession.trim());
+        
+        if (!result.success || !result.isValid) {
+          // Check if it's a rate limit error
+          if (result.code === 'RATE_LIMIT_EXCEEDED') {
+            setShowRateLimitModal(true);
+            setIsValidatingProfession(false);
+            return;
+          }
+          
+          const errorMsg = t('wizard.linkedinImportPage.errors.invalidProfession');
+          setProfessionError(errorMsg);
+          toast.error(errorMsg);
+          setIsValidatingProfession(false);
+          return;
+        }
+      } catch (error) {
+        console.error('Error validating profession:', error);
+        const errorMsg = t('wizard.linkedinImportPage.errors.validationError');
+        setProfessionError(errorMsg);
+        toast.error(errorMsg);
+        setIsValidatingProfession(false);
+        return;
+      }
+      setIsValidatingProfession(false);
+    }
+
     if (wizardState.currentStep < totalSteps - 1) {
       setWizardState(prev => ({
         ...prev,
@@ -391,6 +437,18 @@ export function LinkedInDataWizard({ onBack }: LinkedInDataWizardProps) {
     } else {
       onBack();
     }
+  };
+
+  // Handle retry from rate limit modal
+  const handleRateLimitRetry = () => {
+    setShowRateLimitModal(false);
+    // Retry the validation
+    handleNext();
+  };
+
+  // Close rate limit modal
+  const handleCloseRateLimitModal = () => {
+    setShowRateLimitModal(false);
   };
 
   const processingSteps = (t('wizard.linkedinImportPage.processing.steps', { returnObjects: true }) as Array<{ title: string; message: string }>).map((step, index) => {
@@ -635,7 +693,9 @@ export function LinkedInDataWizard({ onBack }: LinkedInDataWizardProps) {
                   value={wizardState[currentStepConfig.field]}
                   onChange={(e) => handleInputChange(e.target.value)}
                   placeholder={currentStepConfig.placeholder}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
+                    professionError ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                  }`}
                   disabled={isProcessing}
                 />
               ) : (
@@ -646,6 +706,17 @@ export function LinkedInDataWizard({ onBack }: LinkedInDataWizardProps) {
                   className="w-full h-64 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
                   disabled={isProcessing}
                 />
+              )}
+              {professionError && currentStepConfig.field === 'profession' && (
+                <div className="mt-2 space-y-1">
+                  <div className="flex items-center gap-2 text-red-600">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-sm">{professionError}</span>
+                  </div>
+                  <p className="text-sm text-gray-500 ml-6">
+                    {t('wizard.linkedinImportPage.errors.professionValidationHint')}
+                  </p>
+                </div>
               )}
               <div className="mt-2 flex items-center justify-between text-sm">
                 <span className="text-gray-500">
@@ -685,13 +756,18 @@ export function LinkedInDataWizard({ onBack }: LinkedInDataWizardProps) {
 
                 <button
                   onClick={handleNext}
-                  disabled={!canProceed || isProcessing}
+                  disabled={!canProceed || isProcessing || isValidatingProfession}
                   className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-orange-600 to-blue-600 text-white rounded-lg font-medium hover:from-orange-700 hover:to-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isProcessing ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
                       {t('wizard.linkedinImportPage.wizard.buttons.processing')}
+                    </>
+                  ) : isValidatingProfession ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      {t('wizard.linkedinImportPage.wizard.buttons.validating')}
                     </>
                   ) : wizardState.currentStep === totalSteps - 1 ? (
                     <>
@@ -810,6 +886,31 @@ export function LinkedInDataWizard({ onBack }: LinkedInDataWizardProps) {
               <div className="mt-4 text-xs text-gray-500">
                 {t('wizard.linkedinImportPage.processing.warning')}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rate Limit Modal */}
+      {showRateLimitModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
+            {/* Header */}
+            <div className={`px-6 py-4 ${isPremium ? 'bg-gradient-to-r from-blue-500 to-blue-600' : 'bg-gradient-to-r from-amber-500 to-orange-500'}`}>
+              <h3 className="text-white font-semibold text-lg flex items-center gap-2">
+                <Clock className="w-5 h-5" />
+                {t('wizard.rateLimit.title')}
+              </h3>
+            </div>
+            {/* Content */}
+            <div className="p-6">
+              <RateLimitWarning
+                onRetry={handleRateLimitRetry}
+                onClose={handleCloseRateLimitModal}
+                showRetry={true}
+                countdownSeconds={60}
+                isPremium={isPremium}
+              />
             </div>
           </div>
         </div>

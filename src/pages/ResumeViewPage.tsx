@@ -145,6 +145,53 @@ export function ResumeViewPage() {
     navigate(`/wizard/manual/step-1?resumeId=${resume.id}`);
   };
 
+  // Handle enhancement completion from ResumeScoreCard
+  const handleEnhancementComplete = async (sectionType: string, enhancedText: string) => {
+    if (!resume || !id) return;
+
+    try {
+      // Update the generatedResume with enhanced text
+      const updatedGeneratedResume = { ...resume.generatedResume };
+      
+      // Map section type to generatedResume field
+      if (sectionType === 'achievement' || sectionType === 'achievements') {
+        // Parse enhanced text into achievements array
+        const achievements = enhancedText.split('\n').filter(a => a.trim().length > 0);
+        updatedGeneratedResume.achievements = achievements;
+      } else if (sectionType === 'summary') {
+        updatedGeneratedResume.professionalSummary = enhancedText;
+      }
+      // Add more section mappings as needed
+
+      // Save to database
+      const updatedResume = await resumeService.updateResume(id, {
+        generatedResume: updatedGeneratedResume
+      });
+      
+      // Update local state
+      setResume(updatedResume);
+      toast.success('Section enhanced! Re-scoring...');
+
+      // Re-score the resume
+      if (user?.isPremium) {
+        try {
+          setIsLoadingScore(true);
+          const newScore = await resumeScoringService.scoreResume(id);
+          setCurrentScore(newScore);
+          toast.success('Checklist updated with your improvements!');
+        } catch (scoreErr) {
+          console.error('Error re-scoring:', scoreErr);
+          // Enhancement was successful, just couldn't re-score
+        } finally {
+          setIsLoadingScore(false);
+        }
+      }
+    } catch (err) {
+      console.error('Error saving enhancement:', err);
+      toast.error('Failed to save enhancement. Please try again.');
+    }
+  };
+
   const handleDownload = () => {
     if (!resume) return;
     setIsSelectingTemplate(true);
@@ -381,6 +428,7 @@ export function ResumeViewPage() {
               isLoading={isLoadingScore}
               error={scoreError}
               resume={resume.generatedResume}
+              onEnhancementComplete={handleEnhancementComplete}
             />
           </div>
         )}

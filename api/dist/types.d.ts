@@ -376,6 +376,7 @@ export interface ClarificationQuestion {
     context: string;
     type: 'text' | 'textarea' | 'select';
     required: boolean;
+    hintText?: string;
     suggestedAnswer?: string;
     options?: string[];
     relatedSkill?: string;
@@ -393,18 +394,84 @@ export interface ResumeChange {
     newValue: string;
     changeType: 'added' | 'modified' | 'removed' | 'enhanced';
     reason: string;
+    answerId?: string;
+}
+export interface ATSCategoryItem {
+    item: string;
+    found: boolean;
+    location?: string;
+}
+export interface ATSCategory {
+    name: string;
+    score: number;
+    maxScore: number;
+    weight: number;
+    status: 'excellent' | 'good' | 'needs_improvement' | 'poor';
+    details: string;
+    items?: ATSCategoryItem[];
+}
+export interface ATSBreakdown {
+    overallScore: number;
+    categories: ATSCategory[];
+    recommendations: string[];
+}
+export interface KeywordItem {
+    keyword: string;
+    frequency: number;
+    locations: string[];
+    importance?: 'critical' | 'important' | 'nice_to_have';
+}
+export interface CategorizedKeywords {
+    technical: KeywordItem[];
+    softSkills: KeywordItem[];
+    industry: KeywordItem[];
+    certifications: KeywordItem[];
+    methodologies: KeywordItem[];
+    tools: KeywordItem[];
+    experience: KeywordItem[];
+}
+export interface KeywordMatch {
+    keyword: string;
+    category: string;
+    jobImportance: 'critical' | 'important' | 'nice_to_have';
+    resumeFrequency: number;
+    resumeLocations: string[];
+}
+export interface KeywordMatchAnalysis {
+    totalJobKeywords: number;
+    matchedKeywords: number;
+    matchPercentage: number;
+    matchedList: KeywordMatch[];
+    missingCritical: KeywordItem[];
+    missingImportant: KeywordItem[];
+    extraResumeKeywords: KeywordItem[];
+}
+export interface KeywordAnalysis {
+    resumeKeywords: CategorizedKeywords;
+    jobKeywords: CategorizedKeywords;
+    matchAnalysis: KeywordMatchAnalysis;
+}
+export interface AnswerIncorporation {
+    questionId: string;
+    usedInSection: string;
+    changeIndex: number;
 }
 export interface TailoringResult {
     originalResumeId: string;
     changes: ResumeChange[];
     atsScoreBefore: number;
     atsScoreAfter: number;
+    matchScoreBefore: number;
+    matchScoreAfter: number;
     grammarCorrections: {
         original: string;
         corrected: string;
         location: string;
     }[];
     keywordOptimizations: string[];
+    answersIncorporated: AnswerIncorporation[];
+    atsBreakdown: ATSBreakdown;
+    keywordAnalysis: KeywordAnalysis;
 }
 export interface TailoredResumeMetadata {
     isTailored: true;
@@ -454,6 +521,8 @@ export interface EnhanceAnswerRequest {
     questionId: string;
     language: 'en' | 'es';
     resumeId?: string;
+    question?: string;
+    jobInfo?: JobPostingInfo;
 }
 export interface EnhanceAnswerResponse {
     success: boolean;
@@ -468,6 +537,7 @@ export interface GenerateTailoredResumeRequest {
     jobInfo: JobPostingInfo;
     answers: ClarificationAnswer[];
     language: 'en' | 'es';
+    matchScoreBefore: number;
 }
 export interface GenerateTailoredResumeResponse {
     success: boolean;
@@ -609,7 +679,7 @@ export interface JobTitleAchievementsResponse {
     resetTime?: number;
 }
 export interface EnhanceTextRequest {
-    context: 'achievement' | 'summary' | 'project' | 'responsibility';
+    context: 'achievement' | 'summary' | 'project' | 'responsibility' | 'differentiators';
     text: string;
     language: 'es' | 'en';
     jobTitle?: string;

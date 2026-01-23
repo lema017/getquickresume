@@ -108,6 +108,28 @@ declare class AIService {
     }, resumeId?: string): Promise<Partial<ResumeData>>;
     private buildLinkedInParsingPrompt;
     private parseLinkedInResponse;
+    /**
+     * Validate if a given text is a valid profession or job title.
+     * Uses a lightweight AI call optimized for fast validation.
+     * Supports multilingual input (Spanish, English, Portuguese, etc.)
+     */
+    validateProfession(profession: string, requestContext: {
+        authorizer: {
+            userId: string;
+        };
+    }): Promise<{
+        isValid: boolean;
+        message?: string;
+    }>;
+    /**
+     * Build a lightweight prompt for profession validation.
+     * Optimized for minimal token usage and fast response times.
+     */
+    private buildProfessionValidationPrompt;
+    /**
+     * Parse the AI response for profession validation.
+     */
+    private parseProfessionValidationResponse;
     private generateDefaultJobDescription;
     /**
      * Direct enhancement for mechanical fixes that don't require user context.

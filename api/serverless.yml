@@ -27,6 +27,7 @@ provider:
     COVER_LETTERS_TABLE: ${self:service}-cover-letters-${self:provider.stage}
     RESUME_VIEWS_TABLE: ${self:service}-resume-views-${self:provider.stage}
     PROFESSION_SUGGESTIONS_TABLE: ${self:service}-profession-suggestions-${self:provider.stage}
+    VALIDATED_PROFESSIONS_TABLE: ${self:service}-validated-professions-${self:provider.stage}
     OPENAI_API_KEY: ${ssm:/getquickresume/${self:provider.stage}/openai-api-key}
     GROQ_API_KEY: ${ssm:/getquickresume/${self:provider.stage}/groq-api-key}
     PREMIUM_AI_PROVIDER: ${ssm:/getquickresume/${self:provider.stage}/premium-ai-provider, 'openai'}
@@ -53,6 +54,7 @@ provider:
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-resumes-${self:provider.stage}/index/*"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-profession-suggestions-${self:provider.stage}"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-profession-suggestions-${self:provider.stage}/index/*"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-validated-professions-${self:provider.stage}"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-job-title-achievements-${self:provider.stage}"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-job-title-achievements-${self:provider.stage}/index/*"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-rate-limits-${self:provider.stage}"
@@ -928,6 +930,31 @@ functions:
               - Authorization
             allowCredentials: false
 
+  # Profession Validation Function (for LinkedIn Import)
+  validateProfession:
+    handler: dist/handlers/validateProfession.validateProfession
+    timeout: 30
+    environment:
+      GROQ_API_KEY: ${self:provider.environment.GROQ_API_KEY}
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+      AI_USAGE_LOGS_TABLE: ${self:service}-ai-usage-logs-${self:provider.stage}
+      VALIDATED_PROFESSIONS_TABLE: ${self:service}-validated-professions-${self:provider.stage}
+    events:
+      - http:
+          path: api/validate-profession
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
   # LinkedIn Data Processing Function
   linkedInDataParser:
     handler: dist/handlers/linkedInData.parseLinkedInData
@@ -1132,6 +1159,30 @@ functions:
     events:
       - http:
           path: api/job-tailoring/enhance-answer
+          method: post
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Generate answer options with AI (3 distinct options)
+  generateAnswerOptions:
+    handler: dist/handlers/jobTailoring.generateAnswerOptionsHandler
+    timeout: 60
+    environment:
+      GROQ_API_KEY: ${self:provider.environment.GROQ_API_KEY}
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+      AI_USAGE_LOGS_TABLE: ${self:service}-ai-usage-logs-${self:provider.stage}
+    events:
+      - http:
+          path: api/job-tailoring/generate-answer-options
           method: post
           authorizer:
             name: authorize
@@ -1457,6 +1508,18 @@ resources:
             AttributeType: S
         KeySchema:
           - AttributeName: profession
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    ValidatedProfessionsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-validated-professions-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: professionKey
+            AttributeType: S
+        KeySchema:
+          - AttributeName: professionKey
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
 

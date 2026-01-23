@@ -8,7 +8,8 @@ import {
   AlertTriangle,
   ChevronDown,
   ChevronUp,
-  ExternalLink
+  ExternalLink,
+  Loader2
 } from 'lucide-react';
 import { UrlValidationResult } from '@/types/jobTailoring';
 
@@ -18,6 +19,7 @@ interface JobPreviewCardProps {
   onConfirm: () => void;
   onEdit: () => void;
   onReject: () => void;
+  isLoading?: boolean;
 }
 
 export function JobPreviewCard({
@@ -26,6 +28,7 @@ export function JobPreviewCard({
   onConfirm,
   onEdit,
   onReject,
+  isLoading = false,
 }: JobPreviewCardProps) {
   const { t } = useTranslation();
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -138,10 +141,24 @@ export function JobPreviewCard({
         </button>
         <button
           onClick={onConfirm}
-          className="flex-1 py-3 px-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-medium rounded-xl hover:from-orange-600 hover:to-amber-600 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+          disabled={isLoading}
+          className={`flex-1 py-3 px-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-medium rounded-xl transition-all shadow-md flex items-center justify-center gap-2 ${
+            isLoading
+              ? 'opacity-70 cursor-not-allowed'
+              : 'hover:from-orange-600 hover:to-amber-600 hover:shadow-lg'
+          }`}
         >
-          <CheckCircle className="w-4 h-4" />
-          {t('jobTailoring.jobPreview.confirmContinue')}
+          {isLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              {t('jobTailoring.jobPreview.analyzing')}
+            </>
+          ) : (
+            <>
+              <CheckCircle className="w-4 h-4" />
+              {t('jobTailoring.jobPreview.confirmContinue')}
+            </>
+          )}
         </button>
       </div>
     </div>

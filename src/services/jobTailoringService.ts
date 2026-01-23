@@ -54,7 +54,7 @@ async function makeRequest<T>(
       (error as any).statusCode = 403;
       throw error;
     }
-    
+
     // Handle auth errors (401/403) - logout and redirect
     if (response.status === 401 || response.status === 403) {
       handleAuthError();
@@ -63,7 +63,7 @@ async function makeRequest<T>(
       (error as any).statusCode = response.status;
       throw error;
     }
-    
+
     const error = new Error(data.error || data.message || `HTTP error! status: ${response.status}`);
     (error as any).code = data.code;
     (error as any).statusCode = response.status;
@@ -162,7 +162,7 @@ interface AnalyzeJobResponse {
  * Analyze a job posting and extract structured information
  */
 export async function analyzeJobPosting(
-  description: string, 
+  description: string,
   resumeId: string,
   language: 'en' | 'es' = 'en'
 ): Promise<JobAnalysisResult> {
@@ -259,7 +259,9 @@ export async function enhanceAnswer(
   context: string,
   questionId: string,
   language: 'en' | 'es' = 'en',
-  resumeId?: string
+  resumeId?: string,
+  question?: string,
+  jobInfo?: JobPostingInfo
 ): Promise<string> {
   try {
     const response = await makeRequest<EnhanceAnswerResponse>(
@@ -271,7 +273,9 @@ export async function enhanceAnswer(
           context,
           questionId,
           language,
-          resumeId
+          resumeId,
+          question,
+          jobInfo
         }),
       }
     );
@@ -320,7 +324,9 @@ export async function generateTailoredResume(
           resumeId: request.resumeId,
           jobInfo: request.jobInfo,
           answers: request.answers,
-          language: request.language || 'en'
+          language: request.language || 'en',
+          matchScoreBefore: request.matchScoreBefore || 60,  // Pass initial match score
+          matchingSkills: request.matchingSkills || []       // Pass matching skills from initial analysis
         }),
       }
     );
@@ -440,6 +446,67 @@ export const jobTailoringService = {
   generateTailoredResume,
   getTailoringLimits,
   saveTailoredResume,
+  generateAnswerOptions,
 };
 
 export default jobTailoringService;
+
+// ============================================================================
+// Generate Answer Options
+// ============================================================================
+
+interface GenerateAnswerOptionsResponse {
+  success: boolean;
+  data?: {
+    questionId: string;
+    options: string[];
+  };
+  error?: string;
+  message?: string;
+  remainingRequests?: number;
+  resetTime?: number;
+}
+
+/**
+ * Generate 3 AI-powered answer options for a clarification question
+ */
+export async function generateAnswerOptions(
+  questionId: string,
+  question: string,
+  context: string,
+  resumeId: string,
+  jobInfo: JobPostingInfo,
+  language: 'en' | 'es' = 'en'
+): Promise<string[]> {
+  try {
+    const response = await makeRequest<GenerateAnswerOptionsResponse>(
+      'api/job-tailoring/generate-answer-options',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          questionId,
+          question,
+          context,
+          resumeId,
+          jobInfo,
+          language
+        }),
+      }
+    );
+
+    if (!response.success || !response.data) {
+      throw new Error(response.error || 'Failed to generate answer options');
+    }
+
+    return response.data.options;
+  } catch (error) {
+    console.error('Error generating answer options:', error);
+    throw error;
+  }
+}
+
+// Update service export
+export const jobTailoringServiceWithOptions = {
+  ...jobTailoringService,
+  generateAnswerOptions,
+};

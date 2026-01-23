@@ -101,7 +101,7 @@ export function TermsPage() {
               </p>
               <ul className="list-disc list-inside text-gray-600 space-y-2">
                 <li>Los servicios básicos son gratuitos con limitaciones</li>
-                <li>Los servicios Premium requieren una suscripción mensual ($9.99/mes) o anual ($59.99/año)</li>
+                <li>Los servicios Premium requieren una suscripción mensual ($15/mes) o anual ($126/año)</li>
                 <li>Los pagos son procesados de forma segura por PayPal, nuestro proveedor de pagos</li>
                 <li>Las suscripciones se renuevan automáticamente al final de cada período de facturación</li>
                 <li>Puedes cancelar tu suscripción en cualquier momento desde la página de tu cuenta</li>

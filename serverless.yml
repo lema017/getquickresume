@@ -78,6 +78,55 @@ resources:
           SigningBehavior: always
           SigningProtocol: sigv4
 
+    # Custom Cache Policy for Static Assets (1 year TTL for hashed files)
+    StaticAssetsCachePolicy:
+      Type: AWS::CloudFront::CachePolicy
+      Condition: IsProd
+      Properties:
+        CachePolicyConfig:
+          Name: ${self:service}-${self:provider.stage}-static-assets
+          Comment: Cache policy for static assets with content-hash filenames (1 year)
+          DefaultTTL: 31536000  # 1 year in seconds
+          MaxTTL: 31536000
+          MinTTL: 31536000
+          ParametersInCacheKeyAndForwardedToOrigin:
+            CookiesConfig:
+              CookieBehavior: none
+            HeadersConfig:
+              HeaderBehavior: none
+            QueryStringsConfig:
+              QueryStringBehavior: none
+            EnableAcceptEncodingGzip: true
+            EnableAcceptEncodingBrotli: true
+
+    # Response Headers Policy for Static Assets (Cache-Control header)
+    StaticAssetsHeadersPolicy:
+      Type: AWS::CloudFront::ResponseHeadersPolicy
+      Condition: IsProd
+      Properties:
+        ResponseHeadersPolicyConfig:
+          Name: ${self:service}-${self:provider.stage}-static-assets-headers
+          Comment: Add Cache-Control header for immutable static assets
+          CustomHeadersConfig:
+            Items:
+              - Header: Cache-Control
+                Value: "public, max-age=31536000, immutable"
+                Override: true
+
+    # Response Headers Policy for HTML (no-cache for SPA)
+    HtmlHeadersPolicy:
+      Type: AWS::CloudFront::ResponseHeadersPolicy
+      Condition: IsProd
+      Properties:
+        ResponseHeadersPolicyConfig:
+          Name: ${self:service}-${self:provider.stage}-html-headers
+          Comment: No-cache for HTML files to ensure fresh content
+          CustomHeadersConfig:
+            Items:
+              - Header: Cache-Control
+                Value: "no-cache, no-store, must-revalidate"
+                Override: true
+
     # CloudFront Distribution
     CloudFrontDistribution:
       Type: AWS::CloudFront::Distribution
@@ -105,6 +154,35 @@ resources:
               S3OriginConfig:
                 OriginAccessIdentity: ""
           
+          # Cache behavior for static assets (JS, CSS) - long cache with immutable
+          CacheBehaviors:
+            - PathPattern: "/assets/*"
+              TargetOriginId: S3Origin
+              ViewerProtocolPolicy: redirect-to-https
+              AllowedMethods:
+                - GET
+                - HEAD
+              CachedMethods:
+                - GET
+                - HEAD
+              Compress: true
+              CachePolicyId: !Ref StaticAssetsCachePolicy
+              ResponseHeadersPolicyId: !Ref StaticAssetsHeadersPolicy
+            # Cache behavior for fonts
+            - PathPattern: "/fonts/*"
+              TargetOriginId: S3Origin
+              ViewerProtocolPolicy: redirect-to-https
+              AllowedMethods:
+                - GET
+                - HEAD
+              CachedMethods:
+                - GET
+                - HEAD
+              Compress: true
+              CachePolicyId: !Ref StaticAssetsCachePolicy
+              ResponseHeadersPolicyId: !Ref StaticAssetsHeadersPolicy
+          
+          # Default behavior for HTML and other files (short cache)
           DefaultCacheBehavior:
             TargetOriginId: S3Origin
             ViewerProtocolPolicy: redirect-to-https
@@ -118,6 +196,7 @@ resources:
             Compress: true
             CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6  # CachingOptimized
             OriginRequestPolicyId: 88a5eaf4-2fd4-4709-b370-b4c650ea3fcf  # CORS-S3Origin
+            ResponseHeadersPolicyId: !Ref HtmlHeadersPolicy
           
           # Handle SPA routing - return index.html for 403/404
           CustomErrorResponses:

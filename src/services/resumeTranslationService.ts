@@ -2,6 +2,8 @@ import { Resume } from '@/types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/dev';
 
+export type ResumeTranslationMode = 'translate' | 'rewrite';
+
 export interface SupportedLanguage {
   code: string;
   name: string;
@@ -25,7 +27,11 @@ export const resumeTranslationService = {
   /**
    * Translate a resume to a target language
    */
-  async translateResume(resumeId: string, targetLanguage: string): Promise<Resume> {
+  async translateResume(
+    resumeId: string,
+    targetLanguage: string,
+    mode: ResumeTranslationMode = 'translate'
+  ): Promise<Resume> {
     try {
       const token = localStorage.getItem('auth-token');
       if (!token) {
@@ -38,7 +44,7 @@ export const resumeTranslationService = {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ targetLanguage }),
+        body: JSON.stringify({ targetLanguage, mode }),
       });
 
       const data = await response.json();

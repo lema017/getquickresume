@@ -29,6 +29,7 @@ export const es = {
     show: 'Mostrar',
     hide: 'Ocultar',
     refresh: 'Actualizar',
+    clear: 'Limpiar',
   },
 
   // Navigation
@@ -45,6 +46,8 @@ export const es = {
     terms: 'Términos',
     refund: 'Política de Reembolsos',
     support: 'Soporte',
+    openMenu: 'Abrir menú',
+    closeMenu: 'Cerrar menú',
   },
 
   // Landing Page
@@ -61,6 +64,7 @@ export const es = {
         freeForever: '1 CV Gratis',
         aiPowered: 'Con IA',
       },
+      featureCarousel: 'Características destacadas',
       animatedFeatures: [
         { icon: 'brain', text: 'Creador con IA' },
         { icon: 'file-text', text: 'Cartas de Presentación' },
@@ -385,7 +389,7 @@ export const es = {
       },
       monthly: {
         name: 'Premium',
-        price: '$9.99',
+        price: '$15',
         period: 'mes',
         description: 'Para buscadores de empleo activos',
         features: [
@@ -404,14 +408,14 @@ export const es = {
       },
       yearly: {
         name: 'Premium Anual',
-        price: '$4.99',
+        price: '$10.50',
         period: 'mes',
-        savings: 'Ahorra 50% — Facturado $59.88/año',
+        savings: 'Ahorra 30% — Facturado $126/año',
         badge: 'Mejor Valor',
         description: 'Ideal para crecimiento profesional a largo plazo',
         features: [
           'Todo lo de Premium Mensual',
-          '50% de Ahorro',
+          '30% de Ahorro',
           'Facturación Anual',
           'Soporte Prioritario',
         ],
@@ -929,7 +933,10 @@ export const es = {
         completeRequiredSteps: 'Por favor completa los pasos requeridos antes de continuar',
         processingError: 'Error al procesar la información',
         linkedInProcessingError: 'Error al procesar la información de LinkedIn',
-        premiumRequired: 'La importación de LinkedIn es una función premium. Por favor actualiza para acceder a esta funcionalidad.'
+        premiumRequired: 'La importación de LinkedIn es una función premium. Por favor actualiza para acceder a esta funcionalidad.',
+        invalidProfession: 'Por favor ingresa una profesión o cargo válido',
+        validationError: 'Error al validar la profesión. Por favor intenta de nuevo.',
+        professionValidationHint: 'Ejemplos: Ingeniero de Software, Gerente de Marketing, Enfermero, Contador'
       },
       premiumRequired: {
         title: 'Función Premium Requerida',
@@ -968,6 +975,7 @@ export const es = {
           skip: 'Omitir',
           next: 'Siguiente',
           processing: 'Procesando...',
+          validating: 'Validando...',
           processInfo: 'Procesar Información'
         },
         help: {
@@ -2759,8 +2767,13 @@ export const es = {
     translateButton: 'Traducir',
     translating: 'Traduciendo...',
     success: '¡CV traducido exitosamente!',
+    rewriteButton: 'Reescribir',
+    rewriting: 'Reescribiendo...',
+    rewriteSuccess: '¡CV reescrito exitosamente!',
     error: 'Error al traducir el CV',
     confirmation: 'Se creará un nuevo CV en {{language}}',
+    confirmationRewrite: 'Se creará una versión mejorada en {{language}}',
+    currentLanguageBadge: 'Actual',
     premiumRequired: {
       title: 'Función Premium',
       description: 'La traducción de CVs es una función exclusiva para usuarios premium. Actualiza tu plan para acceder a esta funcionalidad.',
@@ -2921,6 +2934,7 @@ export const es = {
     copyright: '© 2024 GetQuickResume. Todos los derechos reservados.',
     madeWith: 'Hecho con',
     inCostaRica: 'en Costa Rica',
+    emailUs: 'Envíanos un correo',
   },
 
   // Checkout
@@ -3168,6 +3182,7 @@ export const es = {
         provideDescription: 'Por favor proporciona una descripción del trabajo',
       },
       analyzeJob: 'Analizar Trabajo',
+      analyzing: 'Analizando...',
       updated: 'Actualizado {{date}}',
     },
 
@@ -3199,6 +3214,7 @@ export const es = {
       enterManually: 'Ingresar detalles manualmente',
       editDetails: 'Editar Detalles',
       confirmContinue: 'Confirmar y Continuar',
+      analyzing: 'Analizando...',
     },
 
     // Componente JobAnalysis
@@ -3252,6 +3268,11 @@ export const es = {
       progress: '{{answered}} de {{total}} preguntas respondidas',
       completeRequired: 'Completa las preguntas requeridas para continuar',
       generateTailored: 'Generar CV Personalizado',
+      generatingTailored: 'Adaptando currículum...',
+      hint: 'Pista',
+      aiGeneratedOptions: 'Opciones Generadas por IA',
+      generateAiSuggestions: 'Generar Sugerencias con IA',
+      regenerate: 'Regenerar',
     },
 
     // Componente ReviewChanges
@@ -3288,6 +3309,47 @@ export const es = {
         modified: 'modificado',
         enhanced: 'mejorado',
       },
+      // Nuevas traducciones para revisión mejorada
+      fullyOptimized: '¡Optimizado para ATS y Listo!',
+      fullyOptimizedDesc: 'Tu CV está completamente optimizado para esta posición',
+      matchBefore: 'Coincidencia Antes',
+      matchAfter: 'Coincidencia Después',
+      matchImproved: 'Coincidencia Mejorada',
+      answersUsed: 'Respuestas Aplicadas',
+      answersAppliedTitle: 'Tus Respuestas Aplicadas',
+      answersAppliedDesc: '{{count}} de tus respuestas fueron incorporadas al CV',
+      atsBreakdownTitle: 'Desglose de Puntaje ATS',
+      atsBreakdownDesc: 'Análisis detallado de la optimización de tu CV',
+      keywordAnalysisTitle: 'Análisis de Palabras Clave',
+      keywordAnalysisDesc: 'Compara las palabras clave de tu CV con los requisitos del trabajo',
+    },
+
+    // Componente ATS Breakdown
+    atsBreakdown: {
+      excellent: 'Excelente',
+      good: 'Bueno',
+      needsImprovement: 'Necesita Mejora',
+      poor: 'Deficiente',
+      atsReady: '¡Listo para ATS!',
+      recommendations: 'Recomendaciones para 100%',
+    },
+
+    // Componente Keyword Analysis
+    keywordAnalysis: {
+      matchOverview: 'Resumen de Coincidencia de Palabras Clave',
+      matched: 'coinciden',
+      critical: 'Crítico',
+      important: 'Importante',
+      niceToHave: 'Deseable',
+      missingCritical: 'Palabras Clave Críticas Faltantes',
+      missingCriticalHint: 'Considera añadir estas palabras clave si tienes experiencia relevante.',
+      missingImportant: 'Palabras Clave Importantes Faltantes',
+      matchedKeywords: 'Palabras Clave Coincidentes',
+      uniqueKeywords: 'Tus Palabras Clave Únicas (Diferenciadores)',
+      uniqueKeywordsHint: 'Estas palabras clave te distinguen de otros candidatos.',
+      fullComparison: 'Comparación Completa de Palabras Clave',
+      yourResumeKeywords: 'Palabras Clave de Tu CV',
+      jobRequirements: 'Requisitos del Trabajo',
     },
 
     // Componente SaveTailored
@@ -3313,6 +3375,9 @@ export const es = {
       saving: 'Guardando...',
       saveResume: 'Guardar CV',
       tailoredBadge: 'Personalizado',
+      saveSuccess: '¡CV guardado exitosamente! Redirigiendo al panel...',
+      saveError: 'Error al guardar el CV. Por favor intenta de nuevo.',
+      redirecting: 'Redirigiendo al panel...',
     },
 
     // Componente JobApplicationsList (Panel)

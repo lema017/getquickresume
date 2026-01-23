@@ -22,7 +22,7 @@ const PAYPAL_API_URL = PAYPAL_ENVIRONMENT === 'live'
 // Plan pricing configuration
 export const PLAN_PRICES = {
   monthly: {
-    amount: '9.99',
+    amount: '15.00',
     currency: 'USD',
     description: 'GetQuickResume Premium - Monthly',
     itemName: '1 Month Premium Subscription',
@@ -30,11 +30,11 @@ export const PLAN_PRICES = {
     durationMonths: 1,
   },
   yearly: {
-    amount: '59.99',
+    amount: '126.00',
     currency: 'USD',
     description: 'GetQuickResume Premium - Yearly',
     itemName: '1 Year Premium Subscription',
-    itemDescription: 'GetQuickResume Premium - Full access to AI resume builder, unlimited downloads, and all premium templates (Save 50%!)',
+    itemDescription: 'GetQuickResume Premium - Full access to AI resume builder, unlimited downloads, and all premium templates (Save 30%!)',
     durationMonths: 12,
   },
 } as const;

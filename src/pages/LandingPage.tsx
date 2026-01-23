@@ -161,19 +161,25 @@ export function LandingPage() {
                   </div>
                 </div>
                 
-                {/* Progress Dots */}
-                <div className="flex justify-center gap-2 mt-4">
-                  {animatedFeatures.map((_, index) => (
+                {/* Progress Dots - with accessible touch targets */}
+                <div className="flex justify-center gap-1 mt-4" role="tablist" aria-label={t('landing.hero.featureCarousel')}>
+                  {animatedFeatures.map((feature, index) => (
                     <button
                       key={index}
                       onClick={() => setCurrentFeatureIndex(index)}
-                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                        index === currentFeatureIndex
-                          ? 'w-6 bg-white'
-                          : 'bg-white/30 hover:bg-white/50'
-                      }`}
-                      aria-label={`Go to feature ${index + 1}`}
-                    />
+                      className="p-3 group"
+                      role="tab"
+                      aria-selected={index === currentFeatureIndex}
+                      aria-label={feature.text || `Feature ${index + 1}`}
+                    >
+                      <span 
+                        className={`block rounded-full transition-all duration-300 ${
+                          index === currentFeatureIndex
+                            ? 'w-6 h-2 bg-white'
+                            : 'w-2 h-2 bg-white/30 group-hover:bg-white/50'
+                        }`}
+                      />
+                    </button>
                   ))}
                 </div>
               </div>

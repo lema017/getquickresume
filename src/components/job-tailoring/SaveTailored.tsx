@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import toast from 'react-hot-toast';
 import { 
   Save,
   ArrowLeft,
@@ -38,13 +39,47 @@ export function SaveTailored({ onBack }: SaveTailoredProps) {
   } = useJobTailoringStore();
 
   const [hasSaved, setHasSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const jobInfo = editedJobInfo || jobAnalysis?.jobInfo;
 
   const handleSave = async () => {
-    const resumeId = await saveTailoredResume();
-    if (resumeId) {
-      setHasSaved(true);
+    setSaveError(null);
+    
+    try {
+      const resumeId = await saveTailoredResume();
+      
+      if (resumeId) {
+        // Show success toast
+        toast.success(
+          t('jobTailoring.save.saveSuccess', {
+            defaultValue: 'Resume saved successfully! Redirecting to dashboard...',
+          }),
+          { duration: 3000 }
+        );
+        
+        // Reset state and navigate to dashboard after a short delay
+        setTimeout(() => {
+          reset();
+          navigate('/dashboard');
+        }, 1500);
+        
+        setHasSaved(true);
+      } else {
+        // Save returned null - show error
+        const errorMsg = t('jobTailoring.save.saveError', {
+          defaultValue: 'Failed to save resume. Please try again.',
+        });
+        setSaveError(errorMsg);
+        toast.error(errorMsg);
+      }
+    } catch (error: any) {
+      console.error('Error saving tailored resume:', error);
+      const errorMsg = error.message || t('jobTailoring.save.saveError', {
+        defaultValue: 'Failed to save resume. Please try again.',
+      });
+      setSaveError(errorMsg);
+      toast.error(errorMsg);
     }
   };
 
@@ -65,90 +100,28 @@ export function SaveTailored({ onBack }: SaveTailoredProps) {
     navigate('/job-tailoring');
   };
 
-  // Success State
+  // Success State - Show brief message while redirecting
   if (hasSaved && savedResumeId) {
     return (
       <div className="max-w-2xl mx-auto">
-        <div className="text-center py-8">
+        <div className="text-center py-16">
           {/* Success Animation */}
           <div className="relative inline-block mb-6">
-            <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center animate-bounce-slow">
-              <PartyPopper className="w-12 h-12 text-white" />
-            </div>
-            <div className="absolute -top-2 -right-2 w-8 h-8 bg-orange-400 rounded-full flex items-center justify-center">
-              <CheckCircle className="w-5 h-5 text-white" />
+            <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center">
+              <CheckCircle className="w-12 h-12 text-white" />
             </div>
           </div>
 
           <h2 className="text-3xl font-bold text-gray-900 mb-3">
             {t('jobTailoring.save.successTitle')}
           </h2>
-          <p className="text-lg text-gray-600 mb-8">
+          <p className="text-lg text-gray-600 mb-4">
             {t('jobTailoring.save.successDesc', { jobTitle: jobInfo?.jobTitle, companyName: jobInfo?.companyName })}
           </p>
-
-          {/* Summary Card */}
-          <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-6 mb-8 text-left">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <FileText className="w-6 h-6 text-orange-600" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-gray-900">{tailoredResumeTitle}</h3>
-                <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                  <span className="flex items-center gap-1">
-                    <Briefcase className="w-4 h-4" />
-                    {jobInfo?.jobTitle}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Building2 className="w-4 h-4" />
-                    {jobInfo?.companyName}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 mt-3">
-                  <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium flex items-center gap-1">
-                    <TrendingUp className="w-4 h-4" />
-                    {t('jobTailoring.review.atsScore')}: {tailoringResult?.atsScoreAfter || 85}/100
-                  </span>
-                  <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-medium">
-                    {t('jobTailoring.save.tailoredBadge')}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={handleViewResume}
-                className="flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-medium rounded-xl hover:from-orange-600 hover:to-amber-600 shadow-lg hover:shadow-xl transition-all"
-              >
-                <Eye className="w-5 h-5" />
-                {t('jobTailoring.save.viewResume')}
-              </button>
-              <button
-                onClick={handleGoToDashboard}
-                className="flex items-center justify-center gap-2 px-6 py-4 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors"
-              >
-                <Home className="w-5 h-5" />
-                {t('jobTailoring.save.dashboard')}
-              </button>
-            </div>
-
-            <button
-              onClick={handleCreateAnother}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3 border border-gray-300 text-gray-600 font-medium rounded-xl hover:bg-gray-50 transition-colors"
-            >
-              <FileText className="w-5 h-5" />
-              {t('jobTailoring.save.tailorAnother')}
-            </button>
-          </div>
-
-          {/* Tips */}
-          <div className="mt-8 text-sm text-gray-500">
-            <p>{t('jobTailoring.save.tip')}</p>
+          
+          <div className="flex items-center justify-center gap-2 text-orange-600">
+            <Loader2 className="w-5 h-5 animate-spin" />
+            <span>{t('jobTailoring.save.redirecting', { defaultValue: 'Redirecting to dashboard...' })}</span>
           </div>
         </div>
       </div>
@@ -238,6 +211,13 @@ export function SaveTailored({ onBack }: SaveTailoredProps) {
           </div>
         </div>
       </div>
+
+      {/* Error Message */}
+      {saveError && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+          <p className="text-red-700 text-sm">{saveError}</p>
+        </div>
+      )}
 
       {/* Navigation */}
       <div className="flex justify-between">

@@ -241,14 +241,14 @@ export function PricingPage() {
               {
                 "@type": "Offer",
                 "name": "Premium Monthly",
-                "price": "9.99",
+                "price": "15",
                 "priceCurrency": "USD",
                 "availability": "https://schema.org/InStock"
               },
               {
                 "@type": "Offer",
                 "name": "Premium Yearly",
-                "price": "59.99",
+                "price": "126",
                 "priceCurrency": "USD",
                 "availability": "https://schema.org/InStock"
               }

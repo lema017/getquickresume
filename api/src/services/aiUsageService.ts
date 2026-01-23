@@ -83,7 +83,7 @@ export interface AIResponse {
 
 export type AIProvider = 'groq' | 'openai' | 'anthropic';
 
-export type AIEndpointType = 
+export type AIEndpointType =
   | 'generateResume'
   | 'scoreResume'
   | 'professionSuggestions'
@@ -102,12 +102,15 @@ export type AIEndpointType =
   | 'jobAnalysis'
   | 'jobQuestions'
   | 'jobAnswerEnhance'
+  | 'jobAnswerOptions'
   | 'jobTailoredResume'
   | 'jobUrlExtraction'
   // Resume Extraction endpoint
   | 'resumeExtraction'
   // Section Validation endpoint
-  | 'validate-section';
+  | 'validate-section'
+  // Profession Validation endpoint
+  | 'validateProfession';
 
 export interface AIUsageLog {
   id: string;
@@ -170,7 +173,7 @@ export function calculateCost(
 ): number {
   // Normalize model name (remove prefixes like "openai/")
   const normalizedModel = model.replace('openai/', '').toLowerCase();
-  
+
   // Get pricing for the provider
   const providerPricing = AI_PRICING[provider];
   if (!providerPricing) {
@@ -181,7 +184,7 @@ export function calculateCost(
 
   // Find matching model pricing
   let modelPricing: { input: number; output: number } | undefined;
-  
+
   for (const [modelKey, pricing] of Object.entries(providerPricing)) {
     if (normalizedModel.includes(modelKey.toLowerCase()) || modelKey.toLowerCase().includes(normalizedModel)) {
       modelPricing = pricing;
@@ -200,12 +203,12 @@ export function calculateCost(
   // Groq prompt caching: cached tokens get 50% discount
   const cachedTokens = usage.cachedTokens || 0;
   const nonCachedInputTokens = usage.promptTokens - cachedTokens;
-  
+
   // Full price for non-cached input tokens + 50% price for cached tokens
-  const inputCost = ((nonCachedInputTokens / 1_000_000) * modelPricing!.input) + 
-                    ((cachedTokens / 1_000_000) * modelPricing!.input * 0.5);
+  const inputCost = ((nonCachedInputTokens / 1_000_000) * modelPricing!.input) +
+    ((cachedTokens / 1_000_000) * modelPricing!.input * 0.5);
   const outputCost = (usage.completionTokens / 1_000_000) * modelPricing!.output;
-  
+
   return Number((inputCost + outputCost).toFixed(8));
 }
 
@@ -226,17 +229,17 @@ export async function logAIUsage(params: {
   isPremium: boolean;
 }): Promise<AIUsageLog> {
   const { userId, resumeId, endpoint, provider, model, usage, isPremium } = params;
-  
+
   const now = new Date();
   const timestamp = now.toISOString();
   const id = `ailog_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  
+
   // Calculate cost
   const costUSD = calculateCost(provider, model, usage);
-  
+
   // Set TTL for 90 days
   const ttl = Math.floor(now.getTime() / 1000) + (90 * 24 * 60 * 60);
-  
+
   const logEntry: AIUsageLog = {
     id,
     userId,
@@ -259,9 +262,9 @@ export async function logAIUsage(params: {
       TableName: aiUsageLogsTable,
       Item: logEntry
     });
-    
+
     await dynamodb.send(command);
-    
+
     console.log('AI Usage logged:', {
       id,
       userId,
@@ -273,7 +276,7 @@ export async function logAIUsage(params: {
       costUSD,
       isPremium
     });
-    
+
     return logEntry;
   } catch (error) {
     console.error('Error logging AI usage:', error);
@@ -395,7 +398,7 @@ export async function updateResumeAICost(
     // Try updating existing aiCost structure
     const command = new UpdateCommand({
       TableName: resumesTable,
-      Key: { 
+      Key: {
         userId: userId,
         resumeId: resumeId
       },
@@ -424,17 +427,17 @@ export async function updateResumeAICost(
     // Check if error is because aiCost doesn't exist (ConditionalCheckFailedException or ValidationException)
     const errorName = error.name || error.code || '';
     console.log('First update attempt failed, error:', errorName, error.message);
-    
-    if (errorName === 'ConditionalCheckFailedException' || 
-        errorName === 'ValidationException' ||
-        error.message?.includes('document path') ||
-        error.message?.includes('aiCost')) {
+
+    if (errorName === 'ConditionalCheckFailedException' ||
+      errorName === 'ValidationException' ||
+      error.message?.includes('document path') ||
+      error.message?.includes('aiCost')) {
       // aiCost doesn't exist, initialize it
       try {
         console.log('Initializing aiCost for resume:', resumeId);
         const initCommand = new UpdateCommand({
           TableName: resumesTable,
-          Key: { 
+          Key: {
             userId: userId,
             resumeId: resumeId
           },
@@ -498,12 +501,17 @@ function getBreakdownCategory(endpointType: AIEndpointType): string {
     case 'jobAnalysis':
     case 'jobQuestions':
     case 'jobAnswerEnhance':
+    case 'jobAnswerOptions':
     case 'jobTailoredResume':
     case 'jobUrlExtraction':
       return 'jobTailoring';
     // Resume Extraction endpoint
     case 'resumeExtraction':
       return 'extraction';
+    // Validation endpoints
+    case 'validate-section':
+    case 'validateProfession':
+      return 'validation';
     default:
       return 'enhancements';
   }
@@ -535,7 +543,7 @@ export async function trackAIUsage(params: {
   const trackingPromises: Promise<any>[] = [
     // 1. Log to AI usage logs table
     logAIUsage({ ...params, usage }),
-    
+
     // 2. Update user aggregates
     updateUserAggregates(userId, usage, costUSD)
   ];

@@ -142,7 +142,7 @@ export const enhanceTextWithAI = async (
         body: JSON.stringify({
           success: false,
           error: 'Context is required',
-          message: 'Please provide a context (achievement, summary, project, or responsibility)'
+          message: 'Please provide a context (achievement, summary, project, responsibility, or differentiators)'
         } as EnhanceTextResponse)
       };
     }
@@ -165,7 +165,7 @@ export const enhanceTextWithAI = async (
     }
 
     // Validate context parameter
-    const validContexts = ['achievement', 'summary', 'project', 'responsibility'];
+    const validContexts = ['achievement', 'summary', 'project', 'responsibility', 'differentiators'];
     if (!validContexts.includes(requestData.context)) {
       return {
         statusCode: 400,

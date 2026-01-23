@@ -30,6 +30,15 @@ export interface LinkedInDataResponse {
   error?: string;
 }
 
+export interface ValidateProfessionResponse {
+  success: boolean;
+  isValid?: boolean;
+  message?: string;
+  error?: string;
+  code?: string;
+  resetTime?: number;
+}
+
 class LinkedInProfileService {
   private async makeRequest(endpoint: string, data: any): Promise<LinkedInImportResponse> {
     const token = localStorage.getItem('auth-token');
@@ -83,6 +92,51 @@ class LinkedInProfileService {
     } catch (error) {
       console.error('Error importing LinkedIn profile via URL:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Validate if a profession/job title is valid using AI
+   */
+  async validateProfession(profession: string): Promise<ValidateProfessionResponse> {
+    try {
+      const token = localStorage.getItem('auth-token');
+      
+      console.log('🔧 LinkedIn Service - Validating profession:', profession);
+      
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/validate-profession`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ profession }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        return {
+          success: false,
+          isValid: false,
+          error: errorData.error || `HTTP error! status: ${response.status}`,
+          code: errorData.code,
+          resetTime: errorData.resetTime
+        };
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error validating profession:', error);
+      return {
+        success: false,
+        isValid: false,
+        error: error instanceof Error ? error.message : 'Unknown error occurred'
+      };
     }
   }
 

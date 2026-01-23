@@ -33,6 +33,7 @@ export function JobAnalysis({ onNext, onBack }: JobAnalysisProps) {
     editedJobInfo,
     setEditedJobInfo,
     generateQuestions,
+    isGeneratingQuestions,
   } = useJobTailoringStore();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -333,10 +334,21 @@ export function JobAnalysis({ onNext, onBack }: JobAnalysisProps) {
         </button>
         <button
           onClick={handleProceed}
-          className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-medium rounded-xl hover:from-orange-600 hover:to-amber-600 shadow-md hover:shadow-lg transition-all"
+          disabled={isGeneratingQuestions}
+          className={`flex items-center gap-2 px-8 py-3 font-medium rounded-xl shadow-md transition-all ${
+            isGeneratingQuestions
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 hover:shadow-lg'
+          }`}
         >
-          {t('jobTailoring.analysis.continueToQuestions')}
-          <ArrowRight className="w-5 h-5" />
+          {isGeneratingQuestions 
+            ? t('jobTailoring.questions.generating')
+            : t('jobTailoring.analysis.continueToQuestions')
+          }
+          {isGeneratingQuestions 
+            ? <Loader2 className="w-5 h-5 animate-spin" />
+            : <ArrowRight className="w-5 h-5" />
+          }
         </button>
       </div>
     </div>

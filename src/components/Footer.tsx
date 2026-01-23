@@ -26,6 +26,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
+                aria-label="Facebook"
               >
                 <Facebook className="w-5 h-5" />
               </a>
@@ -34,12 +35,14 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
+                aria-label="Instagram"
               >
                 <Instagram className="w-5 h-5" />
               </a>
               <a
                 href="mailto:contact@getquickresume.com"
                 className="text-gray-400 hover:text-white transition-colors"
+                aria-label={t('footer.emailUs')}
               >
                 <Mail className="w-5 h-5" />
               </a>

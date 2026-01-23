@@ -20,6 +20,7 @@ const templatesTableName = process.env.TEMPLATES_TABLE || 'getquickresume-api-te
 const supportTicketsTableName = process.env.SUPPORT_TICKETS_TABLE || 'getquickresume-api-support-tickets-dev';
 const resumeViewsTableName = process.env.RESUME_VIEWS_TABLE || 'getquickresume-api-resume-views-dev';
 const aiUsageLogsTableName = process.env.AI_USAGE_LOGS_TABLE || 'getquickresume-api-ai-usage-logs-dev';
+const validatedProfessionsTableName = process.env.VALIDATED_PROFESSIONS_TABLE || 'getquickresume-api-validated-professions-dev';
 
 /**
  * Creates the Users table
@@ -523,6 +524,50 @@ async function createAIUsageLogsTable() {
   }
 }
 
+/**
+ * Creates the Validated Professions table
+ * 
+ * Caches validated professions to avoid redundant AI calls.
+ * Only valid professions are stored - if a record exists, the profession is valid.
+ * 
+ * Schema:
+ * - professionKey (String, HASH) - Normalized profession (lowercase, trimmed)
+ * - originalProfession (String) - Original input for reference
+ * - validatedAt (String) - ISO timestamp when validated
+ */
+async function createValidatedProfessionsTable() {
+  try {
+    console.log(`Creating table: ${validatedProfessionsTableName}`);
+    
+    const command = new CreateTableCommand({
+      TableName: validatedProfessionsTableName,
+      AttributeDefinitions: [
+        {
+          AttributeName: 'professionKey',
+          AttributeType: 'S'
+        }
+      ],
+      KeySchema: [
+        {
+          AttributeName: 'professionKey',
+          KeyType: 'HASH'
+        }
+      ],
+      BillingMode: 'PAY_PER_REQUEST'
+    });
+
+    await client.send(command);
+    console.log(`✅ Table ${validatedProfessionsTableName} created successfully!`);
+  } catch (error) {
+    if (error.name === 'ResourceInUseException') {
+      console.log(`ℹ️  Table ${validatedProfessionsTableName} already exists`);
+    } else {
+      console.error('❌ Error creating table:', error);
+      throw error;
+    }
+  }
+}
+
 async function main() {
   try {
     console.log('🚀 Setting up DynamoDB local tables...');
@@ -539,6 +584,7 @@ async function main() {
     console.log(`Support Tickets Table: ${supportTicketsTableName}`);
     console.log(`Resume Views Table: ${resumeViewsTableName}`);
     console.log(`AI Usage Logs Table: ${aiUsageLogsTableName}`);
+    console.log(`Validated Professions Table: ${validatedProfessionsTableName}`);
     console.log('');
 
     await createUsersTable();
@@ -551,6 +597,7 @@ async function main() {
     await createSupportTicketsTable();
     await createResumeViewsTable();
     await createAIUsageLogsTable();
+    await createValidatedProfessionsTable();
     
     console.log('');
     console.log('✅ All tables created successfully!');

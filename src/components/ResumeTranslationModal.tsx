@@ -31,12 +31,15 @@ export function ResumeTranslationModal({
 
   if (!isOpen) return null;
 
-  // Filter out current language from available languages
-  const availableLanguages = SUPPORTED_LANGUAGES.filter(
-    lang => lang.code !== currentLanguage
-  );
+  // Keep current language selectable (needed for same-language rewrite/polish)
+  const availableLanguages = [...SUPPORTED_LANGUAGES].sort((a, b) => {
+    if (a.code === currentLanguage) return -1;
+    if (b.code === currentLanguage) return 1;
+    return a.name.localeCompare(b.name);
+  });
 
   const isPremium = user?.isPremium ?? false;
+  const isRewriteMode = !!selectedLanguage && selectedLanguage === currentLanguage;
 
   const handleTranslate = async () => {
     if (!selectedLanguage) {
@@ -54,12 +57,18 @@ export function ResumeTranslationModal({
     setError(null);
 
     try {
+      const mode = selectedLanguage === currentLanguage ? 'rewrite' : 'translate';
       const translatedResume: Resume = await resumeTranslationService.translateResume(
         resumeId,
-        selectedLanguage
+        selectedLanguage,
+        mode
       );
 
-      toast.success(t('resumeTranslation.success'));
+      toast.success(
+        mode === 'rewrite'
+          ? t('resumeTranslation.rewriteSuccess', t('resumeTranslation.success'))
+          : t('resumeTranslation.success')
+      );
       
       // Navigate to the new translated resume
       navigate(`/resume/${translatedResume.id}`);
@@ -153,6 +162,13 @@ export function ResumeTranslationModal({
                 >
                   <div className="text-2xl mb-1">{lang.flag}</div>
                   <div className="text-sm font-medium text-gray-900">{lang.name}</div>
+                  {lang.code === currentLanguage && (
+                    <div className="mt-1">
+                      <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-700">
+                        {t('resumeTranslation.currentLanguageBadge', 'Current')}
+                      </span>
+                    </div>
+                  )}
                 </button>
               ))}
             </div>
@@ -174,9 +190,13 @@ export function ResumeTranslationModal({
               <div className="flex items-center">
                 <CheckCircle className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0" />
                 <p className="text-sm text-blue-800">
-                  {t('resumeTranslation.confirmation', {
-                    language: selectedLanguageInfo?.name || selectedLanguage
-                  })}
+                  {isRewriteMode
+                    ? t('resumeTranslation.confirmationRewrite', {
+                        language: selectedLanguageInfo?.name || selectedLanguage,
+                      })
+                    : t('resumeTranslation.confirmation', {
+                        language: selectedLanguageInfo?.name || selectedLanguage,
+                      })}
                 </p>
               </div>
             </div>
@@ -200,12 +220,16 @@ export function ResumeTranslationModal({
                 {isTranslating ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    {t('resumeTranslation.translating')}
+                    {isRewriteMode
+                      ? t('resumeTranslation.rewriting', t('resumeTranslation.translating'))
+                      : t('resumeTranslation.translating')}
                   </>
                 ) : (
                   <>
                     <Globe className="w-4 h-4 mr-2" />
-                    {t('resumeTranslation.translateButton')}
+                    {isRewriteMode
+                      ? t('resumeTranslation.rewriteButton', t('resumeTranslation.translateButton'))
+                      : t('resumeTranslation.translateButton')}
                   </>
                 )}
               </button>

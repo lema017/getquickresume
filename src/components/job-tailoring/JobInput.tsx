@@ -7,7 +7,8 @@ import {
   ArrowLeft,
   ClipboardList,
   Sparkles,
-  AlertCircle
+  AlertCircle,
+  Loader2
 } from 'lucide-react';
 import { useJobTailoringStore } from '@/stores/jobTailoringStore';
 import { useDashboardStore } from '@/stores/dashboardStore';
@@ -32,6 +33,7 @@ export function JobInput({ preselectedResumeId, onNext, onBack }: JobInputProps)
     jobDescription,
     urlValidation,
     isValidatingUrl,
+    isAnalyzing,
     setSelectedResume,
     setInputMode,
     setJobUrl,
@@ -250,6 +252,7 @@ export function JobInput({ preselectedResumeId, onNext, onBack }: JobInputProps)
                     onConfirm={handleConfirmUrlContent}
                     onEdit={() => setInputMode('text')}
                     onReject={handleSwitchToManual}
+                    isLoading={isAnalyzing}
                   />
                 ) : (
                   <UrlValidator
@@ -327,15 +330,24 @@ export function JobInput({ preselectedResumeId, onNext, onBack }: JobInputProps)
           {inputMode === 'text' && (
             <button
               onClick={handleProceed}
-              disabled={!canProceed}
+              disabled={!canProceed || isAnalyzing}
               className={`flex items-center gap-2 px-8 py-3 font-medium rounded-xl transition-all ${
-                canProceed
+                canProceed && !isAnalyzing
                   ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 shadow-md hover:shadow-lg'
                   : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
             >
-              {t('jobTailoring.jobInput.analyzeJob')}
-              <ArrowRight className="w-5 h-5" />
+              {isAnalyzing ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  {t('jobTailoring.jobInput.analyzing')}
+                </>
+              ) : (
+                <>
+                  {t('jobTailoring.jobInput.analyzeJob')}
+                  <ArrowRight className="w-5 h-5" />
+                </>
+              )}
             </button>
           )}
         </div>

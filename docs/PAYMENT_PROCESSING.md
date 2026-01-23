@@ -149,7 +149,7 @@ Orders are created with custom metadata to track the user and plan type:
     custom_id: JSON.stringify({ userId, planType }),
     amount: {
       currency_code: 'USD',
-      value: '9.99' // or '59.99'
+      value: '15.00' // or '126.00'
     }
   }]
 }
@@ -416,8 +416,8 @@ console.log('Payment captured:', response.transactionId);
 
 | Plan | Price | Access Duration |
 |------|-------|-----------------|
-| Monthly | $9.99 USD | 1 month |
-| Yearly | $59.99 USD | 12 months |
+| Monthly | $15 USD | 1 month |
+| Yearly | $126 USD | 12 months |
 
 ---
 

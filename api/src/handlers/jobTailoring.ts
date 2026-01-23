@@ -40,9 +40,9 @@ const corsHeaders = {
 };
 
 const errorResponse = (
-  statusCode: number, 
-  error: string, 
-  message?: string, 
+  statusCode: number,
+  error: string,
+  message?: string,
   code?: string
 ): APIGatewayProxyResult => ({
   statusCode,
@@ -308,7 +308,7 @@ export async function enhanceAnswerHandler(
       return errorResponse(400, 'Invalid request body');
     }
 
-    const { text, context, questionId, language, resumeId } = body;
+    const { text, context, questionId, language, resumeId, question, jobInfo } = body;
 
     if (!text || !context || !questionId) {
       return errorResponse(400, 'Missing required fields', 'text, context, and questionId are required');
@@ -318,7 +318,7 @@ export async function enhanceAnswerHandler(
       return errorResponse(400, 'Text too long', 'Maximum 2000 characters allowed');
     }
 
-    // Enhance the answer
+    // Enhance the answer with full context (question text and job info)
     const enhancedText = await enhanceAnswer(
       text,
       context,
@@ -326,7 +326,9 @@ export async function enhanceAnswerHandler(
       language || 'en',
       userId,
       user.isPremium,
-      resumeId
+      resumeId,
+      question,
+      jobInfo
     );
 
     const response: EnhanceAnswerResponse = {
@@ -339,6 +341,87 @@ export async function enhanceAnswerHandler(
     return successResponse(response);
   } catch (error: any) {
     console.error('Error in enhanceAnswerHandler:', error);
+    return errorResponse(500, 'Internal server error', error.message);
+  }
+}
+
+// ============================================================================
+// 3.5. POST /api/job-tailoring/generate-answer-options
+// ============================================================================
+
+export async function generateAnswerOptionsHandler(
+  event: APIGatewayProxyEvent & AuthorizedEvent
+): Promise<APIGatewayProxyResult> {
+  try {
+    const userId = event.requestContext.authorizer?.userId;
+    if (!userId) {
+      return errorResponse(401, 'Unauthorized', 'User not authenticated');
+    }
+
+    const user = await getUserById(userId);
+    if (!user) {
+      return errorResponse(404, 'User not found');
+    }
+
+    // Rate limiting (same as enhance since it's similar AI usage)
+    const rateLimit = user.isPremium ? RATE_LIMITS.enhance.premium : RATE_LIMITS.enhance.free;
+    const rateLimitCheck = await checkRateLimit(userId, 'job-answer-options', rateLimit, RATE_LIMITS.enhance.windowMs);
+    if (!rateLimitCheck.allowed) {
+      return errorResponse(429, 'Rate limit exceeded', 'Please wait before making another request', 'RATE_LIMIT');
+    }
+
+    // Parse request body
+    let body: {
+      questionId: string;
+      question: string;
+      context: string;
+      resumeId: string;
+      jobInfo: any;
+      language?: 'en' | 'es';
+    };
+    try {
+      body = JSON.parse(event.body || '{}');
+    } catch (e) {
+      return errorResponse(400, 'Invalid request body');
+    }
+
+    const { questionId, question, context, resumeId, jobInfo, language } = body;
+
+    if (!questionId || !question || !context || !resumeId || !jobInfo) {
+      return errorResponse(400, 'Missing required fields', 'questionId, question, context, resumeId, and jobInfo are required');
+    }
+
+    // Get the resume
+    const resume = await getResumeById(userId, resumeId);
+    if (!resume) {
+      return errorResponse(404, 'Resume not found');
+    }
+
+    // Generate 3 answer options using AI
+    const { generateAnswerOptions } = await import('../services/jobTailoringService');
+    const options = await generateAnswerOptions(
+      resume,
+      question,
+      context,
+      jobInfo,
+      language || 'en',
+      userId,
+      user.isPremium
+    );
+
+    const response = {
+      success: true,
+      data: {
+        questionId,
+        options
+      },
+      remainingRequests: rateLimitCheck.remaining - 1,
+      resetTime: rateLimitCheck.resetTime,
+    };
+
+    return successResponse(response);
+  } catch (error: any) {
+    console.error('Error in generateAnswerOptionsHandler:', error);
     return errorResponse(500, 'Internal server error', error.message);
   }
 }
@@ -367,7 +450,7 @@ export async function generateTailoredResumeHandler(
       const limitMessage = user.isPremium
         ? `You have reached your monthly limit of ${usageLimits.limit} tailored resumes. Resets on ${new Date(usageLimits.resetDate!).toLocaleDateString()}.`
         : 'Free users can create 1 tailored resume. Upgrade to Premium for 40 per month.';
-      
+
       return errorResponse(403, 'Usage limit reached', limitMessage, 'USAGE_LIMIT_REACHED');
     }
 
@@ -386,7 +469,7 @@ export async function generateTailoredResumeHandler(
       return errorResponse(400, 'Invalid request body');
     }
 
-    const { resumeId, jobInfo, answers, language } = body;
+    const { resumeId, jobInfo, answers, language, matchScoreBefore, matchingSkills } = body;
 
     if (!resumeId || !jobInfo || !answers) {
       return errorResponse(400, 'Missing required fields', 'resumeId, jobInfo, and answers are required');
@@ -398,14 +481,17 @@ export async function generateTailoredResumeHandler(
       return errorResponse(404, 'Resume not found');
     }
 
-    // Generate the tailored resume
+    // Generate the tailored resume (pass matchScoreBefore for score improvement tracking)
+    // Also pass matchingSkills from initial analysis to prevent false-positive "missing" keywords
     const { tailoredResume, result } = await generateTailoredResume(
       resume,
       jobInfo,
       answers,
       language || 'en',
       userId,
-      user.isPremium
+      user.isPremium,
+      matchScoreBefore || 60,  // Default to 60 if not provided
+      matchingSkills || []     // Skills identified as matching in initial analysis
     );
 
     // Increment usage counter (but don't save yet - user needs to confirm save)
@@ -489,7 +575,7 @@ export async function saveTailoredResumeHandler(
 
     // Create new resume with tailored content
     const newResume = await createResume(userId, originalResume.resumeData, title);
-    
+
     // Update the resume with generated content and tailoring metadata
     await updateResume(userId, newResume.id, {
       generatedResume: tailoredResume,

@@ -1972,8 +1972,8 @@ Improve the text according to the instructions and user-provided context, mainta
         const maxTokens = hasRestrictions ? 16000 : 6000; // gpt-5 models need more tokens for large responses
         aiResponse = await this.callOpenAIWithUsage(prompt, { responseFormatJson: true, max_tokens: maxTokens, temperature: 0.1 });
       } else if (provider === 'groq') {
-        // Groq also supports JSON mode - use premium model for better JSON handling
-        aiResponse = await this.callGroqWithUsage(prompt, { responseFormatJson: true, max_tokens: 6000, temperature: 0.1, model });
+        // Groq with JSON mode - increased max_tokens to 16000 for users with extensive experience/certifications
+        aiResponse = await this.callGroqWithUsage(prompt, { responseFormatJson: true, max_tokens: 16000, temperature: 0.1, model });
       } else {
         aiResponse = await this.callAnthropicWithUsage(prompt);
       }
@@ -2028,9 +2028,9 @@ Improve the text according to the instructions and user-provided context, mainta
     // Sanitize all LinkedIn inputs to prevent prompt injection
     const safeProfession = sanitizeForPrompt(profession || '', 500);
     const safeAbout = sanitizeForPrompt(about || '', 5000);
-    const safeExperience = sanitizeForPrompt(experience || '', 15000);
+    const safeExperience = sanitizeForPrompt(experience || '', 25000);
     const safeEducation = sanitizeForPrompt(education || '', 5000);
-    const safeCertifications = sanitizeForPrompt(certifications || '', 3000);
+    const safeCertifications = sanitizeForPrompt(certifications || '', 8000);
     const safeProjects = sanitizeForPrompt(projects || '', 5000);
     const safeSkills = sanitizeForPrompt(skills || '', 3000);
     const safeRecommendations = sanitizeForPrompt(recommendations || '', 5000);
@@ -2040,24 +2040,29 @@ Improve the text according to the instructions and user-provided context, mainta
 You are an expert in human resources and professional profile analysis. Your task is to extract structured information from LinkedIn plain text and convert it to resume data format.
 
 **CRITICAL RULE - OUTPUT LANGUAGE: ${outLang === 'es' ? 'SPANISH' : 'ENGLISH'}**
-Every text field in your response MUST be in ${outLang === 'es' ? 'Spanish' : 'English'}. Translate ALL content from the input, regardless of its original language.
+Narrative text (sentences, descriptions) MUST be in ${outLang === 'es' ? 'Spanish' : 'English'}.
 
-**WHAT TO TRANSLATE:**
-All text fields: summary, jobDescription, profession, experience[].title/achievements[]/responsibilities[], education[].institution/degree/field, certifications[].name/issuer, projects[].name/description, achievements[].title/description.
+**TRANSLATE (narrative text):**
+- Job titles (e.g., "Software Engineer" → "${outLang === 'es' ? 'Ingeniero de Software' : 'Software Engineer'}")
+- Summary, jobDescription, responsibilities[], achievements[] sentences
+- Descriptive project names (e.g., "Backend API Development" → "${outLang === 'es' ? 'Desarrollo de API Backend' : 'Backend API Development'}")
 
-**EXAMPLES - Projects (MOST COMMON ERROR):**
-❌ WRONG: "Social Web Site For Pets allowing users to interact remotely..."
-✅ CORRECT (${outLang === 'es' ? 'Spanish' : 'English'}): "${outLang === 'es' ? 'Sitio web social para mascotas que permite a los usuarios interactuar de forma remota...' : 'Social Web Site For Pets allowing users to interact remotely...'}"
+**DO NOT TRANSLATE (preserve exactly):**
+- Company names: "Growth Acceleration Partners", "Decision Resources Group", "Petzila"
+- Product/brand names: "Petzi", "AWS", "Oracle ATG"
+- Technologies & frameworks: Java, Spring Boot, SSIS, PostgreSQL, MongoDB, Kubernetes, Docker, AngularJS, Node.js, Jenkins, etc.
+- Acronyms: ETL, CI/CD, API, REST, HTML, CSS, SQL
+- URLs and credential IDs
+- Proper nouns and certifications: "AWS Certified Solutions Architect"
 
-❌ WRONG: Copying project name "Backend API development" without translating
-✅ CORRECT: "${outLang === 'es' ? 'Desarrollo de API Backend' : 'Backend API Development'}"
-
-**NEGATIVE INSTRUCTION:**
-DO NOT copy English text when target language is Spanish. DO NOT copy Spanish text when target language is English. ALWAYS translate.
+**EXAMPLE:**
+INPUT: "For this project I was in charge of defining a strategy to automate ETL testing using SSIS and Postgres."
+${outLang === 'es' ? 'CORRECT: "Definí estrategia para automatizar pruebas de ETL utilizando SSIS y Postgres"' : 'CORRECT: "Defined strategy to automate ETL testing using SSIS and Postgres"'}
+(Note: ETL, SSIS, Postgres preserved; sentence translated)
 
 **INSTRUCTIONS:**
 1. Analyze the provided text from each LinkedIn section
-2. Extract and translate ALL text content to ${outLang === 'es' ? 'Spanish' : 'English'}
+2. Extract and translate ALL narrative text to ${outLang === 'es' ? 'Spanish' : 'English'} while preserving company names, proper nouns, acronyms, and technology terms exactly as they appear
 3. Structure information according to the ResumeData interface
 4. Infer missing fields when possible based on context
 5. Return ONLY a valid JSON object without additional text
@@ -2179,6 +2184,15 @@ Return a JSON object following this structure:
 \`\`\`
 
 **IMPORTANT RULES:**
+- **⚠️ CRITICAL - EXTRACT ALL ITEMS - READ THIS CAREFULLY ⚠️:** 
+  1. FIRST, count how many distinct experiences exist in the EXPERIENCE section (each job title/role is one entry)
+  2. FIRST, count how many distinct certifications exist in the CERTIFICATIONS section (each certification name is one entry)
+  3. Your output MUST have the SAME number of items as you counted
+  4. Do NOT merge multiple roles at the same company - each role = separate entry
+  5. Do NOT skip any certification even if from same issuer (e.g., multiple Udemy courses = multiple entries)
+  6. Extract 2-3 HIGH-QUALITY achievements per experience (quality over quantity)
+  7. If input has 14 experiences, output EXACTLY 14 experience entries
+  8. If input has 18 certifications, output EXACTLY 18 certification entries
 - If you don't find information for a field, use appropriate default values
 - For dates, use YYYY-MM format or YYYY if you only have the year
 - Generate unique IDs for each element (use prefixes like "exp-", "edu-", etc.)
@@ -2189,11 +2203,16 @@ Return a JSON object following this structure:
   * 11+ years: "executive"
 - **For profession**: Use the EXACT value provided by the user in the "PROFESSION" section above. Do NOT infer or determine it from job titles. If profession was provided, copy it exactly as given.
 - **For education**: Extract from "EDUCATION" section. Translate institution, degree, and field to ${outLang === 'es' ? 'Spanish' : 'English'} (e.g., "Bachelor's Degree" → "Licenciatura"). Apply CRITICAL RULE above.
-- **For certifications**: Extract from "CERTIFICATIONS" section. Translate name and issuer to ${outLang === 'es' ? 'Spanish' : 'English'}. For standard certifications (e.g., "AWS Certified Solutions Architect"), translate descriptive parts. Apply CRITICAL RULE above.
-- **For skillsRaw**: Extract ALL skills, tools, and technologies mentioned in "Skills", "Experience", and "Projects" sections. 
-  Include: programming languages, frameworks, development tools, technologies, methodologies, platforms, cloud services, CI/CD tools, databases, operating systems, and any other technical competencies.
-  IGNORE: "X experiences at [Company]", "Y validations", "companies more", company names, job titles.
-  EXAMPLES of what to extract: "Java", "Kubernetes", "Docker", "Spring Boot", "Node.js", "Cursor", "n8n", "Auth0", "Terraform", "MongoDB", "AngularJS", "Express JS", "Git", "AWS", "PostgreSQL", "Jenkins", "Maven", "JPA", "Hibernate", "Android", "HTML", "CSS", "JavaScript", "SQL", "XML", "Bootstrap", "JSP", "AJAX", "JSF", "EJB", "CDI", "Servlets", "Grunt", "Bower", "Yeoman", "JFreeChart", "Struts", "iReport", "JDBC", "XHTML", "JAX-WS", "JAXB", "JavaMail", "RichFaces", "Primefaces", "MyFaces", "GlusterFS", "Jax-Rs", "Memcached", "SSIS", "ETL", "Representational State Transfer", "Spring Framework", "JavaServer Pages", "ETL Testing", "Amazon Web Services (AWS)", "Docker", "Kubernetes", "Jenkins", "Git", "MongoDB", "PostgreSQL", "MySQL", "Oracle", "AWS S3", "AWS EC2", "AWS Cognito", "Glassfish", "Apache Tomcat", "Wildfly Jboss", "Nginx", "Puppet", "Hudson", "Jetty", "Selenium", "TestNG", "JUnit", "PowerMock", "Mockito", "Mocha", "Swagger", "Siege", "UrbanAirship", "Cloudinary", "Flyway DB", "JMS", "Realm io", "Google Maps API", "Google Sign In API", "HTTPS", "In app Purchases", "Akamai", "Websphere", "LexisNexis", "Acxiom", "Sitel", "Apache cxf", "Apache Tiles", "Dozer", "Open Rules", "Spring", "Apache Wicket", "Hibernate", "JMock", "PowerMock", "Maven", "Puppet", "Hudson", "Jenkins", "git", "AngularJS", "Bower", "Yeoman", "RequireJS", "Grunt", "Oracle ATG", "Selenium", "TestNg", "JUnit", "JEE", "JSF", "Facelets", "Seam", "Hibernate", "Primefaces", "Richfaces", "IntelliJ IDEA", "MySQL", "XHTML", "CSS", "Maven", "Java Mail", "Amazon AWS", "Glassfish", "Apache", "JAXRS", "Servlets"
+- **For certifications**: Extract ALL certifications (no quantity limit). IMPORTANT: Keep multiple certifications from the same issuer (e.g., multiple Udemy courses) as SEPARATE entries (do NOT merge them). Extract from "CERTIFICATIONS" section. Translate name and issuer to ${outLang === 'es' ? 'Spanish' : 'English'}. For standard certifications (e.g., "AWS Certified Solutions Architect"), translate descriptive parts. Apply CRITICAL RULE above.
+- **For skillsRaw**: Extract ALL skills, tools, and technologies from "Skills", "Experience", and "Projects" sections.
+  **Categories to extract:**
+  - Languages: Java, JavaScript, Python, TypeScript, SQL, etc.
+  - Frameworks: Spring Boot, Angular, React, Node.js, Express, etc.
+  - Databases: PostgreSQL, MongoDB, MySQL, Oracle, etc.
+  - Cloud/DevOps: AWS, Docker, Kubernetes, Jenkins, Terraform, etc.
+  - Testing: JUnit, Selenium, Mockito, TestNG, Mocha, etc.
+  - Tools: Git, Maven, Gradle, SSIS, etc.
+  **IGNORE**: "X experiences at [Company]", "Y validations", company names, job titles
 - **For projects**: Extract ALL mentioned projects (no quantity limit). Include: id, name, description, technologies[], dates, url.
   **⚠️ MOST CRITICAL FIELD FOR TRANSLATION ERRORS ⚠️**
   - name: MUST be in ${outLang === 'es' ? 'Spanish' : 'English'}. Translate from input.
@@ -2201,24 +2220,54 @@ Return a JSON object following this structure:
   **❌ NEVER DO THIS:** Copying "Social Web Site For Pets allowing users..." when target is Spanish
   **✅ ALWAYS DO THIS:** Translate to "${outLang === 'es' ? 'Sitio web social para mascotas que permite a los usuarios...' : 'Social Web Site For Pets allowing users...'}"
   Apply CRITICAL RULE above. Read ENTIRE projects section - extract each one.
-- **For experience**: For EACH work experience:
+- **For experience**: Extract ALL work experiences (no quantity limit). IMPORTANT: Keep multiple roles at the same company as SEPARATE entries (do NOT merge them into one). For EACH work experience:
   - title: Translate to ${outLang === 'es' ? 'Spanish' : 'English'} (e.g., "Software Engineer" → "Ingeniero de Software"). Apply CRITICAL RULE above.
   - responsibilities: Extract from "EXPERIENCE" section. Convert to present tense with action verbs. Translate to ${outLang === 'es' ? 'Spanish' : 'English'}. Only include explicitly mentioned items. Apply CRITICAL RULE above.
-  - achievements: **FIRST, try to EXTRACT** explicit achievements from the "EXPERIENCE" section text above. Look for:
-    * Direct mentions of achievements, accomplishments, results, or impact
-    * Metrics, percentages, numbers, or quantifiable results mentioned in the text
-    * Keywords that indicate achievements: "mejoré", "reduje", "aumenté", "implementé", "logré", "desarrollé", "optimicé", "escalé", "lideré", "creé", "diseñé", "mejoré", "reduje", "aumenté" (in Spanish) or "improved", "reduced", "increased", "implemented", "achieved", "developed", "optimized", "scaled", "led", "created", "designed" (in English)
-    * Results or outcomes mentioned in project descriptions within the experience text
-    * Convert them to past tense with Action→Result→Metric format when metrics are available.
-    **IF NO EXPLICIT ACHIEVEMENTS ARE FOUND**, **GENERATE** achievements based on the available information:
-    * Use the responsibilities mentioned for this position
-    * Consider projects associated with this experience (from the "PROJECTS" section that match the company or timeframe)
-    * Use technologies and tools mentioned in the job description
-    * Generate realistic achievements that reflect the work described (e.g., if responsibilities mention "implementing CI/CD", generate "Implemented CI/CD pipeline")
-    * Keep achievements coherent with the job title, company, and technologies mentioned
-    * Use Action→Result format when possible, but DO NOT invent specific metrics (percentages, numbers) unless they are in the original text
-    * Achievements should be plausible and realistic based on the responsibilities and technologies
-  Translate all achievements to ${outLang === 'es' ? 'Spanish' : 'English'}. Generate 3-5 per experience. Apply CRITICAL RULE above.
+  - achievements: 
+    **⚠️ EXTRACT 2-3 ACHIEVEMENTS PER EXPERIENCE - GROUNDED IN INPUT TEXT ⚠️**
+    
+    **HARD RULES:**
+    1. **QUANTITY**: Exactly 2-3 achievements per experience (no more, no less)
+    2. **NON-GENERIC ANCHOR (MANDATORY)**: Each achievement MUST include at least ONE non-generic anchor from that SAME experience's text.
+       - Valid non-generic anchors include domain/deliverable nouns like: ETL, SSIS, Postgres/PostgreSQL, SQL functions, data integrity, database recreation, test data loading, HTML report, performance/stress testing, API migration, video/audio sharing, device registration, etc.
+       - Tech stacks alone (e.g., "Java, Spring Boot, React") are NOT sufficient. If an achievement only anchors on a tech stack, it is INVALID → rewrite.
+       - If the experience text contains a specific deliverable phrase (2+ words), include it (e.g., "testing framework", "HTML report", "ETL testing", "data integrity").
+    3. **BALANCED**: For each experience, include:
+       - At least 1 TECHNICAL DELIVERABLE (what was built/implemented)
+       - At least 1 OUTCOME/IMPACT (result achieved - but ONLY if stated in text, no invented metrics)
+    
+    **EXTRACTION PATTERNS:**
+    - "I was in charge of X" → Achievement about X
+    - "I implemented/created/built X" → "Implemented/Created/Built X"
+    - "We implemented a framework that does X" → "Implemented framework for X"
+    - "For this project I..." → Extract what they did
+    
+    **EXAMPLE:**
+    INPUT: "For this project I was in charge of defining a strategy to allow the team to automate database and ETL testing using SSIS and Postgres. We implemented a new framework that allows us to execute all needed testing and generate a html report."
+    
+    CORRECT (anchored, balanced):
+    ✅ "Defined database and ETL testing automation strategy using SSIS and Postgres" (technical + anchor terms)
+    ✅ "Implemented multi-environment testing framework with automated HTML report generation" (technical + anchor terms)
+    
+    WRONG (generic, no anchors):
+    ❌ "Improved team efficiency" (no anchor term, vague)
+    ❌ "Implemented best practices" (no anchor term, generic)
+    ❌ "Reduced errors by 15%" (invented metric)
+    
+    **FORBIDDEN - REWRITE IF GENERATED:**
+    - "improved efficiency/team efficiency"
+    - "implemented best practices"
+    - "collaborated with team"
+    - "software solution"
+    - "improved code quality"
+    - "aplicación de software" / "software application" (unless explicitly stated in input)
+    - "eficiencia del equipo" / "team efficiency" (unless explicitly stated in input)
+    - "calidad y rendimiento de los productos" / "product quality and performance" (unless explicitly stated in input)
+    - "garantizó la calidad y el rendimiento" / "ensured quality and performance" (unless explicitly stated in input)
+    - Any invented percentage/metric
+    - Any achievement without a NON-GENERIC anchor from the input
+    
+    Translate to ${outLang === 'es' ? 'Spanish' : 'English'}. Preserve technology names (Java, SSIS, AWS, etc.).
 - **For achievements (global)**: Extract from About/Recommendations. Translate title and description to ${outLang === 'es' ? 'Spanish' : 'English'}. Apply CRITICAL RULE above.
 - **For jobDescription**: MANDATORY field. If "About" is empty/short, generate 2-3 sentences based on: most recent job, total years, top 3-5 skills. Must be in ${outLang === 'es' ? 'Spanish' : 'English'}. Apply CRITICAL RULE above.
 - **For summary**: Translate to ${outLang === 'es' ? 'Spanish' : 'English'}. Apply CRITICAL RULE above.
@@ -2226,15 +2275,52 @@ Return a JSON object following this structure:
 - Make sure the JSON is valid and complete
 
 **FINAL VERIFICATION - BEFORE RETURNING JSON:**
-Scan ALL text fields in your response. If ANY field contains text in a language other than ${outLang === 'es' ? 'Spanish' : 'English'}, translate it immediately.
+Scan ALL text fields. Narrative text (sentences, descriptions) MUST be in ${outLang === 'es' ? 'Spanish' : 'English'}.
 
-**Pay special attention to projects[]**: This is where errors most commonly occur. Every projects[].name and projects[].description MUST be in ${outLang === 'es' ? 'Spanish' : 'English'}.
+**PRESERVE (do not translate):** Company names, technology names (Java, AWS, SSIS, etc.), product names, acronyms, URLs.
 
-**Checklist:** summary, jobDescription, experience[].title/achievements[]/responsibilities[], education[].institution/degree/field, certifications[].name/issuer, projects[].name/description, achievements[].title/description.
+**TRANSLATE:** Job titles, summaries, achievement sentences, responsibility sentences, descriptive project names.
 
-**If you find English text when target is Spanish (or vice versa), translate it. NO EXCEPTIONS.**
+**Checklist:** summary, jobDescription, experience[].title/achievements[]/responsibilities[], education[].degree/field, projects[].description.
 
 **CRITICAL: You MUST return ONLY valid JSON. Do NOT include markdown code blocks, explanations, or any text outside the JSON object. The response must start with { and end with }.**
+
+**⚠️ FINAL EXTRACTION VERIFICATION ⚠️**
+Before generating JSON, count EVERY item in the input:
+1. Count each certification name in CERTIFICATIONS → output SAME count
+2. Count each job title/role in EXPERIENCE → output SAME count
+3. Do NOT merge or skip items
+4. Each experience: exactly 2-3 anchored achievements
+
+**⚠️ ACHIEVEMENT VERIFICATION (MANDATORY) ⚠️**
+Before returning JSON, verify EVERY achievement:
+
+1. **NON-GENERIC ANCHOR CHECK**: Does it contain at least ONE non-generic anchor from that experience's input text?
+   - Domain/deliverable: ETL, SSIS, Postgres/PostgreSQL, SQL functions, data integrity, database recreation, test data, HTML report, performance/stress testing, API migration proof-of-concept, etc.
+   - Tech stack only (Java/Spring Boot/React) is NOT sufficient.
+   - If NO non-generic anchor → REWRITE to include one from the input
+
+2. **FORBIDDEN PHRASE CHECK** - If present, REWRITE:
+   - "improved efficiency" / "mejoró la eficiencia"
+   - "best practices" / "mejores prácticas"
+   - "collaborated with team" / "colaboró con el equipo"
+   - "software solution" / "solución de software"
+   - "reduced errors by X%" (invented metrics)
+   - "aplicación de software" (unless explicitly stated in input)
+   - "eficiencia del equipo" (unless explicitly stated in input)
+   - "calidad y rendimiento de los productos" (unless explicitly stated in input)
+   - Any phrase that fits ANY job → too generic
+
+3. **BALANCE CHECK**: Each experience should have:
+   - At least 1 technical deliverable achievement
+   - At least 1 outcome/impact achievement (only if supported by text)
+
+4. **UNIQUENESS CHECK**: No achievement text repeated across experiences
+
+5. **TRANSLATION CHECK**:
+   - Narrative text in ${outLang === 'es' ? 'Spanish' : 'English'} ✓
+   - Company names preserved (not translated) ✓
+   - Technology names preserved (Java, AWS, SSIS, etc.) ✓
 
 Process the information and return the structured JSON object:`;
   }
@@ -2270,6 +2356,7 @@ Process the information and return the structured JSON object:`;
       parsed.languages = parsed.languages || [];
       parsed.achievements = parsed.achievements || [];
       parsed.skillsRaw = parsed.skillsRaw || [];
+
       // Migración: combinar toolsRaw en skillsRaw si existe
       if (parsed.toolsRaw && Array.isArray(parsed.toolsRaw) && parsed.toolsRaw.length > 0) {
         const existingSkills = parsed.skillsRaw || [];
@@ -2304,6 +2391,132 @@ Process the information and return the structured JSON object:`;
       console.error('Error parsing LinkedIn response:', error);
       console.error('Raw response:', response);
       throw new Error('Failed to parse LinkedIn response');
+    }
+  }
+
+  /**
+   * Validate if a given text is a valid profession or job title.
+   * Uses a lightweight AI call optimized for fast validation.
+   * Supports multilingual input (Spanish, English, Portuguese, etc.)
+   */
+  async validateProfession(
+    profession: string,
+    requestContext: { authorizer: { userId: string } }
+  ): Promise<{ isValid: boolean; message?: string }> {
+    const prompt = this.buildProfessionValidationPrompt(profession);
+
+    try {
+      const userId = requestContext.authorizer.userId;
+      const user = await getUserById(userId);
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      const isPremium = user.isPremium;
+      
+      // Use Groq for fast, lightweight validation
+      const { provider, model } = getAIConfigForUser(isPremium);
+      
+      let aiResponse: AIResponse;
+      if (provider === 'groq') {
+        aiResponse = await this.callGroqWithUsage(prompt, { 
+          temperature: 0.1, // Low temperature for consistent validation
+          max_tokens: 200,  // Small response expected
+          responseFormatJson: true,
+          model 
+        });
+      } else if (provider === 'openai') {
+        aiResponse = await this.callOpenAIWithUsage(prompt, { 
+          temperature: 0.1,
+          max_tokens: 200,
+          responseFormatJson: true
+        });
+      } else {
+        aiResponse = await this.callAnthropicWithUsage(prompt, { 
+          temperature: 0.1,
+          max_tokens: 200
+        });
+      }
+
+      // Track AI usage
+      await trackAIUsage({
+        userId,
+        endpoint: 'validateProfession',
+        provider,
+        model,
+        usage: aiResponse.usage,
+        isPremium
+      });
+
+      return this.parseProfessionValidationResponse(aiResponse.content);
+    } catch (error) {
+      console.error('Error validating profession with AI:', error);
+      throw new Error('Failed to validate profession');
+    }
+  }
+
+  /**
+   * Build a lightweight prompt for profession validation.
+   * Optimized for minimal token usage and fast response times.
+   */
+  private buildProfessionValidationPrompt(profession: string): string {
+    // Sanitize the profession input
+    const safeProfession = sanitizeUserInput(profession);
+
+    return `You are a profession validator. Determine if the input is a valid, correctly spelled profession or job title.
+
+VALID professions include:
+- Real job titles in any language, spelled correctly (e.g., "Software Engineer", "Ingeniero de Software", "Desenvolvedor", "Marketing Manager", "Chef", "Nurse", "Profesor", "Médico")
+- Career fields, spelled correctly (e.g., "Data Science", "Healthcare", "Finance", "Recursos Humanos")
+- Professional roles, spelled correctly (e.g., "Consultant", "Analyst", "Designer", "Contador")
+
+INVALID inputs include:
+- Random characters or gibberish (e.g., "asdfgh", "1234abc", "xyzqwe", "aaa")
+- Nonsense text that doesn't represent any profession
+- Single letters or numbers without meaning
+- Keyboard smashing or test input (e.g., "test", "qwerty")
+- Very short meaningless text (e.g., "ab", "xx")
+- Placeholder text (e.g., "placeholder", "example", "your profession here")
+- **TYPOS AND MISSPELLINGS**: Words that are close to real professions but contain spelling errors MUST be rejected. Examples:
+  - "software diveloper" (typo of "developer") → INVALID
+  - "sofware engineer" (typo of "software") → INVALID
+  - "managr" or "manger" (typo of "manager") → INVALID
+  - "engeneer" or "enginer" (typo of "engineer") → INVALID
+  - "accountent" (typo of "accountant") → INVALID
+  - "desinger" (typo of "designer") → INVALID
+  - "analista de sistems" (typo of "sistemas") → INVALID
+
+IMPORTANT: The profession MUST be spelled correctly. If a word looks like it could be a profession but has a spelling error, mark it as INVALID.
+
+Input to validate: "${safeProfession}"
+
+Respond with JSON only:
+- If valid (correctly spelled): {"isValid": true}
+- If invalid (gibberish, typo, or misspelled): {"isValid": false, "message": "Please enter a valid profession or job title (check spelling)"}`;
+  }
+
+  /**
+   * Parse the AI response for profession validation.
+   */
+  private parseProfessionValidationResponse(response: string): { isValid: boolean; message?: string } {
+    try {
+      // Clean the response
+      let cleanResponse = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      
+      const parsed = JSON.parse(cleanResponse);
+      
+      return {
+        isValid: parsed.isValid === true,
+        message: parsed.message || undefined
+      };
+    } catch (error) {
+      console.error('Error parsing profession validation response:', error);
+      console.error('Raw response:', response);
+      // On parse error, reject to be safe
+      return {
+        isValid: false,
+        message: 'Validation failed - please try again'
+      };
     }
   }
 

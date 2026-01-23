@@ -7,6 +7,7 @@ import { checkPremiumStatus } from '../utils/premiumValidator';
 
 interface TranslateResumeRequest {
   targetLanguage: string;
+  mode?: 'translate' | 'rewrite';
 }
 
 const SUPPORTED_LANGUAGES = ['en', 'zh', 'hi', 'es', 'fr', 'ar', 'bn', 'pt', 'ru', 'ja'];
@@ -110,6 +111,24 @@ export const translateResume = async (
     }
 
     const requestBody: TranslateResumeRequest = JSON.parse(event.body);
+    const mode: 'translate' | 'rewrite' = requestBody.mode ?? 'translate';
+
+    if (mode !== 'translate' && mode !== 'rewrite') {
+      return {
+        statusCode: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+          'Access-Control-Allow-Methods': 'POST,OPTIONS'
+        },
+        body: JSON.stringify({
+          success: false,
+          error: 'Invalid mode',
+          message: "Mode must be either 'translate' or 'rewrite'"
+        })
+      };
+    }
 
     // Validate target language
     if (!requestBody.targetLanguage || !SUPPORTED_LANGUAGES.includes(requestBody.targetLanguage)) {
@@ -164,8 +183,9 @@ export const translateResume = async (
       };
     }
 
-    // Check if already in target language
-    if (originalResume.resumeData.language === requestBody.targetLanguage) {
+    // Validate same-language rules based on mode
+    const sourceLanguage = originalResume.resumeData.language;
+    if (mode === 'translate' && sourceLanguage === requestBody.targetLanguage) {
       return {
         statusCode: 400,
         headers: {
@@ -181,6 +201,22 @@ export const translateResume = async (
       };
     }
 
+    if (mode === 'rewrite' && sourceLanguage !== requestBody.targetLanguage) {
+      return {
+        statusCode: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+          'Access-Control-Allow-Methods': 'POST,OPTIONS'
+        },
+        body: JSON.stringify({
+          success: false,
+          error: 'Rewrite mode requires targetLanguage to match the current resume language'
+        })
+      };
+    }
+
     // Translate resume with AI usage tracking
     const { translatedResumeData, translatedGeneratedResume } = await translationService.translateResume(
       originalResume.resumeData,
@@ -190,7 +226,8 @@ export const translateResume = async (
         userId,
         resumeId: originalResume.id,
         isPremium: user.isPremium
-      }
+      },
+      mode
     );
 
     // Create new resume with translated content
@@ -208,7 +245,10 @@ export const translateResume = async (
     };
 
     const languageName = languageNames[requestBody.targetLanguage] || requestBody.targetLanguage;
-    const translatedTitle = `${originalResume.title} (${languageName})`;
+    const translatedTitle =
+      mode === 'rewrite'
+        ? `${originalResume.title} (Polished)`
+        : `${originalResume.title} (${languageName})`;
 
     const translatedResume = await createResume(
       userId,

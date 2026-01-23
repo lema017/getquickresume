@@ -29,6 +29,7 @@ export const en = {
     show: 'Show',
     hide: 'Hide',
     refresh: 'Refresh',
+    clear: 'Clear',
   },
 
   // Navigation
@@ -45,6 +46,8 @@ export const en = {
     terms: 'Terms',
     refund: 'Refund Policy',
     support: 'Support',
+    openMenu: 'Open menu',
+    closeMenu: 'Close menu',
   },
 
   // Landing Page
@@ -61,6 +64,7 @@ export const en = {
         freeForever: '1 Free Resume',
         aiPowered: 'AI-Powered',
       },
+      featureCarousel: 'Feature highlights',
       animatedFeatures: [
         { icon: 'brain', text: 'AI Resume Builder' },
         { icon: 'file-text', text: 'Cover Letter Generator' },
@@ -385,7 +389,7 @@ export const en = {
       },
       monthly: {
         name: 'Premium',
-        price: '$9.99',
+        price: '$15',
         period: 'month',
         description: 'For active job seekers',
         features: [
@@ -404,14 +408,14 @@ export const en = {
       },
       yearly: {
         name: 'Premium Yearly',
-        price: '$4.99',
+        price: '$10.50',
         period: 'month',
-        savings: 'Save 50% — Billed $59.88/year',
+        savings: 'Save 30% — Billed $126/year',
         badge: 'Best Value',
         description: 'Best for long-term career growth',
         features: [
           'Everything in Premium Monthly',
-          '50% Savings',
+          '30% Savings',
           'Annual Billing',
           'Priority Support',
         ],
@@ -929,7 +933,10 @@ export const en = {
         completeRequiredSteps: 'Please complete the required steps before continuing',
         processingError: 'Error processing information',
         linkedInProcessingError: 'Error processing LinkedIn information',
-        premiumRequired: 'LinkedIn import is a premium feature. Please upgrade to access this functionality.'
+        premiumRequired: 'LinkedIn import is a premium feature. Please upgrade to access this functionality.',
+        invalidProfession: 'Please enter a valid profession or job title',
+        validationError: 'Error validating profession. Please try again.',
+        professionValidationHint: 'Examples: Software Engineer, Marketing Manager, Nurse, Accountant'
       },
       premiumRequired: {
         title: 'Premium Feature Required',
@@ -968,6 +975,7 @@ export const en = {
           skip: 'Skip',
           next: 'Next',
           processing: 'Processing...',
+          validating: 'Validating...',
           processInfo: 'Process Information'
         },
         help: {
@@ -2704,8 +2712,13 @@ export const en = {
     translateButton: 'Translate',
     translating: 'Translating...',
     success: 'Resume translated successfully!',
+    rewriteButton: 'Rewrite',
+    rewriting: 'Rewriting...',
+    rewriteSuccess: 'Resume rewritten successfully!',
     error: 'Error translating resume',
     confirmation: 'A new resume will be created in {{language}}',
+    confirmationRewrite: 'A new polished version will be created in {{language}}',
+    currentLanguageBadge: 'Current',
     premiumRequired: {
       title: 'Premium Feature',
       description: 'Resume translation is an exclusive feature for premium users. Upgrade your plan to access this functionality.',
@@ -2866,6 +2879,7 @@ export const en = {
     copyright: '© 2024 GetQuickResume. All rights reserved.',
     madeWith: 'Made with',
     inCostaRica: 'in Costa Rica',
+    emailUs: 'Email us',
   },
 
   // Checkout
@@ -3113,6 +3127,7 @@ export const en = {
         provideDescription: 'Please provide a job description',
       },
       analyzeJob: 'Analyze Job',
+      analyzing: 'Analyzing...',
       updated: 'Updated {{date}}',
     },
 
@@ -3144,6 +3159,7 @@ export const en = {
       enterManually: 'Enter details manually',
       editDetails: 'Edit Details',
       confirmContinue: 'Confirm & Continue',
+      analyzing: 'Analyzing...',
     },
 
     // JobAnalysis component
@@ -3197,6 +3213,11 @@ export const en = {
       progress: '{{answered}} of {{total}} questions answered',
       completeRequired: 'Complete required questions to continue',
       generateTailored: 'Generate Tailored Resume',
+      generatingTailored: 'Tailoring Resume...',
+      hint: 'Hint',
+      aiGeneratedOptions: 'AI-Generated Options',
+      generateAiSuggestions: 'Generate AI Suggestions',
+      regenerate: 'Regenerate',
     },
 
     // ReviewChanges component
@@ -3233,6 +3254,47 @@ export const en = {
         modified: 'modified',
         enhanced: 'enhanced',
       },
+      // New translations for enhanced review
+      fullyOptimized: 'ATS Optimized & Ready!',
+      fullyOptimizedDesc: 'Your resume is fully optimized for this job position',
+      matchBefore: 'Match Before',
+      matchAfter: 'Match After',
+      matchImproved: 'Match Improved',
+      answersUsed: 'Answers Applied',
+      answersAppliedTitle: 'Your Answers Applied',
+      answersAppliedDesc: '{{count}} of your answers were incorporated into the resume',
+      atsBreakdownTitle: 'ATS Score Breakdown',
+      atsBreakdownDesc: 'Detailed analysis of your resume optimization',
+      keywordAnalysisTitle: 'Keyword Analysis',
+      keywordAnalysisDesc: 'Compare your resume keywords with job requirements',
+    },
+
+    // ATS Breakdown component
+    atsBreakdown: {
+      excellent: 'Excellent',
+      good: 'Good',
+      needsImprovement: 'Needs Work',
+      poor: 'Poor',
+      atsReady: 'ATS Ready!',
+      recommendations: 'Recommendations for 100% Score',
+    },
+
+    // Keyword Analysis component
+    keywordAnalysis: {
+      matchOverview: 'Keyword Match Overview',
+      matched: 'matched',
+      critical: 'Critical',
+      important: 'Important',
+      niceToHave: 'Nice to Have',
+      missingCritical: 'Missing Critical Keywords',
+      missingCriticalHint: 'Consider adding these keywords if you have relevant experience.',
+      missingImportant: 'Missing Important Keywords',
+      matchedKeywords: 'Matched Keywords',
+      uniqueKeywords: 'Your Unique Keywords (Differentiators)',
+      uniqueKeywordsHint: 'These keywords set you apart from other candidates.',
+      fullComparison: 'Full Keyword Comparison',
+      yourResumeKeywords: 'Your Resume Keywords',
+      jobRequirements: 'Job Requirements',
     },
 
     // SaveTailored component
@@ -3258,6 +3320,9 @@ export const en = {
       saving: 'Saving...',
       saveResume: 'Save Resume',
       tailoredBadge: 'Tailored',
+      saveSuccess: 'Resume saved successfully! Redirecting to dashboard...',
+      saveError: 'Failed to save resume. Please try again.',
+      redirecting: 'Redirecting to dashboard...',
     },
 
     // JobApplicationsList component (Dashboard)
