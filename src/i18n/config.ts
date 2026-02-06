@@ -12,15 +12,24 @@ i18n
       es: { translation: es },
       en: { translation: en },
     },
-    lng: 'es', // Forzar idioma español por defecto
-    fallbackLng: 'es',
+    // Don't force lng - let LanguageDetector determine language
+    fallbackLng: 'en', // English as fallback for unsupported languages
+    supportedLngs: ['en', 'es'],
     debug: false,
     interpolation: {
       escapeValue: false,
     },
     detection: {
+      // Priority: 1) localStorage (user preference), 2) navigator (browser language), 3) htmlTag
       order: ['localStorage', 'navigator', 'htmlTag'],
       caches: ['localStorage'],
+      // Map language variants to supported languages (e.g., en-US -> en, es-MX -> es)
+      convertDetectedLanguage: (lng: string) => {
+        // Extract base language code (e.g., 'en-US' -> 'en', 'es-MX' -> 'es')
+        const baseLang = lng.split('-')[0].toLowerCase();
+        // Return supported language or fallback to English
+        return ['en', 'es'].includes(baseLang) ? baseLang : 'en';
+      },
     },
   });
 

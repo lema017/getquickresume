@@ -12,6 +12,8 @@ import {
   SaveTailoredResumeRequest,
   SaveTailoredResumeResponse,
   TailoringLimitsResponse,
+  IncorporateKeywordRequest,
+  IncorporateKeywordResponse,
   Resume,
   TailoredResumeMetadata,
 } from '../types';
@@ -25,6 +27,7 @@ import {
   checkTailoringLimits,
   incrementTailoringUsage,
   extractJobFromUrl,
+  incorporateKeyword,
 } from '../services/jobTailoringService';
 import { checkRateLimit } from '../middleware/rateLimiter';
 
@@ -68,6 +71,7 @@ const RATE_LIMITS = {
   generate: { free: 2, premium: 10, windowMs: 60000 },
   save: { free: 5, premium: 20, windowMs: 60000 },
   limits: { free: 10, premium: 30, windowMs: 60000 },
+  incorporateKeyword: { free: 0, premium: 5, windowMs: 60000 },  // Premium only, 5 per minute
 };
 
 // ============================================================================
@@ -469,10 +473,22 @@ export async function generateTailoredResumeHandler(
       return errorResponse(400, 'Invalid request body');
     }
 
-    const { resumeId, jobInfo, answers, language, matchScoreBefore, matchingSkills } = body;
+    const { resumeId, jobInfo, answers, claimedKeywords, language, matchScoreBefore, matchingSkills } = body;
 
-    if (!resumeId || !jobInfo || !answers) {
-      return errorResponse(400, 'Missing required fields', 'resumeId, jobInfo, and answers are required');
+    // Validate required fields - now accepts either answers or claimedKeywords
+    if (!resumeId || !jobInfo) {
+      return errorResponse(400, 'Missing required fields', 'resumeId and jobInfo are required');
+    }
+
+    // Convert claimedKeywords to answers format if provided (for backward compatibility with service)
+    let combinedAnswers = answers || [];
+    if (claimedKeywords && claimedKeywords.length > 0) {
+      const answersFromClaims = claimedKeywords.map(ck => ({
+        questionId: `claim-${ck.keyword}`,
+        question: `Describe your experience with ${ck.keyword}`,
+        answer: ck.enhancedContext || ck.userContext,
+      }));
+      combinedAnswers = [...combinedAnswers, ...answersFromClaims];
     }
 
     // Get the resume
@@ -486,7 +502,7 @@ export async function generateTailoredResumeHandler(
     const { tailoredResume, result } = await generateTailoredResume(
       resume,
       jobInfo,
-      answers,
+      combinedAnswers,  // Use combined answers (from both legacy answers and claimedKeywords)
       language || 'en',
       userId,
       user.isPremium,
@@ -669,3 +685,80 @@ export async function getTailoringLimitsHandler(
   }
 }
 
+// ============================================================================
+// 7. POST /api/job-tailoring/incorporate-keyword
+// ============================================================================
+export async function incorporateKeywordHandler(
+  event: APIGatewayProxyEvent & AuthorizedEvent
+): Promise<APIGatewayProxyResult> {
+  try {
+    const userId = event.requestContext.authorizer?.userId;
+    if (!userId) {
+      return errorResponse(401, 'Unauthorized', 'User not authenticated');
+    }
+
+    const user = await getUserById(userId);
+    if (!user) {
+      return errorResponse(404, 'User not found');
+    }
+
+    // Premium-only feature
+    if (!user.isPremium) {
+      return errorResponse(403, 'Premium required', 'This feature is only available to Premium users', 'PREMIUM_REQUIRED');
+    }
+
+    // Rate limiting
+    const rateLimit = RATE_LIMITS.incorporateKeyword.premium;
+    const rateLimitCheck = await checkRateLimit(userId, 'job-incorporate-keyword', rateLimit, RATE_LIMITS.incorporateKeyword.windowMs);
+    if (!rateLimitCheck.allowed) {
+      return errorResponse(429, 'Rate limit exceeded', 'Please wait before making another request', 'RATE_LIMIT');
+    }
+
+    // Parse request body
+    let body: IncorporateKeywordRequest;
+    try {
+      body = JSON.parse(event.body || '{}');
+    } catch (e) {
+      return errorResponse(400, 'Invalid request body');
+    }
+
+    const { keyword, userContext, importance, language, currentResume, jobInfo } = body;
+
+    // Validate required fields
+    if (!keyword || !userContext || !importance || !currentResume || !jobInfo) {
+      return errorResponse(400, 'Missing required fields', 'keyword, userContext, importance, currentResume, and jobInfo are required');
+    }
+
+    if (userContext.length < 10) {
+      return errorResponse(400, 'Context too short', 'Please provide at least 10 characters of context');
+    }
+
+    if (userContext.length > 2000) {
+      return errorResponse(400, 'Context too long', 'Maximum 2000 characters allowed');
+    }
+
+    // Call the service to incorporate the keyword
+    const result = await incorporateKeyword(
+      currentResume,
+      keyword,
+      userContext,
+      importance,
+      jobInfo,
+      language || 'en',
+      userId,
+      user.isPremium
+    );
+
+    const response: IncorporateKeywordResponse = {
+      success: true,
+      data: result,
+      remainingRequests: rateLimitCheck.remaining - 1,
+      resetTime: rateLimitCheck.resetTime,
+    };
+
+    return successResponse(response);
+  } catch (error: any) {
+    console.error('Error in incorporateKeywordHandler:', error);
+    return errorResponse(500, 'Internal server error', error.message);
+  }
+}

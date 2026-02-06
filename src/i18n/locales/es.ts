@@ -30,6 +30,11 @@ export const es = {
     hide: 'Ocultar',
     refresh: 'Actualizar',
     clear: 'Limpiar',
+    trust: {
+      noCardRequired: 'Sin tarjeta de crédito',
+      atsFriendly: 'Compatible con ATS',
+      privacyNote: 'Tus datos se mantienen privados',
+    },
   },
 
   // Navigation
@@ -52,17 +57,26 @@ export const es = {
 
   // Landing Page
   landing: {
+    urgencyBanner: {
+      limitedTime: 'Tiempo Limitado:',
+      message: 'Crea tu CV profesional GRATIS',
+      endsSoon: 'Oferta por tiempo limitado',
+    },
     hero: {
-      title: 'Crea CVs Profesionales con IA',
-      subtitle: 'Gratis. Rápido. Optimizado para ATS.',
-      description: 'Crea CVs ganadores en minutos — sin tarjeta de crédito.',
-      badge: '🚀 Comienza Gratis Hoy',
-      ctaPrimary: 'Crear CV Gratis',
+      title: 'Consigue más entrevistas con un CV optimizado para ATS y adaptado a ofertas de trabajo reales',
+      subtitle: 'Crea tu CV profesional GRATIS — Sin tarjeta de crédito, sin trampa. Comienza en 60 segundos.',
+      description: 'Crea tu CV profesional GRATIS — Sin tarjeta de crédito, sin trampa. Comienza en 60 segundos.',
+      badge: '🎁 Comienza GRATIS — Oferta Limitada',
+      ctaPrimary: 'Crear Mi CV GRATIS Ahora',
       ctaSecondary: 'Ver Funciones',
+      secondaryLinks: {
+        linkedin: 'Importar desde LinkedIn',
+        upload: 'Subir tu CV actual (PDF o Word)',
+      },
       trustIndicators: {
-        noCardRequired: 'Sin tarjeta',
-        freeForever: '1 CV Gratis',
-        aiPowered: 'Con IA',
+        noCardRequired: 'Gratis para Empezar',
+        freeForever: 'Sin Tarjeta de Crédito',
+        aiPowered: 'Plantillas Optimizadas para ATS',
       },
       featureCarousel: 'Características destacadas',
       animatedFeatures: [
@@ -74,6 +88,96 @@ export const es = {
         { icon: 'qr-code', text: 'Compartir con QR' },
       ],
     },
+    problem: {
+      title: '¿Envías CVs pero no consigues entrevistas? Esta es la razón.',
+      intro: 'La mayoría de los CVs son rechazados antes de que un reclutador los vea.',
+      body: 'Los Sistemas de Seguimiento de Candidatos (ATS) filtran automáticamente los CVs que:',
+      bullets: [
+        'No usan las palabras clave correctas',
+        'No están alineados con la descripción del puesto',
+        'No destacan claramente los logros relevantes',
+      ],
+      closing: 'Un CV fuerte no solo tiene buen diseño — tiene que pasar los filtros ATS.',
+    },
+    solution: {
+      title: 'Un CV que realmente pasa los ATS y se ajusta al puesto',
+      bullets: [
+        'Genera un CV potenciado con IA basado en tu experiencia real',
+        'Adapta tu CV a una descripción de trabajo específica',
+        'Verifica tu puntuación de compatibilidad ATS y ve qué mejorar',
+        'Traduce tu CV a otros idiomas sin perder calidad',
+      ],
+      closing: 'Todo en minutos. Sin empezar desde cero.',
+    },
+    atsChecker: {
+      title: '¿Tu CV pasa los Sistemas de Seguimiento de Candidatos?',
+      body: 'Nuestro verificador ATS analiza tu CV de la misma forma que los sistemas de contratación y muestra:',
+      bullets: [
+        'Una puntuación de compatibilidad ATS',
+        'Qué secciones necesitan mejora',
+        'Qué palabras clave faltan para el puesto',
+      ],
+      closing: 'Comienza gratis y ve tu puntuación ATS inicial al instante.',
+      cta: 'Verificar mi CV con ATS (gratis)',
+    },
+    jobTailoringSection: {
+      title: 'Un CV por trabajo — así funciona realmente la contratación',
+      intro: 'Enviar el mismo CV a todos los trabajos reduce drásticamente tus posibilidades.',
+      withGqr: 'Con GetQuickResume:',
+      steps: [
+        'Pega la descripción del puesto',
+        'Analizamos lo que busca el empleador',
+        'Tu CV se adapta para coincidir con ese puesto',
+      ],
+      closing: 'Mejor coincidencia → más entrevistas',
+      cta: 'Adaptar mi CV a una descripción de trabajo',
+    },
+    resumeForJobDescription: {
+      hero: {
+        title: 'CV Adaptado a la Descripción del Puesto — Lo Que Buscan los Empleadores',
+        subtitle: 'Deja de enviar CVs genéricos. Pega una descripción del puesto y adapta tu CV para coincidir con palabras clave, requisitos y filtros ATS.',
+        badge: 'Optimización para el Puesto',
+      },
+      ctaPrimary: 'Adaptar mi CV a una descripción de trabajo',
+      ctaSecondary: 'Ver vista previa de compatibilidad ATS',
+      problem: {
+        title: 'Por qué fallan los CVs genéricos',
+        bullets: [
+          'Baja coincidencia de palabras clave',
+          'Relevancia poco clara para el puesto',
+          'Filtros ATS detectan requisitos faltantes',
+        ],
+      },
+      howItWorks: {
+        title: 'Cómo funciona',
+        steps: [
+          { number: '1', title: 'Pega la descripción del puesto' },
+          { number: '2', title: 'Analizamos lo que busca el empleador' },
+          { number: '3', title: 'Tu CV se adapta para ese puesto' },
+        ],
+      },
+      benefit: 'Mejor coincidencia → más entrevistas',
+      trust: {
+        freeToStart: 'Sin tarjeta de crédito',
+        atsOptimized: 'Resultado optimizado para ATS',
+        privacyNote: 'Tus datos se mantienen privados',
+      },
+    },
+    templates: {
+      title: 'Plantillas de CV profesionales que los reclutadores realmente leen',
+      body: 'Diseños limpios y modernos que funcionan con ATS — no diseños llamativos que son rechazados.',
+      bullets: ['Profesional', 'Claro', 'Enfocado en resultados'],
+    },
+    whoItsFor: {
+      title: 'Perfecto para ti si estás…',
+      bullets: [
+        'Aplicando activamente a trabajos',
+        'Cambiando de rol o industria',
+        'Aplicando a empresas que usan ATS',
+        'Necesitando un CV en inglés u otro idioma',
+      ],
+    },
+    footerSeoMicrocopy: 'Creador de CV con IA · Verificador de CV ATS · CV adaptado a descripción de trabajo · Plantillas de CV profesionales · Traducción de CV',
     socialProof: {
       title: 'Confianza de Profesionales en Todo el Mundo',
       stats: {
@@ -93,6 +197,17 @@ export const es = {
           value: '4.9/5',
           label: 'Satisfacción de Usuarios',
         },
+      },
+    },
+    exploreTools: {
+      title: 'Explora Nuestras Herramientas Gratis',
+      subtitle: 'Todo lo que necesitas para crear un CV ganador',
+      links: {
+        atsChecker: 'Verificador ATS',
+        jobTailoring: 'Adaptar a Descripción de Trabajo',
+        aiBuilder: 'Creador de CV con IA',
+        translator: 'Traductor de CV',
+        templates: 'Plantillas de CV',
       },
     },
     coreFeatures: {
@@ -206,62 +321,74 @@ export const es = {
       },
     },
     freeTier: {
-      title: 'Comienza 100% Gratis',
+      title: 'Comienza gratis. Mejora cuando necesites mejores resultados.',
       subtitle: 'Sin tarjeta de crédito — sin compromisos',
       description: 'Crea tu primer CV profesional completamente gratis y consérvalo para siempre. Actualiza cuando quieras para desbloquear todas las funciones premium.',
       badge: 'Gratis Para Siempre',
       features: [
         {
           icon: 'check',
-          text: '1 CV Profesional',
+          text: '1 CV generado con IA',
         },
         {
           icon: 'check',
-          text: 'Generación de Contenido con IA',
+          text: '1 descarga en PDF',
         },
         {
           icon: 'check',
-          text: 'Plantillas Profesionales',
+          text: 'Vista previa básica de puntuación ATS',
         },
         {
           icon: 'check',
-          text: 'Descarga en PDF',
+          text: 'Plantillas profesionales',
         },
         {
           icon: 'check',
-          text: 'Revisión Gramatical',
+          text: 'Importar desde LinkedIn',
         },
       ],
-      cta: 'Crear Mi CV Gratis',
-      upgradeHint: '¿Necesitas más? Actualiza a Premium para CVs ilimitados y todas las funciones',
+      premiumFeatures: [
+        {
+          icon: 'check',
+          text: 'CVs ilimitados',
+        },
+        {
+          icon: 'check',
+          text: 'CV adaptado a múltiples descripciones de trabajo',
+        },
+        {
+          icon: 'check',
+          text: 'Puntuación ATS completa + lista de mejoras',
+        },
+        {
+          icon: 'check',
+          text: 'Traducción de CV y cartas de presentación',
+        },
+      ],
+      cta: 'Crear mi CV gratis',
+      upgradeHint: 'Mejora solo cuando necesites más entrevistas.',
     },
     howItWorks: {
-      title: 'Crea Tu CV Perfecto en 4 Simples Pasos',
+      title: 'Cómo funciona (3 simples pasos)',
       subtitle: 'Desde el registro hasta las solicitudes de trabajo en minutos',
       steps: [
         {
           number: '01',
-          title: 'Regístrate Gratis',
-          description: 'Crea tu cuenta instantáneamente con Google — sin tarjeta de crédito',
+          title: 'Crea o importa tu CV',
+          description: 'Empieza desde cero, LinkedIn o un archivo existente',
           icon: 'user-plus',
         },
         {
           number: '02',
-          title: 'Construye Tu CV',
-          description: 'Sigue nuestro asistente guiado con sugerencias de IA para cada sección',
-          icon: 'edit-3',
-        },
-        {
-          number: '03',
-          title: 'Mejora y Optimiza',
-          description: 'Usa IA para mejorar contenido, revisar gramática y aumentar tu puntuación ATS',
+          title: 'Optimízalo con IA',
+          description: 'Optimización ATS, redacción profesional y logros claros',
           icon: 'sparkles',
         },
         {
-          number: '04',
-          title: 'Comparte y Aplica',
-          description: 'Descarga, comparte vía QR o adapta para ofertas de trabajo específicas',
-          icon: 'share-2',
+          number: '03',
+          title: 'Descarga o comparte',
+          description: 'PDF profesional listo para aplicar',
+          icon: 'download',
         },
       ],
     },
@@ -296,39 +423,40 @@ export const es = {
       viewPricingDetails: 'Ver detalles completos de precios',
     },
     atsExplainer: {
-      title: 'Supera el ATS y Destaca',
-      subtitle: 'El 75% de los CVs son rechazados por ATS antes de que un humano los vea',
-      description: 'Los Sistemas de Seguimiento de Candidatos (ATS) son software usados por empresas para filtrar CVs antes de que lleguen a los reclutadores. Nuestra IA asegura que tu CV pase siempre.',
+      title: '¿Tu CV pasa los Sistemas de Seguimiento de Candidatos?',
+      subtitle: 'Nuestro verificador ATS analiza tu CV de la misma forma que los sistemas de contratación',
+      description: 'Nuestro verificador ATS analiza tu CV de la misma forma que los sistemas de contratación y muestra:',
       benefits: [
         {
-          icon: 'target',
-          title: 'Optimización de Palabras Clave',
-          description: 'La IA identifica y agrega palabras clave relevantes de las descripciones de trabajo'
+          icon: 'bar-chart',
+          title: 'Una puntuación de compatibilidad ATS',
+          description: 'Ve exactamente cómo funciona tu CV contra sistemas ATS reales'
         },
         {
-          icon: 'check-circle',
-          title: 'Formato Compatible con ATS',
-          description: 'Estructura limpia que las máquinas pueden leer perfectamente'
+          icon: 'alert-circle',
+          title: 'Qué secciones necesitan mejora',
+          description: 'Obtén retroalimentación específica sobre qué arreglar en tu CV'
         },
         {
-          icon: 'trending-up',
-          title: 'Seguimiento de Puntuación',
-          description: 'Ve tu puntuación ATS y mejórala con sugerencias específicas'
+          icon: 'search',
+          title: 'Qué palabras clave faltan',
+          description: 'Descubre las palabras clave que necesitas para el puesto que deseas'
         }
       ],
-      cta: 'Verificar Mi Puntuación ATS'
+      closing: 'Comienza gratis y ve tu puntuación ATS inicial al instante.',
+      cta: 'Verificar mi CV con ATS (gratis)'
     },
     cta: {
-      title: '¿Listo para Conseguir Tu Trabajo Ideal?',
+      title: 'Tu próximo trabajo comienza con un mejor CV',
       subtitle: 'Únete a miles de profesionales que consiguieron empleo con GetQuickResume',
       description: 'Comienza gratis hoy — sin tarjeta de crédito',
       features: [
-        '1 CV Gratis Para Siempre',
-        'Contenido Potenciado por IA',
-        'Optimización ATS',
-        'Plantillas Profesionales',
+        'Optimizado para ATS',
+        'Adaptado a descripciones de trabajo',
+        'Plantillas profesionales',
+        'Traducción de CV',
       ],
-      ctaPrimary: 'Crear Mi CV Gratis',
+      ctaPrimary: 'Crear mi CV optimizado para ATS (gratis)',
       ctaSecondary: 'Comparar Planes',
     },
     testimonials: {
@@ -370,22 +498,21 @@ export const es = {
       ],
     },
     plans: {
-      title: 'Precios Simples y Transparentes',
-      subtitle: 'Comienza gratis, actualiza cuando necesites más poder',
+      title: 'Comienza gratis. Mejora cuando necesites mejores resultados.',
+      subtitle: 'Sin tarjeta de crédito para comenzar',
       popularBadge: 'Más Popular',
+      upgradeHint: 'Mejora solo cuando necesites más entrevistas.',
       free: {
         name: 'Gratis',
         price: '$0',
         period: 'para siempre',
         description: 'Perfecto para comenzar',
         features: [
-          '1 CV Profesional',
-          'Generación de Contenido con IA',
-          'Revisión Gramatical',
-          'Plantillas Básicas',
-          'Descarga en PDF',
+          '1 CV generado con IA',
+          '1 descarga en PDF',
+          'Vista previa básica de puntuación ATS',
         ],
-        cta: 'Comenzar Gratis',
+        cta: 'Crear mi CV gratis',
       },
       monthly: {
         name: 'Premium',
@@ -393,16 +520,10 @@ export const es = {
         period: 'mes',
         description: 'Para buscadores de empleo activos',
         features: [
-          'CVs Ilimitados',
-          'Generador de Cartas de Presentación',
-          'Adaptación para Empleos',
-          'Puntuación y Análisis ATS',
-          'Traducción a 10+ Idiomas',
-          'Compartir con Código QR',
-          'Analíticas del CV',
-          'Mejora con IA',
-          'Plantillas Premium',
-          'Soporte Prioritario',
+          'CVs ilimitados',
+          'CV adaptado a múltiples descripciones de trabajo',
+          'Puntuación ATS completa + lista de mejoras',
+          'Traducción de CV y cartas de presentación',
         ],
         cta: 'Obtener Premium',
       },
@@ -436,6 +557,150 @@ export const es = {
         analytics: { name: 'Analíticas', free: false, premium: true },
         support: { name: 'Soporte', free: 'Email', premium: 'Prioritario' },
       },
+    },
+  },
+
+  // ATS Resume Checker Landing Page
+  atsResumeCheckerPage: {
+    hero: {
+      title: 'Verificador ATS de CV — Comprueba Si Tu Currículum Pasa los Sistemas de Contratación',
+      subtitle: 'La mayoría de los CVs son rechazados antes de que un reclutador los vea. Verifica tu puntuación de compatibilidad ATS y descubre qué mejorar — gratis para empezar.',
+      ctaPrimary: 'Verificar mi CV con ATS (gratis)',
+      ctaSecondary: 'Crear un currículum (gratis)',
+    },
+    whyRejected: {
+      title: 'Por qué la mayoría de CVs son rechazados',
+      bullets: [
+        'Faltan palabras clave específicas del puesto',
+        'Formato deficiente o estructura de secciones incorrecta',
+        'Logros débiles o poco claros',
+      ],
+    },
+    whatYouGet: {
+      title: 'Lo que obtendrás',
+      bullets: [
+        'Puntuación de compatibilidad ATS',
+        'Sugerencias de mejora por sección',
+        'Palabras clave faltantes para el puesto',
+      ],
+      premiumNote: 'Lista de verificación detallada disponible con Premium.',
+    },
+    trust: {
+      noCard: 'Sin tarjeta de crédito',
+      atsTemplates: 'Plantillas compatibles con ATS',
+      privacyNote: 'Tus datos se mantienen privados',
+    },
+    finalCta: {
+      title: '¿Listo para mejorar tu CV?',
+      subtitle: 'Sube tu currículum y obtén retroalimentación ATS instantánea — completamente gratis para empezar.',
+    },
+  },
+
+  // Página SEO de Traductor de CV
+  resumeTranslatorPage: {
+    hero: {
+      title: 'Traducción de CV — Traduce tu Currículum para Trabajos Globales',
+      subtitle: 'Traduce tu currículum sin perder el tono profesional, logros y estructura compatible con ATS.',
+      ctaPrimary: 'Traducir mi CV ahora',
+      ctaSecondary: 'Crear un currículum primero',
+    },
+    whyDifferent: {
+      title: 'Por qué la traducción de CV es diferente',
+      bullets: [
+        'La traducción literal puede sonar poco natural',
+        'La terminología de la industria importa',
+        'El formato debe seguir siendo compatible con ATS',
+      ],
+    },
+    supportedLanguages: {
+      title: 'Idiomas compatibles',
+      description: 'Traduce tu currículum a cualquiera de estos idiomas:',
+    },
+    trust: {
+      noCard: 'Sin tarjeta de crédito',
+      atsFriendly: 'Resultado compatible con ATS',
+      privacyNote: 'Tus datos se mantienen privados',
+    },
+    finalCta: {
+      title: '¿Listo para ser global?',
+      subtitle: 'Traduce tu currículum y postúlate a oportunidades internacionales.',
+    },
+  },
+
+  // AI Resume Builder SEO Page
+  aiResumeBuilderPage: {
+    hero: {
+      title: 'Creador de CV con IA — Crea un Currículum Profesional en Minutos',
+      subtitle: 'Genera un currículum listo para reclutadores desde tu experiencia real, optimiza para ATS y adáptalo a los trabajos que deseas.',
+      ctaPrimary: 'Crear mi CV con IA (gratis)',
+      ctaSecondaryLinkedIn: 'Importar desde LinkedIn',
+      ctaSecondaryUpload: 'Subir mi currículum actual',
+    },
+    whatAiDoes: {
+      title: 'Qué hace la IA',
+      bullets: [
+        'Crea puntos de logros fuertes desde tu experiencia',
+        'Mejora la claridad y el impacto',
+        'Mantiene una estructura compatible con ATS',
+      ],
+    },
+    whyThisWorks: {
+      title: 'Por qué esto funciona',
+      bullets: [
+        'Formato optimizado para ATS',
+        'Adaptación al puesto disponible cuando la necesites',
+        'Plantillas profesionales',
+      ],
+    },
+    templates: {
+      title: 'Plantillas de CV profesionales que los reclutadores realmente leen',
+      subtitle: 'Diseños limpios y modernos que funcionan con ATS — no diseños llamativos que son rechazados.',
+      labels: ['Clásico', 'Moderno', 'Profesional'],
+    },
+    trust: {
+      noCard: 'Sin tarjeta de crédito',
+      atsFriendly: 'Resultado compatible con ATS',
+      privacyNote: 'Tus datos se mantienen privados',
+    },
+    finalCta: {
+      title: '¿Listo para crear tu currículum?',
+      subtitle: 'Comienza gratis y obtén un currículum profesional en minutos.',
+    },
+    footerSeoMicrocopy: 'Creador de CV con IA · Verificador de CV ATS · CV adaptado a descripción del puesto · Plantillas de CV profesionales · Traducción de currículum',
+  },
+
+  // Resume Templates SEO Page
+  resumeTemplatesPage: {
+    hero: {
+      title: 'Plantillas de CV Profesionales — Compatibles con ATS y Listas para Reclutadores',
+      subtitle: 'Elige una plantilla limpia y moderna que los sistemas de contratación pueden leer y los reclutadores prefieren.',
+      ctaPrimary: 'Comenzar gratis',
+    },
+    whyTemplatesMatter: {
+      title: 'Por qué importan las plantillas',
+      bullets: [
+        'Diseño legible y estructurado',
+        'Formato compatible con ATS',
+        'Diseñado para destacar resultados',
+      ],
+    },
+    gallery: {
+      title: 'Galería de plantillas',
+      useTemplate: 'Usar esta plantilla',
+      free: 'Gratis',
+      premium: 'Premium',
+    },
+    trust: {
+      noCard: 'Sin tarjeta de crédito',
+      atsFriendly: 'Plantillas compatibles con ATS',
+      privacyNote: 'Tus datos se mantienen privados',
+    },
+    footerNote: {
+      text: 'Usa una plantilla + contenido con IA para un CV que luce genial y funciona bien.',
+    },
+    finalCta: {
+      title: '¿Listo para crear tu CV?',
+      subtitle: 'Elige una plantilla y deja que la IA te ayude a crear contenido convincente.',
     },
   },
 
@@ -1558,6 +1823,9 @@ export const es = {
             jobTitle: 'Cargo',
             company: 'Empresa',
             duration: 'Duración',
+            startDate: 'Fecha de Inicio',
+            endDate: 'Fecha de Fin',
+            currentJob: 'Trabajo actualmente aquí',
             location: 'Ubicación',
             description: 'Descripción',
             achievements: 'Logros Clave',
@@ -1577,6 +1845,8 @@ export const es = {
             institution: 'Institución',
             field: 'Campo de Estudio',
             duration: 'Duración',
+            graduationYear: 'Año de Graduación',
+            graduationYearPlaceholder: 'ej. 2022',
             gpa: 'GPA',
             coursework: 'Cursos Relevantes',
             honors: 'Honores'
@@ -1593,6 +1863,9 @@ export const es = {
             title: 'Proyectos',
             name: 'Nombre del Proyecto',
             duration: 'Duración',
+            startDate: 'Fecha de Inicio',
+            endDate: 'Fecha de Fin',
+            ongoing: 'Proyecto en progreso',
             description: 'Descripción',
             technologies: 'Tecnologías',
             achievements: 'Logros',
@@ -1612,7 +1885,17 @@ export const es = {
           edit: 'Editar',
           save: 'Guardar',
           cancel: 'Cancelar',
-          aiSuggestions: 'Sugerencias de IA'
+          aiSuggestions: 'Sugerencias de IA',
+          enhanceWithAI: 'Mejorar con IA',
+          addExperience: 'Agregar Experiencia',
+          addEducation: 'Agregar Educación',
+          addCertification: 'Agregar Certificación',
+          addProject: 'Agregar Proyecto',
+          addLanguage: 'Agregar Idioma',
+          confirmDelete: 'Confirmar Eliminación',
+          deleteWarning: 'Esta acción no se puede deshacer. ¿Estás seguro de que deseas eliminar este elemento?',
+          suggestAchievements: 'Sugerir Logros',
+          enhanceDescription: 'Mejorar Descripción'
         }
         }
       },
@@ -1801,10 +2084,24 @@ export const es = {
       upgradeCta: 'Actualizar a Premium',
       premiumBenefit: 'Obtén 10x más sugerencias de IA por minuto',
       retryButton: 'Intentar de nuevo',
+      progressSaved: 'Tu progreso se ha guardado automáticamente. Puedes esperar o volver más tarde.',
       // Mensajes específicos para recalificar
       rescoreTitle: 'Límite de Calificación Alcanzado',
       rescorePremiumMessage: 'La calificación de CVs usa análisis de IA. Para garantizar resultados de calidad para todos, hay un límite de uso justo de 5 calificaciones por minuto. Podrás intentar de nuevo en breve.',
       premiumLimitExplainer: 'Los usuarios Premium pueden calificar hasta 5 CVs por minuto',
+    },
+    score: {
+      readyToScore: 'Listo para Calificar tu CV',
+      scoreDescription: 'Obtén un análisis con IA de tu CV con mejoras accionables.',
+      scoreButton: 'Calificar CV',
+      rescoreButton: 'Recalificar CV',
+      scoring: 'Calificando...',
+      scoreSuccess: '¡CV calificado exitosamente!',
+      scoreError: 'Error al calificar el CV. Por favor, intenta de nuevo.',
+      freeUserNote: 'Los usuarios gratuitos obtienen una calificación por CV',
+      alreadyScored: 'CV Ya Calificado',
+      upgradeToRescore: 'Actualiza a Premium para recalificaciones ilimitadas después de editar',
+      upgradeCta: 'Actualizar a Premium',
     },
   },
 
@@ -2386,16 +2683,6 @@ export const es = {
           multipleVersions: 'Crea múltiples versiones de tu CV',
         },
       },
-      createResume: {
-        title: 'Crear Nuevo CV - Función Premium',
-        description: 'Ya has creado tu CV generado con IA gratis. Actualiza a Premium para crear CVs adicionales.',
-        cta: 'Actualizar para Crear',
-        benefits: {
-          unlimitedResumes: 'Crea CVs ilimitados',
-          aiGeneration: 'Generación de CV con IA',
-          allFeatures: 'Accede a todas las funciones premium',
-        },
-      },
       premiumTemplate: {
         title: 'Plantilla Premium',
         description: 'Este diseño de plantilla es exclusivo para usuarios Premium. Actualiza para desbloquear todas las plantillas y diseños premium.',
@@ -2576,6 +2863,43 @@ export const es = {
     rateLimitExceeded: 'Has alcanzado el límite de 5 mejoras por minuto',
     rateLimitMessage: 'Has alcanzado el límite de mejoras. Espera un minuto.',
     error: 'Error al mejorar el texto'
+  },
+  sectionEnhancement: {
+    title: 'Mejorar con IA',
+    tabs: {
+      autoEnhance: 'Mejora Automática',
+      askAI: 'Pedir Ayuda a IA',
+      manualEdit: 'Editar Manualmente'
+    },
+    descriptions: {
+      auto: 'Mejora automáticamente esta sección con IA para mayor claridad, impacto y profesionalismo.',
+      askAI: 'Proporciona instrucciones específicas para guiar cómo la IA debe mejorar esta sección.',
+      manual: 'Edita el texto directamente tú mismo.'
+    },
+    sections: {
+      summary: 'Resumen Profesional',
+      experience: 'Experiencia Laboral',
+      education: 'Educación',
+      certification: 'Certificaciones',
+      project: 'Proyectos',
+      achievement: 'Logros',
+      language: 'Idiomas'
+    },
+    originalText: 'Texto Original',
+    enhancedText: 'Texto Mejorado',
+    editText: 'Editar Texto',
+    enhanceButton: 'Mejorar',
+    enhancing: 'Mejorando con IA...',
+    enhancedPlaceholder: 'El texto mejorado aparecerá aquí después de hacer clic en "Mejorar"',
+    manualPlaceholder: 'Edita tu texto aquí...',
+    instructionsLabel: 'Tus Instrucciones',
+    instructionsPlaceholder: 'Ej: "Hazlo más conciso", "Añade logros cuantificables", "Usa verbos de acción más fuertes"',
+    tryAgain: 'Intentar de Nuevo',
+    applyChanges: 'Aplicar Cambios',
+    aiNote: 'Las mejoras de IA son sugerencias. Revisa antes de aplicar.',
+    emptyInstructions: 'Por favor, proporciona instrucciones para la IA.',
+    rateLimitMessage: 'Límite de solicitudes alcanzado. Por favor, espera antes de intentar de nuevo.',
+    error: 'Error al mejorar la sección'
   },
   review: {
     downloadSuccess: 'CV descargado exitosamente',
@@ -2931,6 +3255,14 @@ export const es = {
   footer: {
     quickLinks: 'Enlaces Rápidos',
     legal: 'Legal',
+    tools: 'Herramientas',
+    toolLinks: {
+      atsChecker: 'Verificador ATS',
+      jobTailoring: 'CV para Descripción de Trabajo',
+      aiBuilder: 'Creador de CV con IA',
+      translator: 'Traductor de CV',
+      templates: 'Plantillas de CV',
+    },
     copyright: '© 2024 GetQuickResume. Todos los derechos reservados.',
     madeWith: 'Hecho con',
     inCostaRica: 'en Costa Rica',
@@ -3145,13 +3477,15 @@ export const es = {
       back: 'Volver',
     },
 
-    // Nombres de pasos
+    // Nombres de pasos - Ahora 4 pasos en vez de 5
     steps: {
       jobDetails: 'Detalles del Trabajo',
-      analysis: 'Análisis',
-      questions: 'Preguntas',
+      summary: 'Resumen',          // NUEVO: Reemplaza análisis + preguntas
       review: 'Revisar',
       save: 'Guardar',
+      // OBSOLETO: Se mantiene para compatibilidad
+      analysis: 'Análisis',
+      questions: 'Preguntas',
     },
 
     // Componente JobInput
@@ -3243,7 +3577,52 @@ export const es = {
       continueToQuestions: 'Continuar a Preguntas',
     },
 
-    // Componente ClarificationQuestions
+    // NUEVO: Componente TailoringSummary (reemplaza análisis + preguntas)
+    summary: {
+      analyzing: 'Analizando tu CV',
+      analyzingDesc: 'Ejecutando análisis completo de ATS y coincidencia de palabras clave...',
+      noData: 'No hay datos de análisis disponibles',
+      goBack: 'Volver e intentar de nuevo',
+      title: 'Resumen de Personalización',
+      subtitle: 'Revisa tu puntuación ATS y reclama las palabras clave faltantes que tienes experiencia',
+      // Etiquetas de estado de puntuación
+      excellent: 'Excelente',
+      good: 'Bueno',
+      needsImprovement: 'Necesita Mejora',
+      poor: 'Pobre',
+      // Sección de puntuación ATS
+      atsScore: 'Puntuación de Coincidencia ATS',
+      canImprove: 'Puede mejorar',
+      matchedKeywords: 'Palabras Clave Coincidentes',
+      missingCritical: 'Críticas Faltantes',
+      keywordsClaimed: 'Palabras Clave Reclamadas',
+      // Sección de fortalezas
+      strengths: 'Fortalezas del CV',
+      itemsFound: 'elementos encontrados',
+      noStrengths: 'No se identificaron fortalezas específicas aún',
+      // Sección de debilidades
+      areasToImprove: 'Áreas a Mejorar',
+      suggestionsFound: 'sugerencias',
+      noWeaknesses: 'No se identificaron áreas específicas a mejorar',
+      // Secciones de palabras clave faltantes
+      missingCriticalKeywords: 'Palabras Clave Críticas Faltantes',
+      missingImportantKeywords: 'Palabras Clave Importantes Faltantes',
+      missingNiceToHaveKeywords: 'Habilidades Deseables',
+      claimIfYouHave: 'Haz clic en + para reclamar si tienes esta experiencia',
+      keywordsToConsider: 'palabras clave a considerar',
+      bonusKeywords: 'palabras clave adicionales a considerar',
+      keywordsAlreadyPresent: 'palabras clave ya en tu CV',
+      claimKeyword: 'Reclamar esta palabra clave',
+      removeKeyword: 'Eliminar reclamo',
+      // Resumen de palabras clave reclamadas
+      claimedKeywordsSummary: 'Palabras Clave que Has Reclamado',
+      claimedKeywordsNote: 'Estas palabras clave serán incorporadas en tu CV personalizado basándose en la experiencia que describiste.',
+      // Acciones
+      generating: 'Generando...',
+      generateTailored: 'Generar CV Personalizado',
+    },
+
+    // OBSOLETO: Componente ClarificationQuestions (se mantiene para compatibilidad)
     questions: {
       generating: 'Generando Preguntas...',
       generatingDesc: 'Nuestra IA está creando preguntas personalizadas basadas en los requisitos del trabajo',
@@ -3343,13 +3722,66 @@ export const es = {
       niceToHave: 'Deseable',
       missingCritical: 'Palabras Clave Críticas Faltantes',
       missingCriticalHint: 'Considera añadir estas palabras clave si tienes experiencia relevante.',
+      missingCriticalHintWithAdd: 'Haz clic en el botón + para añadir las habilidades en las que tienes experiencia.',
       missingImportant: 'Palabras Clave Importantes Faltantes',
+      missingImportantHintWithAdd: 'Haz clic en el botón + para añadir las habilidades en las que tienes experiencia.',
       matchedKeywords: 'Palabras Clave Coincidentes',
       uniqueKeywords: 'Tus Palabras Clave Únicas (Diferenciadores)',
       uniqueKeywordsHint: 'Estas palabras clave te distinguen de otros candidatos.',
       fullComparison: 'Comparación Completa de Palabras Clave',
       yourResumeKeywords: 'Palabras Clave de Tu CV',
       jobRequirements: 'Requisitos del Trabajo',
+      addKeywordTitle: 'Tengo esta habilidad - añadir al CV',
+    },
+
+    // Keyword Intelligence (sección unificada en página de revisión)
+    keywordIntelligence: {
+      title: 'Inteligencia de Palabras Clave ATS',
+      subtitle: 'Resultados de optimización de palabras clave',
+      before: 'Antes de Optimizar',
+      after: 'Después de Optimizar',
+      improved: 'Mejora',
+      matched: 'coinciden',
+      criticalMissing: 'críticas faltantes',
+      importantMissing: 'importantes faltantes',
+      criticalRequirements: 'Requisitos Críticos',
+      importantSkills: 'Habilidades Importantes',
+      keywordsAdded: 'Palabras Clave Añadidas en esta Optimización',
+      keywordsOptimized: 'palabras clave optimizadas',
+      differentiators: 'Tus Diferenciadores',
+      standOut: 'Habilidades que te hacen destacar',
+      addKeywordTitle: 'Tengo esta habilidad - añadir al CV',
+      addCriticalHint: 'Haz clic en + para añadir habilidades en las que tienes experiencia',
+      addedHint: 'Estas palabras clave fueron añadidas estratégicamente para mejorar tu puntuación ATS',
+      differentiatorsHint: 'Estas habilidades únicas te distinguen de otros candidatos',
+      niceToHaveMissing: 'deseables faltantes',
+      niceToHaveSkills: 'Habilidades Deseables',
+    },
+
+    // Modal Añadir Palabra Clave
+    addKeyword: {
+      title: 'Añadir Palabra Clave Faltante',
+      subtitle: 'Cuéntanos sobre tu experiencia',
+      errorEmpty: 'Por favor proporciona algo de contexto sobre tu experiencia con esta habilidad.',
+      errorTooShort: 'Por favor proporciona más detalles (al menos 10 caracteres).',
+      errorGeneric: 'Error al añadir la palabra clave. Por favor intenta de nuevo.',
+      errorEnhance: 'Error al mejorar el texto. Por favor intenta de nuevo.',
+      criticalDesc: 'Esta palabra clave es crítica para el trabajo. Añadirla mejorará significativamente tu puntuación de coincidencia.',
+      importantDesc: 'Esta palabra clave es importante para el trabajo. Añadirla ayudará a mejorar tus posibilidades.',
+      contextLabel: 'Describe tu experiencia con {{keyword}}',
+      placeholder: 'ej., "3 años de experiencia usando {{keyword}} para desarrollo backend e integraciones de API"',
+      hint: 'La IA incorporará esto en tus secciones de Habilidades, Resumen y/o Experiencia.',
+      suggestions: 'Sugerencias rápidas',
+      prompt1: 'Tengo 2-3 años de experiencia con {{keyword}}',
+      prompt2: 'Usé {{keyword}} en proyectos que involucran...',
+      prompt3: 'Certificado en {{keyword}} / completé formación en {{keyword}}',
+      premiumFeature: 'Función Premium: La IA añadirá inteligentemente esta palabra clave a las secciones relevantes del CV',
+      adding: 'Añadiendo...',
+      addToResume: 'Añadir al CV',
+      // NUEVO: Mejora con IA
+      enhanced: 'Texto mejorado por IA',
+      enhancing: 'Mejorando...',
+      enhanceWithAI: 'Mejorar con IA',
     },
 
     // Componente SaveTailored
@@ -3408,6 +3840,29 @@ export const es = {
         description: '¿Estás seguro de que quieres eliminar este CV personalizado? Esta acción no se puede deshacer.',
         deleting: 'Eliminando...',
       },
+    },
+
+    // Diálogo de recuperación de sesión
+    recovery: {
+      title: '¿Continuar tu progreso?',
+      message: 'Tienes una sesión de personalización sin terminar. ¿Te gustaría continuar donde lo dejaste?',
+      continue: 'Continuar',
+      startFresh: 'Empezar de nuevo',
+      resumeLabel: 'CV:',
+      stepInfo: 'Progreso: Paso {{step}} de 5',
+    },
+
+    // Diálogo de confirmación de salida
+    leave: {
+      title: '¿Salir de la personalización?',
+      message: 'Tienes progreso sin guardar. ¿Estás seguro de que quieres salir? Tu progreso se guardará y podrás volver más tarde.',
+      leave: 'Salir',
+      stay: 'Quedarme',
+    },
+
+    // Errores
+    errors: {
+      resumeDeleted: 'El CV que estabas personalizando ha sido eliminado. Por favor selecciona uno nuevo.',
     },
   },
 

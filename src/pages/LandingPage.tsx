@@ -18,7 +18,16 @@ import {
   TrendingUp,
   Award,
   Gift,
-  ChevronRight
+  ChevronRight,
+  Upload,
+  Linkedin,
+  FileText,
+  AlertCircle,
+  Search,
+  XCircle,
+  Briefcase,
+  Languages,
+  Download
 } from 'lucide-react';
 import { IconWrapper } from '@/components/IconWrapper';
 import {
@@ -30,6 +39,7 @@ import {
   commonFAQs,
   BASE_URL,
 } from '@/utils/seoConfig';
+import { trackLandingView, trackCtaClickStart } from '@/services/marketingAnalytics';
 
 export function LandingPage() {
   const { t, i18n } = useTranslation();
@@ -37,6 +47,11 @@ export function LandingPage() {
   const seo = getPageSEO('home', lang);
   const [activeFeatureTab, setActiveFeatureTab] = useState('jobTailoring');
   const [currentFeatureIndex, setCurrentFeatureIndex] = useState(0);
+
+  // Track landing page view
+  useEffect(() => {
+    trackLandingView('home');
+  }, []);
 
   // Animated feature rotation for hero
   const animatedFeatures = t('landing.hero.animatedFeatures', { returnObjects: true }) as { icon: string; text: string }[];
@@ -107,6 +122,22 @@ export function LandingPage() {
       </Helmet>
 
       <div className="min-h-screen">
+        {/* Urgency Banner - FREE Messaging (Sticky below header + Clickable) */}
+        <Link 
+          to="/login"
+          className="block sticky top-16 z-30 bg-gradient-to-r from-emerald-500 to-green-500 text-white py-2.5 px-4 text-center hover:from-emerald-600 hover:to-green-600 transition-all duration-300 cursor-pointer shadow-md"
+        >
+          <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 flex-wrap">
+            <span className="inline-flex items-center gap-1.5">
+              <span className="text-lg">🔥</span>
+              <span className="font-bold">{t('landing.urgencyBanner.limitedTime')}</span>
+            </span>
+            <span>{t('landing.urgencyBanner.message')}</span>
+            <span className="text-emerald-100 text-sm hidden sm:inline">— {t('landing.urgencyBanner.endsSoon')}</span>
+            <ArrowRight className="w-4 h-4 ml-1 hidden sm:inline" />
+          </div>
+        </Link>
+
         {/* Hero Section - Clean & Modern */}
         <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 py-16 lg:py-24">
           {/* Background decorations */}
@@ -116,13 +147,16 @@ export function LandingPage() {
           
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-emerald-500/20 to-green-500/20 border border-emerald-500/30 backdrop-blur-sm mb-6">
-                <Gift className="w-4 h-4 text-emerald-400" />
-                <span className="text-sm font-medium text-emerald-100">
+              {/* Badge - Prominent FREE messaging (Clickable) */}
+              <Link 
+                to="/login"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-emerald-500/30 to-green-500/30 border-2 border-emerald-400/50 backdrop-blur-sm mb-6 animate-pulse hover:from-emerald-500/50 hover:to-green-500/50 hover:border-emerald-400/70 transition-all duration-300 cursor-pointer"
+              >
+                <Gift className="w-5 h-5 text-emerald-300" />
+                <span className="text-base font-bold text-white">
                   {t('landing.hero.badge')}
                 </span>
-              </div>
+              </Link>
               
               {/* Main Title */}
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-white via-blue-100 to-cyan-100 bg-clip-text text-transparent leading-tight">
@@ -185,23 +219,56 @@ export function LandingPage() {
               </div>
               
               {/* CTAs */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-                <Link 
-                  to="/login" 
-                  className="group relative px-8 py-4 bg-white text-blue-900 rounded-xl font-semibold text-lg shadow-2xl hover:shadow-white/20 transition-all duration-300 flex items-center gap-2 hover:scale-105"
-                >
-                  <Zap className="w-5 h-5" />
-                  {t('landing.hero.ctaPrimary')}
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6 w-full sm:w-auto px-4 sm:px-0 overflow-visible">
+                <div className="relative w-full sm:w-auto mt-4 sm:mt-0">
+                  {/* Pulsing FREE badge (Clickable) */}
+                  <Link 
+                    to="/login"
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:-right-3 sm:-top-2 z-10"
+                  >
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-green-500 text-white text-xs font-bold shadow-lg animate-pulse hover:bg-green-600 transition-colors cursor-pointer">
+                      FREE
+                    </span>
+                  </Link>
+                  <Link 
+                    to="/login" 
+                    onClick={() => trackCtaClickStart('create', 'home')}
+                    className="group relative w-full sm:w-auto px-6 sm:px-8 py-4 bg-white text-blue-900 rounded-xl font-semibold text-base sm:text-lg shadow-2xl hover:shadow-white/20 transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 text-center leading-snug"
+                  >
+                    <Zap className="w-5 h-5 flex-shrink-0" />
+                    <span>{t('landing.hero.ctaPrimary')}</span>
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                  </Link>
+                </div>
                 
                 <a 
                   href="#features" 
-                  className="px-8 py-4 border-2 border-white/30 text-white rounded-xl font-semibold text-lg backdrop-blur-sm hover:bg-white/10 transition-all duration-300 flex items-center gap-2"
+                  className="w-full sm:w-auto px-6 sm:px-8 py-4 border-2 border-white/30 text-white rounded-xl font-semibold text-base sm:text-lg backdrop-blur-sm hover:bg-white/10 transition-all duration-300 flex items-center justify-center gap-2 text-center leading-snug"
                 >
-                  {t('landing.hero.ctaSecondary')}
-                  <ChevronRight className="w-5 h-5" />
+                  <span>{t('landing.hero.ctaSecondary')}</span>
+                  <ChevronRight className="w-5 h-5 flex-shrink-0" />
                 </a>
+              </div>
+
+              {/* Secondary Links */}
+              <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-8 text-sm">
+                <Link 
+                  to="/wizard/linkedin" 
+                  onClick={() => trackCtaClickStart('import', 'home')}
+                  className="flex items-center gap-2 text-blue-200 hover:text-white transition-colors"
+                >
+                  <Linkedin className="w-4 h-4" />
+                  {t('landing.hero.secondaryLinks.linkedin')}
+                </Link>
+                <span className="hidden sm:inline text-slate-500">|</span>
+                <Link 
+                  to="/wizard/upload" 
+                  onClick={() => trackCtaClickStart('upload', 'home')}
+                  className="flex items-center gap-2 text-blue-200 hover:text-white transition-colors"
+                >
+                  <Upload className="w-4 h-4" />
+                  {t('landing.hero.secondaryLinks.upload')}
+                </Link>
               </div>
               
               {/* Trust Indicators */}
@@ -211,11 +278,11 @@ export function LandingPage() {
                   <span>{t('landing.hero.trustIndicators.noCardRequired')}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Gift className="w-4 h-4 text-amber-400" />
+                  <Target className="w-4 h-4 text-amber-400" />
                   <span>{t('landing.hero.trustIndicators.freeForever')}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-purple-400" />
+                  <FileText className="w-4 h-4 text-purple-400" />
                   <span>{t('landing.hero.trustIndicators.aiPowered')}</span>
                 </div>
               </div>
@@ -264,6 +331,115 @@ export function LandingPage() {
                 <p className="text-slate-600 text-sm">{t('landing.socialProof.stats.satisfaction.label')}</p>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Explore Tools Section */}
+        <section className="py-10 bg-slate-50 border-b border-slate-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">
+                {t('landing.exploreTools.title')}
+              </h2>
+              <p className="text-slate-600">
+                {t('landing.exploreTools.subtitle')}
+              </p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-3">
+              <Link 
+                to="/ats-resume-checker" 
+                className="group px-5 py-3 rounded-xl bg-white border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 flex items-center gap-2"
+              >
+                <Search className="w-4 h-4 text-blue-600" />
+                <span className="text-slate-700 font-medium group-hover:text-blue-700">{t('landing.exploreTools.links.atsChecker')}</span>
+              </Link>
+              <Link 
+                to="/resume-for-job-description" 
+                className="group px-5 py-3 rounded-xl bg-white border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 flex items-center gap-2"
+              >
+                <Target className="w-4 h-4 text-blue-600" />
+                <span className="text-slate-700 font-medium group-hover:text-blue-700">{t('landing.exploreTools.links.jobTailoring')}</span>
+              </Link>
+              <Link 
+                to="/ai-resume-builder" 
+                className="group px-5 py-3 rounded-xl bg-white border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 flex items-center gap-2"
+              >
+                <Sparkles className="w-4 h-4 text-blue-600" />
+                <span className="text-slate-700 font-medium group-hover:text-blue-700">{t('landing.exploreTools.links.aiBuilder')}</span>
+              </Link>
+              <Link 
+                to="/resume-translator" 
+                className="group px-5 py-3 rounded-xl bg-white border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 flex items-center gap-2"
+              >
+                <Languages className="w-4 h-4 text-blue-600" />
+                <span className="text-slate-700 font-medium group-hover:text-blue-700">{t('landing.exploreTools.links.translator')}</span>
+              </Link>
+              <Link 
+                to="/resume-templates" 
+                className="group px-5 py-3 rounded-xl bg-white border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 flex items-center gap-2"
+              >
+                <FileText className="w-4 h-4 text-blue-600" />
+                <span className="text-slate-700 font-medium group-hover:text-blue-700">{t('landing.exploreTools.links.templates')}</span>
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Problem Section */}
+        <section className="py-20 lg:py-28 bg-slate-50">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-6">
+                {t('landing.problem.title')}
+              </h2>
+              <p className="text-xl text-slate-700 mb-4">
+                {t('landing.problem.intro')}
+              </p>
+              <p className="text-lg text-slate-600 mb-6">
+                {t('landing.problem.body')}
+              </p>
+            </div>
+            
+            <div className="max-w-2xl mx-auto mb-8">
+              <ul className="space-y-4">
+                {(t('landing.problem.bullets', { returnObjects: true }) as string[]).map((bullet, index) => (
+                  <li key={index} className="flex items-start gap-3 text-slate-700">
+                    <XCircle className="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-lg">{bullet}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <p className="text-center text-lg font-semibold text-slate-800">
+              {t('landing.problem.closing')}
+            </p>
+          </div>
+        </section>
+
+        {/* Solution Section */}
+        <section className="py-20 lg:py-28 bg-white">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-8">
+                {t('landing.solution.title')}
+              </h2>
+            </div>
+            
+            <div className="max-w-2xl mx-auto mb-8">
+              <ul className="space-y-4">
+                {(t('landing.solution.bullets', { returnObjects: true }) as string[]).map((bullet, index) => (
+                  <li key={index} className="flex items-start gap-3 text-slate-700">
+                    <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-lg">{bullet}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <p className="text-center text-xl font-semibold text-blue-600">
+              {t('landing.solution.closing')}
+            </p>
           </div>
         </section>
 
@@ -399,9 +575,9 @@ export function LandingPage() {
               </p>
 
               {/* Free Features Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
+              <div className="flex flex-wrap justify-center gap-4 mb-10 max-w-4xl mx-auto">
                 {(t('landing.freeTier.features', { returnObjects: true }) as unknown as { icon: string; text: string }[]).map((feature, index) => (
-                  <div key={index} className="flex flex-col items-center p-4 rounded-xl bg-white border border-emerald-200 shadow-sm">
+                  <div key={index} className="flex flex-col items-center p-5 rounded-xl bg-white border border-emerald-200 shadow-sm min-w-[140px] w-[160px]">
                     <CheckCircle className="w-8 h-8 text-emerald-500 mb-2" />
                     <span className="text-sm font-medium text-slate-700 text-center">{feature.text}</span>
                   </div>
@@ -425,7 +601,52 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* How It Works - 4 Steps */}
+        {/* Job Tailoring Section - Resume tailored to job description */}
+        <section className="py-20 lg:py-28 bg-gradient-to-br from-blue-50 to-indigo-50">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-6">
+                {t('landing.jobTailoringSection.title')}
+              </h2>
+              <p className="text-lg text-slate-600 mb-4">
+                {t('landing.jobTailoringSection.intro')}
+              </p>
+              <p className="text-lg text-slate-700 font-medium mb-6">
+                {t('landing.jobTailoringSection.withGqr')}
+              </p>
+            </div>
+            
+            <div className="max-w-2xl mx-auto mb-8">
+              <ol className="space-y-4">
+                {(t('landing.jobTailoringSection.steps', { returnObjects: true }) as string[]).map((step, index) => (
+                  <li key={index} className="flex items-start gap-4 text-slate-700">
+                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-sm">
+                      {index + 1}
+                    </span>
+                    <span className="text-lg pt-1">{step}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            <p className="text-center text-xl font-semibold text-green-600 mb-8">
+              {t('landing.jobTailoringSection.closing')}
+            </p>
+
+            <div className="text-center">
+              <Link 
+                to="/login"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 text-white rounded-xl font-semibold text-lg shadow-xl hover:bg-blue-700 transition-all duration-300 hover:scale-105"
+              >
+                <Target className="w-5 h-5" />
+                {t('landing.jobTailoringSection.cta')}
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* How It Works - 3 Steps */}
         <section className="py-20 lg:py-28 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-16">
@@ -437,7 +658,7 @@ export function LandingPage() {
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative max-w-4xl mx-auto">
               {/* Connecting Line */}
               <div className="hidden md:block absolute top-16 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-200 via-blue-400 to-blue-200" />
               
@@ -502,6 +723,29 @@ export function LandingPage() {
                 <Target className="w-5 h-5" />
                 {t('landing.atsExplainer.cta')}
               </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Resume Templates Section */}
+        <section className="py-20 lg:py-28 bg-white">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-6">
+              {t('landing.templates.title')}
+            </h2>
+            <p className="text-lg text-slate-600 mb-10 max-w-2xl mx-auto">
+              {t('landing.templates.body')}
+            </p>
+            
+            <div className="flex flex-wrap justify-center gap-4">
+              {(t('landing.templates.bullets', { returnObjects: true }) as string[]).map((bullet, index) => (
+                <span 
+                  key={index} 
+                  className="px-6 py-3 rounded-full bg-slate-100 text-slate-700 font-medium border border-slate-200"
+                >
+                  {bullet}
+                </span>
+              ))}
             </div>
           </div>
         </section>
@@ -718,6 +962,26 @@ export function LandingPage() {
           </div>
         </section>
 
+        {/* Who It's For Section */}
+        <section className="py-20 lg:py-28 bg-slate-50">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-10">
+              {t('landing.whoItsFor.title')}
+            </h2>
+            
+            <div className="max-w-2xl mx-auto">
+              <ul className="space-y-4">
+                {(t('landing.whoItsFor.bullets', { returnObjects: true }) as string[]).map((bullet, index) => (
+                  <li key={index} className="flex items-center gap-3 text-lg text-slate-700">
+                    <CheckCircle className="w-6 h-6 text-blue-600 flex-shrink-0" />
+                    <span>{bullet}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+
         {/* Final CTA Section */}
         <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 py-20 lg:py-32">
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
@@ -744,25 +1008,34 @@ export function LandingPage() {
               ))}
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center px-4 sm:px-0">
               <Link 
                 to="/login" 
-                className="px-8 py-4 bg-white text-blue-900 rounded-xl font-semibold text-lg shadow-2xl hover:shadow-white/20 transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105"
+                className="w-full sm:w-auto px-6 sm:px-8 py-4 bg-white text-blue-900 rounded-xl font-semibold text-base sm:text-lg shadow-2xl hover:shadow-white/20 transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 text-center leading-snug"
               >
-                <Sparkles className="w-5 h-5" />
-                {t('landing.cta.ctaPrimary')}
+                <Sparkles className="w-5 h-5 flex-shrink-0" />
+                <span>{t('landing.cta.ctaPrimary')}</span>
               </Link>
               
               <a 
                 href="#pricing" 
-                className="px-8 py-4 border-2 border-white text-white rounded-xl font-semibold text-lg backdrop-blur-sm hover:bg-white/10 transition-all duration-300 flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-6 sm:px-8 py-4 border-2 border-white text-white rounded-xl font-semibold text-base sm:text-lg backdrop-blur-sm hover:bg-white/10 transition-all duration-300 flex items-center justify-center gap-2 text-center leading-snug"
               >
-                {t('landing.cta.ctaSecondary')}
-                <ArrowRight className="w-5 h-5" />
+                <span>{t('landing.cta.ctaSecondary')}</span>
+                <ArrowRight className="w-5 h-5 flex-shrink-0" />
               </a>
             </div>
           </div>
         </section>
+
+        {/* Footer SEO Microcopy */}
+        <div className="py-6 bg-slate-100 border-t border-slate-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p className="text-center text-sm text-slate-500">
+              {t('landing.footerSeoMicrocopy')}
+            </p>
+          </div>
+        </div>
       </div>
     </>
   );

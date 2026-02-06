@@ -30,6 +30,11 @@ export const en = {
     hide: 'Hide',
     refresh: 'Refresh',
     clear: 'Clear',
+    trust: {
+      noCardRequired: 'No credit card required',
+      atsFriendly: 'ATS-friendly',
+      privacyNote: 'Your data stays private',
+    },
   },
 
   // Navigation
@@ -52,17 +57,26 @@ export const en = {
 
   // Landing Page
   landing: {
+    urgencyBanner: {
+      limitedTime: 'Limited Time:',
+      message: 'Create your professional resume FREE',
+      endsSoon: 'Offer ends soon',
+    },
     hero: {
-      title: 'Create Professional Resumes with AI',
-      subtitle: 'Free. Fast. ATS-Optimized.',
-      description: 'Build job-winning resumes in minutes — no credit card required.',
-      badge: '🚀 Start Free Today',
-      ctaPrimary: 'Create Free Resume',
+      title: 'Get More Interviews with an ATS-Optimized Resume Tailored to Real Job Postings',
+      subtitle: 'Create your professional resume FREE — No credit card, no catch. Start in 60 seconds.',
+      description: 'Create your professional resume FREE — No credit card, no catch. Start in 60 seconds.',
+      badge: '🎁 Start FREE — Limited Time Offer',
+      ctaPrimary: 'Create My FREE Resume Now',
       ctaSecondary: 'See All Features',
+      secondaryLinks: {
+        linkedin: 'Import from LinkedIn',
+        upload: 'Upload your current resume (PDF or Word)',
+      },
       trustIndicators: {
-        noCardRequired: 'No credit card',
-        freeForever: '1 Free Resume',
-        aiPowered: 'AI-Powered',
+        noCardRequired: 'Free to Start',
+        freeForever: 'No Credit Card Required',
+        aiPowered: 'ATS-Optimized Templates',
       },
       featureCarousel: 'Feature highlights',
       animatedFeatures: [
@@ -74,6 +88,96 @@ export const en = {
         { icon: 'qr-code', text: 'QR Sharing' },
       ],
     },
+    problem: {
+      title: "Sending resumes but not getting interviews? Here's why.",
+      intro: 'Most resumes are rejected before a recruiter ever sees them.',
+      body: 'Applicant Tracking Systems (ATS) automatically filter resumes that:',
+      bullets: [
+        "Don't use the right keywords",
+        "Aren't aligned with the job description",
+        "Don't clearly highlight relevant achievements",
+      ],
+      closing: "A strong resume isn't just well-designed — it has to pass ATS filters.",
+    },
+    solution: {
+      title: 'A resume that actually passes ATS and fits the job',
+      bullets: [
+        'Generate an AI-powered resume based on your real experience',
+        'Tailor your resume to a specific job description',
+        'Check your ATS compatibility score and see what to improve',
+        'Translate your resume into other languages without losing quality',
+      ],
+      closing: 'All in minutes. No starting from scratch.',
+    },
+    atsChecker: {
+      title: 'Does your resume pass Applicant Tracking Systems?',
+      body: 'Our ATS resume checker analyzes your resume the same way hiring systems do and shows:',
+      bullets: [
+        'An ATS compatibility score',
+        'Which sections need improvement',
+        'Which keywords are missing for the role',
+      ],
+      closing: 'Start free and see your initial ATS score instantly.',
+      cta: 'Check my resume with ATS (free)',
+    },
+    jobTailoringSection: {
+      title: 'One resume per job — the way hiring actually works',
+      intro: 'Sending the same resume to every job drastically lowers your chances.',
+      withGqr: 'With GetQuickResume:',
+      steps: [
+        'Paste the job description',
+        'We analyze what the employer is looking for',
+        'Your resume is tailored to match that role',
+      ],
+      closing: 'Better match → more interviews',
+      cta: 'Tailor my resume to a job description',
+    },
+    resumeForJobDescription: {
+      hero: {
+        title: 'Resume Tailored to Job Description — Match What Employers Want',
+        subtitle: 'Stop sending generic resumes. Paste a job description and tailor your resume to match keywords, requirements, and ATS filters.',
+        badge: 'Job-Specific Optimization',
+      },
+      ctaPrimary: 'Tailor my resume to a job description',
+      ctaSecondary: 'See ATS match preview',
+      problem: {
+        title: 'Why generic resumes fail',
+        bullets: [
+          'Low keyword match',
+          'Unclear relevance to the role',
+          'ATS filters missing requirements',
+        ],
+      },
+      howItWorks: {
+        title: 'How it works',
+        steps: [
+          { number: '1', title: 'Paste the job description' },
+          { number: '2', title: 'We analyze what the employer is looking for' },
+          { number: '3', title: 'Your resume is tailored to match that role' },
+        ],
+      },
+      benefit: 'Better match → more interviews',
+      trust: {
+        freeToStart: 'No credit card required',
+        atsOptimized: 'ATS-optimized output',
+        privacyNote: 'Your data stays private',
+      },
+    },
+    templates: {
+      title: 'Professional resume templates recruiters actually read',
+      body: "Clean, modern designs that work with ATS — not flashy layouts that get rejected.",
+      bullets: ['Professional', 'Clear', 'Results-focused'],
+    },
+    whoItsFor: {
+      title: "Perfect for you if you're…",
+      bullets: [
+        'Actively applying for jobs',
+        'Changing roles or industries',
+        'Applying to companies using ATS',
+        'Needing a resume in English or another language',
+      ],
+    },
+    footerSeoMicrocopy: 'AI resume builder · ATS resume checker · Resume tailored to job description · Professional resume templates · Resume translation',
     socialProof: {
       title: 'Trusted by Professionals Worldwide',
       stats: {
@@ -93,6 +197,17 @@ export const en = {
           value: '4.9/5',
           label: 'User Satisfaction',
         },
+      },
+    },
+    exploreTools: {
+      title: 'Explore Our Free Tools',
+      subtitle: 'Everything you need to create a winning resume',
+      links: {
+        atsChecker: 'ATS Resume Checker',
+        jobTailoring: 'Tailor to Job Description',
+        aiBuilder: 'AI Resume Builder',
+        translator: 'Resume Translator',
+        templates: 'Resume Templates',
       },
     },
     coreFeatures: {
@@ -206,62 +321,74 @@ export const en = {
       },
     },
     freeTier: {
-      title: 'Start 100% Free',
+      title: 'Start free. Upgrade when you need better results.',
       subtitle: 'No credit card required — no strings attached',
       description: 'Create your first professional resume completely free and keep it forever. Upgrade anytime to unlock all premium features.',
       badge: 'Free Forever',
       features: [
         {
           icon: 'check',
-          text: '1 Professional Resume',
+          text: '1 AI-generated resume',
         },
         {
           icon: 'check',
-          text: 'AI Content Generation',
+          text: '1 PDF download',
         },
         {
           icon: 'check',
-          text: 'Professional Templates',
+          text: 'Basic ATS score preview',
         },
         {
           icon: 'check',
-          text: 'PDF Download',
+          text: 'Professional templates',
         },
         {
           icon: 'check',
-          text: 'Grammar Check',
+          text: 'LinkedIn import',
         },
       ],
-      cta: 'Create My Free Resume',
-      upgradeHint: 'Need more? Upgrade to Premium for unlimited resumes and all features',
+      premiumFeatures: [
+        {
+          icon: 'check',
+          text: 'Unlimited resumes',
+        },
+        {
+          icon: 'check',
+          text: 'Resume tailored to multiple job descriptions',
+        },
+        {
+          icon: 'check',
+          text: 'Full ATS score + improvement checklist',
+        },
+        {
+          icon: 'check',
+          text: 'Resume translation & cover letters',
+        },
+      ],
+      cta: 'Create my resume for free',
+      upgradeHint: 'Upgrade only when you need more interviews.',
     },
     howItWorks: {
-      title: 'Create Your Perfect Resume in 4 Simple Steps',
+      title: 'How it works (3 simple steps)',
       subtitle: 'From sign-up to job applications in minutes',
       steps: [
         {
           number: '01',
-          title: 'Sign Up Free',
-          description: 'Create your account instantly with Google — no credit card needed',
+          title: 'Create or import your resume',
+          description: 'Start from scratch, LinkedIn, or an existing file',
           icon: 'user-plus',
         },
         {
           number: '02',
-          title: 'Build Your Resume',
-          description: 'Follow our guided wizard with AI suggestions for every section',
-          icon: 'edit-3',
-        },
-        {
-          number: '03',
-          title: 'Enhance & Optimize',
-          description: 'Use AI to improve content, check grammar, and boost your ATS score',
+          title: 'Optimize it with AI',
+          description: 'ATS optimization, professional wording, and clear achievements',
           icon: 'sparkles',
         },
         {
-          number: '04',
-          title: 'Share & Apply',
-          description: 'Download, share via QR code, or tailor for specific job postings',
-          icon: 'share-2',
+          number: '03',
+          title: 'Download or share it',
+          description: 'Professional PDF ready to apply',
+          icon: 'download',
         },
       ],
     },
@@ -296,39 +423,40 @@ export const en = {
       viewPricingDetails: 'View complete pricing details',
     },
     atsExplainer: {
-      title: 'Beat the ATS and Get Noticed',
-      subtitle: '75% of resumes are rejected by ATS before a human ever sees them',
-      description: 'Applicant Tracking Systems (ATS) are software used by companies to filter resumes before they reach recruiters. Our AI ensures your resume passes through every time.',
+      title: 'Does your resume pass Applicant Tracking Systems?',
+      subtitle: 'Our ATS resume checker analyzes your resume the same way hiring systems do',
+      description: 'Our ATS resume checker analyzes your resume the same way hiring systems do and shows:',
       benefits: [
         {
-          icon: 'target',
-          title: 'Keyword Optimization',
-          description: 'AI identifies and adds relevant keywords from job descriptions'
+          icon: 'bar-chart',
+          title: 'An ATS compatibility score',
+          description: 'See exactly how your resume performs against real ATS systems'
         },
         {
-          icon: 'check-circle',
-          title: 'ATS-Friendly Format',
-          description: 'Clean structure that machines can read perfectly'
+          icon: 'alert-circle',
+          title: 'Which sections need improvement',
+          description: 'Get specific feedback on what to fix in your resume'
         },
         {
-          icon: 'trending-up',
-          title: 'Score Tracking',
-          description: 'See your ATS score and improve it with specific suggestions'
+          icon: 'search',
+          title: 'Which keywords are missing',
+          description: 'Discover the keywords you need for the role you want'
         }
       ],
-      cta: 'Check My ATS Score'
+      closing: 'Start free and see your initial ATS score instantly.',
+      cta: 'Check my resume with ATS (free)'
     },
     cta: {
-      title: 'Ready to Land Your Dream Job?',
+      title: 'Your next job starts with a better resume',
       subtitle: 'Join thousands of professionals who got hired with GetQuickResume',
       description: 'Start free today — no credit card required',
       features: [
-        '1 Free Resume Forever',
-        'AI-Powered Content',
-        'ATS Optimization',
-        'Professional Templates',
+        'ATS-optimized',
+        'Tailored to job descriptions',
+        'Professional templates',
+        'Resume translation',
       ],
-      ctaPrimary: 'Create My Free Resume',
+      ctaPrimary: 'Create my ATS-optimized resume (free)',
       ctaSecondary: 'Compare Plans',
     },
     testimonials: {
@@ -370,22 +498,21 @@ export const en = {
       ],
     },
     plans: {
-      title: 'Simple, Transparent Pricing',
-      subtitle: 'Start free, upgrade when you need more power',
+      title: 'Start free. Upgrade when you need better results.',
+      subtitle: 'No credit card required to start',
       popularBadge: 'Most Popular',
+      upgradeHint: 'Upgrade only when you need more interviews.',
       free: {
         name: 'Free',
         price: '$0',
         period: 'forever',
         description: 'Perfect for getting started',
         features: [
-          '1 Professional Resume',
-          'AI Content Generation',
-          'Grammar Check',
-          'Basic Templates',
-          'PDF Download',
+          '1 AI-generated resume',
+          '1 PDF download',
+          'Basic ATS score preview',
         ],
-        cta: 'Start Free',
+        cta: 'Create my resume for free',
       },
       monthly: {
         name: 'Premium',
@@ -393,16 +520,10 @@ export const en = {
         period: 'month',
         description: 'For active job seekers',
         features: [
-          'Unlimited Resumes',
-          'Cover Letter Generator',
-          'Job Tailoring',
-          'ATS Scoring & Analysis',
-          'Translation to 10+ Languages',
-          'QR Code Sharing',
-          'Resume Analytics',
-          'AI Enhancement',
-          'Premium Templates',
-          'Priority Support',
+          'Unlimited resumes',
+          'Resume tailored to multiple job descriptions',
+          'Full ATS score + improvement checklist',
+          'Resume translation & cover letters',
         ],
         cta: 'Get Premium',
       },
@@ -436,6 +557,150 @@ export const en = {
         analytics: { name: 'Analytics', free: false, premium: true },
         support: { name: 'Support', free: 'Email', premium: 'Priority' },
       },
+    },
+  },
+
+  // ATS Resume Checker Landing Page
+  atsResumeCheckerPage: {
+    hero: {
+      title: 'ATS Resume Checker — See If Your Resume Passes Hiring Systems',
+      subtitle: 'Most resumes get rejected before a recruiter sees them. Check your ATS compatibility score and learn what to improve — free to start.',
+      ctaPrimary: 'Check my resume with ATS (free)',
+      ctaSecondary: 'Create a resume (free)',
+    },
+    whyRejected: {
+      title: 'Why most resumes get rejected',
+      bullets: [
+        'Missing role-specific keywords',
+        'Poor formatting or section structure',
+        'Weak or unclear achievements',
+      ],
+    },
+    whatYouGet: {
+      title: "What you'll get",
+      bullets: [
+        'ATS compatibility score',
+        'Section-level improvement hints',
+        'Missing keywords for the role',
+      ],
+      premiumNote: 'Full detailed checklist available with Premium.',
+    },
+    trust: {
+      noCard: 'No credit card required',
+      atsTemplates: 'ATS-friendly templates',
+      privacyNote: 'Your data stays private',
+    },
+    finalCta: {
+      title: 'Ready to improve your resume?',
+      subtitle: 'Upload your resume and get instant ATS feedback — completely free to start.',
+    },
+  },
+
+  // Resume Translator SEO Page
+  resumeTranslatorPage: {
+    hero: {
+      title: 'Resume Translation — Translate Your Resume for Global Jobs',
+      subtitle: 'Translate your resume without losing professional tone, achievements, and ATS-friendly structure.',
+      ctaPrimary: 'Translate my resume now',
+      ctaSecondary: 'Create a resume first',
+    },
+    whyDifferent: {
+      title: 'Why resume translation is different',
+      bullets: [
+        'Literal translation can sound unnatural',
+        'Industry terminology matters',
+        'Formatting must remain ATS-friendly',
+      ],
+    },
+    supportedLanguages: {
+      title: 'Supported languages',
+      description: 'Translate your resume to any of these languages:',
+    },
+    trust: {
+      noCard: 'No credit card required',
+      atsFriendly: 'ATS-friendly output',
+      privacyNote: 'Your data stays private',
+    },
+    finalCta: {
+      title: 'Ready to go global?',
+      subtitle: 'Translate your resume and apply to international opportunities.',
+    },
+  },
+
+  // AI Resume Builder SEO Page
+  aiResumeBuilderPage: {
+    hero: {
+      title: 'AI Resume Builder — Create a Professional Resume in Minutes',
+      subtitle: 'Generate a recruiter-ready resume from your real experience, optimize for ATS, and tailor it for the jobs you want.',
+      ctaPrimary: 'Create my resume with AI (free)',
+      ctaSecondaryLinkedIn: 'Import from LinkedIn',
+      ctaSecondaryUpload: 'Upload my current resume',
+    },
+    whatAiDoes: {
+      title: 'What the AI does',
+      bullets: [
+        'Builds strong bullet points from your experience',
+        'Improves clarity and impact',
+        'Keeps ATS-friendly structure',
+      ],
+    },
+    whyThisWorks: {
+      title: 'Why this works',
+      bullets: [
+        'ATS-optimized formatting',
+        'Job-tailoring available when you need it',
+        'Professional templates',
+      ],
+    },
+    templates: {
+      title: 'Professional resume templates recruiters actually read',
+      subtitle: 'Clean, modern designs that work with ATS — not flashy layouts that get rejected.',
+      labels: ['Classic', 'Modern', 'Professional'],
+    },
+    trust: {
+      noCard: 'No credit card required',
+      atsFriendly: 'ATS-friendly output',
+      privacyNote: 'Your data stays private',
+    },
+    finalCta: {
+      title: 'Ready to build your resume?',
+      subtitle: 'Start free and get a professional resume in minutes.',
+    },
+    footerSeoMicrocopy: 'AI resume builder · ATS resume checker · Resume tailored to job description · Professional resume templates · Resume translation',
+  },
+
+  // Resume Templates SEO Page
+  resumeTemplatesPage: {
+    hero: {
+      title: 'Professional Resume Templates — ATS-Friendly & Recruiter-Ready',
+      subtitle: 'Choose a clean, modern template that hiring systems can read and recruiters prefer.',
+      ctaPrimary: 'Get started free',
+    },
+    whyTemplatesMatter: {
+      title: 'Why templates matter',
+      bullets: [
+        'Readable, structured layout',
+        'ATS-friendly formatting',
+        'Designed to highlight results',
+      ],
+    },
+    gallery: {
+      title: 'Template gallery',
+      useTemplate: 'Use this template',
+      free: 'Free',
+      premium: 'Premium',
+    },
+    trust: {
+      noCard: 'No credit card required',
+      atsFriendly: 'ATS-friendly templates',
+      privacyNote: 'Your data stays private',
+    },
+    footerNote: {
+      text: 'Use a template + AI content for a resume that looks great and performs well.',
+    },
+    finalCta: {
+      title: 'Ready to build your resume?',
+      subtitle: 'Pick a template and let AI help you create compelling content.',
     },
   },
 
@@ -1513,6 +1778,9 @@ export const en = {
               jobTitle: 'Job Title',
               company: 'Company',
               duration: 'Duration',
+              startDate: 'Start Date',
+              endDate: 'End Date',
+              currentJob: 'I currently work here',
               location: 'Location',
               description: 'Description',
               achievements: 'Key Achievements',
@@ -1532,6 +1800,8 @@ export const en = {
               institution: 'Institution',
               field: 'Field of Study',
               duration: 'Duration',
+              graduationYear: 'Graduation Year',
+              graduationYearPlaceholder: 'e.g. 2022',
               gpa: 'GPA',
               coursework: 'Relevant Coursework',
               honors: 'Honors'
@@ -1548,6 +1818,9 @@ export const en = {
               title: 'Projects',
               name: 'Project Name',
               duration: 'Duration',
+              startDate: 'Start Date',
+              endDate: 'End Date',
+              ongoing: 'Ongoing project',
               description: 'Description',
               technologies: 'Technologies',
               achievements: 'Achievements',
@@ -1567,7 +1840,17 @@ export const en = {
             edit: 'Edit',
             save: 'Save',
             cancel: 'Cancel',
-            aiSuggestions: 'AI Suggestions'
+            aiSuggestions: 'AI Suggestions',
+            enhanceWithAI: 'Enhance with AI',
+            addExperience: 'Add Experience',
+            addEducation: 'Add Education',
+            addCertification: 'Add Certification',
+            addProject: 'Add Project',
+            addLanguage: 'Add Language',
+            confirmDelete: 'Confirm Delete',
+            deleteWarning: 'This action cannot be undone. Are you sure you want to delete this item?',
+            suggestAchievements: 'Suggest Achievements',
+            enhanceDescription: 'Enhance Description'
           }
         }
       },
@@ -1756,10 +2039,24 @@ export const en = {
       upgradeCta: 'Upgrade to Premium',
       premiumBenefit: 'Get 10x more AI suggestions per minute',
       retryButton: 'Try again',
+      progressSaved: 'Your progress has been automatically saved. You can safely wait or return later.',
       // Rescore-specific messages
       rescoreTitle: 'Scoring Limit Reached',
       rescorePremiumMessage: "Resume scoring uses AI analysis. To ensure quality results for all users, there's a fair usage limit of 5 scores per minute. You can try again shortly.",
       premiumLimitExplainer: 'Premium users can score up to 5 resumes per minute',
+    },
+    score: {
+      readyToScore: 'Ready to Score Your Resume',
+      scoreDescription: 'Get an AI-powered analysis of your resume with actionable improvements.',
+      scoreButton: 'Score Resume',
+      rescoreButton: 'Re-score Resume',
+      scoring: 'Scoring...',
+      scoreSuccess: 'Resume scored successfully!',
+      scoreError: 'Failed to score resume. Please try again.',
+      freeUserNote: 'Free users get one score per resume',
+      alreadyScored: 'Resume Already Scored',
+      upgradeToRescore: 'Upgrade to Premium for unlimited re-scoring after edits',
+      upgradeCta: 'Upgrade to Premium',
     },
   },
 
@@ -2341,16 +2638,6 @@ export const en = {
           multipleVersions: 'Create multiple versions of your CV',
         },
       },
-      createResume: {
-        title: 'Create New CV - Premium Feature',
-        description: 'You have already created your free AI-generated resume. Upgrade to Premium to create additional resumes.',
-        cta: 'Upgrade to Create',
-        benefits: {
-          unlimitedResumes: 'Create unlimited resumes',
-          aiGeneration: 'AI-powered resume generation',
-          allFeatures: 'Access all premium features',
-        },
-      },
       premiumTemplate: {
         title: 'Premium Template',
         description: 'This template design is exclusive to Premium users. Upgrade to unlock all premium templates and designs.',
@@ -2531,6 +2818,43 @@ export const en = {
     rateLimitExceeded: 'You have reached the limit of 5 improvements per minute',
     rateLimitMessage: 'You have reached the improvement limit. Wait a minute.',
     error: 'Error improving text'
+  },
+  sectionEnhancement: {
+    title: 'Enhance with AI',
+    tabs: {
+      autoEnhance: 'Auto Enhance',
+      askAI: 'Ask AI Help',
+      manualEdit: 'Manual Edit'
+    },
+    descriptions: {
+      auto: 'Automatically enhance this section with AI to improve clarity, impact, and professionalism.',
+      askAI: 'Provide specific instructions to guide how AI should improve this section.',
+      manual: 'Directly edit the text yourself.'
+    },
+    sections: {
+      summary: 'Professional Summary',
+      experience: 'Work Experience',
+      education: 'Education',
+      certification: 'Certifications',
+      project: 'Projects',
+      achievement: 'Achievements',
+      language: 'Languages'
+    },
+    originalText: 'Original Text',
+    enhancedText: 'Enhanced Text',
+    editText: 'Edit Text',
+    enhanceButton: 'Enhance',
+    enhancing: 'Enhancing with AI...',
+    enhancedPlaceholder: 'Enhanced text will appear here after you click "Enhance"',
+    manualPlaceholder: 'Edit your text here...',
+    instructionsLabel: 'Your Instructions',
+    instructionsPlaceholder: 'E.g., "Make it more concise", "Add quantifiable achievements", "Use stronger action verbs"',
+    tryAgain: 'Try Again',
+    applyChanges: 'Apply Changes',
+    aiNote: 'AI enhancements are suggestions. Review before applying.',
+    emptyInstructions: 'Please provide instructions for the AI.',
+    rateLimitMessage: 'Rate limit exceeded. Please wait before trying again.',
+    error: 'Error enhancing section'
   },
   review: {
     downloadSuccess: 'Resume downloaded successfully',
@@ -2876,6 +3200,14 @@ export const en = {
   footer: {
     quickLinks: 'Quick Links',
     legal: 'Legal',
+    tools: 'Tools',
+    toolLinks: {
+      atsChecker: 'ATS Resume Checker',
+      jobTailoring: 'Resume for Job Description',
+      aiBuilder: 'AI Resume Builder',
+      translator: 'Resume Translator',
+      templates: 'Resume Templates',
+    },
     copyright: '© 2024 GetQuickResume. All rights reserved.',
     madeWith: 'Made with',
     inCostaRica: 'in Costa Rica',
@@ -3090,13 +3422,15 @@ export const en = {
       back: 'Back',
     },
 
-    // Step names
+    // Step names - Now 4 steps instead of 5
     steps: {
       jobDetails: 'Job Details',
-      analysis: 'Analysis',
-      questions: 'Questions',
+      summary: 'Summary',        // NEW: Replaces analysis + questions
       review: 'Review',
       save: 'Save',
+      // DEPRECATED: Kept for backward compatibility
+      analysis: 'Analysis',
+      questions: 'Questions',
     },
 
     // JobInput component
@@ -3188,7 +3522,52 @@ export const en = {
       continueToQuestions: 'Continue to Questions',
     },
 
-    // ClarificationQuestions component
+    // NEW: TailoringSummary component (replaces analysis + questions)
+    summary: {
+      analyzing: 'Analyzing Your Resume',
+      analyzingDesc: 'Running comprehensive ATS analysis and keyword matching...',
+      noData: 'No analysis data available',
+      goBack: 'Go back and try again',
+      title: 'Tailoring Summary',
+      subtitle: 'Review your ATS score and claim missing keywords you have experience with',
+      // Score status labels
+      excellent: 'Excellent',
+      good: 'Good',
+      needsImprovement: 'Needs Improvement',
+      poor: 'Poor',
+      // ATS Score section
+      atsScore: 'ATS Match Score',
+      canImprove: 'Can improve',
+      matchedKeywords: 'Matched Keywords',
+      missingCritical: 'Missing Critical',
+      keywordsClaimed: 'Keywords Claimed',
+      // Strengths section
+      strengths: 'Resume Strengths',
+      itemsFound: 'items found',
+      noStrengths: 'No specific strengths identified yet',
+      // Weaknesses section
+      areasToImprove: 'Areas to Improve',
+      suggestionsFound: 'suggestions',
+      noWeaknesses: 'No specific areas to improve identified',
+      // Missing keywords sections
+      missingCriticalKeywords: 'Missing Critical Keywords',
+      missingImportantKeywords: 'Missing Important Keywords',
+      missingNiceToHaveKeywords: 'Nice-to-Have Skills',
+      claimIfYouHave: 'Click + to claim if you have this experience',
+      keywordsToConsider: 'keywords to consider',
+      bonusKeywords: 'bonus keywords to consider',
+      keywordsAlreadyPresent: 'keywords already in your resume',
+      claimKeyword: 'Claim this keyword',
+      removeKeyword: 'Remove claim',
+      // Claimed keywords summary
+      claimedKeywordsSummary: "Keywords You've Claimed",
+      claimedKeywordsNote: 'These keywords will be incorporated into your tailored resume based on your described experience.',
+      // Actions
+      generating: 'Generating...',
+      generateTailored: 'Generate Tailored Resume',
+    },
+
+    // DEPRECATED: ClarificationQuestions component (kept for backward compatibility)
     questions: {
       generating: 'Generating Questions...',
       generatingDesc: 'Our AI is creating personalized questions based on the job requirements',
@@ -3288,13 +3667,66 @@ export const en = {
       niceToHave: 'Nice to Have',
       missingCritical: 'Missing Critical Keywords',
       missingCriticalHint: 'Consider adding these keywords if you have relevant experience.',
+      missingCriticalHintWithAdd: 'Click the + button to add keywords you have experience with.',
       missingImportant: 'Missing Important Keywords',
+      missingImportantHintWithAdd: 'Click the + button to add keywords you have experience with.',
       matchedKeywords: 'Matched Keywords',
       uniqueKeywords: 'Your Unique Keywords (Differentiators)',
       uniqueKeywordsHint: 'These keywords set you apart from other candidates.',
       fullComparison: 'Full Keyword Comparison',
       yourResumeKeywords: 'Your Resume Keywords',
       jobRequirements: 'Job Requirements',
+      addKeywordTitle: 'I have this skill - add to resume',
+    },
+
+    // Keyword Intelligence (unified section in Review page)
+    keywordIntelligence: {
+      title: 'ATS Keyword Intelligence',
+      subtitle: 'Your keyword optimization results',
+      before: 'Before Tailoring',
+      after: 'After Tailoring',
+      improved: 'Improvement',
+      matched: 'matched',
+      criticalMissing: 'critical missing',
+      importantMissing: 'important missing',
+      criticalRequirements: 'Critical Requirements',
+      importantSkills: 'Important Skills',
+      keywordsAdded: 'Keywords Added in This Tailoring',
+      keywordsOptimized: 'keywords optimized',
+      differentiators: 'Your Differentiators',
+      standOut: 'Skills that make you stand out',
+      addKeywordTitle: 'I have this skill - add to resume',
+      addCriticalHint: 'Click + to add keywords you have experience with',
+      addedHint: 'These keywords were strategically added to improve your ATS score',
+      differentiatorsHint: 'These unique skills set you apart from other candidates',
+      niceToHaveMissing: 'nice-to-have missing',
+      niceToHaveSkills: 'Nice-to-Have Skills',
+    },
+
+    // Add Keyword Modal
+    addKeyword: {
+      title: 'Add Missing Keyword',
+      subtitle: 'Tell us about your experience',
+      errorEmpty: 'Please provide some context about your experience with this skill.',
+      errorTooShort: 'Please provide more detail (at least 10 characters).',
+      errorGeneric: 'Failed to add keyword. Please try again.',
+      errorEnhance: 'Failed to enhance text. Please try again.',
+      criticalDesc: 'This keyword is critical for the job. Adding it will significantly improve your match score.',
+      importantDesc: 'This keyword is important for the job. Adding it will help improve your chances.',
+      contextLabel: 'Describe your experience with {{keyword}}',
+      placeholder: 'e.g., "3 years experience using {{keyword}} for backend development and API integrations"',
+      hint: 'The AI will incorporate this into your Skills, Summary, and/or Experience sections.',
+      suggestions: 'Quick suggestions',
+      prompt1: 'I have 2-3 years of experience with {{keyword}}',
+      prompt2: 'Used {{keyword}} in projects involving...',
+      prompt3: 'Certified in {{keyword}} / completed training on {{keyword}}',
+      premiumFeature: 'Premium feature: AI will intelligently add this keyword to relevant resume sections',
+      adding: 'Adding...',
+      addToResume: 'Add to Resume',
+      // NEW: AI enhancement
+      enhanced: 'Text enhanced by AI',
+      enhancing: 'Enhancing...',
+      enhanceWithAI: 'Enhance with AI',
     },
 
     // SaveTailored component
@@ -3353,6 +3785,29 @@ export const en = {
         description: 'Are you sure you want to delete this tailored resume? This action cannot be undone.',
         deleting: 'Deleting...',
       },
+    },
+
+    // Session recovery dialog
+    recovery: {
+      title: 'Continue Your Progress?',
+      message: 'You have an unfinished job tailoring session. Would you like to continue where you left off?',
+      continue: 'Continue',
+      startFresh: 'Start Fresh',
+      resumeLabel: 'Resume:',
+      stepInfo: 'Progress: Step {{step}} of 5',
+    },
+
+    // Leave confirmation dialog
+    leave: {
+      title: 'Leave Job Tailoring?',
+      message: 'You have unsaved progress. Are you sure you want to leave? Your progress will be saved and you can return later.',
+      leave: 'Leave',
+      stay: 'Stay',
+    },
+
+    // Errors
+    errors: {
+      resumeDeleted: 'The resume you were tailoring has been deleted. Please select a new resume.',
     },
   },
 
