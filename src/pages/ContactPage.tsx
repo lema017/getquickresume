@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
-import { Facebook, Instagram, Mail, Send } from 'lucide-react';
+import { Mail, Send } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getPageSEO, BASE_URL } from '@/utils/seoConfig';
 
@@ -173,43 +173,6 @@ export function ContactPage() {
                     <p className="text-gray-600">soporte@getquickresume.com</p>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            {/* Social Media */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-                {t('contact.social.title')}
-              </h2>
-              
-              <div className="space-y-4">
-                <a
-                  href="https://facebook.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
-                >
-                  <Facebook className="w-6 h-6 text-blue-600 mr-3" />
-                  <span>Facebook</span>
-                </a>
-                
-                <a
-                  href="https://instagram.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
-                >
-                  <Instagram className="w-6 h-6 text-pink-600 mr-3" />
-                  <span>Instagram</span>
-                </a>
-                
-                <a
-                  href="mailto:contacto@getquickresume.com"
-                  className="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
-                >
-                  <Mail className="w-6 h-6 text-gray-600 mr-3" />
-                  <span>Gmail</span>
-                </a>
               </div>
             </div>
 
