@@ -10,9 +10,11 @@ import {
   TailoringResult,
   TailoringLimits,
   GenerateTailoredResumeRequest,
+  IncorporateKeywordRequest,
+  IncorporateKeywordResponse,
 } from '@/types/jobTailoring';
 import { validateUrlFormat, isSupportedJobBoard, getJobBoardName, normalizeUrl } from '@/utils/urlValidation';
-import { Resume, GeneratedResume } from '@/types';
+import { Resume, GeneratedResume, normalizeToApiLanguage, ApiLanguage } from '@/types';
 import { handleAuthError } from '@/utils/authErrorHandler';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/dev';
@@ -52,6 +54,15 @@ async function makeRequest<T>(
       const error = new Error(data.message || 'Premium feature required');
       (error as any).code = 'PREMIUM_REQUIRED';
       (error as any).statusCode = 403;
+      throw error;
+    }
+
+    // Handle rate limit error (429) - do NOT logout
+    if (response.status === 429) {
+      const error = new Error(data.message || 'Rate limit exceeded. Please wait before making another request.');
+      (error as any).code = 'RATE_LIMIT';
+      (error as any).statusCode = 429;
+      (error as any).resetTime = data.resetTime;
       throw error;
     }
 
@@ -164,7 +175,7 @@ interface AnalyzeJobResponse {
 export async function analyzeJobPosting(
   description: string,
   resumeId: string,
-  language: 'en' | 'es' = 'en'
+  language?: string
 ): Promise<JobAnalysisResult> {
   try {
     const response = await makeRequest<AnalyzeJobResponse>(
@@ -174,7 +185,7 @@ export async function analyzeJobPosting(
         body: JSON.stringify({
           resumeId,
           description,
-          language
+          language: normalizeToApiLanguage(language)
         }),
       }
     );
@@ -210,7 +221,7 @@ interface GenerateQuestionsResponse {
 export async function generateClarificationQuestions(
   resumeId: string,
   jobInfo: JobPostingInfo,
-  language: 'en' | 'es' = 'en',
+  language?: string,
   suggestions?: string[]
 ): Promise<ClarificationQuestion[]> {
   try {
@@ -221,7 +232,7 @@ export async function generateClarificationQuestions(
         body: JSON.stringify({
           resumeId,
           jobInfo,
-          language,
+          language: normalizeToApiLanguage(language),
           suggestions
         }),
       }
@@ -258,7 +269,7 @@ export async function enhanceAnswer(
   text: string,
   context: string,
   questionId: string,
-  language: 'en' | 'es' = 'en',
+  language?: string,
   resumeId?: string,
   question?: string,
   jobInfo?: JobPostingInfo
@@ -272,7 +283,7 @@ export async function enhanceAnswer(
           text,
           context,
           questionId,
-          language,
+          language: normalizeToApiLanguage(language),
           resumeId,
           question,
           jobInfo
@@ -324,7 +335,7 @@ export async function generateTailoredResume(
           resumeId: request.resumeId,
           jobInfo: request.jobInfo,
           answers: request.answers,
-          language: request.language || 'en',
+          language: normalizeToApiLanguage(request.language),
           matchScoreBefore: request.matchScoreBefore || 60,  // Pass initial match score
           matchingSkills: request.matchingSkills || []       // Pass matching skills from initial analysis
         }),
@@ -435,6 +446,48 @@ export async function saveTailoredResume(
 }
 
 // ============================================================================
+// Incorporate Keyword API
+// ============================================================================
+
+/**
+ * Incorporate a missing keyword into the tailored resume
+ */
+export async function incorporateKeyword(
+  request: IncorporateKeywordRequest
+): Promise<{
+  updatedSections: {
+    skills?: any;
+    professionalSummary?: string;
+    experience?: any[];
+  };
+  changesSummary: string[];
+}> {
+  try {
+    const response = await makeRequest<IncorporateKeywordResponse>(
+      'api/job-tailoring/incorporate-keyword',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          ...request,
+          language: normalizeToApiLanguage(request.language),
+        }),
+      }
+    );
+
+    if (!response.success || !response.data) {
+      const error = new Error(response.error || 'Failed to incorporate keyword');
+      (error as any).code = response.code;
+      throw error;
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error('Error incorporating keyword:', error);
+    throw error;
+  }
+}
+
+// ============================================================================
 // Export service object for convenience
 // ============================================================================
 
@@ -447,6 +500,7 @@ export const jobTailoringService = {
   getTailoringLimits,
   saveTailoredResume,
   generateAnswerOptions,
+  incorporateKeyword,
 };
 
 export default jobTailoringService;
@@ -476,7 +530,7 @@ export async function generateAnswerOptions(
   context: string,
   resumeId: string,
   jobInfo: JobPostingInfo,
-  language: 'en' | 'es' = 'en'
+  language?: string
 ): Promise<string[]> {
   try {
     const response = await makeRequest<GenerateAnswerOptionsResponse>(
@@ -489,7 +543,7 @@ export async function generateAnswerOptions(
           context,
           resumeId,
           jobInfo,
-          language
+          language: normalizeToApiLanguage(language)
         }),
       }
     );

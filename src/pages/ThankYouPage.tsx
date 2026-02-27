@@ -1,8 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { useAuthStore } from '@/stores/authStore';
 import { Check, Crown, ArrowRight, Loader2, Receipt } from 'lucide-react';
+import { BASE_URL } from '@/utils/seoConfig';
+import { trackUpgradePurchased } from '@/services/marketingAnalytics';
 
 // Type for navigation state from payment flow
 interface PaymentState {
@@ -31,6 +34,7 @@ export function ThankYouPage() {
   const transactionId = paymentState?.transactionId || searchParams.get('transaction_id');
   const planType = paymentState?.planType;
   const paymentConfirmed = paymentState?.paymentConfirmed || false;
+  const hasTrackedPurchaseRef = useRef(false);
 
   useEffect(() => {
     // If user is not authenticated, redirect to login
@@ -41,6 +45,11 @@ export function ThankYouPage() {
 
     // If payment was already confirmed (from PayPal synchronous flow), skip polling
     if (paymentConfirmed) {
+      // Track purchase event (only once)
+      if (!hasTrackedPurchaseRef.current) {
+        trackUpgradePurchased(planType || 'unknown');
+        hasTrackedPurchaseRef.current = true;
+      }
       setIsPremium(true);
       setIsVerifying(false);
       return;
@@ -97,8 +106,19 @@ export function ThankYouPage() {
     return null; // Will redirect
   }
 
+  const pageUrl = `${BASE_URL}/thank-you`;
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <>
+      <Helmet>
+        <title>Thank You - GetQuickResume | Payment Confirmation</title>
+        <meta name="description" content="Thank you for your purchase. Your Premium subscription is being activated." />
+        <link rel="canonical" href={pageUrl} />
+        
+        {/* Robots - noIndex for thank you page */}
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Hero Section */}
       <section className="py-20 lg:py-32 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -262,7 +282,8 @@ export function ThankYouPage() {
           </div>
         </section>
       )}
-    </div>
+      </div>
+    </>
   );
 }
 

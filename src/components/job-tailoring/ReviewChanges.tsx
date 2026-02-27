@@ -14,19 +14,12 @@ import {
   FileText,
   Loader2,
   Target,
-  Zap,
   AlertCircle,
   Award,
-  ChevronDown,
-  ChevronUp,
-  BarChart3,
-  Search,
-  MessageSquare
 } from 'lucide-react';
 import { useJobTailoringStore } from '@/stores/jobTailoringStore';
 import { ResumeChange } from '@/types/jobTailoring';
-import ATSBreakdown from './ATSBreakdown';
-import KeywordAnalysis from './KeywordAnalysis';
+import KeywordIntelligence from './KeywordIntelligence';
 
 interface ReviewChangesProps {
   onNext: () => void;
@@ -41,13 +34,13 @@ export function ReviewChanges({ onNext, onBack }: ReviewChangesProps) {
     tailoringResult,
     isGeneratingTailored,
     jobAnalysis,
+    incorporateKeyword,
+    isIncorporatingKeyword,
+    claimedKeywords,
   } = useJobTailoringStore();
 
   const [showDiff, setShowDiff] = useState(true);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['summary', 'skills']));
-  const [showATSBreakdown, setShowATSBreakdown] = useState(true);
-  const [showKeywordAnalysis, setShowKeywordAnalysis] = useState(true);
-  const [showAnswersApplied, setShowAnswersApplied] = useState(false);
 
   const toggleSection = (section: string) => {
     const newExpanded = new Set(expandedSections);
@@ -128,6 +121,11 @@ export function ReviewChanges({ onNext, onBack }: ReviewChangesProps) {
   const atsScoreImprovement = atsScoreAfter - atsScoreBefore;
   const matchScoreImprovement = (matchScoreAfter || 0) - (matchScoreBefore || jobAnalysis?.matchScore || 0);
   const isFullyOptimized = atsScoreAfter >= 95;
+  
+  // Filter valid grammar corrections (non-empty original AND corrected)
+  const validGrammarCorrections = grammarCorrections.filter(
+    c => c.original?.trim() && c.corrected?.trim()
+  );
   
   // Get answers from store for showing which were applied
   const { answers } = useJobTailoringStore();
@@ -241,83 +239,20 @@ export function ReviewChanges({ onNext, onBack }: ReviewChangesProps) {
       )}
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-3 gap-4 mb-8">
         <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
           <div className="text-2xl font-bold text-orange-600">{changes.length}</div>
           <p className="text-sm text-gray-600">{t('jobTailoring.review.changesMade')}</p>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
-          <div className="text-2xl font-bold text-purple-600">{answersIncorporated?.length || 0}</div>
-          <p className="text-sm text-gray-600">{t('jobTailoring.review.answersUsed', 'Answers Applied')}</p>
-        </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
-          <div className="text-2xl font-bold text-green-600">{keywordOptimizations.length}</div>
+          <div className="text-2xl font-bold text-green-600">{keywordOptimizations.length + claimedKeywords.length}</div>
           <p className="text-sm text-gray-600">{t('jobTailoring.review.keywordsAdded')}</p>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
-          <div className="text-2xl font-bold text-blue-600">{grammarCorrections.length}</div>
+          <div className="text-2xl font-bold text-blue-600">{validGrammarCorrections.length}</div>
           <p className="text-sm text-gray-600">{t('jobTailoring.review.grammarFixes')}</p>
         </div>
       </div>
-
-      {/* Answers Applied Section */}
-      {answersIncorporated && answersIncorporated.length > 0 && (
-        <div className="mb-8 bg-white rounded-2xl border border-gray-200 overflow-hidden">
-          <button
-            onClick={() => setShowAnswersApplied(!showAnswersApplied)}
-            className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-                <MessageSquare className="w-5 h-5 text-purple-600" />
-              </div>
-              <div className="text-left">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {t('jobTailoring.review.answersAppliedTitle', 'Your Answers Applied')}
-                </h3>
-                <p className="text-sm text-gray-500">
-                  {t('jobTailoring.review.answersAppliedDesc', `${answersIncorporated.length} of your answers were incorporated into the resume`)}
-                </p>
-              </div>
-            </div>
-            {showAnswersApplied ? (
-              <ChevronUp className="w-5 h-5 text-gray-400" />
-            ) : (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
-            )}
-          </button>
-          
-          {showAnswersApplied && (
-            <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
-              {answersIncorporated.map((incorporated, index) => {
-                const originalAnswer = answers.find(a => a.questionId === incorporated.questionId);
-                const relatedChange = changes[incorporated.changeIndex];
-                return (
-                  <div key={index} className="bg-purple-50 rounded-xl p-4">
-                    <div className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900 text-sm">{originalAnswer?.question || `Question ${index + 1}`}</p>
-                        <p className="text-gray-600 text-sm mt-1">{originalAnswer?.answer || 'Answer provided'}</p>
-                        <div className="mt-2 flex items-center gap-2">
-                          <span className="px-2 py-0.5 bg-purple-200 text-purple-800 text-xs rounded-full font-medium">
-                            Applied to: {incorporated.usedInSection}
-                          </span>
-                          {relatedChange && (
-                            <span className="px-2 py-0.5 bg-blue-200 text-blue-800 text-xs rounded-full font-medium">
-                              {relatedChange.changeType}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
 
       {/* View Toggle */}
       <div className="flex items-center justify-between mb-6">
@@ -393,34 +328,15 @@ export function ReviewChanges({ onNext, onBack }: ReviewChangesProps) {
         ))}
       </div>
 
-      {/* Keyword Optimizations */}
-      <div className="mt-8 bg-white rounded-2xl border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <Target className="w-5 h-5 text-orange-500" />
-          {t('jobTailoring.review.keywordsOptimized')}
-        </h3>
-        <div className="flex flex-wrap gap-2">
-          {keywordOptimizations.map((keyword, index) => (
-            <span
-              key={index}
-              className="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-full text-sm font-medium flex items-center gap-1"
-            >
-              <Zap className="w-3.5 h-3.5" />
-              {keyword}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* Grammar Corrections */}
-      {grammarCorrections.length > 0 && (
-        <div className="mt-4 bg-white rounded-2xl border border-gray-200 p-6">
+      {/* Grammar Corrections - only show if there are valid corrections with content */}
+      {validGrammarCorrections.length > 0 && (
+        <div className="mt-8 bg-white rounded-2xl border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <FileText className="w-5 h-5 text-green-500" />
             {t('jobTailoring.review.grammarImprovements')}
           </h3>
           <div className="space-y-3">
-            {grammarCorrections.map((correction, index) => (
+            {validGrammarCorrections.map((correction, index) => (
               <div key={index} className="flex items-start gap-3">
                 <CheckCircle className="w-4 h-4 text-green-500 mt-1 flex-shrink-0" />
                 <div>
@@ -437,73 +353,73 @@ export function ReviewChanges({ onNext, onBack }: ReviewChangesProps) {
         </div>
       )}
 
-      {/* ATS Breakdown Section */}
-      {atsBreakdown && atsBreakdown.categories && atsBreakdown.categories.length > 0 && (
-        <div className="mt-8 bg-white rounded-2xl border border-gray-200 overflow-hidden">
-          <button
-            onClick={() => setShowATSBreakdown(!showATSBreakdown)}
-            className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-orange-600" />
-              </div>
-              <div className="text-left">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {t('jobTailoring.review.atsBreakdownTitle', 'ATS Score Breakdown')}
-                </h3>
-                <p className="text-sm text-gray-500">
-                  {t('jobTailoring.review.atsBreakdownDesc', 'Detailed analysis of your resume optimization')}
-                </p>
-              </div>
-            </div>
-            {showATSBreakdown ? (
-              <ChevronUp className="w-5 h-5 text-gray-400" />
-            ) : (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
-            )}
-          </button>
-          
-          {showATSBreakdown && (
-            <div className="px-6 pb-6 border-t border-gray-100">
-              <ATSBreakdown breakdown={atsBreakdown} />
-            </div>
-          )}
-        </div>
-      )}
+      {/* Unified Keyword Intelligence Section - Use jobAnalysis for consistent keyword data */}
+      {jobAnalysis?.keywordAnalysis?.matchAnalysis && (
+        <div className="mt-8">
+          {(() => {
+            // Build list of keywords that were claimed or added (to filter from missing)
+            const claimedKeywordNames = claimedKeywords.map(ck => ck.keyword.toLowerCase());
+            // Extract actual keyword names from keywordOptimizations (format: "Added keyword: X" or just "X")
+            const addedKeywordNames = keywordOptimizations.map(opt => {
+              const match = opt.match(/Added keyword:\s*(.+)/i);
+              return match ? match[1].toLowerCase() : opt.toLowerCase();
+            });
+            const resolvedKeywords = [...claimedKeywordNames, ...addedKeywordNames];
+            
+            // Create filtered version of keywordAnalysis
+            const originalAnalysis = jobAnalysis.keywordAnalysis;
+            const filteredMissingCritical = originalAnalysis.matchAnalysis.missingCritical?.filter(
+              k => !resolvedKeywords.some(rk => k.keyword.toLowerCase().includes(rk) || rk.includes(k.keyword.toLowerCase()))
+            ) || [];
+            const filteredMissingImportant = originalAnalysis.matchAnalysis.missingImportant?.filter(
+              k => !resolvedKeywords.some(rk => k.keyword.toLowerCase().includes(rk) || rk.includes(k.keyword.toLowerCase()))
+            ) || [];
+            const filteredMissingNiceToHave = originalAnalysis.matchAnalysis.missingNiceToHave?.filter(
+              k => !resolvedKeywords.some(rk => k.keyword.toLowerCase().includes(rk) || rk.includes(k.keyword.toLowerCase()))
+            ) || [];
+            
+            // Calculate updated match counts (include all missing types)
+            const resolvedCount = (originalAnalysis.matchAnalysis.missingCritical?.length || 0) - filteredMissingCritical.length +
+                                  (originalAnalysis.matchAnalysis.missingImportant?.length || 0) - filteredMissingImportant.length +
+                                  (originalAnalysis.matchAnalysis.missingNiceToHave?.length || 0) - filteredMissingNiceToHave.length;
+            const totalKeywords = originalAnalysis.matchAnalysis.totalJobKeywords || 1;
+            const matchedBefore = originalAnalysis.matchAnalysis.matchedKeywords || 0;
+            const matchedAfter = Math.min(matchedBefore + resolvedCount, totalKeywords);
+            const afterPercentage = Math.round((matchedAfter / totalKeywords) * 100);
+            
+            // Check if all actionable keywords (critical + important + nice_to_have) have been resolved
+            const allActionableResolved = filteredMissingCritical.length === 0 && 
+                                          filteredMissingImportant.length === 0 && 
+                                          filteredMissingNiceToHave.length === 0;
+            
+            // If all actionable keywords are resolved, show 100% - user has done everything they can
+            // Otherwise, show the calculated percentage
+            const finalAfterPercentage = allActionableResolved ? 100 : afterPercentage;
 
-      {/* Keyword Analysis Section */}
-      {keywordAnalysis && keywordAnalysis.matchAnalysis && (
-        <div className="mt-4 bg-white rounded-2xl border border-gray-200 overflow-hidden">
-          <button
-            onClick={() => setShowKeywordAnalysis(!showKeywordAnalysis)}
-            className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                <Search className="w-5 h-5 text-blue-600" />
-              </div>
-              <div className="text-left">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {t('jobTailoring.review.keywordAnalysisTitle', 'Keyword Analysis')}
-                </h3>
-                <p className="text-sm text-gray-500">
-                  {t('jobTailoring.review.keywordAnalysisDesc', 'Compare your resume keywords with job requirements')}
-                </p>
-              </div>
-            </div>
-            {showKeywordAnalysis ? (
-              <ChevronUp className="w-5 h-5 text-gray-400" />
-            ) : (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
-            )}
-          </button>
-          
-          {showKeywordAnalysis && (
-            <div className="px-6 pb-6 border-t border-gray-100">
-              <KeywordAnalysis analysis={keywordAnalysis} />
-            </div>
-          )}
+            // Create the adjusted keywordAnalysis object
+            const adjustedKeywordAnalysis = {
+              ...originalAnalysis,
+              matchAnalysis: {
+                ...originalAnalysis.matchAnalysis,
+                missingCritical: filteredMissingCritical,
+                missingImportant: filteredMissingImportant,
+                missingNiceToHave: filteredMissingNiceToHave,
+                matchedKeywords: allActionableResolved ? totalKeywords : matchedAfter,
+                matchPercentage: finalAfterPercentage,
+              }
+            };
+
+            return (
+              <KeywordIntelligence
+                keywordAnalysis={adjustedKeywordAnalysis}
+                keywordsAdded={[...keywordOptimizations, ...claimedKeywords.map(ck => ck.keyword)]}
+                matchPercentageBefore={originalAnalysis.matchAnalysis.matchPercentage || 0}
+                matchPercentageAfter={finalAfterPercentage}
+                onIncorporateKeyword={incorporateKeyword}
+                isIncorporatingKeyword={isIncorporatingKeyword}
+              />
+            );
+          })()}
         </div>
       )}
 

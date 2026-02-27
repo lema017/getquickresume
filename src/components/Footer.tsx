@@ -2,13 +2,15 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Facebook, Instagram, Mail, Heart } from 'lucide-react';
 
+const SHOW_PILLAR_FOOTER_LINK = true;
+
 export function Footer() {
   const { t } = useTranslation();
 
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
@@ -49,6 +51,38 @@ export function Footer() {
             </div>
           </div>
 
+          {/* Tools */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">{t('footer.tools')}</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/ats-resume-checker" className="text-gray-400 hover:text-white transition-colors">
+                  {t('footer.toolLinks.atsChecker')}
+                </Link>
+              </li>
+              <li>
+                <Link to="/resume-for-job-description" className="text-gray-400 hover:text-white transition-colors">
+                  {t('footer.toolLinks.jobTailoring')}
+                </Link>
+              </li>
+              <li>
+                <Link to="/ai-resume-builder" className="text-gray-400 hover:text-white transition-colors">
+                  {t('footer.toolLinks.aiBuilder')}
+                </Link>
+              </li>
+              <li>
+                <Link to="/resume-translator" className="text-gray-400 hover:text-white transition-colors">
+                  {t('footer.toolLinks.translator')}
+                </Link>
+              </li>
+              <li>
+                <Link to="/resume-templates" className="text-gray-400 hover:text-white transition-colors">
+                  {t('footer.toolLinks.templates')}
+                </Link>
+              </li>
+            </ul>
+          </div>
+
           {/* Quick Links */}
           <div>
             <h3 className="text-lg font-semibold mb-4">{t('footer.quickLinks')}</h3>
@@ -73,6 +107,13 @@ export function Footer() {
                   {t('nav.about')}
                 </Link>
               </li>
+              {SHOW_PILLAR_FOOTER_LINK && (
+                <li>
+                  <Link to="/best-resume-translators" className="text-gray-400 hover:text-white transition-colors">
+                    Best Resume Translators
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
 

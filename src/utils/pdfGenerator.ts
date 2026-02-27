@@ -1,6 +1,14 @@
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import { A4_DIMENSIONS } from './a4Dimensions';
+
+// Dynamic imports for jspdf and html2canvas to avoid loading ~178 KiB on initial page load.
+// These are only fetched when the user actually triggers PDF generation.
+async function loadPdfDeps() {
+  const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+    import('jspdf'),
+    import('html2canvas'),
+  ]);
+  return { jsPDF, html2canvas };
+}
 
 /**
  * Generates PDF from a rendered template element
@@ -13,6 +21,8 @@ export async function generateResumePDF(
   if (!element) {
     throw new Error('Element not found');
   }
+
+  const { jsPDF, html2canvas } = await loadPdfDeps();
 
   // A4 dimensions in mm
   const A4_WIDTH_MM = 210;
@@ -107,6 +117,8 @@ export async function generateResumePDFSimple(
     throw new Error('Element not found');
   }
 
+  const { jsPDF, html2canvas } = await loadPdfDeps();
+
   // Capture the element as canvas
   const canvas = await html2canvas(element, {
     scale: 2,
@@ -189,6 +201,8 @@ export async function generateResumePDFFromPages(
   if (!container) {
     throw new Error('Container not found');
   }
+
+  const { jsPDF, html2canvas } = await loadPdfDeps();
 
   // Find all page containers
   const pageContainers = container.querySelectorAll('.a4-page-container') as NodeListOf<HTMLElement>;

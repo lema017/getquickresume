@@ -10,7 +10,7 @@ interface EnhanceSummaryModalProps {
   originalText: string;
   type: 'summary' | 'differentiators';
   jobTitle?: string;
-  language?: 'es' | 'en';
+  language?: string; // Accepts any language, normalized by service for API
   onApprove: (enhancedText: string) => void;
   resumeId?: string;
 }

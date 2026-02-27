@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { 
   ArrowLeft, 
   Share2, 
@@ -192,7 +193,13 @@ export function ResumeSharePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <>
+      <Helmet>
+        <title>Resume Sharing - GetQuickResume</title>
+        <meta name="description" content="Share and track your resume" />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-4">
@@ -280,7 +287,8 @@ export function ResumeSharePage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 

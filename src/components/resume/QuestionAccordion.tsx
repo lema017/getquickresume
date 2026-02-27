@@ -18,7 +18,7 @@ interface QuestionAccordionProps {
   originalText: string;
   recommendation: string;
   sectionType: 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language';
-  language?: 'es' | 'en';
+  language?: string; // Accepts any language, normalized by service for API
 }
 
 export function QuestionAccordion({ 

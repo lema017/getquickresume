@@ -10,22 +10,14 @@ export function Step7Review() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { navigateToStep } = useWizardNavigation();
-  const { resumeData, calculateCharacters } = useResumeStore();
+  const { resumeData } = useResumeStore();
   const { user } = useAuthStore();
   const [showTranslationModal, setShowTranslationModal] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('en');
 
-  const charactersUsed = calculateCharacters();
-  const isOverLimit = charactersUsed > 3500;
-  const canDownload = !isOverLimit || user?.isPremium;
-
   const handleDownload = () => {
-    if (canDownload) {
-      // Mock download
-      alert(t('review.downloadSuccess'));
-    } else {
-      alert(t('review.premiumRequired'));
-    }
+    // Mock download
+    alert(t('review.downloadSuccess'));
   };
 
 
@@ -76,40 +68,12 @@ export function Step7Review() {
         </div>
       </div>
 
-      {/* Character Status */}
-      <div className={`p-4 rounded-lg mb-8 ${isOverLimit ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200'}`}>
-        <div className="flex justify-between items-center">
-          <div>
-            <h3 className={`font-semibold ${isOverLimit ? 'text-red-900' : 'text-green-900'}`}>
-              {isOverLimit ? 'Límite de caracteres excedido' : 'Dentro del límite de caracteres'}
-            </h3>
-            <p className={`text-sm ${isOverLimit ? 'text-red-700' : 'text-green-700'}`}>
-              {charactersUsed.toLocaleString()}/3,500 caracteres utilizados
-            </p>
-          </div>
-          <div className="w-32 bg-gray-200 rounded-full h-3">
-            <div
-              className={`h-3 rounded-full transition-all duration-300 ${
-                isOverLimit ? 'bg-red-500' : 'bg-green-500'
-              }`}
-              style={{ width: `${Math.min((charactersUsed / 3500) * 100, 100)}%` }}
-            />
-          </div>
-        </div>
-      </div>
-
-
       {/* Action Buttons */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <button
             onClick={handleDownload}
-            disabled={!canDownload}
-            className={`flex-1 flex items-center justify-center py-3 px-6 rounded-lg font-medium transition-colors ${
-              canDownload
-                ? 'bg-primary text-white hover:bg-primary/90'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
+            className="flex-1 flex items-center justify-center py-3 px-6 rounded-lg font-medium transition-colors bg-primary text-white hover:bg-primary/90"
           >
             <Download className="w-5 h-5 mr-2" />
             {t('wizard.steps.review.actions.download')}

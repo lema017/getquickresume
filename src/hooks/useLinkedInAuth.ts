@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { authService } from '@/services/authService';
+import { trackUserRegistered } from '@/services/marketingAnalytics';
 import toast from 'react-hot-toast';
 
 // Generate a random state for CSRF protection
@@ -68,6 +69,16 @@ export const useLinkedInAuth = () => {
       // Save user and token to store
       login(response.user);
       localStorage.setItem('auth-token', response.token);
+
+      // Track new user registration if account was just created (within 30 seconds)
+      if (response.user.createdAt) {
+        const createdAt = new Date(response.user.createdAt).getTime();
+        const now = Date.now();
+        const isNewUser = (now - createdAt) < 30000; // 30 seconds
+        if (isNewUser) {
+          trackUserRegistered('linkedin');
+        }
+      }
 
       toast.success('¡Bienvenido! Iniciando sesión con LinkedIn...');
       navigate('/dashboard', { replace: true });

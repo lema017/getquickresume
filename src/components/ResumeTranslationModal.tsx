@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Globe, Loader2, CheckCircle, Crown, AlertCircle } from 'lucide-react';
+import { X, Globe, Loader2, CheckCircle, Crown, AlertCircle, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
@@ -28,6 +28,7 @@ export function ResumeTranslationModal({
   const [selectedLanguage, setSelectedLanguage] = useState<string>('');
   const [isTranslating, setIsTranslating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   if (!isOpen) return null;
 
@@ -37,6 +38,15 @@ export function ResumeTranslationModal({
     if (b.code === currentLanguage) return 1;
     return a.name.localeCompare(b.name);
   });
+
+  const filteredLanguages = searchQuery.trim()
+    ? availableLanguages.filter((lang) => {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch = lang.name.toLowerCase().includes(query) || lang.code.toLowerCase().includes(query);
+        const isCurrent = lang.code === currentLanguage;
+        return matchesSearch || isCurrent;
+      })
+    : availableLanguages;
 
   const isPremium = user?.isPremium ?? false;
   const isRewriteMode = !!selectedLanguage && selectedLanguage === currentLanguage;
@@ -146,31 +156,48 @@ export function ResumeTranslationModal({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               {t('resumeTranslation.selectLanguage')}
             </label>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {availableLanguages.map((lang) => (
-                <button
-                  key={lang.code}
-                  onClick={() => setSelectedLanguage(lang.code)}
-                  disabled={isTranslating || !isPremium}
-                  className={`p-3 rounded-lg border-2 transition-all ${
-                    selectedLanguage === lang.code
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  } ${
-                    !isPremium ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-                  }`}
-                >
-                  <div className="text-2xl mb-1">{lang.flag}</div>
-                  <div className="text-sm font-medium text-gray-900">{lang.name}</div>
-                  {lang.code === currentLanguage && (
-                    <div className="mt-1">
-                      <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-700">
-                        {t('resumeTranslation.currentLanguageBadge', 'Current')}
-                      </span>
-                    </div>
-                  )}
-                </button>
-              ))}
+            <div className="relative mb-3">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t('resumeTranslation.searchLanguages', 'Search languages...')}
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="max-h-72 overflow-y-auto rounded-lg">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {filteredLanguages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => setSelectedLanguage(lang.code)}
+                    disabled={isTranslating || !isPremium}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      selectedLanguage === lang.code
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    } ${
+                      !isPremium ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                    }`}
+                  >
+                    <div className="text-2xl mb-1">{lang.flag}</div>
+                    <div className="text-sm font-medium text-gray-900">{lang.name}</div>
+                    {lang.code === currentLanguage && (
+                      <div className="mt-1">
+                        <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-700">
+                          {t('resumeTranslation.currentLanguageBadge', 'Current')}
+                        </span>
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+              {filteredLanguages.length === 0 && (
+                <p className="text-center text-sm text-gray-500 py-6">
+                  {t('resumeTranslation.noLanguagesFound', 'No languages found')}
+                </p>
+              )}
             </div>
           </div>
 

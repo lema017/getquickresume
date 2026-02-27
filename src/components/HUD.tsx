@@ -1,49 +1,18 @@
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
 import { useAuthStore } from '@/stores/authStore';
-import { CheckCircle, AlertCircle, Info, Crown, Zap, Circle, ChevronDown, ChevronRight } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useEffect, useState, useMemo } from 'react';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 
 export function HUD() {
   const { t } = useTranslation();
   const { navigateToStep } = useWizardNavigation();
-  const { resumeData, wizardState, calculateCharacters, setCurrentStep } = useResumeStore();
+  const { wizardState, setCurrentStep, generatedResume } = useResumeStore();
   const { user } = useAuthStore();
-  const [isBreakdownExpanded, setIsBreakdownExpanded] = useState(false);
-
-  // Memoize character calculation to prevent unnecessary recalculations
-  const charactersUsed = useMemo(() => calculateCharacters(), [
-    resumeData.summary,
-    resumeData.jobDescription,
-    resumeData.skillsRaw,
-    resumeData.experience,
-    resumeData.education,
-    resumeData.certifications,
-    resumeData.projects,
-    resumeData.languages,
-    calculateCharacters
-  ]);
-  const maxCharacters = 3500;
-  const progressPercentage = (charactersUsed / maxCharacters) * 100;
-  const isNearLimit = progressPercentage > 80;
-  const isOverLimit = charactersUsed > maxCharacters;
-
-  const getProgressColor = () => {
-    if (isOverLimit) return 'bg-red-500';
-    if (isNearLimit) return 'bg-amber-500';
-    return 'bg-green-500';
-  };
-
-  const getProgressIcon = () => {
-    if (isOverLimit) return <AlertCircle className="w-4 h-4 text-red-500" />;
-    if (isNearLimit) return <AlertCircle className="w-4 h-4 text-amber-500" />;
-    return <CheckCircle className="w-4 h-4 text-green-500" />;
-  };
 
   // Step navigation functions
-  const steps = [
+  const allSteps = [
     { number: 1, key: 'profile', title: t('wizard.steps.profile.title') },
     { number: 2, key: 'skills', title: t('wizard.steps.skills.title') },
     { number: 3, key: 'experience', title: t('wizard.steps.experience.title') },
@@ -57,6 +26,15 @@ export function HUD() {
     { number: 11, key: 'final', title: t('hud.stepTitles.final') },
   ];
 
+  // Filter steps based on wizard phase
+  // Steps 1-7: Pre-generation phase (data entry)
+  // Steps 8-11: Post-generation phase (AI enhancement)
+  const hasGeneratedResume = generatedResume !== null;
+  const isPostGeneration = hasGeneratedResume || wizardState.currentStep >= 8;
+  const visibleSteps = isPostGeneration 
+    ? allSteps.filter(step => step.number >= 8) 
+    : allSteps.filter(step => step.number <= 7);
+
   const handleStepClick = (stepNumber: number) => {
     if (stepNumber !== wizardState.currentStep) {
       setCurrentStep(stepNumber);
@@ -69,8 +47,15 @@ export function HUD() {
   };
 
   const isStepAccessible = (stepNumber: number) => {
-    // Step 1 is always accessible
-    if (stepNumber === 1) {
+    // If we have a generatedResume or current step is 8+, lock steps 1-7
+    // This enforces one-way flow: once AI generation happens, users can only edit forward
+    const hasGeneratedResume = generatedResume !== null;
+    if ((wizardState.currentStep >= 8 || hasGeneratedResume) && stepNumber < 8) {
+      return false;
+    }
+    
+    // Step 8 is always accessible if we have a generated resume
+    if (stepNumber === 8 && hasGeneratedResume) {
       return true;
     }
     
@@ -89,7 +74,7 @@ export function HUD() {
       {/* Step Navigation */}
       <div className="mb-4">
         <div className="flex justify-between items-center">
-          {steps.map((step, index) => {
+          {visibleSteps.map((step, index) => {
             const isCompleted = isStepCompleted(step.number);
             const isCurrent = step.number === wizardState.currentStep;
             const isAccessible = isStepAccessible(step.number);
@@ -123,7 +108,7 @@ export function HUD() {
                   {step.title.split(' ')[0]}
                 </span>
                 {/* Connector line */}
-                {index < steps.length - 1 && (
+                {index < visibleSteps.length - 1 && (
                   <div className="absolute top-4 left-1/2 w-full h-0.5 bg-gray-200 -z-10" 
                        style={{ 
                          left: '50%',
@@ -136,96 +121,6 @@ export function HUD() {
           })}
         </div>
       </div>
-
-      {/* Character Counter - Compact */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center space-x-2">
-          {getProgressIcon()}
-          <span className="text-sm font-medium text-gray-700">
-            {t('hud.charactersLabel')} {charactersUsed.toLocaleString()}/{user?.isPremium ? '∞' : maxCharacters.toLocaleString()}
-          </span>
-          <span className={`text-xs px-2 py-1 rounded-full ${
-            isOverLimit ? 'bg-red-100 text-red-800' : 
-            isNearLimit ? 'bg-amber-100 text-amber-800' : 
-            'bg-green-100 text-green-800'
-          }`}>
-            {user?.isPremium ? '100%' : `${Math.round(progressPercentage)}%`}
-          </span>
-        </div>
-        
-        <button
-          onClick={() => setIsBreakdownExpanded(!isBreakdownExpanded)}
-          className="text-xs text-blue-600 hover:text-blue-800 flex items-center space-x-1"
-        >
-          {isBreakdownExpanded ? (
-            <>
-              <ChevronDown className="w-3 h-3" />
-              <span>{t('hud.hideBreakdown')}</span>
-            </>
-          ) : (
-            <>
-              <ChevronRight className="w-3 h-3" />
-              <span>{t('hud.showBreakdown')}</span>
-            </>
-          )}
-        </button>
-      </div>
-
-      {/* Character Breakdown - Collapsible */}
-      {isBreakdownExpanded && (
-        <div className="bg-gray-50 rounded-lg p-3 mb-3 border border-gray-200">
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="flex justify-between">
-              <span className="text-gray-600">{t('hud.breakdown.summary')}</span>
-              <span className="font-medium">{resumeData.summary.length}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">{t('hud.breakdown.experience')}</span>
-              <span className="font-medium">
-                {resumeData.experience.reduce((acc, exp) => 
-                  acc + exp.title.length + exp.company.length + 
-                  exp.achievements.join(' ').length + exp.responsibilities.join(' ').length, 0
-                )}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">{t('hud.breakdown.education')}</span>
-              <span className="font-medium">
-                {resumeData.education.reduce((acc, edu) => 
-                  acc + edu.institution.length + edu.degree.length + edu.field.length, 0
-                )}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">{t('hud.breakdown.projects')}</span>
-              <span className="font-medium">
-                {resumeData.projects.reduce((acc, proj) => 
-                  acc + proj.name.length + proj.description.length + proj.technologies.join(' ').length, 0
-                )}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">{t('hud.breakdown.skills')}</span>
-              <span className="font-medium">
-                {resumeData.skillsRaw.join(' ').length}
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Status Message - Compact */}
-      {!user?.isPremium && (isOverLimit || isNearLimit) && (
-        <div className={`text-xs p-2 rounded mb-3 ${
-          isOverLimit ? 'bg-red-50 text-red-800' : 'bg-amber-50 text-amber-800'
-        }`}>
-          {isOverLimit ? (
-            t('hud.limitExceeded', { count: charactersUsed - maxCharacters })
-          ) : (
-            t('hud.charactersRemaining', { count: maxCharacters - charactersUsed })
-          )}
-        </div>
-      )}
 
       {/* Premium Status Section */}
       {!user?.isPremium && (

@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { useAuthStore } from '@/stores/authStore';
 import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 import { GoogleLogin } from '@react-oauth/google';
 import { Facebook } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { getPageSEO, BASE_URL } from '@/utils/seoConfig';
 
 // Google icon component
 const GoogleIcon = ({ className }: { className?: string }) => (
@@ -30,11 +32,14 @@ const GoogleIcon = ({ className }: { className?: string }) => (
 );
 
 export function LoginPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { login, setLoading } = useAuthStore();
   const { handleGoogleLogin, handleError, isLoading: googleLoading } = useGoogleAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const lang = (i18n.language === 'es' ? 'es' : 'en') as 'en' | 'es';
+  const seo = getPageSEO('login', lang);
+  const pageUrl = `${BASE_URL}/login`;
 
   const handleSocialLogin = async (provider: 'google' | 'facebook') => {
     setIsLoading(true);
@@ -84,7 +89,36 @@ export function LoginPage() {
   ];
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <>
+      <Helmet>
+        <title>{seo.title}</title>
+        <meta name="description" content={seo.description} />
+        <link rel="canonical" href={pageUrl} />
+        
+        {/* hreflang for internationalization */}
+        <link rel="alternate" hrefLang="en" href={pageUrl} />
+        <link rel="alternate" hrefLang="es" href={`${pageUrl}?lang=es`} />
+        <link rel="alternate" hrefLang="x-default" href={pageUrl} />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={seo.title} />
+        <meta property="og:description" content={seo.description} />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:site_name" content="GetQuickResume" />
+        <meta property="og:image" content={`${BASE_URL}/images/og-default.png`} />
+        <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={seo.title} />
+        <meta name="twitter:description" content={seo.description} />
+        <meta name="twitter:image" content={`${BASE_URL}/images/og-default.png`} />
+        
+        {/* Robots - noIndex for login page */}
+        <meta name="robots" content={seo.noIndex ? 'noindex, nofollow' : 'index, follow'} />
+      </Helmet>
+      <div className="w-full max-w-md mx-auto">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
           {t('auth.title')}
@@ -133,6 +167,7 @@ export function LoginPage() {
           </a>
         </p>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1850 512" width="1850" height="512" role="img" aria-label="GetQuickResume logo lockup">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- White background for marketing assets -->
+  <rect x="0" y="0" width="1850" height="512" fill="#FFFFFF" />
+
+  <!-- Left: icon (same mark as /public/logo.svg), scaled to 512x512 -->
+  <g transform="translate(0 0) scale(16)">
+    <rect width="32" height="32" rx="8" fill="url(#gradient)"/>
+    <g fill="none" stroke="#FFFFFF" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M 23.3 9.9 A 9.5 9.5 0 1 0 23.3 22.1" />
+      <path d="M 16.2 16.0 H 23.2" />
+      <path d="M 23.2 16.0 V 21.2" />
+    </g>
+  </g>
+
+  <!-- Right: wordmark -->
+  <text
+    x="580"
+    y="256"
+    font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif"
+    font-size="150"
+    font-weight="800"
+    letter-spacing="-2"
+    dominant-baseline="middle"
+    fill="#111827"
+  >getQuickResume</text>
+</svg>

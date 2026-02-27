@@ -1,4 +1,5 @@
 import { handleAuthError } from '@/utils/authErrorHandler';
+import { normalizeToApiLanguage, ApiLanguage } from '@/types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/dev';
 
@@ -13,7 +14,7 @@ export interface GenerateQuestionsRequest {
   sectionType: 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language';
   recommendation: string;
   originalText: string;
-  language: 'es' | 'en';
+  language?: string; // Accepts any language, normalized to 'es' | 'en' for API
   resumeId?: string; // Optional resume ID for AI cost tracking
 }
 
@@ -33,7 +34,7 @@ export interface EnhanceWithContextRequest {
   sectionType: 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language';
   originalText: string;
   userInstructions: string;
-  language: 'es' | 'en';
+  language?: string; // Accepts any language, normalized to 'es' | 'en' for API
   gatheredContext: Array<{
     questionId: string;
     answer: string;
@@ -57,7 +58,7 @@ export interface GenerateAnswerSuggestionRequest {
   originalText: string;
   recommendation: string;
   sectionType: 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language';
-  language: 'es' | 'en';
+  language?: string; // Accepts any language, normalized to 'es' | 'en' for API
   resumeId?: string; // Optional resume ID for AI cost tracking
 }
 
@@ -77,7 +78,7 @@ export interface DirectEnhanceRequest {
   checklistItemId: string;
   sectionType: 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language';
   originalText: string;
-  language: 'es' | 'en';
+  language?: string; // Accepts any language, normalized to 'es' | 'en' for API
   resumeId?: string;
 }
 
@@ -108,6 +109,10 @@ class EnhancementService {
   ): Promise<Question[]> {
     try {
       const token = await this.getAuthToken();
+      const normalizedRequest = {
+        ...request,
+        language: normalizeToApiLanguage(request.language),
+      };
       const response = await fetch(
         `${API_BASE_URL}/api/ai/generate-enhancement-questions`,
         {
@@ -116,7 +121,7 @@ class EnhancementService {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(request),
+          body: JSON.stringify(normalizedRequest),
         }
       );
 
@@ -161,7 +166,7 @@ class EnhancementService {
         sectionType: request.sectionType,
         originalText: request.originalText,
         userInstructions: request.userInstructions,
-        language: request.language,
+        language: normalizeToApiLanguage(request.language),
         gatheredContext: request.gatheredContext,
       };
 
@@ -218,6 +223,10 @@ class EnhancementService {
   ): Promise<string> {
     try {
       const token = await this.getAuthToken();
+      const normalizedRequest = {
+        ...request,
+        language: normalizeToApiLanguage(request.language),
+      };
       const response = await fetch(
         `${API_BASE_URL}/api/ai/generate-answer-suggestion`,
         {
@@ -226,7 +235,7 @@ class EnhancementService {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(request),
+          body: JSON.stringify(normalizedRequest),
         }
       );
 
@@ -266,6 +275,10 @@ class EnhancementService {
   async directEnhance(request: DirectEnhanceRequest): Promise<string> {
     try {
       const token = await this.getAuthToken();
+      const normalizedRequest = {
+        ...request,
+        language: normalizeToApiLanguage(request.language),
+      };
       const response = await fetch(
         `${API_BASE_URL}/api/ai/direct-enhance`,
         {
@@ -274,7 +287,7 @@ class EnhancementService {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(request),
+          body: JSON.stringify(normalizedRequest),
         }
       );
 

@@ -1,3 +1,16 @@
+/**
+ * @deprecated This component has been replaced by KeywordIntelligence.tsx
+ * which provides a unified, consolidated view of keyword analysis in the Review page.
+ * 
+ * The new KeywordIntelligence component combines:
+ * - Keywords Optimized for ATS
+ * - ATS Score Breakdown  
+ * - Keyword Analysis (this component)
+ * 
+ * This file is kept for reference. It can be safely deleted after confirming
+ * the new implementation works correctly.
+ */
+
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { 
@@ -5,44 +18,39 @@ import {
   XCircle, 
   AlertTriangle, 
   Info,
-  ChevronDown,
-  ChevronUp,
-  Sparkles
+  Sparkles,
+  Plus
 } from 'lucide-react';
-import { KeywordAnalysis as KeywordAnalysisType, KeywordItem, CategorizedKeywords } from '@/types/jobTailoring';
+import { KeywordAnalysis as KeywordAnalysisType } from '@/types/jobTailoring';
+import { AddKeywordModal } from './AddKeywordModal';
 
 interface KeywordAnalysisProps {
   analysis: KeywordAnalysisType;
+  onIncorporateKeyword?: (keyword: string, context: string, importance: 'critical' | 'important' | 'nice_to_have') => Promise<void>;
+  isIncorporatingKeyword?: boolean;
 }
 
-const CATEGORY_LABELS: Record<keyof CategorizedKeywords, string> = {
-  technical: 'Technical Skills',
-  softSkills: 'Soft Skills',
-  industry: 'Industry Terms',
-  certifications: 'Certifications',
-  methodologies: 'Methodologies',
-  tools: 'Tools & Platforms',
-  experience: 'Experience Level'
-};
-
-const CATEGORY_COLORS: Record<keyof CategorizedKeywords, string> = {
-  technical: 'bg-blue-100 text-blue-800 border-blue-200',
-  softSkills: 'bg-purple-100 text-purple-800 border-purple-200',
-  industry: 'bg-green-100 text-green-800 border-green-200',
-  certifications: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-  methodologies: 'bg-orange-100 text-orange-800 border-orange-200',
-  tools: 'bg-pink-100 text-pink-800 border-pink-200',
-  experience: 'bg-indigo-100 text-indigo-800 border-indigo-200'
-};
-
-export function KeywordAnalysis({ analysis }: KeywordAnalysisProps) {
+export function KeywordAnalysis({ analysis, onIncorporateKeyword, isIncorporatingKeyword = false }: KeywordAnalysisProps) {
   const { t } = useTranslation();
-  const [expandedSection, setExpandedSection] = useState<string | null>('comparison');
+  
+  // State for AddKeywordModal
+  const [selectedKeyword, setSelectedKeyword] = useState<{
+    keyword: string;
+    importance: 'critical' | 'important' | 'nice_to_have';
+  } | null>(null);
 
-  const { resumeKeywords, jobKeywords, matchAnalysis } = analysis;
+  const { matchAnalysis } = analysis;
+  
+  // Handler for opening the add keyword modal
+  const openAddKeywordModal = (keyword: string, importance: 'critical' | 'important' | 'nice_to_have') => {
+    setSelectedKeyword({ keyword, importance });
+  };
 
-  const toggleSection = (section: string) => {
-    setExpandedSection(expandedSection === section ? null : section);
+  // Handler for submitting the keyword incorporation
+  const handleIncorporateKeyword = async (keyword: string, context: string) => {
+    if (onIncorporateKeyword && selectedKeyword) {
+      await onIncorporateKeyword(keyword, context, selectedKeyword.importance);
+    }
   };
 
   // Calculate critical/important/nice-to-have counts
@@ -77,47 +85,6 @@ export function KeywordAnalysis({ analysis }: KeywordAnalysisProps) {
       default:
         return importance;
     }
-  };
-
-  // Helper to render categorized keywords
-  const renderCategoryKeywords = (keywords: CategorizedKeywords, isJobKeywords: boolean = false) => {
-    const categories = Object.entries(keywords) as [keyof CategorizedKeywords, KeywordItem[]][];
-    const nonEmptyCategories = categories.filter(([_, items]) => items && items.length > 0);
-
-    if (nonEmptyCategories.length === 0) {
-      return <p className="text-sm text-gray-500 italic">No keywords found</p>;
-    }
-
-    return (
-      <div className="space-y-4">
-        {nonEmptyCategories.map(([category, items]) => (
-          <div key={category}>
-            <h5 className="text-xs font-semibold text-gray-500 uppercase mb-2">
-              {CATEGORY_LABELS[category]} ({items.length})
-            </h5>
-            <div className="flex flex-wrap gap-2">
-              {items.map((item, index) => (
-                <div 
-                  key={index} 
-                  className={`px-2 py-1 rounded-lg text-xs font-medium border ${CATEGORY_COLORS[category]} flex items-center gap-1`}
-                  title={item.locations?.join(', ') || (item.importance ? `Importance: ${item.importance}` : '')}
-                >
-                  {item.keyword}
-                  {item.frequency && item.frequency > 1 && (
-                    <span className="opacity-70">({item.frequency}x)</span>
-                  )}
-                  {isJobKeywords && item.importance && (
-                    <span className={`ml-1 px-1.5 py-0.5 rounded text-[10px] ${getImportanceBadge(item.importance)}`}>
-                      {item.importance === 'critical' ? '!' : item.importance === 'important' ? '*' : ''}
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
   };
 
   return (
@@ -174,17 +141,30 @@ export function KeywordAnalysis({ analysis }: KeywordAnalysisProps) {
           </div>
           <div className="flex flex-wrap gap-2">
             {matchAnalysis.missingCritical.map((item, index) => (
-              <span 
+              <div 
                 key={index}
-                className="px-3 py-1.5 bg-white border border-red-300 rounded-lg text-sm text-red-800 flex items-center gap-1"
+                className="flex items-center gap-1"
               >
-                <XCircle className="w-3.5 h-3.5" />
-                {item.keyword}
-              </span>
+                <span className="px-3 py-1.5 bg-white border border-red-300 rounded-lg text-sm text-red-800 flex items-center gap-1">
+                  <XCircle className="w-3.5 h-3.5" />
+                  {item.keyword}
+                </span>
+                {onIncorporateKeyword && (
+                  <button
+                    onClick={() => openAddKeywordModal(item.keyword, 'critical')}
+                    className="p-1.5 hover:bg-red-100 rounded-lg transition-colors group"
+                    title={t('jobTailoring.keywordAnalysis.addKeywordTitle', 'I have this skill - add to resume')}
+                  >
+                    <Plus className="w-4 h-4 text-red-600 group-hover:text-red-700" />
+                  </button>
+                )}
+              </div>
             ))}
           </div>
           <p className="text-xs text-red-700 mt-3">
-            {t('jobTailoring.keywordAnalysis.missingCriticalHint', 'Consider adding these keywords if you have relevant experience.')}
+            {onIncorporateKeyword 
+              ? t('jobTailoring.keywordAnalysis.missingCriticalHintWithAdd', 'Click the + button to add keywords you have experience with.')
+              : t('jobTailoring.keywordAnalysis.missingCriticalHint', 'Consider adding these keywords if you have relevant experience.')}
           </p>
         </div>
       )}
@@ -200,15 +180,31 @@ export function KeywordAnalysis({ analysis }: KeywordAnalysisProps) {
           </div>
           <div className="flex flex-wrap gap-2">
             {matchAnalysis.missingImportant.map((item, index) => (
-              <span 
+              <div 
                 key={index}
-                className="px-3 py-1.5 bg-white border border-orange-300 rounded-lg text-sm text-orange-800 flex items-center gap-1"
+                className="flex items-center gap-1"
               >
-                <XCircle className="w-3.5 h-3.5" />
-                {item.keyword}
-              </span>
+                <span className="px-3 py-1.5 bg-white border border-orange-300 rounded-lg text-sm text-orange-800 flex items-center gap-1">
+                  <XCircle className="w-3.5 h-3.5" />
+                  {item.keyword}
+                </span>
+                {onIncorporateKeyword && (
+                  <button
+                    onClick={() => openAddKeywordModal(item.keyword, 'important')}
+                    className="p-1.5 hover:bg-orange-100 rounded-lg transition-colors group"
+                    title={t('jobTailoring.keywordAnalysis.addKeywordTitle', 'I have this skill - add to resume')}
+                  >
+                    <Plus className="w-4 h-4 text-orange-600 group-hover:text-orange-700" />
+                  </button>
+                )}
+              </div>
             ))}
           </div>
+          {onIncorporateKeyword && (
+            <p className="text-xs text-orange-700 mt-3">
+              {t('jobTailoring.keywordAnalysis.missingImportantHintWithAdd', 'Click the + button to add keywords you have experience with.')}
+            </p>
+          )}
         </div>
       )}
 
@@ -272,44 +268,17 @@ export function KeywordAnalysis({ analysis }: KeywordAnalysisProps) {
         </div>
       )}
 
-      {/* Side-by-Side Comparison (Collapsible) */}
-      <div className="bg-gray-50 rounded-xl overflow-hidden">
-        <button
-          onClick={() => toggleSection('comparison')}
-          className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-100 transition-colors"
-        >
-          <h4 className="font-semibold text-gray-900">
-            {t('jobTailoring.keywordAnalysis.fullComparison', 'Full Keyword Comparison')}
-          </h4>
-          {expandedSection === 'comparison' ? (
-            <ChevronUp className="w-5 h-5 text-gray-400" />
-          ) : (
-            <ChevronDown className="w-5 h-5 text-gray-400" />
-          )}
-        </button>
-
-        {expandedSection === 'comparison' && (
-          <div className="px-4 pb-4 grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-gray-200 pt-4">
-            {/* Resume Keywords */}
-            <div>
-              <h5 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                {t('jobTailoring.keywordAnalysis.yourResumeKeywords', 'Your Resume Keywords')}
-              </h5>
-              {renderCategoryKeywords(resumeKeywords, false)}
-            </div>
-
-            {/* Job Keywords */}
-            <div>
-              <h5 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
-                {t('jobTailoring.keywordAnalysis.jobRequirements', 'Job Requirements')}
-              </h5>
-              {renderCategoryKeywords(jobKeywords, true)}
-            </div>
-          </div>
-        )}
-      </div>
+      {/* Add Keyword Modal */}
+      {selectedKeyword && (
+        <AddKeywordModal
+          isOpen={!!selectedKeyword}
+          onClose={() => setSelectedKeyword(null)}
+          keyword={selectedKeyword.keyword}
+          importance={selectedKeyword.importance}
+          onSubmit={handleIncorporateKeyword}
+          isLoading={isIncorporatingKeyword}
+        />
+      )}
     </div>
   );
 }

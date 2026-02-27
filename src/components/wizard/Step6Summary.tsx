@@ -14,7 +14,7 @@ import { summarySuggestionService } from '@/services/summarySuggestionService';
 export function Step7Summary() {
   const { t } = useTranslation();
   const { navigateToStep } = useWizardNavigation();
-  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep, calculateCharacters, currentResumeId } = useResumeStore();
+  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep, currentResumeId } = useResumeStore();
   const { user } = useAuthStore();
   const [summary, setSummary] = useState(resumeData.summary);
   const [jobDescription, setJobDescription] = useState(resumeData.jobDescription);
@@ -218,15 +218,7 @@ export function Step7Summary() {
       const newSummary = summary ? `${summary}\n\n${suggestion}` : suggestion;
       setSummary(newSummary);
       
-      // Actualizar el contador de caracteres
-      const currentCharacters = calculateCharacters();
-      const suggestionCharacters = suggestion.length + 2; // +2 for newlines
-      const newTotalCharacters = currentCharacters + suggestionCharacters;
-      
-      updateResumeData({ 
-        summary: newSummary,
-        totalCharacters: newTotalCharacters 
-      });
+      updateResumeData({ summary: newSummary });
       
       // Mark suggestion as used
       setUsedExperienceSuggestions(prev => new Set([...prev, suggestion]));
@@ -239,15 +231,7 @@ export function Step7Summary() {
       const newJobDescription = jobDescription ? `${jobDescription}\n\n${suggestion}` : suggestion;
       setJobDescription(newJobDescription);
       
-      // Actualizar el contador de caracteres
-      const currentCharacters = calculateCharacters();
-      const suggestionCharacters = suggestion.length + 2; // +2 for newlines
-      const newTotalCharacters = currentCharacters + suggestionCharacters;
-      
-      updateResumeData({ 
-        jobDescription: newJobDescription,
-        totalCharacters: newTotalCharacters 
-      });
+      updateResumeData({ jobDescription: newJobDescription });
       
       // Mark suggestion as used
       setUsedDifferentiatorsSuggestions(prev => new Set([...prev, suggestion]));
@@ -295,9 +279,6 @@ export function Step7Summary() {
     setJobDescription(enhancedText);
     updateResumeData({ jobDescription: enhancedText });
   };
-
-  const characterCount = summary.length + jobDescription.length;
-  const isNearLimit = characterCount > 2800;
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -652,29 +633,6 @@ export function Step7Summary() {
             )}
           </div>
         </div>
-      </div>
-
-      {/* Character Counter */}
-      <div className={`p-4 rounded-lg mb-6 ${isNearLimit ? 'bg-amber-50 border border-amber-200' : 'bg-gray-50 border border-gray-200'}`}>
-        <div className="flex justify-between items-center">
-          <span className={`text-sm font-medium ${isNearLimit ? 'text-amber-800' : 'text-gray-700'}`}>
-            Total de caracteres: {characterCount.toLocaleString()}/3,500
-          </span>
-          <div className="w-32 bg-gray-200 rounded-full h-2">
-            <div
-              className={`h-2 rounded-full transition-all duration-300 ${
-                characterCount > 3500 ? 'bg-red-500' : 
-                characterCount > 2800 ? 'bg-amber-500' : 'bg-green-500'
-              }`}
-              style={{ width: `${Math.min((characterCount / 3500) * 100, 100)}%` }}
-            />
-          </div>
-        </div>
-        {isNearLimit && (
-          <p className="text-amber-700 text-sm mt-2">
-            ⚠️ Te estás acercando al límite de caracteres. Considera ser más conciso.
-          </p>
-        )}
       </div>
 
       {/* Motivation */}

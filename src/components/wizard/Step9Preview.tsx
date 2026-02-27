@@ -19,6 +19,7 @@ import { convertResumeDataToTemplateFormat, filterDataForPage, TemplateDataForma
 import { generateSmallMockResumeData } from '@/utils/mockResumeData';
 import { generateResumePDFFromPages } from '@/utils/pdfGenerator';
 import { downloadService } from '@/services/downloadService';
+import { trackResumeDownloadCompleted } from '@/services/marketingAnalytics';
 
 // Helper interface for PaginationInfo (matching templates/client structure)
 interface PageContentSections {
@@ -295,16 +296,18 @@ export function Step9Preview() {
       console.log('🔍 [DEBUG] Starting pagination calculation for template:', template.name);
       setCalculatingPagination(true);
       try {
-        // Use existing resumeData from store if available and complete, otherwise convert from generatedResume
+        // Always convert from generatedResume to get enhanced content (description, skills, etc.)
+        // Then preserve specific fields from storeResumeData
         let resumeData: ResumeData;
-        if (storeResumeData && storeResumeData.firstName && storeResumeData.experience && storeResumeData.experience.length > 0) {
-          // Use existing data from store to preserve all fields (profession, targetLevel, etc.)
-          console.log('🔍 [DEBUG] Using existing resumeData from store to preserve all fields');
-          resumeData = storeResumeData;
-        } else {
-          // Fallback: convert from generatedResume if store data is incomplete
-          console.log('🔍 [DEBUG] Store data incomplete, converting from generatedResume');
-          resumeData = convertGeneratedResumeToResumeData(generatedResume);
+        // Always use convertGeneratedResumeToResumeData to include enhanced content
+        resumeData = convertGeneratedResumeToResumeData(generatedResume);
+        // Preserve fields from storeResumeData if they exist
+        if (storeResumeData) {
+          if (storeResumeData.profession) resumeData.profession = storeResumeData.profession;
+          if (storeResumeData.targetLevel) resumeData.targetLevel = storeResumeData.targetLevel;
+          if (storeResumeData.linkedin) resumeData.linkedin = storeResumeData.linkedin;
+          if (storeResumeData.jobDescription) resumeData.jobDescription = storeResumeData.jobDescription;
+          if (storeResumeData.totalCharacters) resumeData.totalCharacters = storeResumeData.totalCharacters;
         }
         
         console.log('🔍 [DEBUG] Resume data ready, calling calculatePagination...');
@@ -495,6 +498,9 @@ export function Step9Preview() {
 
       // Generate PDF
       await generateResumePDFFromPages(container as HTMLElement, fileName);
+      
+      // Track successful download completion
+      trackResumeDownloadCompleted(currentResumeId || undefined, selectedTemplate?.id);
       
       // Mark step as completed after successful download
       markStepCompleted(10);

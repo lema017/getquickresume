@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import toast from 'react-hot-toast';
 import { 
   FileText, 
   Link2, 
@@ -16,6 +17,7 @@ import { Resume } from '@/types';
 import { UrlValidator } from './UrlValidator';
 import { JobPreviewCard } from './JobPreviewCard';
 import { looksLikeUrl } from '@/utils/urlValidation';
+import { RateLimitModal } from '@/components/RateLimitModal';
 
 interface JobInputProps {
   preselectedResumeId?: string;
@@ -40,10 +42,13 @@ export function JobInput({ preselectedResumeId, onNext, onBack }: JobInputProps)
     setJobDescription,
     validateUrl,
     analyzeJob,
+    reset,
   } = useJobTailoringStore();
 
   const [showResumeSelector, setShowResumeSelector] = useState(!preselectedResumeId);
   const [localError, setLocalError] = useState<string | null>(null);
+  const [isRateLimited, setIsRateLimited] = useState(false);
+  const [rateLimitError, setRateLimitError] = useState<string | null>(null);
 
   // Load resumes if not already loaded
   useEffect(() => {
@@ -62,6 +67,24 @@ export function JobInput({ preselectedResumeId, onNext, onBack }: JobInputProps)
       }
     }
   }, [preselectedResumeId, resumes, sourceResume, setSelectedResume]);
+
+  // Validate that persisted sourceResume still exists in user's resumes list
+  useEffect(() => {
+    // Only check if we have a sourceResume from persistence and resumes are loaded
+    if (sourceResume && resumes.length > 0 && !isLoadingResumes) {
+      const resumeStillExists = resumes.some(r => r.id === sourceResume.id);
+      if (!resumeStillExists) {
+        // Resume was deleted, clear the invalid state
+        console.warn('Persisted resume no longer exists, clearing state');
+        toast.error(
+          t('jobTailoring.errors.resumeDeleted', {
+            defaultValue: 'The resume you were tailoring has been deleted. Please select a new resume.'
+          })
+        );
+        reset();
+      }
+    }
+  }, [sourceResume, resumes, isLoadingResumes, reset, t]);
 
   // Filter to only show generated resumes
   const generatedResumes = resumes.filter(r => r.generatedResume);
@@ -89,7 +112,15 @@ export function JobInput({ preselectedResumeId, onNext, onBack }: JobInputProps)
   };
 
   const handleUrlValidate = async () => {
-    await validateUrl(jobUrl);
+    setIsRateLimited(false);
+    setRateLimitError(null);
+    const result = await validateUrl(jobUrl);
+    
+    // Check if rate limit error occurred
+    if (result.error?.code === 'RATE_LIMIT') {
+      setIsRateLimited(true);
+      setRateLimitError(result.error.message);
+    }
   };
 
   const handleConfirmUrlContent = () => {
@@ -109,9 +140,23 @@ export function JobInput({ preselectedResumeId, onNext, onBack }: JobInputProps)
       return;
     }
 
-    // Start analysis and proceed to next step
-    await analyzeJob();
-    onNext();
+    // Reset rate limit state
+    setIsRateLimited(false);
+    setRateLimitError(null);
+    setLocalError(null);
+
+    try {
+      // Start analysis and proceed to next step
+      await analyzeJob();
+      onNext();
+    } catch (err: any) {
+      if (err?.code === 'RATE_LIMIT' || err?.statusCode === 429) {
+        setIsRateLimited(true);
+        setRateLimitError(err.message);
+      } else {
+        setLocalError(err.message || t('jobTailoring.jobInput.errors.analysisError'));
+      }
+    }
   };
 
   const handleSwitchToManual = () => {
@@ -310,7 +355,7 @@ export function JobInput({ preselectedResumeId, onNext, onBack }: JobInputProps)
         )}
 
         {/* Error Message */}
-        {localError && (
+        {localError && !isRateLimited && (
           <div className="flex items-center gap-2 text-red-600 bg-red-50 px-4 py-3 rounded-xl">
             <AlertCircle className="w-5 h-5 flex-shrink-0" />
             <span>{localError}</span>
@@ -352,6 +397,24 @@ export function JobInput({ preselectedResumeId, onNext, onBack }: JobInputProps)
           )}
         </div>
       </div>
+
+      {/* Rate Limit Modal */}
+      <RateLimitModal
+        isOpen={isRateLimited}
+        message={rateLimitError || undefined}
+        onRetry={() => {
+          if (inputMode === 'url' && jobUrl) {
+            handleUrlValidate();
+          } else {
+            handleProceed();
+          }
+        }}
+        onClose={() => {
+          setIsRateLimited(false);
+          setRateLimitError(null);
+        }}
+        countdownSeconds={60}
+      />
     </div>
   );
 }

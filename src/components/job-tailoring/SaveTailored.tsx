@@ -18,6 +18,7 @@ import {
   Share2
 } from 'lucide-react';
 import { useJobTailoringStore } from '@/stores/jobTailoringStore';
+import { RateLimitModal } from '@/components/RateLimitModal';
 
 interface SaveTailoredProps {
   onBack: () => void;
@@ -40,11 +41,15 @@ export function SaveTailored({ onBack }: SaveTailoredProps) {
 
   const [hasSaved, setHasSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [isRateLimited, setIsRateLimited] = useState(false);
+  const [rateLimitError, setRateLimitError] = useState<string | null>(null);
 
   const jobInfo = editedJobInfo || jobAnalysis?.jobInfo;
 
   const handleSave = async () => {
     setSaveError(null);
+    setIsRateLimited(false);
+    setRateLimitError(null);
     
     try {
       const resumeId = await saveTailoredResume();
@@ -75,11 +80,18 @@ export function SaveTailored({ onBack }: SaveTailoredProps) {
       }
     } catch (error: any) {
       console.error('Error saving tailored resume:', error);
-      const errorMsg = error.message || t('jobTailoring.save.saveError', {
-        defaultValue: 'Failed to save resume. Please try again.',
-      });
-      setSaveError(errorMsg);
-      toast.error(errorMsg);
+      
+      // Check for rate limit error
+      if (error?.code === 'RATE_LIMIT' || error?.statusCode === 429) {
+        setIsRateLimited(true);
+        setRateLimitError(error.message);
+      } else {
+        const errorMsg = error.message || t('jobTailoring.save.saveError', {
+          defaultValue: 'Failed to save resume. Please try again.',
+        });
+        setSaveError(errorMsg);
+        toast.error(errorMsg);
+      }
     }
   };
 
@@ -213,7 +225,7 @@ export function SaveTailored({ onBack }: SaveTailoredProps) {
       </div>
 
       {/* Error Message */}
-      {saveError && (
+      {saveError && !isRateLimited && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
           <p className="text-red-700 text-sm">{saveError}</p>
         </div>
@@ -230,9 +242,9 @@ export function SaveTailored({ onBack }: SaveTailoredProps) {
         </button>
         <button
           onClick={handleSave}
-          disabled={isSaving || !tailoredResumeTitle.trim()}
+          disabled={isSaving || !tailoredResumeTitle.trim() || isRateLimited}
           className={`flex items-center gap-2 px-8 py-3 font-medium rounded-xl transition-all ${
-            isSaving || !tailoredResumeTitle.trim()
+            isSaving || !tailoredResumeTitle.trim() || isRateLimited
               ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
               : 'bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 shadow-md hover:shadow-lg'
           }`}
@@ -250,6 +262,18 @@ export function SaveTailored({ onBack }: SaveTailoredProps) {
           )}
         </button>
       </div>
+
+      {/* Rate Limit Modal */}
+      <RateLimitModal
+        isOpen={isRateLimited}
+        message={rateLimitError || undefined}
+        onRetry={handleSave}
+        onClose={() => {
+          setIsRateLimited(false);
+          setRateLimitError(null);
+        }}
+        countdownSeconds={60}
+      />
     </div>
   );
 }

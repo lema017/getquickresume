@@ -30,6 +30,10 @@ export const AI_PRICING = {
     'gpt-oss-20b': {
       input: 0.075,
       output: 0.30
+    },
+    'llama-3.1-8b-instant': {
+      input: 0.05,   // $0.05 per 1M input tokens
+      output: 0.08   // $0.08 per 1M output tokens
     }
   },
   openai: {
@@ -92,6 +96,7 @@ export type AIEndpointType =
   | 'jobTitleAchievements'
   | 'enhanceText'
   | 'improveSection'
+  | 'autoEnhanceSection'
   | 'enhancementQuestions'
   | 'answerSuggestion'
   | 'directEnhance'
@@ -105,12 +110,16 @@ export type AIEndpointType =
   | 'jobAnswerOptions'
   | 'jobTailoredResume'
   | 'jobUrlExtraction'
+  | 'incorporateKeyword'
   // Resume Extraction endpoint
   | 'resumeExtraction'
   // Section Validation endpoint
   | 'validate-section'
   // Profession Validation endpoint
-  | 'validateProfession';
+  | 'validateProfession'
+  // Public endpoints
+  | 'publicTranslateResume'
+  | 'publicAtsCheck';
 
 export interface AIUsageLog {
   id: string;
@@ -496,7 +505,10 @@ function getBreakdownCategory(endpointType: AIEndpointType): string {
     case 'linkedInParsing':
       return 'linkedInParsing';
     case 'translateResume':
+    case 'publicTranslateResume':
       return 'translation';
+    case 'publicAtsCheck':
+      return 'scoring';
     // Job Tailoring endpoints
     case 'jobAnalysis':
     case 'jobQuestions':

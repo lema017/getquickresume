@@ -98,7 +98,7 @@ export function Header() {
                     isActive('/') ? 'text-primary' : 'text-gray-700 hover:text-primary'
                   }`}
                 >
-                  Dashboard
+                  {t('nav.home')}
                 </Link>
                 
                 <Link
@@ -197,7 +197,7 @@ export function Header() {
             ) : (
               <Link
                 to="/login"
-                className="btn-primary"
+                className="btn-primary hidden sm:inline-flex text-sm"
               >
                 {t('landing.hero.ctaPrimary')}
               </Link>

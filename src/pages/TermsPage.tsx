@@ -1,11 +1,64 @@
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
+import { 
+  getPageSEO, 
+  BASE_URL, 
+  generateArticleSchema 
+} from '@/utils/seoConfig';
 
 export function TermsPage() {
   const { t, i18n } = useTranslation();
   const isSpanish = i18n.language === 'es';
+  const lang = (i18n.language === 'es' ? 'es' : 'en') as 'en' | 'es';
+  const seo = getPageSEO('terms', lang);
+  const pageUrl = `${BASE_URL}/legal/terms`;
+  const articleSchema = generateArticleSchema(
+    seo.title,
+    seo.description,
+    '2024-01-01',
+    new Date().toISOString().split('T')[0]
+  );
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <>
+      <Helmet>
+        <title>{seo.title}</title>
+        <meta name="description" content={seo.description} />
+        <link rel="canonical" href={pageUrl} />
+        
+        {/* hreflang for internationalization */}
+        <link rel="alternate" hrefLang="en" href={pageUrl} />
+        <link rel="alternate" hrefLang="es" href={`${pageUrl}?lang=es`} />
+        <link rel="alternate" hrefLang="x-default" href={pageUrl} />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content={seo.ogType || 'article'} />
+        <meta property="og:title" content={seo.title} />
+        <meta property="og:description" content={seo.description} />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:site_name" content="GetQuickResume" />
+        <meta property="og:image" content={seo.ogImage || `${BASE_URL}/images/og-default.png`} />
+        <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={seo.title} />
+        <meta name="twitter:description" content={seo.description} />
+        <meta name="twitter:image" content={seo.ogImage || `${BASE_URL}/images/og-default.png`} />
+        
+        {/* Additional SEO meta tags */}
+        <meta name="robots" content="index, follow" />
+        <meta name="keywords" content={lang === 'es' 
+          ? 'términos de servicio, condiciones de uso, acuerdo de usuario, términos legales'
+          : 'terms of service, terms and conditions, user agreement, legal terms'
+        } />
+        
+        {/* Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify(articleSchema)}
+        </script>
+      </Helmet>
+      <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-8">
@@ -213,6 +266,7 @@ export function TermsPage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

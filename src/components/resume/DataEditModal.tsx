@@ -6,15 +6,19 @@ import {
   ResumeData, 
   EnhancedEducation, 
   EnhancedProject, 
+  EnhancedExperience,
+  EnhancedCertification,
   LanguageProficiency,
   Education,
   Project,
   Language,
-  Achievement
+  Achievement,
+  WorkExperience,
+  Certification
 } from '@/types';
 import { sectionValidationService, FieldError, ValidatableSection } from '@/services/sectionValidationService';
 
-export type EditableSection = 'contact' | 'education' | 'skills' | 'projects' | 'languages' | 'achievements';
+export type EditableSection = 'contact' | 'education' | 'skills' | 'projects' | 'languages' | 'achievements' | 'experience' | 'certifications';
 
 interface DataEditModalProps {
   isOpen: boolean;
@@ -99,6 +103,12 @@ export function DataEditModal({
   // Achievements form state
   const [achievementsList, setAchievementsList] = useState<string[]>([]);
 
+  // Experience form state
+  const [experienceList, setExperienceList] = useState<EnhancedExperience[]>([]);
+
+  // Certifications form state
+  const [certificationsList, setCertificationsList] = useState<EnhancedCertification[]>([]);
+
   // Initialize form data when modal opens
   useEffect(() => {
     if (isOpen && generatedResume) {
@@ -137,6 +147,16 @@ export function DataEditModal({
             ? [...generatedResume.achievements] 
             : ['']);
           break;
+        case 'experience':
+          setExperienceList(generatedResume.experience?.length > 0 
+            ? [...generatedResume.experience] 
+            : [createEmptyExperience()]);
+          break;
+        case 'certifications':
+          setCertificationsList(generatedResume.certifications?.length > 0 
+            ? [...generatedResume.certifications] 
+            : [createEmptyCertification()]);
+          break;
       }
       setError(null);
       // Only clear field errors if no initial errors are provided
@@ -169,6 +189,29 @@ export function DataEditModal({
     level: 'Intermediate',
   });
 
+  const createEmptyExperience = (): EnhancedExperience => ({
+    title: '',
+    company: '',
+    duration: '',
+    location: '',
+    description: '',
+    achievements: [],
+    skills: [],
+    impact: [],
+    startDate: '',
+    endDate: '',
+    isCurrent: false,
+  });
+
+  const createEmptyCertification = (): EnhancedCertification => ({
+    name: '',
+    issuer: '',
+    date: '',
+    credentialId: '',
+    url: '',
+    skills: [],
+  });
+
   const getSectionIcon = () => {
     switch (section) {
       case 'contact': return <User className="w-5 h-5" />;
@@ -177,6 +220,8 @@ export function DataEditModal({
       case 'projects': return <FolderGit2 className="w-5 h-5" />;
       case 'languages': return <Globe className="w-5 h-5" />;
       case 'achievements': return <Trophy className="w-5 h-5" />;
+      case 'experience': return <Briefcase className="w-5 h-5" />;
+      case 'certifications': return <Trophy className="w-5 h-5" />;
       default: return null;
     }
   };
@@ -189,6 +234,8 @@ export function DataEditModal({
       case 'projects': return 'Edit Projects';
       case 'languages': return 'Edit Languages';
       case 'achievements': return 'Edit Achievements';
+      case 'experience': return 'Edit Work Experience';
+      case 'certifications': return 'Edit Certifications';
       default: return 'Edit Section';
     }
   };
@@ -472,6 +519,40 @@ export function DataEditModal({
                 year: new Date().getFullYear().toString(),
                 pageNumber: null,
               })),
+          };
+          break;
+
+        case 'experience':
+          generatedResumeUpdates = { experience: experienceList };
+          // Convert EnhancedExperience to WorkExperience for resumeData
+          resumeDataUpdates = {
+            experience: experienceList.map((exp, index) => ({
+              id: resumeData.experience[index]?.id || Date.now().toString() + index,
+              title: exp.title,
+              company: exp.company,
+              startDate: exp.startDate || exp.duration.split(' - ')[0] || '',
+              endDate: exp.endDate || exp.duration.split(' - ')[1] || '',
+              isCurrent: exp.isCurrent || exp.duration.toLowerCase().includes('present'),
+              description: exp.description,
+              achievements: exp.achievements || [],
+              pageNumber: null,
+            })),
+          };
+          break;
+
+        case 'certifications':
+          generatedResumeUpdates = { certifications: certificationsList };
+          // Convert EnhancedCertification to Certification for resumeData
+          resumeDataUpdates = {
+            certifications: certificationsList.map((cert, index) => ({
+              id: resumeData.certifications[index]?.id || Date.now().toString() + index,
+              name: cert.name,
+              issuer: cert.issuer,
+              date: cert.date,
+              credentialId: cert.credentialId || '',
+              url: cert.url || '',
+              pageNumber: null,
+            })),
           };
           break;
       }
@@ -1057,6 +1138,266 @@ export function DataEditModal({
               >
                 <Plus className="w-4 h-4" />
                 Add Achievement
+              </button>
+            </div>
+          )}
+
+          {/* Experience Form */}
+          {section === 'experience' && (
+            <div className="space-y-6">
+              {experienceList.map((exp, index) => (
+                <div key={index} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="flex justify-between items-start mb-4">
+                    <h4 className="font-medium text-gray-900">Experience #{index + 1}</h4>
+                    {experienceList.length > 1 && (
+                      <button
+                        onClick={() => setExperienceList(prev => prev.filter((_, i) => i !== index))}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Job Title *</label>
+                      <input
+                        type="text"
+                        value={exp.title}
+                        onChange={(e) => {
+                          const updated = [...experienceList];
+                          updated[index] = { ...exp, title: e.target.value };
+                          setExperienceList(updated);
+                          setError(null);
+                          setFieldErrors(prev => prev.filter(err => !(err.index === index && err.field === 'title')));
+                        }}
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                          !exp.title?.trim() || hasFieldError(index, 'title')
+                            ? 'border-red-400 bg-red-50 focus:border-red-500 focus:ring-red-500' 
+                            : 'border-gray-300'
+                        }`}
+                        placeholder="Software Engineer, Product Manager, etc."
+                      />
+                      {!exp.title?.trim() && (
+                        <p className="mt-1 text-xs text-red-600">Required: Enter a job title</p>
+                      )}
+                      {hasFieldError(index, 'title') && exp.title?.trim() && (
+                        <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3" />
+                          {getFieldError(index, 'title')?.reason}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Company *</label>
+                      <input
+                        type="text"
+                        value={exp.company}
+                        onChange={(e) => {
+                          const updated = [...experienceList];
+                          updated[index] = { ...exp, company: e.target.value };
+                          setExperienceList(updated);
+                          setError(null);
+                          setFieldErrors(prev => prev.filter(err => !(err.index === index && err.field === 'company')));
+                        }}
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                          !exp.company?.trim() || hasFieldError(index, 'company')
+                            ? 'border-red-400 bg-red-50 focus:border-red-500 focus:ring-red-500' 
+                            : 'border-gray-300'
+                        }`}
+                        placeholder="Company name"
+                      />
+                      {!exp.company?.trim() && (
+                        <p className="mt-1 text-xs text-red-600">Required: Enter a company name</p>
+                      )}
+                      {hasFieldError(index, 'company') && exp.company?.trim() && (
+                        <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3" />
+                          {getFieldError(index, 'company')?.reason}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                      <input
+                        type="text"
+                        value={exp.location || ''}
+                        onChange={(e) => {
+                          const updated = [...experienceList];
+                          updated[index] = { ...exp, location: e.target.value };
+                          setExperienceList(updated);
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="City, Country or Remote"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
+                      <input
+                        type="text"
+                        value={exp.duration}
+                        onChange={(e) => {
+                          const updated = [...experienceList];
+                          updated[index] = { ...exp, duration: e.target.value };
+                          setExperienceList(updated);
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="Jan 2020 - Present"
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                      <textarea
+                        value={exp.description}
+                        onChange={(e) => {
+                          const updated = [...experienceList];
+                          updated[index] = { ...exp, description: e.target.value };
+                          setExperienceList(updated);
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        rows={3}
+                        placeholder="Describe your responsibilities and achievements..."
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <button
+                onClick={() => setExperienceList(prev => [...prev, createEmptyExperience()])}
+                className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+              >
+                <Plus className="w-4 h-4" />
+                Add Experience
+              </button>
+            </div>
+          )}
+
+          {/* Certifications Form */}
+          {section === 'certifications' && (
+            <div className="space-y-6">
+              {certificationsList.map((cert, index) => (
+                <div key={index} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="flex justify-between items-start mb-4">
+                    <h4 className="font-medium text-gray-900">Certification #{index + 1}</h4>
+                    {certificationsList.length > 1 && (
+                      <button
+                        onClick={() => setCertificationsList(prev => prev.filter((_, i) => i !== index))}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Certification Name *</label>
+                      <input
+                        type="text"
+                        value={cert.name}
+                        onChange={(e) => {
+                          const updated = [...certificationsList];
+                          updated[index] = { ...cert, name: e.target.value };
+                          setCertificationsList(updated);
+                          setError(null);
+                          setFieldErrors(prev => prev.filter(err => !(err.index === index && err.field === 'name')));
+                        }}
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                          !cert.name?.trim() || hasFieldError(index, 'name')
+                            ? 'border-red-400 bg-red-50 focus:border-red-500 focus:ring-red-500' 
+                            : 'border-gray-300'
+                        }`}
+                        placeholder="AWS Solutions Architect, PMP, etc."
+                      />
+                      {!cert.name?.trim() && (
+                        <p className="mt-1 text-xs text-red-600">Required: Enter a certification name</p>
+                      )}
+                      {hasFieldError(index, 'name') && cert.name?.trim() && (
+                        <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3" />
+                          {getFieldError(index, 'name')?.reason}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Issuing Organization *</label>
+                      <input
+                        type="text"
+                        value={cert.issuer}
+                        onChange={(e) => {
+                          const updated = [...certificationsList];
+                          updated[index] = { ...cert, issuer: e.target.value };
+                          setCertificationsList(updated);
+                          setError(null);
+                          setFieldErrors(prev => prev.filter(err => !(err.index === index && err.field === 'issuer')));
+                        }}
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                          !cert.issuer?.trim() || hasFieldError(index, 'issuer')
+                            ? 'border-red-400 bg-red-50 focus:border-red-500 focus:ring-red-500' 
+                            : 'border-gray-300'
+                        }`}
+                        placeholder="Amazon Web Services, PMI, etc."
+                      />
+                      {!cert.issuer?.trim() && (
+                        <p className="mt-1 text-xs text-red-600">Required: Enter the issuing organization</p>
+                      )}
+                      {hasFieldError(index, 'issuer') && cert.issuer?.trim() && (
+                        <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3" />
+                          {getFieldError(index, 'issuer')?.reason}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Date Earned</label>
+                      <input
+                        type="text"
+                        value={cert.date}
+                        onChange={(e) => {
+                          const updated = [...certificationsList];
+                          updated[index] = { ...cert, date: e.target.value };
+                          setCertificationsList(updated);
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="Jan 2023"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Credential ID</label>
+                      <input
+                        type="text"
+                        value={cert.credentialId || ''}
+                        onChange={(e) => {
+                          const updated = [...certificationsList];
+                          updated[index] = { ...cert, credentialId: e.target.value };
+                          setCertificationsList(updated);
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="ABC123XYZ"
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Verification URL</label>
+                      <input
+                        type="url"
+                        value={cert.url || ''}
+                        onChange={(e) => {
+                          const updated = [...certificationsList];
+                          updated[index] = { ...cert, url: e.target.value };
+                          setCertificationsList(updated);
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="https://..."
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <button
+                onClick={() => setCertificationsList(prev => [...prev, createEmptyCertification()])}
+                className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+              >
+                <Plus className="w-4 h-4" />
+                Add Certification
               </button>
             </div>
           )}

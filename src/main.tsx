@@ -3,12 +3,17 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import { Toaster } from 'react-hot-toast'
-import { GoogleOAuthProvider } from '@react-oauth/google'
 import App from './App'
 import './index.css'
 import './i18n/config'
+import { initMarketingTracking } from './services/marketingAnalytics'
 
-const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+// Initialize marketing tracking after first render (non-blocking)
+if ('requestIdleCallback' in window) {
+  requestIdleCallback(() => initMarketingTracking());
+} else {
+  setTimeout(() => initMarketingTracking(), 0);
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <HelmetProvider>
@@ -18,19 +23,17 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         v7_relativeSplatPath: true,
       }}
     >
-      <GoogleOAuthProvider clientId={clientId}>
-        <App />
-        <Toaster 
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#363636',
-              color: '#fff',
-            },
-          }}
-        />
-      </GoogleOAuthProvider>
+      <App />
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+        }}
+      />
     </BrowserRouter>
   </HelmetProvider>,
 )

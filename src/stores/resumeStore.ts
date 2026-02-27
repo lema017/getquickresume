@@ -54,7 +54,6 @@ interface ResumeStore {
   addLanguage: (language: Language) => void;
   updateLanguage: (id: string, updates: Partial<Language>) => void;
   removeLanguage: (id: string) => void;
-  calculateCharacters: () => number;
   resetResume: () => void;
   setDirty: (dirty: boolean) => void;
   
@@ -86,9 +85,7 @@ interface ResumeStore {
   updateResumeSection: (sectionType: string, enhancedText: string, sectionId?: string) => GeneratedResume | null;
   
   // Resume Data Sync Actions
-  // Syncs ALL sections from resumeData to generatedResume (comprehensive)
-  syncResumeDataToGeneratedResume: () => GeneratedResume | null;
-  // Legacy: only syncs contact info (deprecated, use syncResumeDataToGeneratedResume)
+  // Syncs only contact info from resumeData to generatedResume
   syncContactInfoToGeneratedResume: () => GeneratedResume | null;
   // Reverse sync: generatedResume to resumeData (for Step 9 in-place edits)
   syncGeneratedResumeToResumeData: () => void;
@@ -97,6 +94,8 @@ interface ResumeStore {
     generatedResumeUpdates: Partial<GeneratedResume>,
     resumeDataUpdates: Partial<ResumeData>
   ) => Promise<void>;
+  // Persist generatedResume to API without re-scoring (for Step 8 enhancements)
+  persistGeneratedResume: () => Promise<void>;
 }
 
 const initialResumeData: ResumeData = {
@@ -619,41 +618,6 @@ export const useResumeStore = create<ResumeStore>((set, get) => ({
         }));
       },
 
-      calculateCharacters: () => {
-        const state = get();
-        const data = state.resumeData;
-        
-        let total = 0;
-        total += data.summary.length;
-        total += data.jobDescription.length;
-        total += data.skillsRaw.join(' ').length;
-        
-        data.experience.forEach(exp => {
-          total += exp.title.length + exp.company.length;
-          total += exp.achievements.join(' ').length;
-          total += exp.responsibilities.join(' ').length;
-        });
-        
-        data.education.forEach(edu => {
-          total += edu.institution.length + edu.degree.length + edu.field.length;
-        });
-        
-        data.certifications.forEach(cert => {
-          total += cert.name.length + cert.issuer.length;
-        });
-        
-        data.projects.forEach(proj => {
-          total += proj.name.length + proj.description.length;
-          total += proj.technologies.join(' ').length;
-        });
-        
-        data.languages.forEach(lang => {
-          total += lang.name.length;
-        });
-        
-        return total;
-      },
-
       resetResume: () => {
         // Clear any pending save
         if (saveTimeout) {
@@ -856,7 +820,7 @@ export const useResumeStore = create<ResumeStore>((set, get) => ({
           
           case 'experience':
             // If sectionId is provided, update specific experience entry
-            // Otherwise, update the first experience entry's description
+            // Otherwise, parse and distribute to all experiences
             if (sectionId && updatedResume.experience) {
               const expIndex = parseInt(sectionId, 10);
               if (!isNaN(expIndex) && updatedResume.experience[expIndex]) {
@@ -866,11 +830,43 @@ export const useResumeStore = create<ResumeStore>((set, get) => ({
                 };
               }
             } else if (updatedResume.experience && updatedResume.experience.length > 0) {
-              // Update first experience entry
-              updatedResume.experience[0] = {
-                ...updatedResume.experience[0],
-                description: enhancedText
-              };
+              // Parse enhanced text by double-newlines and distribute to each experience
+              const entries = enhancedText.split(/\n\s*\n/).filter(e => e.trim().length > 0);
+              
+              if (entries.length >= updatedResume.experience.length) {
+                // Distribute each entry to its corresponding experience
+                updatedResume.experience.forEach((exp, index) => {
+                  if (entries[index]) {
+                    // Extract description after "Title at Company:" pattern
+                    const entry = entries[index];
+                    const colonIndex = entry.indexOf(':');
+                    const description = colonIndex !== -1 
+                      ? entry.slice(colonIndex + 1).trim() 
+                      : entry.trim();
+                    
+                    updatedResume.experience[index] = {
+                      ...exp,
+                      description
+                    };
+                  }
+                });
+              } else {
+                // Fallback: fewer entries than experiences - update only what we have
+                entries.forEach((entry, index) => {
+                  if (updatedResume.experience[index]) {
+                    const colonIndex = entry.indexOf(':');
+                    const description = colonIndex !== -1 
+                      ? entry.slice(colonIndex + 1).trim() 
+                      : entry.trim();
+                    
+                    updatedResume.experience[index] = {
+                      ...updatedResume.experience[index],
+                      description
+                    };
+                  }
+                });
+                console.warn(`Enhanced text had ${entries.length} entries, but ${updatedResume.experience.length} experiences exist.`);
+              }
             }
             break;
           
@@ -1229,226 +1225,10 @@ export const useResumeStore = create<ResumeStore>((set, get) => ({
         return updatedResume;
       },
 
-      // Comprehensive sync: syncs ALL sections from resumeData to generatedResume
-      // This handles user edits in any wizard step (profile, education, experience, etc.)
-      syncResumeDataToGeneratedResume: () => {
-        const { resumeData, generatedResume } = get();
-        if (!generatedResume || !resumeData) return null;
-
-        // Helper function to format dates into duration string
-        const formatDuration = (startDate?: string, endDate?: string, isCurrent?: boolean, isOngoing?: boolean): string => {
-          const start = startDate || '';
-          const end = isCurrent || isOngoing ? 'Present' : (endDate || '');
-          if (!start && !end) return '';
-          if (!end) return start;
-          return `${start} - ${end}`;
-        };
-
-        // Track if any changes were made
-        let hasChanges = false;
-
-        // Start with a copy of the current generatedResume
-        const updatedResume: GeneratedResume = JSON.parse(JSON.stringify(generatedResume));
-
-        // 1. Sync Contact Info
-        const newFullName = resumeData.firstName && resumeData.lastName 
-          ? `${resumeData.firstName} ${resumeData.lastName}` 
-          : updatedResume.contactInfo.fullName;
-        
-        if (newFullName !== updatedResume.contactInfo.fullName ||
-            resumeData.email !== updatedResume.contactInfo.email ||
-            resumeData.phone !== updatedResume.contactInfo.phone ||
-            resumeData.linkedin !== updatedResume.contactInfo.linkedin ||
-            resumeData.country !== updatedResume.contactInfo.location) {
-          updatedResume.contactInfo = {
-            fullName: newFullName,
-            email: resumeData.email || updatedResume.contactInfo.email,
-            phone: resumeData.phone || updatedResume.contactInfo.phone,
-            linkedin: resumeData.linkedin || updatedResume.contactInfo.linkedin,
-            location: resumeData.country || updatedResume.contactInfo.location,
-          };
-          hasChanges = true;
-        }
-
-        // 2. Sync Professional Summary
-        if (resumeData.summary && resumeData.summary !== updatedResume.professionalSummary) {
-          updatedResume.professionalSummary = resumeData.summary;
-          hasChanges = true;
-        }
-
-        // 3. Sync Education
-        if (resumeData.education && resumeData.education.length > 0) {
-          const syncedEducation: EnhancedEducation[] = resumeData.education.map((edu, index) => {
-            const existingEdu = updatedResume.education[index];
-            const duration = formatDuration(edu.startDate, edu.endDate);
-            
-            return {
-              degree: edu.degree || existingEdu?.degree || '',
-              institution: edu.institution || existingEdu?.institution || '',
-              field: edu.field || existingEdu?.field || '',
-              duration: duration || existingEdu?.duration || '',
-              gpa: edu.gpa || existingEdu?.gpa,
-              relevantCoursework: existingEdu?.relevantCoursework,
-              honors: existingEdu?.honors,
-            };
-          });
-          
-          // Check if education has changed
-          const eduChanged = JSON.stringify(syncedEducation) !== JSON.stringify(updatedResume.education);
-          if (eduChanged) {
-            updatedResume.education = syncedEducation;
-            hasChanges = true;
-          }
-        }
-
-        // 4. Sync Work Experience
-        if (resumeData.experience && resumeData.experience.length > 0) {
-          const syncedExperience: EnhancedExperience[] = resumeData.experience.map((exp, index) => {
-            const existingExp = updatedResume.experience[index];
-            const duration = formatDuration(exp.startDate, exp.endDate, exp.isCurrent);
-            
-            return {
-              title: exp.title || existingExp?.title || '',
-              company: exp.company || existingExp?.company || '',
-              duration: duration || existingExp?.duration || '',
-              location: existingExp?.location,
-              description: existingExp?.description || '',
-              achievements: exp.achievements.length > 0 ? exp.achievements : (existingExp?.achievements || []),
-              skills: existingExp?.skills || [],
-              impact: exp.responsibilities.length > 0 ? exp.responsibilities : (existingExp?.impact || []),
-            };
-          });
-          
-          const expChanged = JSON.stringify(syncedExperience) !== JSON.stringify(updatedResume.experience);
-          if (expChanged) {
-            updatedResume.experience = syncedExperience;
-            hasChanges = true;
-          }
-        }
-
-        // 5. Sync Projects
-        if (resumeData.projects && resumeData.projects.length > 0) {
-          const syncedProjects: EnhancedProject[] = resumeData.projects.map((proj, index) => {
-            const existingProj = updatedResume.projects[index];
-            const duration = formatDuration(proj.startDate, proj.endDate, false, proj.isOngoing);
-            
-            return {
-              name: proj.name || existingProj?.name || '',
-              description: proj.description || existingProj?.description || '',
-              technologies: proj.technologies.length > 0 ? proj.technologies : (existingProj?.technologies || []),
-              duration: duration || existingProj?.duration || '',
-              url: proj.url || existingProj?.url,
-              achievements: existingProj?.achievements || [],
-              impact: existingProj?.impact || '',
-            };
-          });
-          
-          const projChanged = JSON.stringify(syncedProjects) !== JSON.stringify(updatedResume.projects);
-          if (projChanged) {
-            updatedResume.projects = syncedProjects;
-            hasChanges = true;
-          }
-        }
-
-        // 6. Sync Certifications
-        if (resumeData.certifications && resumeData.certifications.length > 0) {
-          const syncedCertifications: EnhancedCertification[] = resumeData.certifications.map((cert, index) => {
-            const existingCert = updatedResume.certifications[index];
-            
-            return {
-              name: cert.name || existingCert?.name || '',
-              issuer: cert.issuer || existingCert?.issuer || '',
-              date: cert.date || existingCert?.date || '',
-              credentialId: cert.credentialId || existingCert?.credentialId,
-              url: cert.url || existingCert?.url,
-              skills: existingCert?.skills || [],
-            };
-          });
-          
-          const certChanged = JSON.stringify(syncedCertifications) !== JSON.stringify(updatedResume.certifications);
-          if (certChanged) {
-            updatedResume.certifications = syncedCertifications;
-            hasChanges = true;
-          }
-        }
-
-        // 7. Sync Languages
-        if (resumeData.languages && resumeData.languages.length > 0) {
-          const syncedLanguages: LanguageProficiency[] = resumeData.languages.map((lang, index) => {
-            const existingLang = updatedResume.languages[index];
-            
-            return {
-              language: lang.name || existingLang?.language || '',
-              level: lang.level || existingLang?.level || 'intermediate',
-              certifications: existingLang?.certifications,
-            };
-          });
-          
-          const langChanged = JSON.stringify(syncedLanguages) !== JSON.stringify(updatedResume.languages);
-          if (langChanged) {
-            updatedResume.languages = syncedLanguages;
-            hasChanges = true;
-          }
-        }
-
-        // 8. Sync Achievements
-        if (resumeData.achievements && resumeData.achievements.length > 0) {
-          const syncedAchievements: string[] = resumeData.achievements.map(ach => ach.title);
-          
-          const achChanged = JSON.stringify(syncedAchievements) !== JSON.stringify(updatedResume.achievements);
-          if (achChanged) {
-            updatedResume.achievements = syncedAchievements;
-            hasChanges = true;
-          }
-        }
-
-        // 9. Sync Skills (preserve existing categorization if possible)
-        if (resumeData.skillsRaw && resumeData.skillsRaw.length > 0) {
-          // Get all existing skills to compare
-          const existingAllSkills = [
-            ...(updatedResume.skills?.technical || []),
-            ...(updatedResume.skills?.soft || []),
-            ...(updatedResume.skills?.tools || [])
-          ];
-          
-          // Check if skills have changed
-          const skillsChanged = JSON.stringify(resumeData.skillsRaw.sort()) !== JSON.stringify(existingAllSkills.sort());
-          
-          if (skillsChanged) {
-            // Try to preserve categorization: find which skills are new and add them to technical
-            // Keep existing categorized skills that are still in the new list
-            const newSkillsSet = new Set(resumeData.skillsRaw.map(s => s.toLowerCase()));
-            
-            const keptTechnical = updatedResume.skills?.technical?.filter(s => newSkillsSet.has(s.toLowerCase())) || [];
-            const keptSoft = updatedResume.skills?.soft?.filter(s => newSkillsSet.has(s.toLowerCase())) || [];
-            const keptTools = updatedResume.skills?.tools?.filter(s => newSkillsSet.has(s.toLowerCase())) || [];
-            
-            // Find new skills that weren't in any category
-            const existingSkillsLower = new Set([
-              ...keptTechnical.map(s => s.toLowerCase()),
-              ...keptSoft.map(s => s.toLowerCase()),
-              ...keptTools.map(s => s.toLowerCase())
-            ]);
-            
-            const newSkills = resumeData.skillsRaw.filter(s => !existingSkillsLower.has(s.toLowerCase()));
-            
-            updatedResume.skills = {
-              technical: [...keptTechnical, ...newSkills],
-              soft: keptSoft,
-              tools: keptTools,
-            };
-            hasChanges = true;
-          }
-        }
-
-        if (!hasChanges) {
-          return null; // No changes needed
-        }
-
-        set({ generatedResume: updatedResume });
-        console.log('syncResumeDataToGeneratedResume: Synced all sections from resumeData to generatedResume');
-        return updatedResume;
-      },
+      // Note: syncResumeDataToGeneratedResume was removed.
+      // Once AI generation happens in Step 8, the generatedResume is the source of truth.
+      // All edits from Step 8 onwards happen directly on generatedResume via GeneratedResumeView.
+      // Backward navigation to Steps 1-7 is locked after reaching Step 8.
 
       // Reverse sync: generatedResume to resumeData
       // Used when user makes edits in Step 9 DataEditModal
@@ -1655,6 +1435,33 @@ export const useResumeStore = create<ResumeStore>((set, get) => ({
         }
 
         console.log('updateSectionAndSync: Updated both stores, saved to API, and re-scored');
+      },
+
+      // Persist generatedResume to API without re-scoring
+      // Used for Step 8 enhancements where we want to save changes but not trigger expensive re-scoring
+      persistGeneratedResume: async () => {
+        const { generatedResume, currentResumeId } = get();
+        
+        if (!currentResumeId) {
+          console.warn('persistGeneratedResume: No resume ID available');
+          return;
+        }
+
+        if (!generatedResume) {
+          console.warn('persistGeneratedResume: No generated resume to persist');
+          return;
+        }
+
+        try {
+          await resumeService.updateResume(currentResumeId, {
+            generatedResume,
+          });
+          set({ isDirty: false, lastSaved: new Date() });
+          console.log('persistGeneratedResume: Saved generatedResume to API (no re-scoring)');
+        } catch (error) {
+          console.error('Error persisting generated resume:', error);
+          throw error;
+        }
       },
     })
 );

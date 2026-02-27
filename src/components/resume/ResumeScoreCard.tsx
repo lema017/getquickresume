@@ -154,6 +154,9 @@ export const ResumeScoreCard = memo(function ResumeScoreCard({ score, isLoading,
       'language': 'languages',
       'achievements': 'achievements',
       'achievement': 'achievements',
+      'experience': 'experience',
+      'certifications': 'certifications',
+      'certification': 'certifications',
     };
     return map[sectionKey.toLowerCase()] || null;
   };
@@ -165,6 +168,8 @@ export const ResumeScoreCard = memo(function ResumeScoreCard({ score, isLoading,
       'data-quality-skills': 'skills',
       'data-quality-profile': 'contact',
       'data-quality-languages': 'languages',
+      'data-quality-experience': 'experience',
+      'data-quality-certifications': 'certifications',
     };
     return map[itemId] || null;
   };
@@ -181,6 +186,9 @@ export const ResumeScoreCard = memo(function ResumeScoreCard({ score, isLoading,
       'profile': 'contact',
       'contact': 'contact',
       'languages': 'languages',
+      'experience': 'experience',
+      'certifications': 'certifications',
+      'certification': 'certifications',
     };
     
     return sectionNames
@@ -266,19 +274,62 @@ export const ResumeScoreCard = memo(function ResumeScoreCard({ score, isLoading,
             initialValidationErrors: fieldErrors,
           });
         } else {
-          // Fallback if we can't parse sections
-          toast.error('Data quality issues found. Please review and fix invalid entries in the sections below.', { duration: 5000 });
+          // Fallback: find first incomplete data quality item and open its section
+          const dataQualitySection = score?.checklist?.dataQuality;
+          const incompleteItem = dataQualitySection?.items?.find(i => 
+            !i.isCompleted && i.id !== 'data-quality-overall'
+          );
+          
+          if (incompleteItem) {
+            const targetSection = mapDataQualityToSection(incompleteItem.id);
+            if (targetSection) {
+              const fieldErrors = parseFieldErrorsFromEvidence(incompleteItem.evidence, incompleteItem.details);
+              setDataEditModal({
+                isOpen: true,
+                section: targetSection,
+                checklistItemId: incompleteItem.id,
+                checklistItemLabel: incompleteItem.label,
+                initialValidationErrors: fieldErrors,
+              });
+              return;
+            }
+          }
+          
+          // Last resort fallback - open experience section as it's the most common data quality issue
+          setDataEditModal({
+            isOpen: true,
+            section: 'experience',
+            checklistItemId: item.id,
+            checklistItemLabel: item.label,
+            initialValidationErrors: parseFieldErrorsFromEvidence(item.evidence, item.details),
+          });
         }
         return;
       }
       
-      // Handle experience and certifications - not directly editable via DataEditModal
+      // Handle experience - now editable via DataEditModal
       if (item.id === 'data-quality-experience') {
-        toast.error('To fix experience data quality issues, go back to the Experience step and edit the entries with invalid values.', { duration: 5000 });
+        const fieldErrors = parseFieldErrorsFromEvidence(item.evidence, item.details);
+        setDataEditModal({
+          isOpen: true,
+          section: 'experience',
+          checklistItemId: item.id,
+          checklistItemLabel: item.label,
+          initialValidationErrors: fieldErrors,
+        });
         return;
       }
+      
+      // Handle certifications - now editable via DataEditModal
       if (item.id === 'data-quality-certifications') {
-        toast.error('To fix certifications data quality issues, go back to the Education & Certifications step and edit the entries with invalid values.', { duration: 5000 });
+        const fieldErrors = parseFieldErrorsFromEvidence(item.evidence, item.details);
+        setDataEditModal({
+          isOpen: true,
+          section: 'certifications',
+          checklistItemId: item.id,
+          checklistItemLabel: item.label,
+          initialValidationErrors: fieldErrors,
+        });
         return;
       }
       

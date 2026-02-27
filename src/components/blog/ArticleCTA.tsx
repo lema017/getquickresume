@@ -60,10 +60,10 @@ export function ArticleCTA({
         </div>
         <Link
           to="/login"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors whitespace-nowrap"
+          className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors text-center leading-snug"
         >
-          Try GetQuickResume
-          <ArrowRight className="w-4 h-4" />
+          <span>Try GetQuickResume</span>
+          <ArrowRight className="w-4 h-4 flex-shrink-0" />
         </Link>
       </div>
     </div>

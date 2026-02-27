@@ -1,4 +1,4 @@
-import { SummarySuggestionRequest, SummarySuggestionResponse } from '@/types';
+import { SummarySuggestionRequest, SummarySuggestionResponse, normalizeToApiLanguage } from '@/types';
 import { handleAuthError } from '@/utils/authErrorHandler';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/dev';
@@ -69,7 +69,7 @@ class SummarySuggestionService {
     achievements: string[],
     projects: Array<{ name: string; description: string; technologies: string[] }>,
     type: 'experience' | 'differentiators',
-    language: 'es' | 'en' = 'es',
+    language?: string,
     resumeId?: string
   ): Promise<string[]> {
     try {
@@ -80,7 +80,7 @@ class SummarySuggestionService {
         profession,
         achievements,
         projectDescriptions,
-        language,
+        language: normalizeToApiLanguage(language),
         type
       };
 
@@ -115,7 +115,7 @@ class SummarySuggestionService {
     profession: string,
     achievements: string[],
     projects: Array<{ name: string; description: string; technologies: string[] }>,
-    language: 'es' | 'en' = 'es',
+    language?: string,
     resumeId?: string
   ): Promise<string[]> {
     return this.getSummarySuggestions(profession, achievements, projects, 'experience', language, resumeId);
@@ -129,7 +129,7 @@ class SummarySuggestionService {
     profession: string,
     achievements: string[],
     projects: Array<{ name: string; description: string; technologies: string[] }>,
-    language: 'es' | 'en' = 'es',
+    language?: string,
     resumeId?: string
   ): Promise<string[]> {
     return this.getSummarySuggestions(profession, achievements, projects, 'differentiators', language, resumeId);

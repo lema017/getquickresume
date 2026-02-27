@@ -3,6 +3,7 @@ export interface AITrackingContext {
     userId: string;
     resumeId?: string;
     isPremium: boolean;
+    forceModel?: string;
 }
 declare class AIService {
     private config;
@@ -63,6 +64,16 @@ declare class AIService {
         questionId: string;
         answer: string;
     }>, trackingContext?: AITrackingContext): Promise<string>;
+    /**
+     * Auto-enhance a resume section using predefined prompts for each section type.
+     * This method uses the cheap Groq model to reduce costs while providing value.
+     */
+    autoEnhanceSection(sectionType: 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language', originalText: string, language: 'es' | 'en', trackingContext?: AITrackingContext): Promise<string>;
+    /**
+     * Build auto-enhancement prompt for a specific section type.
+     * Each section type has tailored instructions for improvement.
+     */
+    private buildAutoEnhancePrompt;
     /**
      * Generate contextual questions based on a recommendation for enhancing a resume section
      * Premium-only feature - uses configured AI provider
@@ -141,6 +152,10 @@ declare class AIService {
             userId: string;
         };
     }, resumeId?: string): Promise<string>;
+    /**
+     * Clean the AI response to remove unwanted patterns like "is rewritten as:", labels, etc.
+     */
+    private cleanDirectEnhanceResponse;
     /**
      * Build targeted prompt for mechanical fixes based on checklist item type.
      */

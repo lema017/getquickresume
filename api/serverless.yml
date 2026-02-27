@@ -629,6 +629,52 @@ functions:
               - Content-Type
             allowCredentials: false
 
+  # Public resume translation (no auth, IP rate-limited)
+  publicTranslateResume:
+    handler: dist/handlers/publicResumeTranslation.handler
+    timeout: 30
+    memorySize: 256
+    reservedConcurrency: 10
+    environment:
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+      AI_USAGE_LOGS_TABLE: ${self:service}-ai-usage-logs-${self:provider.stage}
+      GROQ_API_KEY: ${self:provider.environment.GROQ_API_KEY}
+    events:
+      - http:
+          path: api/public/translate-resume
+          method: post
+          throttle:
+            burstLimit: 100
+            rateLimit: 50
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+            allowCredentials: false
+
+  # Public ATS check (no auth, IP rate-limited)
+  publicAtsCheck:
+    handler: dist/handlers/publicAtsCheck.handler
+    timeout: 30
+    memorySize: 256
+    reservedConcurrency: 10
+    environment:
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+      AI_USAGE_LOGS_TABLE: ${self:service}-ai-usage-logs-${self:provider.stage}
+      GROQ_API_KEY: ${self:provider.environment.GROQ_API_KEY}
+    events:
+      - http:
+          path: api/public/ats-check
+          method: post
+          throttle:
+            burstLimit: 100
+            rateLimit: 50
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+            allowCredentials: false
+
   # Resume scoring endpoints
   scoreResume:
     handler: dist/handlers/resumeScoring.scoreResume
@@ -1123,7 +1169,10 @@ functions:
               - Authorization
             allowCredentials: false
 
-  # Generate clarification questions
+  # DEPRECATED: Generate clarification questions
+  # This endpoint is deprecated as of the Tailoring Summary redesign (Jan 2026).
+  # The new flow uses claimed keywords instead of clarification questions.
+  # Keeping for backward compatibility during transition period.
   generateJobQuestions:
     handler: dist/handlers/jobTailoring.generateQuestions
     timeout: 60
@@ -1172,7 +1221,10 @@ functions:
               - Authorization
             allowCredentials: false
 
-  # Generate answer options with AI (3 distinct options)
+  # DEPRECATED: Generate answer options with AI (3 distinct options)
+  # This endpoint is deprecated as of the Tailoring Summary redesign (Jan 2026).
+  # The new flow uses claimed keywords instead of clarification questions.
+  # Keeping for backward compatibility during transition period.
   generateAnswerOptions:
     handler: dist/handlers/jobTailoring.generateAnswerOptionsHandler
     timeout: 60
@@ -1256,6 +1308,31 @@ functions:
       - http:
           path: api/job-tailoring/limits
           method: get
+          authorizer:
+            name: authorize
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 0
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Incorporate missing keyword into tailored resume (Premium only)
+  incorporateKeyword:
+    handler: dist/handlers/jobTailoring.incorporateKeywordHandler
+    timeout: 60
+    environment:
+      GROQ_API_KEY: ${self:provider.environment.GROQ_API_KEY}
+      RESUMES_TABLE: ${self:service}-resumes-${self:provider.stage}
+      RATE_LIMITS_TABLE: ${self:service}-rate-limits-${self:provider.stage}
+      AI_USAGE_LOGS_TABLE: ${self:service}-ai-usage-logs-${self:provider.stage}
+    events:
+      - http:
+          path: api/job-tailoring/incorporate-keyword
+          method: post
           authorizer:
             name: authorize
             type: token

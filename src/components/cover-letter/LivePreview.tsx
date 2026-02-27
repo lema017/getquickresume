@@ -26,7 +26,6 @@ import { coverLetterService } from '@/services/coverLetterService';
 import { CoverLetterParagraph, CoverLetterTemplate } from '@/types/coverLetter';
 import { useAuthStore } from '@/stores/authStore';
 import toast from 'react-hot-toast';
-import html2pdf from 'html2pdf.js';
 
 export function LivePreview() {
   const { t } = useTranslation();
@@ -124,6 +123,8 @@ export function LivePreview() {
         }
       };
 
+      // Dynamic import to avoid loading ~178 KiB on initial page load
+      const { default: html2pdf } = await import('html2pdf.js');
       await (html2pdf as any)().set(opt).from(element).save();
       toast.success(t('coverLetter.preview.downloadStarted') || 'Download started!', { id: 'pdf-download' });
     } catch (error) {

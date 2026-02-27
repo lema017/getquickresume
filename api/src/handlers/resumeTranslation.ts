@@ -10,7 +10,15 @@ interface TranslateResumeRequest {
   mode?: 'translate' | 'rewrite';
 }
 
-const SUPPORTED_LANGUAGES = ['en', 'zh', 'hi', 'es', 'fr', 'ar', 'bn', 'pt', 'ru', 'ja'];
+const SUPPORTED_LANGUAGES = [
+  'en', 'zh', 'hi', 'es', 'fr', 'ar', 'bn', 'pt', 'ru', 'ja',
+  'de', 'ko', 'it', 'nl', 'pl', 'tr', 'sv', 'da', 'no', 'fi',
+  'cs', 'ro', 'hu', 'el', 'th', 'vi', 'id', 'ms', 'tl', 'my',
+  'km', 'lo', 'uk', 'bg', 'hr', 'sr', 'sk', 'sl', 'lt', 'lv',
+  'et', 'ur', 'ta', 'te', 'mr', 'gu', 'kn', 'ml', 'pa', 'ne',
+  'si', 'he', 'fa', 'ka', 'az', 'kk', 'uz', 'sw', 'am', 'af',
+  'ca',
+];
 
 export const translateResume = async (
   event: APIGatewayProxyEvent & AuthorizedEvent
@@ -241,7 +249,58 @@ export const translateResume = async (
       'bn': 'Bengali',
       'pt': 'Portuguese',
       'ru': 'Russian',
-      'ja': 'Japanese'
+      'ja': 'Japanese',
+      'de': 'German',
+      'ko': 'Korean',
+      'it': 'Italian',
+      'nl': 'Dutch',
+      'pl': 'Polish',
+      'tr': 'Turkish',
+      'sv': 'Swedish',
+      'da': 'Danish',
+      'no': 'Norwegian',
+      'fi': 'Finnish',
+      'cs': 'Czech',
+      'ro': 'Romanian',
+      'hu': 'Hungarian',
+      'el': 'Greek',
+      'th': 'Thai',
+      'vi': 'Vietnamese',
+      'id': 'Indonesian',
+      'ms': 'Malay',
+      'tl': 'Filipino',
+      'my': 'Burmese',
+      'km': 'Khmer',
+      'lo': 'Lao',
+      'uk': 'Ukrainian',
+      'bg': 'Bulgarian',
+      'hr': 'Croatian',
+      'sr': 'Serbian',
+      'sk': 'Slovak',
+      'sl': 'Slovenian',
+      'lt': 'Lithuanian',
+      'lv': 'Latvian',
+      'et': 'Estonian',
+      'ur': 'Urdu',
+      'ta': 'Tamil',
+      'te': 'Telugu',
+      'mr': 'Marathi',
+      'gu': 'Gujarati',
+      'kn': 'Kannada',
+      'ml': 'Malayalam',
+      'pa': 'Punjabi',
+      'ne': 'Nepali',
+      'si': 'Sinhala',
+      'he': 'Hebrew',
+      'fa': 'Persian',
+      'ka': 'Georgian',
+      'az': 'Azerbaijani',
+      'kk': 'Kazakh',
+      'uz': 'Uzbek',
+      'sw': 'Swahili',
+      'am': 'Amharic',
+      'af': 'Afrikaans',
+      'ca': 'Catalan',
     };
 
     const languageName = languageNames[requestBody.targetLanguage] || requestBody.targetLanguage;

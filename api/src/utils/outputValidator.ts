@@ -67,10 +67,19 @@ export function detectOutputInjection(output: string): { isValid: boolean; reaso
   return { isValid: true };
 }
 
+export interface ValidateImprovedTextOptions {
+  /** 
+   * When true, allows substantial rewrites where similarity to original may be low.
+   * Use when user has provided explicit context for how they want the text changed.
+   */
+  allowSubstantialRewrite?: boolean;
+}
+
 export function validateImprovedText(
   improved: string,
   original: string,
-  sectionType: string
+  sectionType: string,
+  options?: ValidateImprovedTextOptions
 ): { isValid: boolean; reason?: string } {
   
   if (!improved || typeof improved !== 'string') {
@@ -121,17 +130,21 @@ export function validateImprovedText(
   }
 
   // 5. Verificar que mantiene contexto básico (palabras clave del original)
-  const originalWords = original.toLowerCase().split(/\s+/).filter(word => word.length > 3);
-  const improvedWords = improved.toLowerCase().split(/\s+/).filter(word => word.length > 3);
-  
-  // Si el original tiene palabras clave, al menos algunas deberían estar en el mejorado
-  if (originalWords.length > 0) {
-    const commonWords = originalWords.filter(word => improvedWords.includes(word));
-    const similarity = commonWords.length / originalWords.length;
+  // Skip this check when allowSubstantialRewrite is true, since the user explicitly
+  // provided context for how they want the text changed (e.g., adding metrics)
+  if (!options?.allowSubstantialRewrite) {
+    const originalWords = original.toLowerCase().split(/\s+/).filter(word => word.length > 3);
+    const improvedWords = improved.toLowerCase().split(/\s+/).filter(word => word.length > 3);
     
-    // Si menos del 20% de las palabras clave están presentes, podría ser muy diferente
-    if (similarity < 0.2 && originalWords.length > 5) {
-      return { isValid: false, reason: 'Improved text seems too different from original' };
+    // Si el original tiene palabras clave, al menos algunas deberían estar en el mejorado
+    if (originalWords.length > 0) {
+      const commonWords = originalWords.filter(word => improvedWords.includes(word));
+      const similarity = commonWords.length / originalWords.length;
+      
+      // Si menos del 20% de las palabras clave están presentes, podría ser muy diferente
+      if (similarity < 0.2 && originalWords.length > 5) {
+        return { isValid: false, reason: 'Improved text seems too different from original' };
+      }
     }
   }
 

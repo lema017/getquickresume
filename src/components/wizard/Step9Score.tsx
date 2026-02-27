@@ -2,12 +2,13 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
-import { ArrowRight, ArrowLeft, X } from 'lucide-react';
+import { ArrowRight, ArrowLeft, X, Sparkles, Crown } from 'lucide-react';
 import { ResumeScoreCard } from '@/components/resume/ResumeScoreCard';
 import { RateLimitWarning } from '@/components/RateLimitWarning';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '@/stores/authStore';
 import { resumeService } from '@/services/resumeService';
+import { trackAtsScoreViewed } from '@/services/marketingAnalytics';
 
 export function Step9Score() {
   const { t } = useTranslation();
@@ -23,19 +24,25 @@ export function Step9Score() {
     isPollingScore,
     fetchResumeScore,
     scoreResume,
-    pollForScore,
     updateResumeSection,
     setGeneratedResume,
-    syncResumeDataToGeneratedResume,
     syncGeneratedResumeToResumeData,
     resumeData,
     rateLimitInfo,
     clearRateLimitInfo
   } = useResumeStore();
   const { user } = useAuthStore();
-  const [hasStartedPolling, setHasStartedPolling] = useState(false);
-  const hasSyncedResumeData = useRef(false);
+  const [hasFetchedScore, setHasFetchedScore] = useState(false);
   const [showRateLimitModal, setShowRateLimitModal] = useState(false);
+  const hasTrackedScoreRef = useRef(false);
+
+  // Track when score is viewed (only once per session)
+  useEffect(() => {
+    if (currentScore && !hasTrackedScoreRef.current) {
+      trackAtsScoreViewed(currentScore.totalScore);
+      hasTrackedScoreRef.current = true;
+    }
+  }, [currentScore]);
 
   // Show rate limit modal when rateLimitInfo is set
   useEffect(() => {
@@ -60,91 +67,39 @@ export function Step9Score() {
     clearRateLimitInfo();
   };
 
-  // Reset polling flag when resumeId changes
+  // Reset fetch flag when resumeId changes
   useEffect(() => {
-    setHasStartedPolling(false);
-    hasSyncedResumeData.current = false;
+    setHasFetchedScore(false);
   }, [currentResumeId]);
 
-  // Reset sync flag on unmount so sync runs again when user returns to Step 9
-  // This is important for the "Fix" flow: user goes to Step 1, edits data, returns to Step 9
-  useEffect(() => {
-    return () => {
-      hasSyncedResumeData.current = false;
-    };
-  }, []);
+  // Note: We no longer sync resumeData to generatedResume here.
+  // Once AI generation happens in Step 8, the generatedResume is the source of truth.
+  // All edits from Step 8 onwards happen directly on generatedResume via GeneratedResumeView.
 
-  // Sync ALL resume data from resumeData to generatedResume on mount
-  // This handles the case where user edited ANY section via wizard steps (profile, education, experience, etc.)
-  // and returned to Step 9 to see their updated score.
-  // 
-  // NOTE: This sync is only needed for wizard step edits (Steps 1-8).
-  // Edits made via DataEditModal in Step 9 use updateSectionAndSync() which updates both stores directly.
-  // The sync runs once per mount. If the user makes changes in DataEditModal, those changes
-  // are saved directly to both stores, so they won't be overwritten by this sync.
+  // Fetch existing score when component mounts (but don't auto-score)
+  // Scoring now requires explicit user action via "Score Resume" button
   useEffect(() => {
-    const syncAndRescore = async () => {
-      if (!currentResumeId || !generatedResume || hasSyncedResumeData.current) return;
-      
-      hasSyncedResumeData.current = true;
-      
-      // Try to sync ALL sections from resumeData to generatedResume
-      // syncResumeDataToGeneratedResume() only updates fields where resumeData differs from generatedResume
-      // If user made edits in DataEditModal, both stores are already in sync, so nothing will change
-      const updatedResume = syncResumeDataToGeneratedResume();
-      
-      if (updatedResume) {
-        // Resume data was synced - save to API and re-score
-        try {
-          await resumeService.updateResume(currentResumeId, {
-            generatedResume: updatedResume
-          });
-          
-          // Trigger re-score to update checklist with synced data
-          if (user?.isPremium) {
-            await scoreResume(currentResumeId);
-          }
-        } catch (error) {
-          console.error('Error syncing resume data:', error);
-        }
-      }
-    };
-    
-    syncAndRescore();
-  }, [currentResumeId, generatedResume, syncResumeDataToGeneratedResume, scoreResume, user?.isPremium]);
-
-  // Fetch score when component mounts or resumeId changes
-  useEffect(() => {
-    if (currentResumeId && !hasStartedPolling) {
-      // First, try to fetch existing score
-      fetchResumeScore(currentResumeId).then(() => {
-        // Check if score is still null after fetch
-        const state = useResumeStore.getState();
-        if (!state.currentScore) {
-          // Score doesn't exist, start polling for it (auto-scoring in background)
-          setHasStartedPolling(true);
-          // Wait a bit for auto-scoring to potentially complete, then poll
-          setTimeout(() => {
-            pollForScore(currentResumeId, 10, 2000).catch(err => {
-              console.error('Error polling for score:', err);
-            });
-          }, 2000); // Wait 2 seconds before starting to poll
-        }
+    if (currentResumeId && !hasFetchedScore) {
+      setHasFetchedScore(true);
+      fetchResumeScore(currentResumeId).catch(err => {
+        console.error('Error fetching score:', err);
       });
     }
-  }, [currentResumeId, fetchResumeScore, pollForScore, hasStartedPolling]);
+  }, [currentResumeId, fetchResumeScore, hasFetchedScore]);
 
+  // Handle score resume button click
+  // Works for both free users (first score only) and premium users (re-scoring)
   const handleScoreResume = async () => {
-    if (currentResumeId && user?.isPremium) {
-      try {
-        await scoreResume(currentResumeId);
-        toast.success('Resume scored successfully!');
-      } catch (error: any) {
-        console.error('Failed to score resume:', error);
-        // Don't show toast for rate limit errors - modal will be shown instead
-        if (error?.name !== 'RateLimitError') {
-          toast.error('Failed to score resume. Please try again.');
-        }
+    if (!currentResumeId) return;
+    
+    try {
+      await scoreResume(currentResumeId);
+      toast.success(t('wizard.score.scoreSuccess', 'Resume scored successfully!'));
+    } catch (error: any) {
+      console.error('Failed to score resume:', error);
+      // Don't show toast for rate limit errors - modal will be shown instead
+      if (error?.name !== 'RateLimitError') {
+        toast.error(t('wizard.score.scoreError', 'Failed to score resume. Please try again.'));
       }
     }
   };
@@ -248,16 +203,73 @@ export function Step9Score() {
         />
       </div>
 
-      {/* Score Resume Button (Premium Only) */}
-      {user?.isPremium && currentResumeId && (
-        <div className="mb-8 flex justify-end">
-          <button
-            onClick={handleScoreResume}
-            disabled={isScoring}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isScoring ? 'Scoring...' : 'Re-score Resume'}
-          </button>
+      {/* Scoring Actions - Strategy:
+          - No score: Show "Score Resume" button (free + premium)
+          - Has score + Free user: Show existing score message + upgrade CTA
+          - Has score + Premium: Show "Re-score Resume" button
+      */}
+      {currentResumeId && (
+        <div className="mb-8">
+          {!currentScore && !isScoring && !isPollingScore ? (
+            // No score yet - show Score Resume button for all users
+            <div className="flex flex-col items-center gap-4 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+              <div className="text-center">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  {t('wizard.score.readyToScore', 'Ready to Score Your Resume')}
+                </h3>
+                <p className="text-sm text-gray-600 max-w-md">
+                  {t('wizard.score.scoreDescription', 'Get an AI-powered analysis of your resume with actionable improvements.')}
+                </p>
+              </div>
+              <button
+                onClick={handleScoreResume}
+                disabled={isScoring}
+                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Sparkles className="w-5 h-5" />
+                {isScoring ? t('wizard.score.scoring', 'Scoring...') : t('wizard.score.scoreButton', 'Score Resume')}
+              </button>
+              {!user?.isPremium && (
+                <p className="text-xs text-gray-500 text-center">
+                  {t('wizard.score.freeUserNote', 'Free users get one score per resume')}
+                </p>
+              )}
+            </div>
+          ) : currentScore && !user?.isPremium ? (
+            // Free user with existing score - show upgrade CTA
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-amber-50 rounded-xl border border-amber-200">
+              <div className="flex items-center gap-3">
+                <Crown className="w-6 h-6 text-amber-600" />
+                <div>
+                  <p className="font-medium text-amber-900">
+                    {t('wizard.score.alreadyScored', 'Resume Already Scored')}
+                  </p>
+                  <p className="text-sm text-amber-700">
+                    {t('wizard.score.upgradeToRescore', 'Upgrade to Premium for unlimited re-scoring after edits')}
+                  </p>
+                </div>
+              </div>
+              <a
+                href="/pricing"
+                className="flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow transition-all text-center leading-snug"
+              >
+                <Crown className="w-4 h-4 flex-shrink-0" />
+                <span>{t('wizard.score.upgradeCta', 'Upgrade to Premium')}</span>
+              </a>
+            </div>
+          ) : user?.isPremium && currentScore ? (
+            // Premium user with existing score - show re-score button
+            <div className="flex justify-end">
+              <button
+                onClick={handleScoreResume}
+                disabled={isScoring}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Sparkles className="w-4 h-4" />
+                {isScoring ? t('wizard.score.scoring', 'Scoring...') : t('wizard.score.rescoreButton', 'Re-score Resume')}
+              </button>
+            </div>
+          ) : null}
         </div>
       )}
 

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { BlogLayout } from '@/components/blog/BlogLayout';
 import { ArticleCTA } from '@/components/blog/ArticleCTA';
 import { StepHeading } from '@/components/blog/StepHeading';
@@ -366,6 +367,18 @@ export function WhatIsATS() {
         <li><strong>Test your resume</strong> — parse it yourself to see what the ATS sees</li>
         <li><strong>Tailor each application</strong> — one-size-fits-all resumes score lower</li>
       </ul>
+
+      <p>
+        Want to see how your resume measures up?{' '}
+        <Link to="/ats-resume-checker" className="text-blue-600 hover:underline">
+          Check your ATS score
+        </Link>{' '}
+        with our free tool, or explore the{' '}
+        <Link to="/best-resume-translators" className="text-blue-600 hover:underline">
+          best resume translators
+        </Link>{' '}
+        if you're applying internationally.
+      </p>
 
       <p>
         Understanding ATS is no longer optional in today's job market. But here's the 

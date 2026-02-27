@@ -23,14 +23,14 @@ interface TemplatePreviewModalProps {
  */
 export function convertGeneratedResumeToResumeData(generatedResume: GeneratedResume): ResumeData {
   // Extract name from fullName
-  const nameParts = generatedResume.contactInfo.fullName.split(' ');
+  const nameParts = (generatedResume.contactInfo?.fullName || '').split(' ');
   const firstName = nameParts[0] || '';
   const lastName = nameParts.slice(1).join(' ') || '';
 
-  // Convert experience
-  const experience = generatedResume.experience.map((exp, index) => {
+  // Convert experience (with null safety)
+  const experience = (generatedResume.experience || []).map((exp, index) => {
     // Parse duration to extract dates (format: "2020 - 2023" or "Jan 2020 - Present")
-    const durationParts = exp.duration.split(' - ');
+    const durationParts = (exp.duration || '').split(' - ');
     const startDate = durationParts[0]?.trim() || '';
     const endDate = durationParts[1]?.trim() || '';
     const isCurrent = endDate.toLowerCase() === 'present' || endDate.toLowerCase() === 'actual';
@@ -42,15 +42,23 @@ export function convertGeneratedResumeToResumeData(generatedResume: GeneratedRes
       startDate: startDate,
       endDate: isCurrent ? undefined : endDate,
       isCurrent: isCurrent,
-      achievements: exp.achievements || [],
-      responsibilities: exp.impact || [],
+      // Include description as first achievement, then the rest
+      achievements: [
+        ...(exp.description ? [exp.description] : []),
+        ...(exp.achievements || [])
+      ],
+      // Include impact as responsibilities, then skills as a formatted line
+      responsibilities: [
+        ...(exp.impact || []),
+        ...(exp.skills?.length ? [`Skills: ${exp.skills.join(', ')}`] : [])
+      ],
       pageNumber: null,
     };
   });
 
-  // Convert education
-  const education = generatedResume.education.map((edu, index) => {
-    const durationParts = edu.duration.split(' - ');
+  // Convert education (with null safety)
+  const education = (generatedResume.education || []).map((edu, index) => {
+    const durationParts = (edu.duration || '').split(' - ');
     const startDate = durationParts[0]?.trim() || '';
     const endDate = durationParts[1]?.trim() || '';
 
@@ -67,8 +75,8 @@ export function convertGeneratedResumeToResumeData(generatedResume: GeneratedRes
     };
   });
 
-  // Convert certifications
-  const certifications = generatedResume.certifications.map((cert, index) => ({
+  // Convert certifications (with null safety)
+  const certifications = (generatedResume.certifications || []).map((cert, index) => ({
     id: `cert-${index}`,
     name: cert.name,
     issuer: cert.issuer,
@@ -78,9 +86,9 @@ export function convertGeneratedResumeToResumeData(generatedResume: GeneratedRes
     pageNumber: null,
   }));
 
-  // Convert projects
-  const projects = generatedResume.projects.map((proj, index) => {
-    const durationParts = proj.duration.split(' - ');
+  // Convert projects (with null safety)
+  const projects = (generatedResume.projects || []).map((proj, index) => {
+    const durationParts = (proj.duration || '').split(' - ');
     const startDate = durationParts[0]?.trim() || '';
     const endDate = durationParts[1]?.trim() || '';
 
@@ -97,19 +105,20 @@ export function convertGeneratedResumeToResumeData(generatedResume: GeneratedRes
     };
   });
 
-  // Convert languages
-  const languages = generatedResume.languages.map((lang, index) => ({
+  // Convert languages (with null safety)
+  const languages = (generatedResume.languages || []).map((lang, index) => ({
     id: `lang-${index}`,
     name: lang.language,
-    level: (lang.level.toLowerCase() as 'basic' | 'intermediate' | 'advanced' | 'native') || 'intermediate',
+    level: (lang.level?.toLowerCase() as 'basic' | 'intermediate' | 'advanced' | 'native') || 'intermediate',
     pageNumber: null,
   }));
 
-  // Combine all skills
+  // Combine all skills (with null safety)
+  const skills = generatedResume.skills || { technical: [], soft: [], tools: [] };
   const skillsRaw = [
-    ...generatedResume.skills.technical,
-    ...generatedResume.skills.soft,
-    ...generatedResume.skills.tools,
+    ...(skills.technical || []),
+    ...(skills.soft || []),
+    ...(skills.tools || []),
   ];
 
   // Extract location parts
@@ -119,15 +128,15 @@ export function convertGeneratedResumeToResumeData(generatedResume: GeneratedRes
   return {
     firstName,
     lastName,
-    email: generatedResume.contactInfo.email,
-    phone: generatedResume.contactInfo.phone,
+    email: generatedResume.contactInfo?.email || '',
+    phone: generatedResume.contactInfo?.phone || '',
     country,
-    linkedin: generatedResume.contactInfo.linkedin || '',
+    linkedin: generatedResume.contactInfo?.linkedin || '',
     language: 'en', // Default to English, can be adjusted
     targetLevel: 'mid', // Default, can be adjusted
     profession: '', // Not directly available in GeneratedResume
     tone: 'professional',
-    summary: generatedResume.professionalSummary,
+    summary: generatedResume.professionalSummary || '',
     jobDescription: '',
     skillsRaw,
     experience,
@@ -135,7 +144,7 @@ export function convertGeneratedResumeToResumeData(generatedResume: GeneratedRes
     certifications,
     projects,
     languages,
-    achievements: generatedResume.achievements.map((ach, index) => ({
+    achievements: (generatedResume.achievements || []).map((ach, index) => ({
       id: `ach-${index}`,
       title: ach,
       description: '',
@@ -294,14 +303,15 @@ export function TemplatePreviewModal({
         // Read storeResumeData inside the effect (gets current value without being a dependency)
         const currentResumeData = storeResumeData;
         
-        // Use existing resumeData from store if available and complete, otherwise convert from generatedResume
-        let resumeData: ResumeData;
-        if (currentResumeData && currentResumeData.firstName && currentResumeData.experience && currentResumeData.experience.length > 0) {
-          // Use existing data from store to preserve all fields (profession, targetLevel, etc.)
-          resumeData = currentResumeData;
-        } else {
-          // Fallback: convert from generatedResume if store data is incomplete
-          resumeData = convertGeneratedResumeToResumeData(generatedResume);
+        // Always convert from generatedResume to get enhanced content (description, skills, etc.)
+        let resumeData: ResumeData = convertGeneratedResumeToResumeData(generatedResume);
+        // Preserve specific fields from storeResumeData if they exist
+        if (currentResumeData) {
+          if (currentResumeData.profession) resumeData.profession = currentResumeData.profession;
+          if (currentResumeData.targetLevel) resumeData.targetLevel = currentResumeData.targetLevel;
+          if (currentResumeData.linkedin) resumeData.linkedin = currentResumeData.linkedin;
+          if (currentResumeData.jobDescription) resumeData.jobDescription = currentResumeData.jobDescription;
+          if (currentResumeData.totalCharacters) resumeData.totalCharacters = currentResumeData.totalCharacters;
         }
         
         // Calculate pagination

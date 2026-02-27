@@ -17,6 +17,7 @@ import {
 import { useJobTailoringStore } from '@/stores/jobTailoringStore';
 import { ClarificationQuestion } from '@/types/jobTailoring';
 import { EnhancementReviewModal } from '@/components/resume/EnhancementReviewModal';
+import { RateLimitModal } from '@/components/RateLimitModal';
 
 interface ClarificationQuestionsProps {
   onNext: () => void;
@@ -52,6 +53,12 @@ export function ClarificationQuestions({ onNext, onBack }: ClarificationQuestion
   const [enhancementEnhancedText, setEnhancementEnhancedText] = useState('');
   const [enhancementQuestionId, setEnhancementQuestionId] = useState<string | null>(null);
 
+  // Rate limit state
+  const [isRateLimited, setIsRateLimited] = useState(false);
+  const [rateLimitError, setRateLimitError] = useState<string | null>(null);
+  const [rateLimitAction, setRateLimitAction] = useState<'enhance' | 'options' | 'generate' | null>(null);
+  const [rateLimitQuestionId, setRateLimitQuestionId] = useState<string | null>(null);
+
   const toggleQuestion = (id: string) => {
     const newExpanded = new Set(expandedQuestions);
     if (newExpanded.has(id)) {
@@ -77,6 +84,10 @@ export function ClarificationQuestions({ onNext, onBack }: ClarificationQuestion
     // Store original text before enhancement
     const originalText = currentAnswer;
     
+    // Reset rate limit state
+    setIsRateLimited(false);
+    setRateLimitError(null);
+    
     setEnhancingId(question.id);
     try {
       // Get enhanced text directly from the return value (don't read from stale state)
@@ -90,6 +101,13 @@ export function ClarificationQuestions({ onNext, onBack }: ClarificationQuestion
       setEnhancementEnhancedText(enhancedText);
       setEnhancementQuestionId(question.id);
       setEnhancementModalOpen(true);
+    } catch (err: any) {
+      if (err?.code === 'RATE_LIMIT' || err?.statusCode === 429) {
+        setIsRateLimited(true);
+        setRateLimitError(err.message);
+        setRateLimitAction('enhance');
+        setRateLimitQuestionId(question.id);
+      }
     } finally {
       setEnhancingId(null);
     }
@@ -114,7 +132,20 @@ export function ClarificationQuestions({ onNext, onBack }: ClarificationQuestion
   };
 
   const handleGenerateOptions = async (question: ClarificationQuestion) => {
-    await generateAnswerOptions(question.id);
+    // Reset rate limit state
+    setIsRateLimited(false);
+    setRateLimitError(null);
+    
+    try {
+      await generateAnswerOptions(question.id);
+    } catch (err: any) {
+      if (err?.code === 'RATE_LIMIT' || err?.statusCode === 429) {
+        setIsRateLimited(true);
+        setRateLimitError(err.message);
+        setRateLimitAction('options');
+        setRateLimitQuestionId(question.id);
+      }
+    }
   };
 
   const handleSelectOption = (questionId: string, optionIndex: number) => {
@@ -122,8 +153,21 @@ export function ClarificationQuestions({ onNext, onBack }: ClarificationQuestion
   };
 
   const handleProceed = async () => {
-    await generateTailoredResume();
-    onNext();
+    // Reset rate limit state
+    setIsRateLimited(false);
+    setRateLimitError(null);
+    
+    try {
+      await generateTailoredResume();
+      onNext();
+    } catch (err: any) {
+      if (err?.code === 'RATE_LIMIT' || err?.statusCode === 429) {
+        setIsRateLimited(true);
+        setRateLimitError(err.message);
+        setRateLimitAction('generate');
+        setRateLimitQuestionId(null);
+      }
+    }
   };
 
   // Check if required questions are answered
@@ -418,9 +462,9 @@ export function ClarificationQuestions({ onNext, onBack }: ClarificationQuestion
         </button>
         <button
           onClick={handleProceed}
-          disabled={!requiredQuestionsAnswered || isGeneratingTailored}
+          disabled={!requiredQuestionsAnswered || isGeneratingTailored || isRateLimited}
           className={`flex items-center gap-2 px-8 py-3 font-medium rounded-xl transition-all ${
-            requiredQuestionsAnswered && !isGeneratingTailored
+            requiredQuestionsAnswered && !isGeneratingTailored && !isRateLimited
               ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 shadow-md hover:shadow-lg'
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'
           }`}
@@ -445,6 +489,34 @@ export function ClarificationQuestions({ onNext, onBack }: ClarificationQuestion
         sectionType="answer"
         onApprove={handleEnhancementApprove}
         onReject={handleEnhancementReject}
+      />
+
+      {/* Rate Limit Modal */}
+      <RateLimitModal
+        isOpen={isRateLimited}
+        message={rateLimitError || undefined}
+        onRetry={() => {
+          const questionId = rateLimitQuestionId;
+          const action = rateLimitAction;
+          
+          // Retry the appropriate action
+          if (action === 'generate') {
+            handleProceed();
+          } else if (action === 'enhance' && questionId) {
+            const question = questions.find(q => q.id === questionId);
+            if (question) handleEnhance(question);
+          } else if (action === 'options' && questionId) {
+            const question = questions.find(q => q.id === questionId);
+            if (question) handleGenerateOptions(question);
+          }
+        }}
+        onClose={() => {
+          setIsRateLimited(false);
+          setRateLimitError(null);
+          setRateLimitAction(null);
+          setRateLimitQuestionId(null);
+        }}
+        countdownSeconds={60}
       />
     </div>
   );

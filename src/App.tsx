@@ -24,7 +24,8 @@ import { BASE_URL } from '@/utils/seoConfig';
 // Landing page - Keep static for fast initial load
 import { LandingPage } from '@/pages/LandingPage';
 
-// Auth
+// Auth - GoogleAuthWrapper lazy-loaded to avoid loading Google Identity Services SDK on every page
+const GoogleAuthWrapper = lazy(() => import('@/components/GoogleAuthWrapper'));
 const LoginPage = lazy(() => import('@/pages/LoginPage').then(m => ({ default: m.LoginPage })));
 
 // Main app pages
@@ -48,6 +49,12 @@ const ContactPage = lazy(() => import('@/pages/ContactPage').then(m => ({ defaul
 const AboutPage = lazy(() => import('@/pages/AboutPage').then(m => ({ default: m.AboutPage })));
 const SupportPage = lazy(() => import('@/pages/SupportPage').then(m => ({ default: m.SupportPage })));
 
+// SEO Landing pages
+const AtsResumeCheckerPage = lazy(() => import('@/pages/AtsResumeCheckerPage').then(m => ({ default: m.AtsResumeCheckerPage })));
+const AiResumeBuilderPage = lazy(() => import('@/pages/AiResumeBuilderPage').then(m => ({ default: m.AiResumeBuilderPage })));
+const ResumeTranslatorPage = lazy(() => import('@/pages/ResumeTranslatorPage').then(m => ({ default: m.ResumeTranslatorPage })));
+const ResumeTemplatesPage = lazy(() => import('@/pages/ResumeTemplatesPage').then(m => ({ default: m.ResumeTemplatesPage })));
+
 // Legal pages
 const PrivacyPage = lazy(() => import('@/pages/PrivacyPage').then(m => ({ default: m.PrivacyPage })));
 const TermsPage = lazy(() => import('@/pages/TermsPage').then(m => ({ default: m.TermsPage })));
@@ -57,6 +64,12 @@ const RefundPolicyPage = lazy(() => import('@/pages/RefundPolicyPage').then(m =>
 const BlogPage = lazy(() => import('@/pages/BlogPage').then(m => ({ default: m.BlogPage })));
 const HowToMakeGoodResume = lazy(() => import('@/pages/articles/HowToMakeGoodResume').then(m => ({ default: m.HowToMakeGoodResume })));
 const WhatIsATS = lazy(() => import('@/pages/articles/WhatIsATS').then(m => ({ default: m.WhatIsATS })));
+const ResumeTipsForCareerChangers = lazy(() => import('@/pages/articles/ResumeTipsForCareerChangers').then(m => ({ default: m.ResumeTipsForCareerChangers })));
+const CommonResumeMistakes = lazy(() => import('@/pages/articles/CommonResumeMistakes').then(m => ({ default: m.CommonResumeMistakes })));
+const BestResumeTranslator = lazy(() => import('@/pages/articles/BestResumeTranslator').then(m => ({ default: m.BestResumeTranslator })));
+
+// SEO Landing Pages
+const ResumeForJobDescriptionPage = lazy(() => import('@/pages/ResumeForJobDescriptionPage').then(m => ({ default: m.ResumeForJobDescriptionPage })));
 
 // Public
 const PublicResumePage = lazy(() => import('@/pages/PublicResumePage').then(m => ({ default: m.PublicResumePage })));
@@ -130,7 +143,9 @@ function App() {
             
             <Route path="/login" element={
               <AuthLayout>
-                <LoginPage />
+                <GoogleAuthWrapper>
+                  <LoginPage />
+                </GoogleAuthWrapper>
               </AuthLayout>
             } />
             
@@ -145,6 +160,31 @@ function App() {
             <Route path="/about" element={
               <MainLayout>
                 <AboutPage />
+              </MainLayout>
+            } />
+
+            {/* SEO Landing Pages */}
+            <Route path="/ats-resume-checker" element={
+              <MainLayout>
+                <AtsResumeCheckerPage />
+              </MainLayout>
+            } />
+
+            <Route path="/ai-resume-builder" element={
+              <MainLayout>
+                <AiResumeBuilderPage />
+              </MainLayout>
+            } />
+
+            <Route path="/resume-translator" element={
+              <MainLayout>
+                <ResumeTranslatorPage />
+              </MainLayout>
+            } />
+
+            <Route path="/resume-templates" element={
+              <MainLayout>
+                <ResumeTemplatesPage />
               </MainLayout>
             } />
             
@@ -182,6 +222,31 @@ function App() {
             <Route path="/blog/what-is-ats-system" element={
               <MainLayout>
                 <WhatIsATS />
+              </MainLayout>
+            } />
+
+            <Route path="/blog/resume-tips-for-career-changers" element={
+              <MainLayout>
+                <ResumeTipsForCareerChangers />
+              </MainLayout>
+            } />
+
+            <Route path="/blog/common-resume-mistakes" element={
+              <MainLayout>
+                <CommonResumeMistakes />
+              </MainLayout>
+            } />
+
+            {/* SEO Landing Pages */}
+            <Route path="/resume-for-job-description" element={
+              <MainLayout>
+                <ResumeForJobDescriptionPage />
+              </MainLayout>
+            } />
+
+            <Route path="/best-resume-translators" element={
+              <MainLayout>
+                <BestResumeTranslator />
               </MainLayout>
             } />
 

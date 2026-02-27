@@ -11,8 +11,8 @@ class SectionImprovementService {
       throw new Error('No autenticado');
     }
     
-    // Sanitize input (frontend)
-    const sanitized = this.sanitizeInput(request.userInstructions);
+    // Sanitize input (frontend) - only if userInstructions is provided
+    const sanitized = request.userInstructions ? this.sanitizeInput(request.userInstructions) : '';
     
     const response = await fetch(`${API_BASE_URL}/api/ai/improve-section`, {
       method: 'POST',
@@ -22,7 +22,8 @@ class SectionImprovementService {
       },
       body: JSON.stringify({
         ...request,
-        userInstructions: sanitized
+        userInstructions: sanitized,
+        autoEnhance: request.autoEnhance || false
       })
     });
     

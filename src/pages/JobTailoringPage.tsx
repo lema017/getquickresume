@@ -1,33 +1,38 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { 
   ArrowLeft, 
   Target,
   ClipboardList,
-  Search,
-  HelpCircle,
+  BarChart3,
   GitCompare,
   Save,
   CheckCircle,
-  Globe
+  Globe,
+  RotateCcw,
+  PlayCircle,
+  X,
+  AlertTriangle
 } from 'lucide-react';
 import { useJobTailoringStore } from '@/stores/jobTailoringStore';
 import { useAuthStore } from '@/stores/authStore';
 import { JobInput } from '@/components/job-tailoring/JobInput';
-import { JobAnalysis } from '@/components/job-tailoring/JobAnalysis';
-import { ClarificationQuestions } from '@/components/job-tailoring/ClarificationQuestions';
+import { TailoringSummary } from '@/components/job-tailoring/TailoringSummary';
 import { ReviewChanges } from '@/components/job-tailoring/ReviewChanges';
 import { SaveTailored } from '@/components/job-tailoring/SaveTailored';
+import { TailoringWizardStep } from '@/types/jobTailoring';
+import { trackJobTailoringStarted } from '@/services/marketingAnalytics';
 
-const STEP_KEYS = ['jobDetails', 'analysis', 'questions', 'review', 'save'] as const;
+// New 4-step flow: Job Input -> Tailoring Summary -> Review Changes -> Save
+const STEP_KEYS = ['jobDetails', 'summary', 'review', 'save'] as const;
 
 const STEPS = [
   { id: 1, key: 'jobDetails', icon: ClipboardList },
-  { id: 2, key: 'analysis', icon: Search },
-  { id: 3, key: 'questions', icon: HelpCircle },
-  { id: 4, key: 'review', icon: GitCompare },
-  { id: 5, key: 'save', icon: Save },
+  { id: 2, key: 'summary', icon: BarChart3 },     // NEW: Tailoring Summary (replaces analysis + questions)
+  { id: 3, key: 'review', icon: GitCompare },
+  { id: 4, key: 'save', icon: Save },
 ];
 
 export function JobTailoringPage() {
@@ -42,7 +47,24 @@ export function JobTailoringPage() {
     nextStep,
     prevStep,
     reset,
+    jobDescription,
+    hasPersistedSession,
+    sourceResume,
   } = useJobTailoringStore();
+
+  // Dialog states
+  const [showRecoveryDialog, setShowRecoveryDialog] = useState(false);
+  const [showLeaveConfirmation, setShowLeaveConfirmation] = useState(false);
+  const [hasCheckedSession, setHasCheckedSession] = useState(false);
+  const hasTrackedRef = useRef(false);
+
+  // Track job tailoring started (only once per session)
+  useEffect(() => {
+    if (!hasTrackedRef.current) {
+      trackJobTailoringStarted(resumeId);
+      hasTrackedRef.current = true;
+    }
+  }, [resumeId]);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -50,6 +72,62 @@ export function JobTailoringPage() {
       navigate('/login');
     }
   }, [isAuthenticated, navigate]);
+
+  // Check for existing persisted session on mount
+  useEffect(() => {
+    if (!hasCheckedSession && isAuthenticated) {
+      // Small delay to ensure store is hydrated
+      const timer = setTimeout(() => {
+        const hasValidSession = hasPersistedSession();
+        
+        // If resumeId is provided, user explicitly wants to start a new tailoring for that resume
+        if (resumeId) {
+          // Reset if there's existing state for a different resume
+          if (sourceResume && sourceResume.id !== resumeId) {
+            reset();
+          }
+          setHasCheckedSession(true);
+          return;
+        }
+        
+        // If we have state (currentStep > 1) but session is invalid (expired or no data),
+        // reset to clean state
+        if (currentStep > 1 && !hasValidSession) {
+          console.log('Expired or invalid session detected, resetting...');
+          reset();
+          setHasCheckedSession(true);
+          return;
+        }
+        
+        // Show recovery dialog if there's a valid persisted session
+        if (hasValidSession && currentStep > 1) {
+          setShowRecoveryDialog(true);
+        }
+        setHasCheckedSession(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [hasCheckedSession, isAuthenticated, hasPersistedSession, currentStep, resumeId, sourceResume, reset]);
+
+  // Browser close/refresh warning
+  useEffect(() => {
+    const hasUnsavedProgress = currentStep > 1 || jobDescription.trim().length > 50;
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedProgress) {
+        e.preventDefault();
+        e.returnValue = ''; // Required for Chrome
+      }
+    };
+
+    if (hasUnsavedProgress) {
+      window.addEventListener('beforeunload', handleBeforeUnload);
+    }
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [currentStep, jobDescription]);
 
   // Language toggle
   const toggleLanguage = () => {
@@ -59,10 +137,38 @@ export function JobTailoringPage() {
 
   const currentLanguage = i18n.language?.startsWith('es') ? 'es' : 'en';
 
-  // Handle back to dashboard
+  // Handle back to dashboard - with confirmation if there's progress
   const handleBack = () => {
+    const hasUnsavedProgress = currentStep > 1;
+    if (hasUnsavedProgress) {
+      setShowLeaveConfirmation(true);
+    } else {
+      reset();
+      navigate('/dashboard');
+    }
+  };
+
+  // Confirm leave - reset and navigate
+  const handleConfirmLeave = () => {
+    setShowLeaveConfirmation(false);
     reset();
     navigate('/dashboard');
+  };
+
+  // Cancel leave - close dialog
+  const handleCancelLeave = () => {
+    setShowLeaveConfirmation(false);
+  };
+
+  // Session recovery handlers
+  const handleContinueSession = () => {
+    setShowRecoveryDialog(false);
+    // State is already restored, user continues where they left off
+  };
+
+  const handleStartFresh = () => {
+    reset();
+    setShowRecoveryDialog(false);
   };
 
   // Handle step navigation
@@ -77,11 +183,11 @@ export function JobTailoringPage() {
   const handleStepClick = (stepId: number) => {
     // Only allow clicking on completed steps or the current step
     if (stepId <= currentStep) {
-      setCurrentStep(stepId as 1 | 2 | 3 | 4 | 5);
+      setCurrentStep(stepId as TailoringWizardStep);
     }
   };
 
-  // Render current step content
+  // Render current step content - Now 4 steps instead of 5
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
@@ -93,27 +199,21 @@ export function JobTailoringPage() {
           />
         );
       case 2:
+        // NEW: Tailoring Summary (replaces JobAnalysis + ClarificationQuestions)
         return (
-          <JobAnalysis
+          <TailoringSummary
             onNext={handleNextStep}
             onBack={handlePrevStep}
           />
         );
       case 3:
         return (
-          <ClarificationQuestions
-            onNext={handleNextStep}
-            onBack={handlePrevStep}
-          />
-        );
-      case 4:
-        return (
           <ReviewChanges
             onNext={handleNextStep}
             onBack={handlePrevStep}
           />
         );
-      case 5:
+      case 4:
         return (
           <SaveTailored
             onBack={handlePrevStep}
@@ -125,9 +225,15 @@ export function JobTailoringPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
+    <>
+      <Helmet>
+        <title>Job Tailoring - GetQuickResume</title>
+        <meta name="description" content="Tailor your resume to job descriptions" />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50">
+        {/* Header */}
+        <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
@@ -238,7 +344,116 @@ export function JobTailoringPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {renderStepContent()}
       </main>
-    </div>
+
+      {/* Session Recovery Dialog */}
+      {showRecoveryDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-orange-500 to-amber-500 px-6 py-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                  <RotateCcw className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="text-lg font-semibold text-white">
+                  {t('jobTailoring.recovery.title', { defaultValue: 'Continue Your Progress?' })}
+                </h3>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-6">
+              <p className="text-gray-600 mb-4">
+                {t('jobTailoring.recovery.message', { 
+                  defaultValue: 'You have an unfinished job tailoring session. Would you like to continue where you left off?' 
+                })}
+              </p>
+
+              {/* Show what was saved */}
+              {sourceResume && (
+                <div className="bg-orange-50 rounded-xl p-4 mb-6">
+                  <p className="text-sm text-orange-800 font-medium mb-1">
+                    {t('jobTailoring.recovery.resumeLabel', { defaultValue: 'Resume:' })}
+                  </p>
+                  <p className="text-sm text-orange-700">
+                    {sourceResume.title || t('jobTailoring.jobInput.untitledResume', { defaultValue: 'Untitled Resume' })}
+                  </p>
+                  <p className="text-xs text-orange-600 mt-2">
+                    {t('jobTailoring.recovery.stepInfo', { 
+                      step: currentStep,
+                      defaultValue: `Progress: Step ${currentStep} of 4`
+                    })}
+                  </p>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  onClick={handleStartFresh}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                  {t('jobTailoring.recovery.startFresh', { defaultValue: 'Start Fresh' })}
+                </button>
+                <button
+                  onClick={handleContinueSession}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-medium rounded-xl hover:from-orange-600 hover:to-amber-600 transition-all shadow-md"
+                >
+                  <PlayCircle className="w-4 h-4" />
+                  {t('jobTailoring.recovery.continue', { defaultValue: 'Continue' })}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Leave Confirmation Dialog */}
+      {showLeaveConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+            {/* Header */}
+            <div className="bg-amber-50 px-6 py-4 border-b border-amber-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-amber-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {t('jobTailoring.leave.title', { defaultValue: 'Leave Job Tailoring?' })}
+                </h3>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-6">
+              <p className="text-gray-600 mb-6">
+                {t('jobTailoring.leave.message', { 
+                  defaultValue: 'You have unsaved progress. Are you sure you want to leave? Your progress will be saved and you can return later.' 
+                })}
+              </p>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  onClick={handleCancelLeave}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-medium rounded-xl hover:from-orange-600 hover:to-amber-600 transition-all shadow-md"
+                >
+                  {t('jobTailoring.leave.stay', { defaultValue: 'Stay' })}
+                </button>
+                <button
+                  onClick={handleConfirmLeave}
+                  className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
+                >
+                  {t('jobTailoring.leave.leave', { defaultValue: 'Leave' })}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      </div>
+    </>
   );
 }
 

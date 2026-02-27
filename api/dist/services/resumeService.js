@@ -135,15 +135,20 @@ exports.verifyResumeOwnership = verifyResumeOwnership;
 const updateResume = async (userId, resumeId, updates) => {
     try {
         const now = new Date().toISOString();
-        const updateExpression = 'SET updatedAt = :updatedAt';
+        const updateExpression = 'SET #updatedAt = :updatedAt';
         const expressionAttributeValues = {
             ':updatedAt': now,
         };
+        const expressionAttributeNames = {
+            '#updatedAt': 'updatedAt',
+        };
         // Construir expresión de actualización dinámicamente
+        // Use ExpressionAttributeNames to handle DynamoDB reserved keywords (status, name, data, etc.)
         const updateExpressions = [];
         Object.keys(updates).forEach((key, index) => {
             if (key !== 'id' && key !== 'userId' && key !== 'createdAt' && key !== 'updatedAt' && updates[key] !== undefined) {
-                updateExpressions.push(`${key} = :val${index}`);
+                updateExpressions.push(`#attr${index} = :val${index}`);
+                expressionAttributeNames[`#attr${index}`] = key;
                 expressionAttributeValues[`:val${index}`] = updates[key];
             }
         });
@@ -157,6 +162,7 @@ const updateResume = async (userId, resumeId, updates) => {
                 resumeId
             },
             UpdateExpression: `${updateExpression}, ${updateExpressions.join(', ')}`,
+            ExpressionAttributeNames: expressionAttributeNames,
             ExpressionAttributeValues: expressionAttributeValues,
             ReturnValues: 'ALL_NEW',
         });

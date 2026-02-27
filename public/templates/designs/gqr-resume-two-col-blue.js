@@ -684,14 +684,13 @@
             ${experience.length > 0 ? `
             <div class="section-title">${t.workExperience}</div>
             ${experience.map(exp => {
-              const title = safeStr(exp.title);
+              const position = safeStr(exp.position);
               const company = safeStr(exp.company);
-              const achievements = safeArr(exp.achievements);
-              const responsibilities = safeArr(exp.responsibilities);
+              const description = safeArr(exp.description);
               const dateRange = formatDateRange(
                 safeStr(exp.startDate),
                 safeStr(exp.endDate),
-                exp.isCurrent === true,
+                false,
                 lang
               );
               
@@ -699,15 +698,14 @@
               <div class="experience-item">
                 <div class="item-header">
                   <div>
-                    <div class="item-title">${escapeHtml(title)}${company ? ` @ ${escapeHtml(company)}` : ''}</div>
+                    <div class="item-title">${escapeHtml(position)}${company ? ` @ ${escapeHtml(company)}` : ''}</div>
                     ${company ? `<div class="item-company">${escapeHtml(company)}</div>` : ''}
                   </div>
                   <div class="item-date">${escapeHtml(dateRange)}</div>
                 </div>
-                ${achievements.length > 0 || responsibilities.length > 0 ? `
+                ${description.length > 0 ? `
                 <ul class="item-bullets">
-                  ${achievements.map(ach => `<li class="item-bullet">${escapeHtml(safeStr(ach))}</li>`).join('')}
-                  ${responsibilities.map(resp => `<li class="item-bullet">${escapeHtml(safeStr(resp))}</li>`).join('')}
+                  ${description.map(item => `<li class="item-bullet">${escapeHtml(safeStr(item))}</li>`).join('')}
                 </ul>
                 ` : ''}
               </div>

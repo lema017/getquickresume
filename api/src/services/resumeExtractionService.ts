@@ -154,7 +154,7 @@ Extract the following information and return it as a valid JSON object:
   "targetLevel": "entry" | "mid" | "senior" | "executive" (infer from experience),
   "tone": "professional" (always use professional for extraction),
   "summary": string (professional summary if found, otherwise empty string),
-  "skills": string[] (list of technical and soft skills found),
+  "skills": string[] (comprehensive list of ALL technical skills, tools, technologies, methodologies, and soft skills - extract EVERY skill mentioned),
   "experiences": [
     {
       "id": string (generate unique id like "exp-1"),
@@ -163,8 +163,8 @@ Extract the following information and return it as a valid JSON object:
       "startDate": string (format: YYYY-MM, e.g., "2020-01"),
       "endDate": string (format: YYYY-MM, e.g., "2023-06", or empty string if current),
       "isCurrent": boolean,
-      "achievements": string[] (bullet points of achievements),
-      "responsibilities": string[]
+      "achievements": string[] (preserve FULL text - complete descriptions, do not truncate or summarize, automatically correct grammar and spelling errors),
+      "responsibilities": string[] (preserve FULL text - complete descriptions, do not truncate or summarize, automatically correct grammar and spelling errors)
     }
   ],
   "education": [
@@ -252,7 +252,7 @@ ${isSpanish ? `
 
 - For dates: Use YYYY-MM format (e.g., "2020-01"), or just YYYY if month is not available
 - For current positions: Set isCurrent=true and leave endDate empty
-- For skills: Extract both technical skills and soft skills
+- For skills: Extract ALL technical skills, soft skills, tools, technologies, and methodologies (see detailed SKILLS EXTRACTION section below)
 - For targetLevel: 
   * "entry" = 0-2 years experience
   * "mid" = 3-5 years experience  
@@ -261,6 +261,77 @@ ${isSpanish ? `
 - If a section is not found, return an empty array [] or empty string ""
 - Generate unique IDs for each item (exp-1, exp-2, edu-1, etc.)
 - For phone numbers: Include country code if present
+
+RESPONSIBILITIES AND ACHIEVEMENTS EXTRACTION (CRITICAL):
+- PRESERVE THE COMPLETE, FULL TEXT - do not truncate, summarize, or shorten
+- Include ALL details mentioned in the original text
+- If the original text is a single paragraph, preserve it as a single item
+- Only split into multiple items if there are clear separators (bullets, line breaks, numbered lists)
+- CRITICAL: DETECT SECTION BOUNDARIES - STOP extracting experience content when you encounter:
+  * Section headers like: "Skills", "Technical Skills", "Education", "Certifications", "Languages", "Projects", "Awards", "References", "Achievements", "Summary", "Profile", "Objective"
+  * Also recognize common variations/typos: "Skills/Experience", "Skills/Experince", "Skill Set", "Core Competencies", "Technical Proficiencies", "Areas of Expertise"
+  * Section headers are typically standalone lines, often in title case or ALL CAPS, sometimes with colons
+  * LINE BREAKS AND SPACING: New sections often appear after a line break followed by a blank line or extra spacing - these visual separators indicate section boundaries
+  * When you see a blank line followed by a header-like text (title case, ALL CAPS, or ending with colon), this marks a new section
+  * DO NOT include content from other sections in the experience achievements/responsibilities
+  * Example of WRONG extraction (sections merged):
+    If resume has: "...deployed on client's networks;
+    
+    Skills/Experience
+    Network and Servers: Servers Configurations..."
+    → The experience should END at "deployed on client's networks;"
+    → The blank line + "Skills/Experience" header indicates a NEW SECTION
+    → "Network and Servers: Servers Configurations..." belongs in the SKILLS section, NOT in the experience
+- Preserve technical details, technologies mentioned, and complete descriptions
+- AUTOMATICALLY CORRECT GRAMMAR AND SPELLING ERRORS while preserving meaning:
+  * Fix spelling errors (e.g., "Backed End" → "Backend", but keep company names as-is like "Mutual Alajuela")
+  * Correct grammar issues (e.g., "for the communication" → "for communication")
+  * Fix punctuation and capitalization (e.g., "spring" → "Spring" when referring to Spring Framework)
+  * Improve sentence clarity and flow
+  * Fix hyphenation (e.g., "third party" → "third-party" when used as adjective)
+  * Add missing commas where appropriate
+  * Do NOT change technical terms, company names, or specific details
+  * Do NOT add information that wasn't in the original
+- Example:
+  Original: "Java Senior Backed End Developer: Responsible for creating and modifying microservices to handle different financial processes for the communication between the core and third party providers. All this with spring projects using the standard best practices, patterns and security offered in the market."
+  → Extract job title as: "Java Senior Backend Developer" (corrected "Backed End" → "Backend")
+  → Extract achievements/responsibilities as: "Responsible for creating and modifying microservices to handle different financial processes for communication between the core and third-party providers. All this with Spring projects using standard best practices, patterns, and security offered in the market."
+  NOT as: "Created and modified microservices to handle different financial processes" (this is truncated - WRONG)
+  Grammar corrections applied: "for the communication" → "for communication", "third party" → "third-party", "spring" → "Spring", added comma before "and security"
+
+SKILLS EXTRACTION (CRITICAL):
+Extract ALL skills comprehensively from any section that contains skills, including:
+- Sections explicitly named "Skills", "Technical Skills", "Core Competencies", "Areas of Expertise", "Skills/Experience", "Skills/Experince" (common typo), "Skill Set", "Technical Proficiencies"
+- Skills mentioned within experience descriptions, project descriptions, or summary sections
+- Nested subsections within skills sections (e.g., "Operating Systems", "Programming and Database Engines", "Virtualization Skills", "Continuous Integration Tools", "Network and Servers")
+
+SKILL EXTRACTION RULES:
+1. Parse ALL content under skill headers and their subsections - do not stop at the first few items
+2. Extract EACH individual skill/technology/tool as a separate array item:
+   - "Windows 2008, 2012 Server, Active Directory, DHCP, DNS" → ["Windows 2008", "Windows 2012 Server", "Active Directory", "DHCP", "DNS"]
+   - "Java, Spring Boot, Hibernate" → ["Java", "Spring Boot", "Hibernate"]
+3. Include version numbers when meaningful (e.g., "Oracle 11g/12c" → ["Oracle 11g", "Oracle 12c"] or "Oracle 11g/12c" as single item)
+4. Extract tools AND their contexts when explicitly named (e.g., "Oracle Enterprise Manager", "DBVisualizer", "MS Visio")
+5. Include methodologies and frameworks (e.g., "Scrum", "Agile", "REST web services", "UML")
+6. Include operating systems (e.g., "Windows XP", "Windows 7", "Linux", "Red Hat")
+7. Include programming languages AND frameworks (e.g., "Java", "JavaServer Faces", "Spring Boot", "Node.js", "C#")
+8. Include database technologies (e.g., "PostgreSQL", "MySQL", "Oracle", "MongoDB", "DB2", "MSSQL Server")
+9. Include DevOps/CI tools (e.g., "Jenkins", "Bamboo", "Rancher", "Docker")
+10. Include virtualization technologies (e.g., "VMware Workstation", "Citrix XenApp", "VMware ThinApp")
+11. Include IDEs and development tools (e.g., "Eclipse", "IntelliJ", "Visual Studio", "Netbeans")
+
+SKILL NORMALIZATION:
+- Normalize casing for technology names (e.g., "spring boot" → "Spring Boot", "JAVA" → "Java")
+- Keep canonical names (e.g., "JavaScript" not "Javascript", "Node.js" not "nodejs")
+- Avoid duplicates - if "IBM DB2" and "DB2" both appear, keep only "IBM DB2" (the more specific one)
+- Remove generic phrases that aren't skills (e.g., "Two years of experience" is NOT a skill, but "Windows XP troubleshooting" IS)
+- Preserve multi-word skill names (e.g., "Microsoft Application Virtualization", "Java Persistence API")
+
+Example input:
+"Programming and Database Engines
+ DBA skills in Relational Databases Management systems like IBM- DB2(DBVisualizer), PostgreSQL, MSSQL Server, Oracle 11g/12c..."
+
+Expected output skills (partial): ["IBM DB2", "DBVisualizer", "PostgreSQL", "MSSQL Server", "Oracle 11g/12c", "DBA", "Relational Databases"]
 
 DATA QUALITY VALIDATION (CRITICAL):
 You MUST evaluate the authenticity and meaningfulness of ALL extracted data.
@@ -339,7 +410,7 @@ Return the JSON object now:`;
             }
           ],
           temperature: 0.1, // Low temperature for more deterministic extraction
-          max_tokens: 4000,
+          max_tokens: 8000, // Increased to accommodate full text extraction without truncation
           response_format: { type: 'json_object' }
         }),
       });
@@ -389,6 +460,265 @@ Return the JSON object now:`;
       });
       throw error;
     }
+  }
+
+  /**
+   * Normalize and deduplicate skills list
+   * - Splits compound skills (comma/semicolon separated)
+   * - Normalizes casing for known technologies
+   * - Removes duplicates (case-insensitive, keeps more specific variant)
+   * - Filters out non-skill phrases
+   */
+  private normalizeSkills(skills: string[]): string[] {
+    // Known technology canonical names for casing normalization
+    const canonicalNames: Record<string, string> = {
+      'javascript': 'JavaScript',
+      'typescript': 'TypeScript',
+      'node.js': 'Node.js',
+      'nodejs': 'Node.js',
+      'react': 'React',
+      'reactjs': 'React',
+      'vue.js': 'Vue.js',
+      'vuejs': 'Vue.js',
+      'angular': 'Angular',
+      'angularjs': 'AngularJS',
+      'java': 'Java',
+      'spring boot': 'Spring Boot',
+      'spring-boot': 'Spring Boot',
+      'springboot': 'Spring Boot',
+      'spring webflux': 'Spring WebFlux',
+      'hibernate': 'Hibernate',
+      'c#': 'C#',
+      'c++': 'C++',
+      'python': 'Python',
+      'ruby': 'Ruby',
+      'php': 'PHP',
+      'golang': 'Go',
+      'go': 'Go',
+      'rust': 'Rust',
+      'swift': 'Swift',
+      'kotlin': 'Kotlin',
+      'objective-c': 'Objective-C',
+      'objectivec': 'Objective-C',
+      'postgresql': 'PostgreSQL',
+      'postgres': 'PostgreSQL',
+      'mysql': 'MySQL',
+      'mongodb': 'MongoDB',
+      'redis': 'Redis',
+      'elasticsearch': 'Elasticsearch',
+      'oracle': 'Oracle',
+      'mssql': 'MSSQL Server',
+      'mssql server': 'MSSQL Server',
+      'sql server': 'SQL Server',
+      'db2': 'DB2',
+      'ibm db2': 'IBM DB2',
+      'ibm- db2': 'IBM DB2',
+      'docker': 'Docker',
+      'kubernetes': 'Kubernetes',
+      'k8s': 'Kubernetes',
+      'jenkins': 'Jenkins',
+      'bamboo': 'Bamboo',
+      'rancher': 'Rancher',
+      'aws': 'AWS',
+      'azure': 'Azure',
+      'gcp': 'GCP',
+      'google cloud': 'Google Cloud',
+      'linux': 'Linux',
+      'red hat': 'Red Hat',
+      'redhat': 'Red Hat',
+      'ubuntu': 'Ubuntu',
+      'centos': 'CentOS',
+      'windows': 'Windows',
+      'vmware': 'VMware',
+      'vmware workstation': 'VMware Workstation',
+      'citrix xenapp': 'Citrix XenApp',
+      'vmware thinapp': 'VMware ThinApp',
+      'git': 'Git',
+      'github': 'GitHub',
+      'gitlab': 'GitLab',
+      'bitbucket': 'Bitbucket',
+      'jira': 'Jira',
+      'confluence': 'Confluence',
+      'html': 'HTML',
+      'html5': 'HTML5',
+      'html 5': 'HTML5',
+      'css': 'CSS',
+      'css3': 'CSS3',
+      'sass': 'SASS',
+      'scss': 'SCSS',
+      'less': 'LESS',
+      'tailwind': 'Tailwind CSS',
+      'tailwindcss': 'Tailwind CSS',
+      'bootstrap': 'Bootstrap',
+      'graphql': 'GraphQL',
+      'rest': 'REST',
+      'restful': 'RESTful',
+      'api': 'API',
+      'rest api': 'REST API',
+      'rest web services': 'REST Web Services',
+      'soap': 'SOAP',
+      'xml': 'XML',
+      'json': 'JSON',
+      'yaml': 'YAML',
+      'sql': 'SQL',
+      'nosql': 'NoSQL',
+      'pl/pgsql': 'PL/pgSQL',
+      'plpgsql': 'PL/pgSQL',
+      'agile': 'Agile',
+      'scrum': 'Scrum',
+      'kanban': 'Kanban',
+      'ci/cd': 'CI/CD',
+      'devops': 'DevOps',
+      'uml': 'UML',
+      'vbs': 'VBS',
+      'vbscript': 'VBScript',
+      'powershell': 'PowerShell',
+      'power shell': 'PowerShell',
+      'bash': 'Bash',
+      'shell': 'Shell',
+      'eclipse': 'Eclipse',
+      'intellij': 'IntelliJ',
+      'intellij idea': 'IntelliJ IDEA',
+      'netbeans': 'NetBeans',
+      'visual studio': 'Visual Studio',
+      'vs code': 'VS Code',
+      'vscode': 'VS Code',
+      'active directory': 'Active Directory',
+      'dhcp': 'DHCP',
+      'dns': 'DNS',
+      'tcp/ip': 'TCP/IP',
+      'http': 'HTTP',
+      'https': 'HTTPS',
+      'ssl': 'SSL',
+      'tls': 'TLS',
+      'oauth': 'OAuth',
+      'jwt': 'JWT',
+      'saml': 'SAML',
+      'ldap': 'LDAP',
+      'jpa': 'JPA',
+      'java persistence api': 'Java Persistence API',
+      'jsf': 'JSF',
+      'javaserver faces': 'JavaServer Faces',
+      'primefaces': 'PrimeFaces',
+      'jasper reports': 'Jasper Reports',
+      'jasperreports': 'Jasper Reports',
+      'liquibase': 'Liquibase',
+      'flyway': 'Flyway',
+      'maven': 'Maven',
+      'gradle': 'Gradle',
+      'npm': 'npm',
+      'yarn': 'Yarn',
+      'webpack': 'Webpack',
+      'vite': 'Vite',
+      'installscript': 'InstallScript',
+      'ms visio': 'MS Visio',
+      'microsoft visio': 'MS Visio',
+      'dia': 'Dia',
+      'oracle enterprise manager': 'Oracle Enterprise Manager',
+      'dbvisualizer': 'DBVisualizer',
+      'dba': 'DBA',
+      'microsoft application virtualization': 'Microsoft Application Virtualization',
+      'app-v': 'App-V',
+    };
+
+    // Phrases that are NOT skills (filter these out)
+    const nonSkillPhrases = [
+      /^\d+\s*(years?|months?)\s*(of\s*)?(experience|exp)/i,
+      /^experience\s*(with|in|using)?$/i,
+      /^knowledge\s*(of|in|with)?$/i,
+      /^understanding\s*(of|in)?$/i,
+      /^skills?\s*(in|with)?$/i,
+      /^proficient\s*(in|with)?$/i,
+      /^expertise\s*(in|with)?$/i,
+      /^familiar\s*(with)?$/i,
+      /^advanced\s*(knowledge)?$/i,
+      /^basic\s*(knowledge)?$/i,
+      /^process\s*oriented\s*person$/i,
+      /^general\s*(knowledge|experience)$/i,
+      /^two\s*years?\s*of\s*experience/i,
+      /^etc\.?$/i,
+    ];
+
+    // Step 1: Split compound skills and flatten
+    const expandedSkills: string[] = [];
+    for (const skill of skills) {
+      if (typeof skill !== 'string') continue;
+      
+      // Split by common separators (comma, semicolon, bullet points)
+      // But be careful with version numbers like "Oracle 11g/12c"
+      const parts = skill
+        .split(/[,;•·]/)
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+      
+      expandedSkills.push(...parts);
+    }
+
+    // Step 2: Normalize and filter
+    const normalizedSkills: string[] = [];
+    for (let skill of expandedSkills) {
+      // Trim whitespace and remove leading/trailing special chars
+      skill = skill.trim().replace(/^[-–—•·\s]+|[-–—•·\s]+$/g, '');
+      
+      // Skip empty or too short
+      if (skill.length < 2) continue;
+      
+      // Skip non-skill phrases
+      if (nonSkillPhrases.some(pattern => pattern.test(skill))) continue;
+      
+      // Apply canonical casing
+      const lowerSkill = skill.toLowerCase();
+      if (canonicalNames[lowerSkill]) {
+        skill = canonicalNames[lowerSkill];
+      } else {
+        // Title case for multi-word skills that aren't in canonical list
+        // But preserve already capitalized acronyms
+        if (skill === skill.toLowerCase() && skill.includes(' ')) {
+          skill = skill.split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+        }
+      }
+      
+      normalizedSkills.push(skill);
+    }
+
+    // Step 3: Deduplicate (case-insensitive, keep more specific variant)
+    const seen = new Map<string, string>(); // lowercase -> actual value
+    for (const skill of normalizedSkills) {
+      const lower = skill.toLowerCase();
+      
+      // Check if we already have this or a variant
+      let dominated = false;
+      let dominates: string | null = null;
+      
+      for (const [existingLower, existingActual] of seen.entries()) {
+        // Check if current skill is a substring of existing (existing is more specific)
+        if (existingLower.includes(lower) && existingLower !== lower) {
+          dominated = true;
+          break;
+        }
+        // Check if existing is a substring of current (current is more specific)
+        if (lower.includes(existingLower) && existingLower !== lower) {
+          dominates = existingLower;
+          break;
+        }
+      }
+      
+      if (dominated) continue; // Skip less specific variant
+      
+      if (dominates) {
+        // Replace less specific with more specific
+        seen.delete(dominates);
+      }
+      
+      // Add or update
+      if (!seen.has(lower)) {
+        seen.set(lower, skill);
+      }
+    }
+
+    return Array.from(seen.values());
   }
 
   /**
@@ -455,7 +785,7 @@ Return the JSON object now:`;
         linkedin: parsed.linkedin || '',
         targetLevel: this.validateTargetLevel(parsed.targetLevel),
         tone: 'professional',
-        skills: ensureArray(parsed.skills),
+        skills: this.normalizeSkills(ensureArray(parsed.skills)),
         experiences: ensureArray(parsed.experiences).map((exp: any, idx: number) => ({
           id: exp.id || `exp-${idx + 1}`,
           title: exp.title || '',
@@ -739,6 +1069,126 @@ Return the JSON object now:`;
         isResumeContent: false
       };
     }
+  }
+
+  /**
+   * Development validation for skill normalization
+   * Call this method to verify normalization logic works as expected
+   * Usage: resumeExtractionService.validateSkillNormalization()
+   */
+  validateSkillNormalization(): { passed: boolean; results: { input: string[]; output: string[]; expectedSubset: string[]; missing: string[] } } {
+    // Sample skills as they might be extracted by AI from the example resume
+    const sampleExtractedSkills = [
+      'Java',
+      'Spring Boot',
+      'PostgreSQL',
+      'Spring WebFlux',
+      'Jasper Reports',
+      'Liquibase',
+      'Primefaces',
+      'Hibernate',
+      'MongoDB',
+      'PL/pgSQL',
+      'javascript',  // lowercase - should normalize
+      'HTML 5',      // should normalize to HTML5
+      'Node.js',
+      'Objective-C',
+      'C#',
+      'CSS',
+      'InstallScript',
+      'VBS',
+      'JavaServer Faces',
+      'Java Persistence API',
+      'MySQL',
+      'Oracle 11g/12c',
+      'DB2',
+      'IBM DB2',     // duplicate of DB2 - should keep more specific
+      'IBM- DB2',    // variant - should normalize
+      'MSSQL Server',
+      'Oracle Enterprise Manager',
+      'UML',
+      'Dia',
+      'MS Visio',
+      'VMWARE WorkStation',  // casing issue
+      'Citrix XenApp',
+      'VMware ThinApp',
+      'Microsoft Application Virtualization',
+      'Bamboo',
+      'Jenkins',
+      'Rancher',
+      'eclipse',     // lowercase
+      'intellij',    // lowercase
+      'netbeans',    // lowercase
+      'Visual Studio 2010',
+      'Active Directory',
+      'DHCP',
+      'DNS',
+      'Windows 2008',
+      'Windows 2012 Server',
+      'Windows XP',
+      'Windows 7',
+      'Red Hat',
+      'Linux',
+      'Scrum',
+      'Agile',
+      'REST web services',
+      'two years of experience', // should be filtered out
+      'Process Oriented Person',  // should be filtered out
+      'DBA',
+    ];
+
+    // Expected skills that MUST appear in output
+    const expectedSubset = [
+      'Java',
+      'Spring Boot',
+      'PostgreSQL',
+      'JavaScript',        // normalized from 'javascript'
+      'HTML5',             // normalized from 'HTML 5'
+      'Node.js',
+      'IBM DB2',           // kept as more specific than 'DB2'
+      'Oracle Enterprise Manager',
+      'VMware Workstation', // normalized casing
+      'Eclipse',           // normalized from 'eclipse'
+      'IntelliJ',          // normalized from 'intellij'
+      'NetBeans',          // normalized from 'netbeans'
+      'Active Directory',
+      'Scrum',
+      'DBA',
+    ];
+
+    const output = this.normalizeSkills(sampleExtractedSkills);
+
+    // Check that expected skills are present
+    const missing = expectedSubset.filter(expected => 
+      !output.some(skill => skill.toLowerCase() === expected.toLowerCase())
+    );
+
+    // Check that non-skills were filtered out
+    const nonSkillsFiltered = !output.some(skill => 
+      /two years of experience/i.test(skill) || 
+      /process oriented person/i.test(skill)
+    );
+
+    const passed = missing.length === 0 && nonSkillsFiltered;
+
+    console.log('[ResumeExtractionService] Skill normalization validation:', {
+      passed,
+      inputCount: sampleExtractedSkills.length,
+      outputCount: output.length,
+      missing,
+      nonSkillsFiltered,
+      sampleOutput: output.slice(0, 15),
+    });
+
+    return {
+      passed,
+      results: {
+        input: sampleExtractedSkills,
+        output,
+        expectedSubset,
+        missing,
+      }
+    };
   }
 }
 

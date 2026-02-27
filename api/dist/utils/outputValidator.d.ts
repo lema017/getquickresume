@@ -8,7 +8,14 @@ export declare function detectOutputInjection(output: string): {
     isValid: boolean;
     reason?: string;
 };
-export declare function validateImprovedText(improved: string, original: string, sectionType: string): {
+export interface ValidateImprovedTextOptions {
+    /**
+     * When true, allows substantial rewrites where similarity to original may be low.
+     * Use when user has provided explicit context for how they want the text changed.
+     */
+    allowSubstantialRewrite?: boolean;
+}
+export declare function validateImprovedText(improved: string, original: string, sectionType: string, options?: ValidateImprovedTextOptions): {
     isValid: boolean;
     reason?: string;
 };

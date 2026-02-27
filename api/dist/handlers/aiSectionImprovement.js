@@ -140,25 +140,30 @@ const improveSectionWithAI = async (event) => {
             };
         }
         const sanitizedLanguage = (0, inputSanitizer_1.sanitizeLanguage)(requestData.language);
-        const sanitizedInstructions = (0, inputSanitizer_1.sanitizeUserInput)(requestData.userInstructions);
-        // 5. Validar instrucciones del usuario
-        const inputValidation = (0, inputSanitizer_1.validateInput)(sanitizedInstructions);
-        if (!inputValidation.isValid) {
-            await (0, rateLimiter_1.logSuspiciousActivity)(userId, endpoint, `Invalid input: ${inputValidation.reason}`, sanitizedInstructions);
-            return {
-                statusCode: 400,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-                    'Access-Control-Allow-Methods': 'POST,OPTIONS',
-                },
-                body: JSON.stringify({
-                    success: false,
-                    error: 'Invalid input',
-                    message: inputValidation.reason || 'Input validation failed'
-                })
-            };
+        const isAutoEnhance = requestData.autoEnhance === true;
+        // Only sanitize and validate user instructions if not auto-enhancing
+        let sanitizedInstructions = '';
+        if (!isAutoEnhance) {
+            sanitizedInstructions = (0, inputSanitizer_1.sanitizeUserInput)(requestData.userInstructions || '');
+            // 5. Validar instrucciones del usuario (only for custom prompts)
+            const inputValidation = (0, inputSanitizer_1.validateInput)(sanitizedInstructions);
+            if (!inputValidation.isValid) {
+                await (0, rateLimiter_1.logSuspiciousActivity)(userId, endpoint, `Invalid input: ${inputValidation.reason}`, sanitizedInstructions);
+                return {
+                    statusCode: 400,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+                        'Access-Control-Allow-Methods': 'POST,OPTIONS',
+                    },
+                    body: JSON.stringify({
+                        success: false,
+                        error: 'Invalid input',
+                        message: inputValidation.reason || 'Input validation failed'
+                    })
+                };
+            }
         }
         // 6. Validar texto original
         if (!requestData.originalText || requestData.originalText.trim().length === 0) {
@@ -177,6 +182,8 @@ const improveSectionWithAI = async (event) => {
                 })
             };
         }
+        // 6.5 Sanitize original text to prevent prompt injection via resume content
+        const sanitizedOriginalText = (0, inputSanitizer_1.sanitizeForPrompt)(requestData.originalText, 5000);
         // 7. Sanitize gathered context if provided
         let sanitizedGatheredContext;
         if (requestData.gatheredContext && Array.isArray(requestData.gatheredContext)) {
@@ -206,12 +213,27 @@ const improveSectionWithAI = async (event) => {
             }
         }
         // 8. Llamar AI service con inputs sanitizados
+        // Note: We force the cheap Groq model for ALL section enhancements to reduce costs
         try {
-            const improvedText = await aiService_1.aiService.improveSectionWithUserInstructions(sanitizedSectionType, requestData.originalText, sanitizedInstructions, sanitizedLanguage, sanitizedGatheredContext, {
-                userId,
-                resumeId: requestData.resumeId,
-                isPremium: user.isPremium
-            });
+            let improvedText;
+            if (isAutoEnhance) {
+                // Auto-enhance mode: use automatic improvement prompts
+                improvedText = await aiService_1.aiService.autoEnhanceSection(sanitizedSectionType, sanitizedOriginalText, sanitizedLanguage, {
+                    userId,
+                    resumeId: requestData.resumeId,
+                    isPremium: user.isPremium,
+                    forceModel: 'openai/gpt-oss-20b' // Force cheap model for cost reduction
+                });
+            }
+            else {
+                // Custom prompt mode: use user instructions
+                improvedText = await aiService_1.aiService.improveSectionWithUserInstructions(sanitizedSectionType, sanitizedOriginalText, sanitizedInstructions, sanitizedLanguage, sanitizedGatheredContext, {
+                    userId,
+                    resumeId: requestData.resumeId,
+                    isPremium: user.isPremium,
+                    forceModel: 'openai/gpt-oss-20b' // Force cheap model for cost reduction
+                });
+            }
             const response = {
                 success: true,
                 data: improvedText,

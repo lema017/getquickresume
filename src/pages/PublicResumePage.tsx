@@ -1,9 +1,11 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { Resume } from '@/types';
 import { publicResumeService } from '@/services/publicResumeService';
+import { BASE_URL, generatePersonSchema } from '@/utils/seoConfig';
 import { ContactSection } from '@/components/resume-view/ContactSection';
 import { SummarySection } from '@/components/resume-view/SummarySection';
 import { ProfileMetadataSection } from '@/components/resume-view/ProfileMetadataSection';
@@ -93,9 +95,58 @@ export function PublicResumePage() {
   }
 
   const { resumeData } = resume;
+  
+  // Generate dynamic SEO based on resume data
+  const fullName = `${resumeData.firstName || ''} ${resumeData.lastName || ''}`.trim() || 'Professional Resume';
+  const jobTitle = resumeData.profession || resumeData.targetFunction || undefined;
+  const description = resumeData.summary 
+    ? `${resumeData.summary.substring(0, 155)}...`
+    : `Professional resume of ${fullName}${jobTitle ? `, ${jobTitle}` : ''}. View complete resume details and experience.`;
+  const pageTitle = `${fullName}${jobTitle ? ` - ${jobTitle}` : ''} | Professional Resume | GetQuickResume`;
+  const pageUrl = `${BASE_URL}/share/${shareToken}`;
+  
+  // Generate Person schema
+  const personSchema = generatePersonSchema(
+    fullName,
+    jobTitle,
+    description,
+    resumeData.email,
+    pageUrl,
+    resumeData.linkedin ? [resumeData.linkedin] : undefined
+  );
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <>
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={pageUrl} />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content="profile" />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:site_name" content="GetQuickResume" />
+        <meta property="og:image" content={`${BASE_URL}/images/og-default.png`} />
+        {jobTitle && <meta property="profile:title" content={jobTitle} />}
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={`${BASE_URL}/images/og-default.png`} />
+        
+        {/* Additional SEO meta tags */}
+        <meta name="robots" content="index, follow" />
+        <meta name="keywords" content={`${fullName}, ${jobTitle || 'resume'}, professional resume, CV, curriculum vitae, ${resumeData.skillsRaw?.slice(0, 5).join(', ') || ''}`} />
+        
+        {/* Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify(personSchema)}
+        </script>
+      </Helmet>
+      <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Resume Content */}
         <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
@@ -135,7 +186,8 @@ export function PublicResumePage() {
           </a>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 

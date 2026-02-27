@@ -63,8 +63,12 @@ export function convertResumeDataToTemplateFormat(resumeData: ResumeData): Templ
     location: resumeData.country || undefined,
   };
 
-  // 4. Profile: Map summary to profile
-  const profile = resumeData.summary || undefined;
+  // 4. Profile: Combine summary and differentiators (jobDescription)
+  const summaryText = resumeData.summary?.trim() || '';
+  const differentiatorsText = resumeData.jobDescription?.trim() || '';
+  const profile = [summaryText, differentiatorsText]
+    .filter(Boolean)
+    .join('\n\n') || undefined;
   const profilePageNumber = resumeData.summaryPageNumber ?? undefined;
 
   // 5. Skills: Map skillsRaw to skills
@@ -90,6 +94,7 @@ export function convertResumeDataToTemplateFormat(resumeData: ResumeData): Templ
     company: exp.company,
     startDate: exp.startDate,
     endDate: exp.isCurrent ? 'Present' : (exp.endDate || ''),
+    // Combine achievements and responsibilities into description array
     description: [...(exp.achievements || []), ...(exp.responsibilities || [])],
     pageNumber: exp.pageNumber ?? undefined,
   }));

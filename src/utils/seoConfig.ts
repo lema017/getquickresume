@@ -27,13 +27,13 @@ export interface PageSEO {
 export const pageSEO: Record<string, PageSEO> = {
   home: {
     en: {
-      title: 'GetQuickResume - Free AI Resume Builder | Create Professional Resumes in Minutes',
-      description: 'Create a professional, ATS-optimized resume in minutes with our free AI-powered resume builder. Choose from beautiful templates, get AI-generated content suggestions, and land your dream job.',
+      title: 'Free AI Resume Builder, Templates, ATS & Translation | GetQuickResume',
+      description: 'Get more interviews with an ATS-optimized resume tailored to real job postings. Free AI resume builder with ATS checker, resume templates, and resume translation. Start free today.',
       ogType: 'website',
     },
     es: {
-      title: 'GetQuickResume - Creador de CV con IA Gratis | Crea tu Currículum Profesional',
-      description: 'Crea un currículum profesional optimizado para ATS en minutos con nuestro creador de CV con IA gratuito. Elige entre plantillas hermosas, obtén sugerencias de contenido con IA y consigue el trabajo de tus sueños.',
+      title: 'GetQuickResume - Verificador ATS y Creador de CV con IA | Adapta tu CV a Descripciones de Trabajo',
+      description: 'Consigue más entrevistas con un CV optimizado para ATS y adaptado a ofertas reales. Creador de CV con IA gratis, verificador ATS, plantillas profesionales y traducción de CV. Comienza gratis hoy.',
       ogType: 'website',
     },
   },
@@ -95,6 +95,126 @@ export const pageSEO: Record<string, PageSEO> = {
       title: 'Iniciar Sesión - GetQuickResume | Accede a tu Panel de CV',
       description: 'Inicia sesión en GetQuickResume para acceder a tu panel de currículums, editar tus CVs y gestionar tu cuenta. Crea una cuenta gratis para comenzar.',
       noIndex: true,
+    },
+  },
+  resumeForJobDescription: {
+    en: {
+      title: 'Resume Tailored to Job Description - Match What Employers Want | GetQuickResume',
+      description: 'Stop sending generic resumes. Paste a job description and tailor your resume to match keywords, requirements, and ATS filters. Free to start.',
+      ogType: 'website',
+    },
+    es: {
+      title: 'CV Adaptado a la Descripción del Puesto - Lo Que Buscan los Empleadores | GetQuickResume',
+      description: 'Deja de enviar CVs genéricos. Pega una descripción del puesto y adapta tu CV para coincidir con palabras clave, requisitos y filtros ATS. Gratis para comenzar.',
+      ogType: 'website',
+    },
+  },
+  atsResumeChecker: {
+    en: {
+      title: 'Free ATS Resume Checker — Get Your Score Now | GetQuickResume',
+      description: 'Is your resume getting past ATS filters? Check your score in 10 seconds — get keyword analysis, missing sections & actionable tips. 100% free, no sign-up.',
+      ogType: 'website',
+    },
+    es: {
+      title: 'Verificador ATS de CV Gratis — Prueba tu Currículum Contra Sistemas de Contratación | GetQuickResume',
+      description: 'Verifica si tu CV pasa los filtros ATS usados por empleadores. Obtén tu puntuación de compatibilidad ATS, palabras clave faltantes y consejos de mejora — gratis para empezar.',
+      ogType: 'website',
+    },
+  },
+  resumeTranslator: {
+    en: {
+      title: 'Free Resume Translator — Translate Your CV to 10+ Languages Instantly | GetQuickResume',
+      description: 'Translate your resume into any language in seconds — keep your professional tone, achievements, and ATS-friendly formatting intact. No sign-up required. Try it free.',
+      ogType: 'website',
+    },
+    es: {
+      title: 'Traducción de CV — Traduce tu Currículum para Trabajos Globales | GetQuickResume',
+      description: 'Traduce tu CV a más de 10 idiomas sin perder el tono profesional, logros ni la estructura compatible con ATS. Gratis para comenzar.',
+      ogType: 'website',
+    },
+  },
+  aiResumeBuilder: {
+    en: {
+      title: 'AI Resume Builder — Create a Professional Resume in Minutes | GetQuickResume',
+      description: 'Generate a recruiter-ready resume from your real experience, optimize for ATS, and tailor it for the jobs you want. Free AI resume builder.',
+      ogType: 'website',
+    },
+    es: {
+      title: 'Creador de CV con IA — Crea un Currículum Profesional en Minutos | GetQuickResume',
+      description: 'Genera un currículum listo para reclutadores desde tu experiencia real, optimiza para ATS y adáptalo a los trabajos que deseas. Creador de CV con IA gratis.',
+      ogType: 'website',
+    },
+  },
+  resumeTemplates: {
+    en: {
+      title: 'Professional Resume Templates — ATS-Friendly & Recruiter-Ready | GetQuickResume',
+      description: 'Choose from our collection of professional, ATS-friendly resume templates designed for modern job seekers. Clean layouts that hiring systems can read.',
+      ogType: 'website',
+    },
+    es: {
+      title: 'Plantillas de CV Profesionales — Compatibles con ATS | GetQuickResume',
+      description: 'Elige entre nuestra colección de plantillas de CV profesionales y compatibles con ATS, diseñadas para el mercado laboral actual.',
+      ogType: 'website',
+    },
+  },
+  premium: {
+    en: {
+      title: 'Premium Features - GetQuickResume | Unlimited Resumes & AI Enhancements',
+      description: 'Upgrade to Premium for unlimited resumes, AI-powered enhancements, priority support, and exclusive templates. Start your free trial today.',
+      ogType: 'website',
+    },
+    es: {
+      title: 'Características Premium - GetQuickResume | CVs Ilimitados y Mejoras con IA',
+      description: 'Actualiza a Premium para CVs ilimitados, mejoras con IA, soporte prioritario y plantillas exclusivas. Comienza tu prueba gratis hoy.',
+      ogType: 'website',
+    },
+  },
+  support: {
+    en: {
+      title: 'Support & Help Center - GetQuickResume | Get Assistance with Your Resume',
+      description: 'Get help with your resume, account, or any questions about GetQuickResume. Our support team is here to assist you with creating professional resumes.',
+      ogType: 'website',
+    },
+    es: {
+      title: 'Centro de Soporte y Ayuda - GetQuickResume | Obtén Asistencia con tu CV',
+      description: 'Obtén ayuda con tu currículum, cuenta o cualquier pregunta sobre GetQuickResume. Nuestro equipo de soporte está aquí para ayudarte a crear CVs profesionales.',
+      ogType: 'website',
+    },
+  },
+  privacy: {
+    en: {
+      title: 'Privacy Policy - GetQuickResume | How We Protect Your Data',
+      description: 'Read our privacy policy to understand how GetQuickResume collects, uses, and protects your personal information and resume data.',
+      ogType: 'article',
+    },
+    es: {
+      title: 'Política de Privacidad - GetQuickResume | Cómo Protegemos tus Datos',
+      description: 'Lee nuestra política de privacidad para entender cómo GetQuickResume recopila, usa y protege tu información personal y datos de currículum.',
+      ogType: 'article',
+    },
+  },
+  terms: {
+    en: {
+      title: 'Terms of Service - GetQuickResume | User Agreement & Legal Terms',
+      description: 'Read our terms of service to understand the rules and guidelines for using GetQuickResume. Learn about your rights and responsibilities as a user.',
+      ogType: 'article',
+    },
+    es: {
+      title: 'Términos de Servicio - GetQuickResume | Acuerdo de Usuario y Términos Legales',
+      description: 'Lee nuestros términos de servicio para entender las reglas y pautas para usar GetQuickResume. Conoce tus derechos y responsabilidades como usuario.',
+      ogType: 'article',
+    },
+  },
+  refund: {
+    en: {
+      title: 'Refund Policy - GetQuickResume | Return & Refund Information',
+      description: 'Review our refund policy to understand our return and refund procedures for GetQuickResume Premium subscriptions and services.',
+      ogType: 'article',
+    },
+    es: {
+      title: 'Política de Reembolso - GetQuickResume | Información de Devoluciones y Reembolsos',
+      description: 'Revisa nuestra política de reembolso para entender nuestros procedimientos de devolución y reembolso para suscripciones y servicios Premium de GetQuickResume.',
+      ogType: 'article',
     },
   },
 };
@@ -296,6 +416,29 @@ export function generateArticleSchema(
     mainEntityOfPage: {
       '@type': 'WebPage',
     },
+  };
+}
+
+/**
+ * Generate Person structured data for resume pages
+ */
+export function generatePersonSchema(
+  name: string,
+  jobTitle?: string,
+  description?: string,
+  email?: string,
+  url?: string,
+  sameAs?: string[]
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name,
+    jobTitle,
+    description,
+    email,
+    url,
+    sameAs: sameAs || [],
   };
 }
 

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { BlogLayout } from '@/components/blog/BlogLayout';
 import { ArticleCTA } from '@/components/blog/ArticleCTA';
 import { StepHeading } from '@/components/blog/StepHeading';
@@ -163,6 +164,18 @@ export function HowToMakeGoodResume() {
         <li><strong>Languages:</strong> Increasingly valuable in global companies</li>
         <li><strong>Volunteer work:</strong> Shows character and can fill employment gaps</li>
       </ul>
+
+      <p>
+        If you're targeting international roles, you can{' '}
+        <Link to="/resume-translator" className="text-blue-600 hover:underline">
+          translate your resume into another language
+        </Link>{' '}
+        using specialized tools. See our list of the{' '}
+        <Link to="/best-resume-translators" className="text-blue-600 hover:underline">
+          best resume translators in 2026
+        </Link>{' '}
+        for recommendations.
+      </p>
 
       <ArticleCTA 
         variant="inline"

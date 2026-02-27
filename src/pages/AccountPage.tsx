@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { useAuthStore } from '@/stores/authStore';
 import { useDashboardStore } from '@/stores/dashboardStore';
 import { 
@@ -261,7 +262,13 @@ export function AccountPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 md:py-12">
+    <>
+      <Helmet>
+        <title>Account - GetQuickResume</title>
+        <meta name="description" content="Manage your account settings" />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 md:py-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Profile Header */}
@@ -544,6 +551,7 @@ export function AccountPage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

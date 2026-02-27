@@ -19,7 +19,7 @@ export function LanguagesSection({ languages }: LanguagesSectionProps) {
     
     // Map non-English values to English keys
     const toEnglish: Record<string, string> = {
-      // Spanish
+      // Spanish & Portuguese (shared: nativo, básico)
       'nativo': 'native',
       'nativa': 'native',
       'avanzado': 'advanced',
@@ -45,13 +45,11 @@ export function LanguagesSection({ languages }: LanguagesSectionProps) {
       'начинающий': 'beginner',
       'базовый': 'basic',
       'начальный': 'basic',
-      // Portuguese
-      'nativo': 'native',
+      // Portuguese (unique)
       'fluente': 'fluent',
       'avançado': 'advanced',
       'intermediário': 'intermediate',
       'iniciante': 'beginner',
-      'básico': 'basic',
       // French
       'natif': 'native',
       'native': 'native',

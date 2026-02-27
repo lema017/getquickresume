@@ -40,6 +40,7 @@ export function JobApplicationsList() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const { resumes, isLoading } = useDashboardStore();
+  const isPremium = user?.isPremium || false;
 
   // Language toggle
   const toggleLanguage = () => {
@@ -92,6 +93,10 @@ export function JobApplicationsList() {
   }, []);
 
   const handleCreateNew = () => {
+    if (!isPremium) {
+      setShowPremiumModal(true);
+      return;
+    }
     if (canCreateNew) {
       navigate('/job-tailoring');
     } else {
@@ -245,15 +250,17 @@ export function JobApplicationsList() {
                 <button
                   onClick={handleCreateNew}
                   className={`px-6 py-3 rounded-xl font-medium shadow-lg transition-all flex items-center gap-2 mx-auto ${
-                    canCreateNew
+                    isPremium && canCreateNew
                       ? 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-orange-500/25'
                       : 'bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white shadow-amber-500/25'
                   }`}
                 >
                   <Sparkles className="w-5 h-5" />
-                  {canCreateNew 
-                    ? t('jobTailoring.dashboard.tailorForJob')
-                    : t('jobTailoring.dashboard.upgradeForMore')}
+                  {!isPremium 
+                    ? t('jobTailoring.dashboard.upgrade')
+                    : canCreateNew 
+                      ? t('jobTailoring.dashboard.tailorForJob')
+                      : t('jobTailoring.dashboard.upgradeForMore')}
                 </button>
               </>
             )}
@@ -279,7 +286,7 @@ export function JobApplicationsList() {
         <PremiumActionModal
           isOpen={showPremiumModal}
           onClose={() => setShowPremiumModal(false)}
-          feature="enhance"
+          feature="tailorForJob"
         />
       </>
     );
@@ -322,13 +329,17 @@ export function JobApplicationsList() {
             <button
               onClick={handleCreateNew}
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                canCreateNew
+                isPremium && canCreateNew
                   ? 'bg-orange-600 text-white hover:bg-orange-700'
                   : 'bg-gradient-to-r from-amber-500 to-yellow-600 text-white hover:from-amber-600 hover:to-yellow-700'
               }`}
             >
               <Plus className="w-4 h-4" />
-              {canCreateNew ? t('jobTailoring.dashboard.new') : t('jobTailoring.dashboard.upgrade')}
+              {!isPremium 
+                ? t('jobTailoring.dashboard.upgrade') 
+                : canCreateNew 
+                  ? t('jobTailoring.dashboard.new') 
+                  : t('jobTailoring.dashboard.upgrade')}
             </button>
           </div>
         </div>
@@ -400,7 +411,7 @@ export function JobApplicationsList() {
       <PremiumActionModal
         isOpen={showPremiumModal}
         onClose={() => setShowPremiumModal(false)}
-        feature="enhance"
+        feature="tailorForJob"
       />
 
       {/* Delete Confirmation Modal */}

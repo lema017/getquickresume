@@ -9,7 +9,7 @@ interface EnhanceTextModalProps {
   onClose: () => void;
   originalText: string;
   jobTitle?: string;
-  language?: 'es' | 'en';
+  language?: string; // Accepts any language, normalized by service for API
   onApprove: (enhancedText: string) => void;
   resumeId?: string; // Optional resume ID for AI cost tracking
 }

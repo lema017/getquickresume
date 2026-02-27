@@ -13,9 +13,6 @@ import {
   Target,
   Check,
   Crown,
-  Users,
-  Globe,
-  TrendingUp,
   Award,
   Gift,
   ChevronRight,
@@ -27,9 +24,11 @@ import {
   XCircle,
   Briefcase,
   Languages,
-  Download
+  Download,
+  Globe
 } from 'lucide-react';
 import { IconWrapper } from '@/components/IconWrapper';
+import { KeywordMatchPreview } from '@/components/KeywordMatchPreview';
 import {
   getPageSEO,
   generateOrganizationSchema,
@@ -39,7 +38,7 @@ import {
   commonFAQs,
   BASE_URL,
 } from '@/utils/seoConfig';
-import { trackLandingView, trackCtaClickStart } from '@/services/marketingAnalytics';
+import { startLandingEngagementTracking, trackLandingView, trackCtaClickStart } from '@/services/marketingAnalytics';
 
 export function LandingPage() {
   const { t, i18n } = useTranslation();
@@ -51,6 +50,11 @@ export function LandingPage() {
   // Track landing page view
   useEffect(() => {
     trackLandingView('home');
+  }, []);
+
+  // Engagement tracking (time + scroll depth)
+  useEffect(() => {
+    return startLandingEngagementTracking('home');
   }, []);
 
   // Animated feature rotation for hero
@@ -122,22 +126,6 @@ export function LandingPage() {
       </Helmet>
 
       <div className="min-h-screen">
-        {/* Urgency Banner - FREE Messaging (Sticky below header + Clickable) */}
-        <Link 
-          to="/login"
-          className="block sticky top-16 z-30 bg-gradient-to-r from-emerald-500 to-green-500 text-white py-2.5 px-4 text-center hover:from-emerald-600 hover:to-green-600 transition-all duration-300 cursor-pointer shadow-md"
-        >
-          <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 flex-wrap">
-            <span className="inline-flex items-center gap-1.5">
-              <span className="text-lg">🔥</span>
-              <span className="font-bold">{t('landing.urgencyBanner.limitedTime')}</span>
-            </span>
-            <span>{t('landing.urgencyBanner.message')}</span>
-            <span className="text-emerald-100 text-sm hidden sm:inline">— {t('landing.urgencyBanner.endsSoon')}</span>
-            <ArrowRight className="w-4 h-4 ml-1 hidden sm:inline" />
-          </div>
-        </Link>
-
         {/* Hero Section - Clean & Modern */}
         <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 py-16 lg:py-24">
           {/* Background decorations */}
@@ -150,7 +138,7 @@ export function LandingPage() {
               {/* Badge - Prominent FREE messaging (Clickable) */}
               <Link 
                 to="/login"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-emerald-500/30 to-green-500/30 border-2 border-emerald-400/50 backdrop-blur-sm mb-6 animate-pulse hover:from-emerald-500/50 hover:to-green-500/50 hover:border-emerald-400/70 transition-all duration-300 cursor-pointer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-emerald-500/30 to-green-500/30 border-2 border-emerald-400/50 backdrop-blur-sm mb-6 hover:from-emerald-500/50 hover:to-green-500/50 hover:border-emerald-400/70 transition-all duration-300 cursor-pointer"
               >
                 <Gift className="w-5 h-5 text-emerald-300" />
                 <span className="text-base font-bold text-white">
@@ -173,11 +161,14 @@ export function LandingPage() {
                 {t('landing.hero.description')}
               </p>
 
+              {/* Instant demo (retention) */}
+              <KeywordMatchPreview />
+
               {/* Spotlight Feature Carousel */}
-              <div className="mb-10">
+              <div className="mb-10 mt-10 relative isolate z-0">
                 <div className="relative inline-flex items-center justify-center">
                   {/* Glow effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-cyan-500/20 rounded-2xl blur-xl scale-110" />
+                  <div className="absolute inset-0 -z-10 pointer-events-none bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-cyan-500/20 rounded-2xl blur-xl scale-110" />
                   
                   {/* Feature Card */}
                   <div className="relative px-8 py-4 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl">
@@ -226,7 +217,7 @@ export function LandingPage() {
                     to="/login"
                     className="absolute -top-3 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:-right-3 sm:-top-2 z-10"
                   >
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-green-500 text-white text-xs font-bold shadow-lg animate-pulse hover:bg-green-600 transition-colors cursor-pointer">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-green-500 text-white text-xs font-bold shadow-lg hover:bg-green-600 transition-colors cursor-pointer">
                       FREE
                     </span>
                   </Link>
@@ -290,50 +281,6 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* Social Proof Stats Bar */}
-        <section className="py-12 bg-white border-b border-slate-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              <div className="text-center">
-                <div className="flex items-center justify-center mb-2">
-                  <Users className="w-6 h-6 text-blue-600 mr-2" />
-                  <span className="text-3xl lg:text-4xl font-bold text-slate-900">
-                    {t('landing.socialProof.stats.resumesCreated.value')}
-                  </span>
-                </div>
-                <p className="text-slate-600 text-sm">{t('landing.socialProof.stats.resumesCreated.label')}</p>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center mb-2">
-                  <Globe className="w-6 h-6 text-green-600 mr-2" />
-                  <span className="text-3xl lg:text-4xl font-bold text-slate-900">
-                    {t('landing.socialProof.stats.languages.value')}
-                  </span>
-                </div>
-                <p className="text-slate-600 text-sm">{t('landing.socialProof.stats.languages.label')}</p>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center mb-2">
-                  <TrendingUp className="w-6 h-6 text-orange-600 mr-2" />
-                  <span className="text-3xl lg:text-4xl font-bold text-slate-900">
-                    {t('landing.socialProof.stats.atsScore.value')}
-                  </span>
-                </div>
-                <p className="text-slate-600 text-sm">{t('landing.socialProof.stats.atsScore.label')}</p>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center mb-2">
-                  <Star className="w-6 h-6 text-yellow-500 mr-2" />
-                  <span className="text-3xl lg:text-4xl font-bold text-slate-900">
-                    {t('landing.socialProof.stats.satisfaction.value')}
-                  </span>
-                </div>
-                <p className="text-slate-600 text-sm">{t('landing.socialProof.stats.satisfaction.label')}</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Explore Tools Section */}
         <section className="py-10 bg-slate-50 border-b border-slate-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -380,6 +327,13 @@ export function LandingPage() {
               >
                 <FileText className="w-4 h-4 text-blue-600" />
                 <span className="text-slate-700 font-medium group-hover:text-blue-700">{t('landing.exploreTools.links.templates')}</span>
+              </Link>
+              <Link 
+                to="/best-resume-translators" 
+                className="group px-5 py-3 rounded-xl bg-white border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 flex items-center gap-2"
+              >
+                <Globe className="w-4 h-4 text-blue-600" />
+                <span className="text-slate-700 font-medium group-hover:text-blue-700">Best Resume Translators</span>
               </Link>
             </div>
           </div>
@@ -1024,6 +978,35 @@ export function LandingPage() {
                 <span>{t('landing.cta.ctaSecondary')}</span>
                 <ArrowRight className="w-5 h-5 flex-shrink-0" />
               </a>
+            </div>
+          </div>
+        </section>
+
+        {/* Recommended Resources */}
+        <section className="py-10 bg-slate-50 border-t border-slate-200">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-lg font-semibold text-slate-700 text-center mb-5">Recommended Resources</h2>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Link
+                to="/best-resume-translators"
+                className="group flex items-center gap-3 px-5 py-4 rounded-xl bg-white border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all duration-200"
+              >
+                <Globe className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                <div>
+                  <span className="text-slate-800 font-medium group-hover:text-blue-700 block">Best Resume Translators in 2026</span>
+                  <span className="text-slate-500 text-sm">Compare top translation tools for your CV</span>
+                </div>
+              </Link>
+              <Link
+                to="/resume-translator"
+                className="group flex items-center gap-3 px-5 py-4 rounded-xl bg-white border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all duration-200"
+              >
+                <Languages className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                <div>
+                  <span className="text-slate-800 font-medium group-hover:text-blue-700 block">Free Resume Translation Tool</span>
+                  <span className="text-slate-500 text-sm">Translate your resume in seconds with AI</span>
+                </div>
+              </Link>
             </div>
           </div>
         </section>

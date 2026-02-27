@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
-import { ArrowRight, ArrowLeft, Edit3, CheckCircle, Linkedin, RefreshCw } from 'lucide-react';
+import { ArrowRight, CheckCircle, Linkedin, RefreshCw } from 'lucide-react';
 import { countries } from '@/utils/countries';
 import { resumeService } from '@/services/resumeService';
 import { ResumeGenerationProgress } from './ResumeGenerationProgress';
@@ -12,14 +12,14 @@ import { PremiumActionModal } from '@/components/PremiumActionModal';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '@/stores/authStore';
 import { formatName, formatProfession } from '@/utils/textFormatting';
+import { trackResumeGeneratedAI } from '@/services/marketingAnalytics';
 
 export function Step8Preview() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { navigateToStep } = useWizardNavigation();
-  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, setGeneratedResume, setIsGenerating, generatedResume, isGenerating, currentResumeId, setCurrentResumeId, hasLoadedExistingResume, setScore, syncResumeDataToGeneratedResume } = useResumeStore();
+  const { resumeData, updateResumeData, markStepCompleted, setCurrentStep, setGeneratedResume, setIsGenerating, generatedResume, isGenerating, currentResumeId, setCurrentResumeId, hasLoadedExistingResume, setScore } = useResumeStore();
   const { user } = useAuthStore();
-  const [editingSection, setEditingSection] = useState<string | null>(null);
   const [isGeneratingCV, setIsGeneratingCV] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [backendError, setBackendError] = useState<string | null>(null);
@@ -90,9 +90,13 @@ export function Step8Preview() {
           // Guardar en el store
           setGeneratedResume(response.data!);
           
-          // Sync resumeData to generatedResume to ensure all education entries are included
-          // The AI might not include all entries, so we need to sync manually
-          setTimeout(() => syncResumeDataToGeneratedResume(), 100);
+          // Track AI resume generation success
+          trackResumeGeneratedAI(response.resumeId || currentResumeId || undefined);
+          
+          // Note: We intentionally do NOT call syncResumeDataToGeneratedResume() here.
+          // The AI generates enhanced content (merged summary, detailed experiences, etc.)
+          // and syncing would overwrite AI-generated data with raw resumeData, losing enhancements.
+          // If users want to edit, they can use the edit features in GeneratedResumeView.
           
           // Si no tenemos resumeId, guardarlo del response (esto solo pasa en la primera generación)
           if (!currentResumeId && response.resumeId) {
@@ -151,22 +155,6 @@ export function Step8Preview() {
     navigateToStep(9);
   };
 
-  const handleBack = () => {
-    navigateToStep(7);
-  };
-
-  const handleEdit = (section: string) => {
-    setEditingSection(section);
-  };
-
-  const handleSave = () => {
-    setEditingSection(null);
-  };
-
-  const handleCancel = () => {
-    setEditingSection(null);
-  };
-
   const handleRegenerateCV = async () => {
     // Check if user can use AI features - show CTA if not
     if (!canUseAIFeatures) {
@@ -195,8 +183,11 @@ export function Step8Preview() {
       // Guardar en el store
       setGeneratedResume(response.data!);
       
-      // Sync resumeData to generatedResume to ensure all education entries are included
-      setTimeout(() => syncResumeDataToGeneratedResume(), 100);
+      // Track AI resume regeneration success
+      trackResumeGeneratedAI(response.resumeId || currentResumeId || undefined);
+      
+      // Note: We intentionally do NOT call syncResumeDataToGeneratedResume() here.
+      // The AI generates enhanced content and syncing would overwrite it with raw resumeData.
       
       // Use the score from the response if available (scoring is now synchronous)
       if (response.score) {
@@ -419,46 +410,36 @@ export function Step8Preview() {
                     </div>
                   )}
                 </div>
-                <button
-                  onClick={() => handleEdit('header')}
-                  className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
-                >
-                  <Edit3 className="w-4 h-4 mr-1" />
-                  {t('wizard.steps.preview.ui.sections.header.edit')}
-                </button>
               </div>
             </div>
 
           {/* Summary Section */}
-          {resumeData.summary && (
+          {(resumeData.summary || resumeData.jobDescription) && (
             <div>
-              <div className="flex justify-between items-center mb-2">
-                <h2 className="text-lg font-semibold text-gray-900">{t('wizard.steps.preview.ui.sections.summary.title')}</h2>
-                <button
-                  onClick={() => handleEdit('summary')}
-                  className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
-                >
-                  <Edit3 className="w-4 h-4 mr-1" />
-                  {t('wizard.steps.preview.ui.sections.summary.edit')}
-                </button>
-              </div>
-              <p className="text-gray-700">{resumeData.summary}</p>
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">{t('wizard.steps.preview.ui.sections.summary.title')}</h2>
+              {resumeData.summary && (
+                <div className="mb-3">
+                  <p className="text-sm font-medium text-gray-500 mb-1">
+                    {t('wizard.steps.summary.questions.summary')}
+                  </p>
+                  <p className="text-gray-700">{resumeData.summary}</p>
+                </div>
+              )}
+              {resumeData.jobDescription && (
+                <div>
+                  <p className="text-sm font-medium text-gray-500 mb-1">
+                    {t('wizard.steps.summary.questions.achievements')}
+                  </p>
+                  <p className="text-gray-700">{resumeData.jobDescription}</p>
+                </div>
+              )}
             </div>
           )}
 
           {/* Experience Section */}
           {resumeData.experience.length > 0 && (
             <div>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">{t('wizard.steps.preview.ui.sections.experience.title')}</h2>
-                <button
-                  onClick={() => handleEdit('experience')}
-                  className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
-                >
-                  <Edit3 className="w-4 h-4 mr-1" />
-                  {t('wizard.steps.preview.ui.sections.experience.edit')}
-                </button>
-              </div>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('wizard.steps.preview.ui.sections.experience.title')}</h2>
               <div className="space-y-4">
                 {resumeData.experience.map((exp, index) => (
                   <div key={exp.id} className="border-l-4 border-blue-200 pl-4">
@@ -480,16 +461,7 @@ export function Step8Preview() {
           {/* Education Section */}
           {resumeData.education.length > 0 && (
             <div>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">{t('wizard.steps.preview.ui.sections.education.title')}</h2>
-                <button
-                  onClick={() => handleEdit('education')}
-                  className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
-                >
-                  <Edit3 className="w-4 h-4 mr-1" />
-                  {t('wizard.steps.preview.ui.sections.education.edit')}
-                </button>
-              </div>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('wizard.steps.preview.ui.sections.education.title')}</h2>
               <div className="space-y-3">
                 {resumeData.education.map((edu, index) => (
                   <div key={edu.id} className="border-l-4 border-green-200 pl-4">
@@ -505,16 +477,7 @@ export function Step8Preview() {
           {/* Skills Section */}
           {resumeData.skillsRaw.length > 0 && (
             <div>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">{t('wizard.steps.preview.ui.sections.skills.title')}</h2>
-                <button
-                  onClick={() => handleEdit('skills')}
-                  className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
-                >
-                  <Edit3 className="w-4 h-4 mr-1" />
-                  {t('wizard.steps.preview.ui.sections.skills.edit')}
-                </button>
-              </div>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('wizard.steps.preview.ui.sections.skills.title')}</h2>
               <div className="flex flex-wrap gap-2">
                 {resumeData.skillsRaw.map((skill, index) => (
                   <span key={index} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
@@ -529,11 +492,7 @@ export function Step8Preview() {
       </div>
 
       {/* Navigation */}
-      <div className="flex justify-between">
-        <button onClick={handleBack} className="btn-outline flex items-center">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          {t('common.back')}
-        </button>
+      <div className="flex justify-end">
         <button onClick={handleNext} className="btn-primary flex items-center">
           {t('common.next')}
           <ArrowRight className="w-4 h-4 ml-2" />

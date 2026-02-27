@@ -137,49 +137,7 @@ export const scoreResume = async (
       };
     }
 
-    // Premium check - on-demand scoring is premium only
-    const premiumStatus = checkPremiumStatus(user);
-    if (!premiumStatus.isPremium) {
-      return {
-        statusCode: 403,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-          'Access-Control-Allow-Methods': 'POST,OPTIONS'
-        },
-        body: JSON.stringify({
-          success: false,
-          error: premiumStatus.isExpired ? 'Premium subscription expired' : 'Premium feature',
-          message: premiumStatus.isExpired 
-            ? 'Your premium subscription has expired. Please renew to continue using this feature.'
-            : 'On-demand resume scoring is a premium feature. Please upgrade to premium to use this feature.'
-        } as ScoreResumeResponse)
-      };
-    }
-
-    // Rate limiting: 1 request/minute for free users, 5 requests/minute for premium users
-    const maxRequests = user.isPremium ? 5 : 1;
-    const rateLimitResult = await checkRateLimit(userId, 'score-resume', maxRequests, 60000);
-    if (!rateLimitResult.allowed) {
-      return {
-        statusCode: 429,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-          'Access-Control-Allow-Methods': 'POST,OPTIONS'
-        },
-        body: JSON.stringify({
-          success: false,
-          error: 'Rate limit exceeded',
-          message: `Too many scoring requests. Please wait before trying again. (Limit: ${maxRequests} per minute)`,
-          resetTime: rateLimitResult.resetTime
-        } as ScoreResumeResponse)
-      };
-    }
-
-    // Get resumeId from path parameters
+    // Get resumeId from path parameters (moved up to enable free user score check)
     const resumeId = event.pathParameters?.id;
     if (!resumeId) {
       return {
@@ -195,6 +153,82 @@ export const scoreResume = async (
           error: 'Resume ID is required'
         } as ScoreResumeResponse)
       };
+    }
+
+    // Check user premium status
+    const premiumStatus = checkPremiumStatus(user);
+    
+    // FREE USER SCORING STRATEGY:
+    // - Free users get exactly ONE score per resume (lifetime limit)
+    // - If they already have a score, return the existing score
+    // - If they don't have a score, allow them to generate one
+    if (!premiumStatus.isPremium) {
+      // Check if this resume already has a score
+      const existingScore = await getResumeScore(userId, resumeId);
+      
+      if (existingScore && existingScore.generatedAt) {
+        // Free user already has a score - return existing score
+        console.log(`Free user ${userId} already scored resume ${resumeId}, returning existing score`);
+        
+        // Filter score for free users (same logic as getScore)
+        const filteredScore = {
+          totalScore: existingScore.totalScore,
+          maxPossibleScore: existingScore.maxPossibleScore || 10.0,
+          completionPercentage: existingScore.completionPercentage || 0,
+          isOptimized: false,
+          breakdown: existingScore.breakdown,
+          checklist: {},
+          enhancementHistory: [],
+          strengths: existingScore.strengths,
+          improvements: [],
+          improvementHints: generateImprovementHints(existingScore.checklist, existingScore.totalScore),
+          generatedAt: existingScore.generatedAt,
+          scoringVersion: existingScore.scoringVersion || '1.0.0',
+        };
+        
+        return {
+          statusCode: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+            'Access-Control-Allow-Methods': 'POST,OPTIONS'
+          },
+          body: JSON.stringify({
+            success: true,
+            data: filteredScore,
+            message: 'Returning existing score (free users get one score per resume)',
+            isExistingScore: true
+          } as ScoreResumeResponse)
+        };
+      }
+      // Free user doesn't have a score yet - allow them to generate one
+      console.log(`Free user ${userId} scoring resume ${resumeId} for the first time`);
+    }
+
+    // PREMIUM USER: Apply rate limiting (they can re-score as often as rate limits allow)
+    // FREE USER (first score): No rate limit for the first and only score
+    let rateLimitResult: { allowed: boolean; remaining: number; resetTime: number } | null = null;
+    if (premiumStatus.isPremium) {
+      const maxRequests = 5; // 5 requests/minute for premium users
+      rateLimitResult = await checkRateLimit(userId, 'score-resume', maxRequests, 60000);
+      if (!rateLimitResult.allowed) {
+        return {
+          statusCode: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+            'Access-Control-Allow-Methods': 'POST,OPTIONS'
+          },
+          body: JSON.stringify({
+            success: false,
+            error: 'Rate limit exceeded',
+            message: `Too many scoring requests. Please wait before trying again. (Limit: ${maxRequests} per minute)`,
+            resetTime: rateLimitResult.resetTime
+          } as ScoreResumeResponse)
+        };
+      }
     }
 
     // Get resume and verify ownership
@@ -253,6 +287,35 @@ export const scoreResume = async (
     // Update resume with score
     await updateResumeWithScore(userId, resumeId, score);
 
+    // Build response based on user type
+    const responseBody: ScoreResumeResponse = {
+      success: true,
+      data: premiumStatus.isPremium ? score : {
+        // Filter score for free users (same logic as getScore)
+        totalScore: score.totalScore,
+        maxPossibleScore: score.maxPossibleScore || 10.0,
+        completionPercentage: score.completionPercentage || 0,
+        isOptimized: false,
+        breakdown: score.breakdown,
+        checklist: {},
+        enhancementHistory: [],
+        strengths: score.strengths,
+        improvements: [],
+        improvementHints: generateImprovementHints(score.checklist, score.totalScore),
+        generatedAt: score.generatedAt,
+        scoringVersion: score.scoringVersion || '1.0.0',
+      },
+      message: premiumStatus.isPremium 
+        ? 'Resume scored successfully' 
+        : 'Resume scored successfully (free users get one score per resume)'
+    };
+
+    // Add rate limit info for premium users
+    if (rateLimitResult) {
+      responseBody.remainingRequests = rateLimitResult.remaining;
+      responseBody.resetTime = rateLimitResult.resetTime;
+    }
+
     return {
       statusCode: 200,
       headers: {
@@ -261,13 +324,7 @@ export const scoreResume = async (
         'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
         'Access-Control-Allow-Methods': 'POST,OPTIONS'
       },
-      body: JSON.stringify({
-        success: true,
-        data: score,
-        message: 'Resume scored successfully',
-        remainingRequests: rateLimitResult.remaining,
-        resetTime: rateLimitResult.resetTime
-      } as ScoreResumeResponse)
+      body: JSON.stringify(responseBody)
     };
 
   } catch (error) {

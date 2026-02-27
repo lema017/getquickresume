@@ -473,20 +473,20 @@ export function PricingPage() {
             {t('landing.cta.description')}
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center px-4 sm:px-0">
             <Link 
               to="/login" 
-              className="px-8 py-4 bg-white text-blue-900 rounded-xl font-semibold text-lg shadow-2xl hover:shadow-white/20 transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105"
+              className="w-full sm:w-auto px-6 sm:px-8 py-4 bg-white text-blue-900 rounded-xl font-semibold text-base sm:text-lg shadow-2xl hover:shadow-white/20 transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 text-center leading-snug"
             >
-              {t('landing.cta.ctaPrimary')}
-              <ArrowRight className="w-5 h-5" />
+              <span>{t('landing.cta.ctaPrimary')}</span>
+              <ArrowRight className="w-5 h-5 flex-shrink-0" />
             </Link>
             
             <Link 
               to="/" 
-              className="px-8 py-4 border-2 border-white text-white rounded-xl font-semibold text-lg backdrop-blur-sm hover:bg-white/10 transition-all duration-300 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-6 sm:px-8 py-4 border-2 border-white text-white rounded-xl font-semibold text-base sm:text-lg backdrop-blur-sm hover:bg-white/10 transition-all duration-300 flex items-center justify-center gap-2 text-center leading-snug"
             >
-              {t('landing.cta.ctaSecondary')}
+              <span>{t('landing.cta.ctaSecondary')}</span>
             </Link>
           </div>
         </div>

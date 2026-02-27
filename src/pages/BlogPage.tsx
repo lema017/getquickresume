@@ -37,11 +37,15 @@ export function BlogPage() {
         <meta property="og:description" content={seo.description} />
         <meta property="og:url" content={`${BASE_URL}/blog`} />
         <meta property="og:site_name" content="GetQuickResume" />
+        <meta property="og:image" content={`${BASE_URL}/images/og-blog.png`} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={seo.title} />
         <meta name="twitter:description" content={seo.description} />
+        <meta name="twitter:image" content={`${BASE_URL}/images/og-blog.png`} />
         
         {/* Structured data */}
         <script type="application/ld+json">
@@ -155,10 +159,10 @@ export function BlogPage() {
                 
                 <Link
                   to="/login"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-white text-blue-600 rounded-xl font-semibold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 whitespace-nowrap"
+                  className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 sm:px-8 py-4 bg-white text-blue-600 rounded-xl font-semibold text-base sm:text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 text-center leading-snug"
                 >
-                  {lang === 'es' ? 'Comenzar Gratis' : 'Start Free - No Credit Card'}
-                  <ArrowRight className="w-5 h-5" />
+                  <span>{lang === 'es' ? 'Comenzar Gratis' : 'Start Free - No Credit Card'}</span>
+                  <ArrowRight className="w-5 h-5 flex-shrink-0" />
                 </Link>
               </div>
             </div>

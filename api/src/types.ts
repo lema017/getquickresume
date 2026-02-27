@@ -378,6 +378,7 @@ export interface ScoreResumeResponse {
   message?: string;
   remainingRequests?: number;
   resetTime?: number;
+  isExistingScore?: boolean; // True if returning cached score (for free users)
 }
 
 // Resume AI Cost tracking for analytics
@@ -444,6 +445,11 @@ export interface JobAnalysisResult {
     context?: string;
   }[];
   suggestions: string[];
+  // NEW fields for enhanced Tailoring Summary page
+  atsBreakdown: ATSBreakdown;           // Detailed ATS analysis
+  keywordAnalysis: KeywordAnalysis;     // Comprehensive keyword analysis
+  strengths: string[];                  // Resume strengths for this position
+  weaknesses: string[];                 // Resume weaknesses/gaps
 }
 
 export interface ClarificationQuestion {
@@ -462,6 +468,14 @@ export interface ClarificationAnswer {
   questionId: string;
   question: string;
   answer: string;
+}
+
+// Claimed Keyword - when user claims to have experience with a missing keyword
+export interface ClaimedKeyword {
+  keyword: string;
+  importance: 'critical' | 'important' | 'nice_to_have';
+  userContext: string;        // User's description of their experience
+  enhancedContext?: string;   // AI-enhanced version
 }
 
 export interface ResumeChange {
@@ -532,6 +546,7 @@ export interface KeywordMatchAnalysis {
   matchedList: KeywordMatch[];      // Keywords found in both
   missingCritical: KeywordItem[];   // Critical job keywords NOT in resume
   missingImportant: KeywordItem[];  // Important job keywords NOT in resume
+  missingNiceToHave?: KeywordItem[]; // Nice-to-have job keywords NOT in resume
   extraResumeKeywords: KeywordItem[]; // Resume keywords not in job (may still be valuable)
 }
 
@@ -637,7 +652,8 @@ export interface EnhanceAnswerResponse {
 export interface GenerateTailoredResumeRequest {
   resumeId: string;
   jobInfo: JobPostingInfo;
-  answers: ClarificationAnswer[];
+  answers?: ClarificationAnswer[];          // Legacy: clarification answers (optional for backward compatibility)
+  claimedKeywords?: ClaimedKeyword[];       // NEW: claimed keywords from Tailoring Summary page
   language: 'en' | 'es';
   matchScoreBefore: number;       // Initial match score from job analysis
   matchingSkills?: string[];      // Skills already identified as matching in initial analysis
@@ -678,6 +694,34 @@ export interface TailoringLimitsResponse {
   data?: TailoringLimits;
   error?: string;
   message?: string;
+}
+
+// Incorporate Keyword Types
+export interface IncorporateKeywordRequest {
+  resumeId: string;            // The tailored resume being edited
+  keyword: string;             // The keyword to incorporate
+  userContext: string;         // User's brief description of their experience
+  importance: 'critical' | 'important' | 'nice_to_have';
+  language: 'en' | 'es';
+  currentResume: GeneratedResume;  // Current state of tailored resume
+  jobInfo: JobPostingInfo;     // Job context for better incorporation
+}
+
+export interface IncorporateKeywordResponse {
+  success: boolean;
+  data?: {
+    updatedSections: {
+      skills?: GeneratedResume['skills'];
+      professionalSummary?: string;
+      experience?: GeneratedResume['experience'];
+    };
+    changesSummary: string[];  // e.g., ["Added AWS to Technical Skills", "Updated summary to mention cloud experience"]
+  };
+  error?: string;
+  code?: string;
+  message?: string;
+  remainingRequests?: number;
+  resetTime?: number;
 }
 
 
@@ -830,6 +874,7 @@ export interface ImproveSectionRequest {
   userInstructions: string;
   language: 'es' | 'en';
   resumeId?: string; // Optional resume ID for AI usage tracking
+  autoEnhance?: boolean; // If true, use automatic enhancement prompts instead of user instructions
   gatheredContext?: Array<{
     questionId: string;
     answer: string;

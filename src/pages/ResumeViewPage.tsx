@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { resumeService } from '@/services/resumeService';
@@ -34,6 +35,7 @@ import { convertResumeDataToTemplateFormat, filterDataForPage, TemplateDataForma
 import { generateResumePDFFromPages } from '@/utils/pdfGenerator';
 import { WebComponentRenderer } from '@/components/wizard/WebComponentRenderer';
 import { A4_DIMENSIONS } from '@/utils/a4Dimensions';
+import { trackResumeDownloadCompleted } from '@/services/marketingAnalytics';
 
 export function ResumeViewPage() {
   const { id } = useParams<{ id: string }>();
@@ -147,7 +149,7 @@ export function ResumeViewPage() {
 
   // Handle enhancement completion from ResumeScoreCard
   const handleEnhancementComplete = async (sectionType: string, enhancedText: string) => {
-    if (!resume || !id) return;
+    if (!resume || !id || !resume.generatedResume) return;
 
     try {
       // Update the generatedResume with enhanced text
@@ -331,6 +333,9 @@ export function ResumeViewPage() {
 
       await generateResumePDFFromPages(templateContainerRef.current, fileName);
 
+      // Track successful download completion
+      trackResumeDownloadCompleted(resume.id, template.id);
+
       toast.success(t('resumeView.download.success'));
     } catch (err) {
       console.error('Error generating PDF:', err);
@@ -395,10 +400,29 @@ export function ResumeViewPage() {
     );
   }
 
-  const { resumeData } = resume;
+  // For tailored resumes, use generatedResume content; otherwise use original resumeData
+  // generatedResume contains the tailored/optimized content with added keywords
+  const resumeData: ResumeData = resume.generatedResume 
+    ? {
+        ...convertGeneratedResumeToResumeData(resume.generatedResume),
+        // Preserve metadata fields from original resumeData
+        profession: resume.resumeData.profession,
+        targetLevel: resume.resumeData.targetLevel,
+        linkedin: resume.resumeData.linkedin,
+        jobDescription: resume.resumeData.jobDescription,
+        totalCharacters: resume.resumeData.totalCharacters,
+        language: resume.resumeData.language,
+      }
+    : resume.resumeData;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <>
+      <Helmet>
+        <title>{resume.title || 'Resume'} - GetQuickResume</title>
+        <meta name="description" content="View and edit your resume" />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back Button */}
         <button
@@ -580,7 +604,8 @@ export function ResumeViewPage() {
         />
       )}
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 

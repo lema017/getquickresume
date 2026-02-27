@@ -66,7 +66,7 @@ function detectOutputInjection(output) {
     }
     return { isValid: true };
 }
-function validateImprovedText(improved, original, sectionType) {
+function validateImprovedText(improved, original, sectionType, options) {
     if (!improved || typeof improved !== 'string') {
         return { isValid: false, reason: 'Improved text is required' };
     }
@@ -108,15 +108,19 @@ function validateImprovedText(improved, original, sectionType) {
         return { isValid: true }; // Esto está bien, el usuario puede no querer cambios
     }
     // 5. Verificar que mantiene contexto básico (palabras clave del original)
-    const originalWords = original.toLowerCase().split(/\s+/).filter(word => word.length > 3);
-    const improvedWords = improved.toLowerCase().split(/\s+/).filter(word => word.length > 3);
-    // Si el original tiene palabras clave, al menos algunas deberían estar en el mejorado
-    if (originalWords.length > 0) {
-        const commonWords = originalWords.filter(word => improvedWords.includes(word));
-        const similarity = commonWords.length / originalWords.length;
-        // Si menos del 20% de las palabras clave están presentes, podría ser muy diferente
-        if (similarity < 0.2 && originalWords.length > 5) {
-            return { isValid: false, reason: 'Improved text seems too different from original' };
+    // Skip this check when allowSubstantialRewrite is true, since the user explicitly
+    // provided context for how they want the text changed (e.g., adding metrics)
+    if (!options?.allowSubstantialRewrite) {
+        const originalWords = original.toLowerCase().split(/\s+/).filter(word => word.length > 3);
+        const improvedWords = improved.toLowerCase().split(/\s+/).filter(word => word.length > 3);
+        // Si el original tiene palabras clave, al menos algunas deberían estar en el mejorado
+        if (originalWords.length > 0) {
+            const commonWords = originalWords.filter(word => improvedWords.includes(word));
+            const similarity = commonWords.length / originalWords.length;
+            // Si menos del 20% de las palabras clave están presentes, podría ser muy diferente
+            if (similarity < 0.2 && originalWords.length > 5) {
+                return { isValid: false, reason: 'Improved text seems too different from original' };
+            }
         }
     }
     // 6. Verificar que no contiene contenido inapropiado básico

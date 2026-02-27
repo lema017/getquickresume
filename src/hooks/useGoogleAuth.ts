@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { authService } from '@/services/authService';
+import { trackUserRegistered } from '@/services/marketingAnalytics';
 import toast from 'react-hot-toast';
 
 export const useGoogleAuth = () => {
@@ -27,6 +28,16 @@ export const useGoogleAuth = () => {
       
       // Guardar datos del usuario en localStorage para validación posterior
       localStorage.setItem('user-data', JSON.stringify(response.user));
+      
+      // Track new user registration if account was just created (within 30 seconds)
+      if (response.user.createdAt) {
+        const createdAt = new Date(response.user.createdAt).getTime();
+        const now = Date.now();
+        const isNewUser = (now - createdAt) < 30000; // 30 seconds
+        if (isNewUser) {
+          trackUserRegistered('google');
+        }
+      }
       
       login(response.user);
       toast.success('¡Bienvenido! Iniciando sesión...');

@@ -1,10 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { useAuthStore } from '@/stores/authStore';
 import { Check, Crown, Loader2, ArrowDown, ChevronDown, ChevronUp } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { paypalService, PlanType } from '@/services/paypalService';
+import { 
+  getPageSEO, 
+  BASE_URL, 
+  generateSoftwareApplicationSchema 
+} from '@/utils/seoConfig';
+import { trackUpgradeViewed } from '@/services/marketingAnalytics';
 
 // PayPal SDK types
 declare global {
@@ -33,9 +40,13 @@ declare global {
 const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID || '';
 
 export function PremiumPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { user, isAuthenticated, refreshUserPremiumStatus } = useAuthStore();
+  const lang = (i18n.language === 'es' ? 'es' : 'en') as 'en' | 'es';
+  const seo = getPageSEO('premium', lang);
+  const pageUrl = `${BASE_URL}/premium`;
+  const softwareAppSchema = generateSoftwareApplicationSchema();
   const [loadingPlan, setLoadingPlan] = useState<'monthly' | 'yearly' | null>(null);
   const [showFeatures, setShowFeatures] = useState(false);
   const [paypalReady, setPaypalReady] = useState(false);
@@ -45,6 +56,11 @@ export function PremiumPage() {
   const monthlyButtonRef = useRef<HTMLDivElement>(null);
   const yearlyButtonRef = useRef<HTMLDivElement>(null);
   const paypalButtonsRendered = useRef<{ monthly: boolean; yearly: boolean }>({ monthly: false, yearly: false });
+
+  // Track upgrade page view
+  useEffect(() => {
+    trackUpgradeViewed('premium_page');
+  }, []);
 
   // Load PayPal SDK
   useEffect(() => {
@@ -255,35 +271,112 @@ export function PremiumPage() {
 
   // If user is already premium, show different view
   if (user?.isPremium) {
-  return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-        <section className="py-20 lg:py-32 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full text-white font-medium mb-8">
-              <Crown className="w-5 h-5 mr-2" />
-              {t('premium.premiumUser')}
+    return (
+      <>
+        <Helmet>
+          <title>{seo.title}</title>
+          <meta name="description" content={seo.description} />
+          <link rel="canonical" href={pageUrl} />
+          
+          {/* hreflang for internationalization */}
+          <link rel="alternate" hrefLang="en" href={pageUrl} />
+          <link rel="alternate" hrefLang="es" href={`${pageUrl}?lang=es`} />
+          <link rel="alternate" hrefLang="x-default" href={pageUrl} />
+          
+          {/* Open Graph */}
+          <meta property="og:type" content={seo.ogType || 'website'} />
+          <meta property="og:title" content={seo.title} />
+          <meta property="og:description" content={seo.description} />
+          <meta property="og:url" content={pageUrl} />
+          <meta property="og:site_name" content="GetQuickResume" />
+          <meta property="og:image" content={seo.ogImage || `${BASE_URL}/images/og-default.png`} />
+          <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
+          
+          {/* Twitter Card */}
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={seo.title} />
+          <meta name="twitter:description" content={seo.description} />
+          <meta name="twitter:image" content={seo.ogImage || `${BASE_URL}/images/og-default.png`} />
+          
+          {/* Additional SEO meta tags */}
+          <meta name="robots" content="index, follow" />
+          <meta name="keywords" content={lang === 'es' 
+            ? 'premium cv, cv ilimitado, mejoras ia, plantillas premium, soporte prioritario, creador cv premium'
+            : 'premium resume, unlimited resumes, ai enhancements, premium templates, priority support, premium resume builder'
+          } />
+          
+          {/* Structured Data */}
+          <script type="application/ld+json">
+            {JSON.stringify(softwareAppSchema)}
+          </script>
+        </Helmet>
+        <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+          <section className="py-20 lg:py-32 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+              <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full text-white font-medium mb-8">
+                <Crown className="w-5 h-5 mr-2" />
+                {t('premium.premiumUser')}
+              </div>
+              <h1 className="text-4xl lg:text-6xl font-bold text-white mb-6">
+                {t('premium.title')}
+              </h1>
+              <p className="text-xl text-blue-100 mb-8">
+                {t('premium.subtitle')}
+              </p>
+              <Link
+                to="/dashboard"
+                className="inline-flex items-center px-8 py-4 bg-white text-blue-900 rounded-xl font-semibold text-lg shadow-2xl hover:shadow-white/20 transition-all duration-300 hover:scale-105"
+              >
+                Go to Dashboard
+                <ArrowDown className="w-5 h-5 ml-2 rotate-[-90deg]" />
+              </Link>
             </div>
-            <h1 className="text-4xl lg:text-6xl font-bold text-white mb-6">
-              {t('premium.title')}
-            </h1>
-            <p className="text-xl text-blue-100 mb-8">
-              {t('premium.subtitle')}
-            </p>
-            <Link
-              to="/dashboard"
-              className="inline-flex items-center px-8 py-4 bg-white text-blue-900 rounded-xl font-semibold text-lg shadow-2xl hover:shadow-white/20 transition-all duration-300 hover:scale-105"
-            >
-              Go to Dashboard
-              <ArrowDown className="w-5 h-5 ml-2 rotate-[-90deg]" />
-            </Link>
+          </section>
         </div>
-      </section>
-          </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <>
+      <Helmet>
+        <title>{seo.title}</title>
+        <meta name="description" content={seo.description} />
+        <link rel="canonical" href={pageUrl} />
+        
+        {/* hreflang for internationalization */}
+        <link rel="alternate" hrefLang="en" href={pageUrl} />
+        <link rel="alternate" hrefLang="es" href={`${pageUrl}?lang=es`} />
+        <link rel="alternate" hrefLang="x-default" href={pageUrl} />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content={seo.ogType || 'website'} />
+        <meta property="og:title" content={seo.title} />
+        <meta property="og:description" content={seo.description} />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:site_name" content="GetQuickResume" />
+        <meta property="og:image" content={seo.ogImage || `${BASE_URL}/images/og-default.png`} />
+        <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={seo.title} />
+        <meta name="twitter:description" content={seo.description} />
+        <meta name="twitter:image" content={seo.ogImage || `${BASE_URL}/images/og-default.png`} />
+        
+        {/* Additional SEO meta tags */}
+        <meta name="robots" content="index, follow" />
+        <meta name="keywords" content={lang === 'es' 
+          ? 'premium cv, cv ilimitado, mejoras ia, plantillas premium, soporte prioritario, creador cv premium'
+          : 'premium resume, unlimited resumes, ai enhancements, premium templates, priority support, premium resume builder'
+        } />
+        
+        {/* Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify(softwareAppSchema)}
+        </script>
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Simplified Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 py-16 lg:py-24">
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -464,6 +557,7 @@ export function PremiumPage() {
           )}
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 }

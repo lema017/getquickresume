@@ -2,7 +2,8 @@ import {
   JobTitleAchievementsRequest, 
   JobTitleAchievementsResponse,
   EnhanceTextRequest,
-  EnhanceTextResponse
+  EnhanceTextResponse,
+  normalizeToApiLanguage
 } from '@/types';
 import { handleAuthError } from '@/utils/authErrorHandler';
 
@@ -66,16 +67,17 @@ class ExperienceAchievementService {
 
   async getAchievementsByJobTitle(
     jobTitle: string,
-    language: 'es' | 'en' = 'es',
+    language?: string,
     resumeId?: string
   ): Promise<{ suggestions: string[]; fromCache: boolean }> {
     if (!jobTitle || jobTitle.trim() === '') {
       throw new Error('El título del puesto es requerido para generar sugerencias de logros.');
     }
 
+    const apiLanguage = normalizeToApiLanguage(language);
     const requestBody: JobTitleAchievementsRequest & { resumeId?: string } = {
       jobTitle: jobTitle.trim(),
-      language
+      language: apiLanguage
     };
 
     if (resumeId) {
@@ -108,7 +110,7 @@ class ExperienceAchievementService {
   async enhanceAchievement(
     text: string,
     jobTitle?: string,
-    language: 'es' | 'en' = 'es',
+    language?: string,
     resumeId?: string
   ): Promise<string> {
     if (!text || text.trim() === '') {
@@ -118,7 +120,7 @@ class ExperienceAchievementService {
     const requestBody: EnhanceTextRequest & { resumeId?: string } = {
       context: 'achievement',
       text: text.trim(),
-      language,
+      language: normalizeToApiLanguage(language),
       jobTitle
     };
 
@@ -149,7 +151,7 @@ class ExperienceAchievementService {
   async enhanceProjectDescription(
     text: string,
     projectName?: string,
-    language: 'es' | 'en' = 'es',
+    language?: string,
     resumeId?: string
   ): Promise<string> {
     if (!text || text.trim() === '') {
@@ -159,7 +161,7 @@ class ExperienceAchievementService {
     const requestBody: EnhanceTextRequest & { resumeId?: string } = {
       context: 'project',
       text: text.trim(),
-      language,
+      language: normalizeToApiLanguage(language),
       jobTitle: projectName // Using jobTitle field for project name context
     };
 
@@ -190,7 +192,7 @@ class ExperienceAchievementService {
   async enhanceSummaryText(
     text: string,
     jobTitle?: string,
-    language: 'es' | 'en' = 'es',
+    language?: string,
     resumeId?: string
   ): Promise<string> {
     if (!text || text.trim() === '') {
@@ -200,7 +202,7 @@ class ExperienceAchievementService {
     const requestBody: EnhanceTextRequest & { resumeId?: string } = {
       context: 'summary',
       text: text.trim(),
-      language,
+      language: normalizeToApiLanguage(language),
       jobTitle
     };
 
@@ -231,7 +233,7 @@ class ExperienceAchievementService {
   async enhanceDifferentiatorsText(
     text: string,
     jobTitle?: string,
-    language: 'es' | 'en' = 'es',
+    language?: string,
     resumeId?: string
   ): Promise<string> {
     if (!text || text.trim() === '') {
@@ -241,7 +243,7 @@ class ExperienceAchievementService {
     const requestBody: EnhanceTextRequest & { resumeId?: string } = {
       context: 'differentiators',
       text: text.trim(),
-      language,
+      language: normalizeToApiLanguage(language),
       jobTitle
     };
 

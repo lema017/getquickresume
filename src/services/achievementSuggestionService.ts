@@ -1,4 +1,4 @@
-import { AchievementSuggestion, AchievementSuggestionResponse, Project } from '@/types';
+import { AchievementSuggestion, AchievementSuggestionResponse, Project, normalizeToApiLanguage, ApiLanguage } from '@/types';
 import { handleAuthError } from '@/utils/authErrorHandler';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/dev';
@@ -62,17 +62,18 @@ class AchievementSuggestionService {
   async getAchievementSuggestions(
     profession: string,
     projects: Project[],
-    language: 'es' | 'en' = 'es',
+    language?: string,
     resumeId?: string
   ): Promise<AchievementSuggestion[]> {
     if (!profession || profession.trim() === '') {
       throw new Error('La profesión es requerida para generar sugerencias de logros.');
     }
 
+    const apiLanguage = normalizeToApiLanguage(language);
     const requestBody: {
       profession: string;
       projects: Array<{ name: string; description: string; technologies: string[] }>;
-      language: 'es' | 'en';
+      language: ApiLanguage;
       resumeId?: string;
     } = {
       profession: profession.trim(),
@@ -81,7 +82,7 @@ class AchievementSuggestionService {
         description: project.description,
         technologies: project.technologies
       })),
-      language
+      language: apiLanguage
     };
 
     if (resumeId) {

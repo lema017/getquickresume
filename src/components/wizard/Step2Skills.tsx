@@ -14,7 +14,7 @@ import { suggestionService } from '@/services/suggestionService';
 export function Step2Skills() {
   const { t } = useTranslation();
   const { navigateToStep } = useWizardNavigation();
-  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep, calculateCharacters, currentResumeId } = useResumeStore();
+  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep, currentResumeId } = useResumeStore();
   const { user } = useAuthStore();
   const [errors, setErrors] = useState<FieldValidation>({});
   const [skills, setSkills] = useState(resumeData.skillsRaw || []);
@@ -43,16 +43,7 @@ export function Step2Skills() {
       setSkills(newSkills);
       setNewSkill('');
       
-      // Actualizar el contador de caracteres
-      const currentCharacters = calculateCharacters();
-      const skillCharacters = skillToAdd.length;
-      const newTotalCharacters = currentCharacters + skillCharacters;
-      
-      // Actualizar el store con el nuevo total de caracteres
-      updateResumeData({ 
-        skillsRaw: newSkills,
-        totalCharacters: newTotalCharacters 
-      });
+      updateResumeData({ skillsRaw: newSkills });
       
       // Limpiar error de habilidades si existe
       if (errors.skills) {
@@ -68,17 +59,7 @@ export function Step2Skills() {
   const removeSkill = (skill: string) => {
     const newSkills = skills.filter(s => s !== skill);
     setSkills(newSkills);
-    
-    // Actualizar el contador de caracteres (restar los caracteres del skill eliminado)
-    const currentCharacters = calculateCharacters();
-    const skillCharacters = skill.length;
-    const newTotalCharacters = currentCharacters - skillCharacters;
-    
-    // Actualizar el store con el nuevo total de caracteres
-    updateResumeData({ 
-      skillsRaw: newSkills,
-      totalCharacters: Math.max(0, newTotalCharacters) // Asegurar que no sea negativo
-    });
+    updateResumeData({ skillsRaw: newSkills });
   };
 
   // Load suggestions combining skills and tools from API
@@ -129,16 +110,7 @@ export function Step2Skills() {
       const newSkills = [...skills, skill];
       setSkills(newSkills);
       
-      // Actualizar el contador de caracteres
-      const currentCharacters = calculateCharacters();
-      const skillCharacters = skill.length;
-      const newTotalCharacters = currentCharacters + skillCharacters;
-      
-      // Actualizar el store con el nuevo total de caracteres
-      updateResumeData({ 
-        skillsRaw: newSkills,
-        totalCharacters: newTotalCharacters 
-      });
+      updateResumeData({ skillsRaw: newSkills });
       
       // Limpiar error de habilidades si existe
       if (errors.skills) {
@@ -162,16 +134,7 @@ export function Step2Skills() {
     const newSkills = [...skills, ...skillsToAdd];
     setSkills(newSkills);
     
-    // Actualizar el contador de caracteres (sumar todos los caracteres de las nuevas habilidades)
-    const currentCharacters = calculateCharacters();
-    const totalNewCharacters = skillsToAdd.reduce((sum, skill) => sum + skill.length, 0);
-    const newTotalCharacters = currentCharacters + totalNewCharacters;
-    
-    // Actualizar el store con el nuevo total de caracteres
-    updateResumeData({ 
-      skillsRaw: newSkills,
-      totalCharacters: newTotalCharacters 
-    });
+    updateResumeData({ skillsRaw: newSkills });
     
     // Limpiar error de habilidades si existe
     if (errors.skills) {

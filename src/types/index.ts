@@ -43,6 +43,17 @@ export interface SkillPageRange {
   pageNumber: number;
 }
 
+// Language type for resume data (all supported UI languages)
+export type ResumeLanguage = 'en' | 'es' | 'zh' | 'hi' | 'fr' | 'ar' | 'bn' | 'pt' | 'ru' | 'ja';
+
+// API language type (languages supported by backend AI services)
+export type ApiLanguage = 'en' | 'es';
+
+// Helper to normalize any language to API-supported language
+export function normalizeToApiLanguage(lang?: string): ApiLanguage {
+  return lang === 'es' ? 'es' : 'en';
+}
+
 // Resume Data Types
 export interface ResumeData {
   // Step 1: Professional Profile
@@ -50,7 +61,7 @@ export interface ResumeData {
   lastName: string;
   country: string;
   linkedin: string;
-  language: 'en' | 'es' | 'zh' | 'hi' | 'fr' | 'ar' | 'bn' | 'pt' | 'ru' | 'ja';
+  language: ResumeLanguage;
   targetLevel: 'entry' | 'mid' | 'senior' | 'executive';
   profession: string;
   tone: 'professional' | 'creative' | 'technical' | 'friendly';
@@ -218,10 +229,6 @@ export interface TranslationResult {
 export interface HUDData {
   currentStep: number;
   totalSteps: number;
-  charactersUsed: number;
-  maxCharacters: number;
-  progressPercentage: number;
-  isNearLimit: boolean;
 }
 
 // API Response Types
@@ -303,6 +310,10 @@ export interface EnhancedExperience {
   achievements: string[];
   skills: string[];
   impact: string[];
+  // Raw date fields for editing (matching Step3 format)
+  startDate?: string;  // "YYYY-MM" format
+  endDate?: string;    // "YYYY-MM" format
+  isCurrent?: boolean;
 }
 
 export interface EnhancedEducation {
@@ -313,6 +324,8 @@ export interface EnhancedEducation {
   gpa?: string;
   relevantCoursework?: string[];
   honors?: string[];
+  // Raw date field for editing (matching Step4 format)
+  graduationYear?: string;  // Just the year
 }
 
 export interface EnhancedProject {
@@ -323,6 +336,10 @@ export interface EnhancedProject {
   url?: string;
   achievements: string[];
   impact: string;
+  // Raw date fields for editing (matching Step5 format)
+  startDate?: string;  // "YYYY-MM" format
+  endDate?: string;    // "YYYY-MM" format
+  isOngoing?: boolean;
 }
 
 export interface EnhancedCertification {
@@ -600,6 +617,7 @@ export interface ImproveSectionRequest {
   userInstructions: string;
   language: 'es' | 'en';
   resumeId?: string; // Optional resume ID for AI usage tracking
+  autoEnhance?: boolean; // If true, use automatic enhancement prompts instead of user instructions
 }
 
 export interface ImproveSectionResponse {

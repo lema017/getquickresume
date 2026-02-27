@@ -314,6 +314,7 @@ export interface ScoreResumeResponse {
     message?: string;
     remainingRequests?: number;
     resetTime?: number;
+    isExistingScore?: boolean;
 }
 export interface ResumeAICost {
     totalInputTokens: number;
@@ -369,6 +370,10 @@ export interface JobAnalysisResult {
         context?: string;
     }[];
     suggestions: string[];
+    atsBreakdown: ATSBreakdown;
+    keywordAnalysis: KeywordAnalysis;
+    strengths: string[];
+    weaknesses: string[];
 }
 export interface ClarificationQuestion {
     id: string;
@@ -385,6 +390,12 @@ export interface ClarificationAnswer {
     questionId: string;
     question: string;
     answer: string;
+}
+export interface ClaimedKeyword {
+    keyword: string;
+    importance: 'critical' | 'important' | 'nice_to_have';
+    userContext: string;
+    enhancedContext?: string;
 }
 export interface ResumeChange {
     section: 'summary' | 'experience' | 'skills' | 'education' | 'projects' | 'achievements';
@@ -444,6 +455,7 @@ export interface KeywordMatchAnalysis {
     matchedList: KeywordMatch[];
     missingCritical: KeywordItem[];
     missingImportant: KeywordItem[];
+    missingNiceToHave?: KeywordItem[];
     extraResumeKeywords: KeywordItem[];
 }
 export interface KeywordAnalysis {
@@ -535,9 +547,11 @@ export interface EnhanceAnswerResponse {
 export interface GenerateTailoredResumeRequest {
     resumeId: string;
     jobInfo: JobPostingInfo;
-    answers: ClarificationAnswer[];
+    answers?: ClarificationAnswer[];
+    claimedKeywords?: ClaimedKeyword[];
     language: 'en' | 'es';
     matchScoreBefore: number;
+    matchingSkills?: string[];
 }
 export interface GenerateTailoredResumeResponse {
     success: boolean;
@@ -571,6 +585,31 @@ export interface TailoringLimitsResponse {
     data?: TailoringLimits;
     error?: string;
     message?: string;
+}
+export interface IncorporateKeywordRequest {
+    resumeId: string;
+    keyword: string;
+    userContext: string;
+    importance: 'critical' | 'important' | 'nice_to_have';
+    language: 'en' | 'es';
+    currentResume: GeneratedResume;
+    jobInfo: JobPostingInfo;
+}
+export interface IncorporateKeywordResponse {
+    success: boolean;
+    data?: {
+        updatedSections: {
+            skills?: GeneratedResume['skills'];
+            professionalSummary?: string;
+            experience?: GeneratedResume['experience'];
+        };
+        changesSummary: string[];
+    };
+    error?: string;
+    code?: string;
+    message?: string;
+    remainingRequests?: number;
+    resetTime?: number;
 }
 export interface GenerateResumeResponse {
     success: boolean;
@@ -699,6 +738,7 @@ export interface ImproveSectionRequest {
     userInstructions: string;
     language: 'es' | 'en';
     resumeId?: string;
+    autoEnhance?: boolean;
     gatheredContext?: Array<{
         questionId: string;
         answer: string;

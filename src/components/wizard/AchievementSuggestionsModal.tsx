@@ -8,7 +8,7 @@ interface AchievementSuggestionsModalProps {
   isOpen: boolean;
   onClose: () => void;
   jobTitle: string;
-  language?: 'es' | 'en';
+  language?: string; // Accepts any language, normalized by service for API
   onSelect: (suggestions: string[]) => void;
   resumeId?: string; // Optional resume ID for AI cost tracking
 }

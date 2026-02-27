@@ -43,8 +43,9 @@ export function BlogLayout({
   });
 
   const canonicalUrl = typeof window !== 'undefined' ? window.location.href.split('?')[0] : '';
-  const slug = canonicalUrl.split('/').pop() || '';
-  const absoluteImageUrl = imageUrl ? `${BASE_URL}${imageUrl}` : undefined;
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+  const hreflangBase = `${BASE_URL}${pathname}`;
+  const absoluteImageUrl = imageUrl ? `${BASE_URL}${imageUrl}` : `${BASE_URL}/images/og-default.png`;
   
   // Generate breadcrumb schema
   const breadcrumbSchema = generateBreadcrumbSchema([
@@ -80,9 +81,9 @@ export function BlogLayout({
         <link rel="canonical" href={canonicalUrl} />
         
         {/* hreflang */}
-        <link rel="alternate" hrefLang="en" href={`${BASE_URL}/blog/${slug}`} />
-        <link rel="alternate" hrefLang="es" href={`${BASE_URL}/blog/${slug}?lang=es`} />
-        <link rel="alternate" hrefLang="x-default" href={`${BASE_URL}/blog/${slug}`} />
+        <link rel="alternate" hrefLang="en" href={hreflangBase} />
+        <link rel="alternate" hrefLang="es" href={`${hreflangBase}?lang=es`} />
+        <link rel="alternate" hrefLang="x-default" href={hreflangBase} />
         
         {/* Open Graph */}
         <meta property="og:type" content="article" />
@@ -91,7 +92,9 @@ export function BlogLayout({
         <meta property="og:url" content={canonicalUrl} />
         <meta property="og:site_name" content="GetQuickResume" />
         <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
-        {absoluteImageUrl && <meta property="og:image" content={absoluteImageUrl} />}
+        <meta property="og:image" content={absoluteImageUrl} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         <meta property="article:published_time" content={publishDate} />
         <meta property="article:author" content="GetQuickResume Team" />
         <meta property="article:section" content={category} />
@@ -100,7 +103,7 @@ export function BlogLayout({
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={title} />
         <meta name="twitter:description" content={excerpt} />
-        {absoluteImageUrl && <meta name="twitter:image" content={absoluteImageUrl} />}
+        <meta name="twitter:image" content={absoluteImageUrl} />
         
         {/* Breadcrumb structured data */}
         <script type="application/ld+json">
@@ -139,7 +142,7 @@ export function BlogLayout({
         {/* Hero Image */}
         <div className="w-full bg-gradient-to-br from-gray-100 to-gray-200">
           <div className="max-w-5xl mx-auto">
-            <div className="aspect-[21/9] relative">
+            <div className="aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] relative">
               {imageUrl ? (
                 <img
                   src={imageUrl}

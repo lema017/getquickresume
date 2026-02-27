@@ -1,11 +1,59 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { HelpCircle, MessageSquare, AlertCircle, Lightbulb, Send, ArrowLeft, Clock, CheckCircle, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { supportService, SupportTicket, SupportTicketType } from '@/services/supportService';
+import { 
+  getPageSEO, 
+  BASE_URL, 
+  generateFAQSchema 
+} from '@/utils/seoConfig';
 
 export function SupportPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = (i18n.language === 'es' ? 'es' : 'en') as 'en' | 'es';
+  const seo = getPageSEO('support', lang);
+  const pageUrl = `${BASE_URL}/support`;
+  
+  // Common support FAQs
+  const supportFAQs = lang === 'es' ? [
+    {
+      question: '¿Cómo puedo crear un ticket de soporte?',
+      answer: 'Puedes crear un ticket de soporte completando el formulario en la página de soporte. Selecciona el tipo de consulta, proporciona un asunto y mensaje detallado, y nuestro equipo te responderá lo antes posible.',
+    },
+    {
+      question: '¿Cuánto tiempo tarda en responder el soporte?',
+      answer: 'Nuestro equipo de soporte generalmente responde dentro de 24-48 horas. Los usuarios Premium reciben prioridad en las respuestas.',
+    },
+    {
+      question: '¿Puedo ver el estado de mis tickets?',
+      answer: 'Sí, puedes ver todos tus tickets de soporte y su estado (abierto, en progreso, resuelto, cerrado) en la página de soporte.',
+    },
+    {
+      question: '¿Qué tipos de consultas puedo enviar?',
+      answer: 'Puedes enviar consultas de ayuda, quejas, comentarios o sugerencias de características. Selecciona el tipo apropiado al crear tu ticket.',
+    },
+  ] : [
+    {
+      question: 'How can I create a support ticket?',
+      answer: 'You can create a support ticket by filling out the form on the support page. Select the type of inquiry, provide a subject and detailed message, and our team will respond as soon as possible.',
+    },
+    {
+      question: 'How long does support take to respond?',
+      answer: 'Our support team typically responds within 24-48 hours. Premium users receive priority in responses.',
+    },
+    {
+      question: 'Can I view the status of my tickets?',
+      answer: 'Yes, you can view all your support tickets and their status (open, in-progress, resolved, closed) on the support page.',
+    },
+    {
+      question: 'What types of inquiries can I send?',
+      answer: 'You can send help inquiries, complaints, comments, or feature suggestions. Select the appropriate type when creating your ticket.',
+    },
+  ];
+  
+  const faqSchema = generateFAQSchema(supportFAQs);
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -135,7 +183,14 @@ export function SupportPage() {
 
   if (selectedTicket) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <>
+        <Helmet>
+          <title>{seo.title}</title>
+          <meta name="description" content={seo.description} />
+          <link rel="canonical" href={pageUrl} />
+          <meta name="robots" content="index, follow" />
+        </Helmet>
+        <div className="min-h-screen bg-gray-50 py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <button
             onClick={() => setSelectedTicket(null)}
@@ -192,11 +247,50 @@ export function SupportPage() {
           </div>
         </div>
       </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <>
+      <Helmet>
+        <title>{seo.title}</title>
+        <meta name="description" content={seo.description} />
+        <link rel="canonical" href={pageUrl} />
+        
+        {/* hreflang for internationalization */}
+        <link rel="alternate" hrefLang="en" href={pageUrl} />
+        <link rel="alternate" hrefLang="es" href={`${pageUrl}?lang=es`} />
+        <link rel="alternate" hrefLang="x-default" href={pageUrl} />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content={seo.ogType || 'website'} />
+        <meta property="og:title" content={seo.title} />
+        <meta property="og:description" content={seo.description} />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:site_name" content="GetQuickResume" />
+        <meta property="og:image" content={seo.ogImage || `${BASE_URL}/images/og-default.png`} />
+        <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={seo.title} />
+        <meta name="twitter:description" content={seo.description} />
+        <meta name="twitter:image" content={seo.ogImage || `${BASE_URL}/images/og-default.png`} />
+        
+        {/* Additional SEO meta tags */}
+        <meta name="robots" content="index, follow" />
+        <meta name="keywords" content={lang === 'es' 
+          ? 'soporte, ayuda, ticket de soporte, asistencia, contacto, ayuda cv'
+          : 'support, help, support ticket, assistance, contact, resume help'
+        } />
+        
+        {/* Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify(faqSchema)}
+        </script>
+      </Helmet>
+      <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -329,7 +423,8 @@ export function SupportPage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 

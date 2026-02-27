@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { User, AuthState } from '@/types';
 import { authService } from '@/services/authService';
+import { trackUpgradePurchased } from '@/services/marketingAnalytics';
 
 interface AuthStore extends AuthState {
   // Actions
@@ -136,6 +137,10 @@ export const useAuthStore = create<AuthStore>()(
         if (!token) return;
 
         try {
+          // Get current user state before refresh
+          const previousUser = get().user;
+          const wasPremium = previousUser?.isPremium || false;
+          
           // Fetch fresh user data from backend (not from stale JWT)
           const user = await authService.getCurrentUser(token);
           if (user) {
@@ -154,6 +159,13 @@ export const useAuthStore = create<AuthStore>()(
               isPremium: user.isPremium,
               subscriptionExpiration: user.subscriptionExpiration
             });
+            
+            // Track premium activation if user just became premium
+            if (!wasPremium && user.isPremium) {
+              console.log('[AuthStore] User became premium - tracking upgrade');
+              trackUpgradePurchased('premium');
+            }
+            
             set({ user, isAuthenticated: true });
           } else {
             // If getCurrentUser returns null, token might be invalid

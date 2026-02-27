@@ -18,10 +18,13 @@ Allow: /pricing
 Allow: /about
 Allow: /contact
 Allow: /legal/
+Allow: /ats-resume-checker
+Allow: /resume-for-job-description
+Allow: /ai-resume-builder
+Allow: /resume-translator
+Allow: /resume-templates
+Allow: /best-resume-translators
 
 # Sitemap location
 Sitemap: https://getquickresume.com/sitemap.xml
-
-# Crawl-delay for politeness (optional)
-Crawl-delay: 1
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Sparkles, FileText, Globe, AlertTriangle, X, Edit3, Loader2 } from 'lucide-react';
 import { useCoverLetterStore } from '@/stores/coverLetterStore';
 import { useAuthStore } from '@/stores/authStore';
@@ -183,7 +184,13 @@ export function CoverLetterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <>
+      <Helmet>
+        <title>Cover Letter - GetQuickResume</title>
+        <meta name="description" content="Create professional cover letters" />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -329,7 +336,8 @@ export function CoverLetterPage() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
 

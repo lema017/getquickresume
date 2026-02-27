@@ -1,3 +1,14 @@
+/**
+ * @deprecated This component has been replaced by KeywordIntelligence.tsx
+ * which provides a unified, consolidated view of keyword analysis in the Review page.
+ * 
+ * The ATS breakdown information is now integrated into the KeywordIntelligence
+ * component's before/after comparison and category breakdown sections.
+ * 
+ * This file is kept for reference. It can be safely deleted after confirming
+ * the new implementation works correctly.
+ */
+
 import { useTranslation } from 'react-i18next';
 import { 
   CheckCircle, 

@@ -20,7 +20,7 @@ const featureConfigs = {
       iconBg: 'bg-green-100',
       button: 'from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700',
     },
-    languages: ['🇺🇸 English', '🇪🇸 Spanish', '🇫🇷 French', '🇩🇪 German', '🇵🇹 Portuguese', '🇮🇹 Italian', '🇨🇳 Chinese', '🇯🇵 Japanese', '🇰🇷 Korean', '🇸🇦 Arabic', '🇳🇱 Dutch', '🇵🇱 Polish'],
+    languages: ['🇺🇸 English', '🇪🇸 Spanish', '🇫🇷 French', '🇩🇪 German', '🇵🇹 Portuguese', '🇮🇹 Italian', '🇨🇳 Chinese', '🇯🇵 Japanese', '🇰🇷 Korean', '🇸🇦 Arabic', '🇮🇳 Hindi', '50+ more'],
   },
   tailorForJob: {
     icon: Target,

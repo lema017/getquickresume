@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useJobTailoringStore } from '@/stores/jobTailoringStore';
 import { JobPostingInfo } from '@/types/jobTailoring';
+import { RateLimitModal } from '@/components/RateLimitModal';
 
 interface JobAnalysisProps {
   onNext: () => void;
@@ -38,6 +39,8 @@ export function JobAnalysis({ onNext, onBack }: JobAnalysisProps) {
 
   const [isEditing, setIsEditing] = useState(false);
   const [localJobInfo, setLocalJobInfo] = useState<JobPostingInfo | null>(null);
+  const [isRateLimited, setIsRateLimited] = useState(false);
+  const [rateLimitError, setRateLimitError] = useState<string | null>(null);
 
   useEffect(() => {
     if (editedJobInfo) {
@@ -60,8 +63,21 @@ export function JobAnalysis({ onNext, onBack }: JobAnalysisProps) {
   };
 
   const handleProceed = async () => {
-    await generateQuestions();
-    onNext();
+    setIsRateLimited(false);
+    setRateLimitError(null);
+    
+    try {
+      await generateQuestions();
+      onNext();
+    } catch (err: any) {
+      if (err?.code === 'RATE_LIMIT' || err?.statusCode === 429) {
+        setIsRateLimited(true);
+        setRateLimitError(err.message);
+      } else {
+        // For other errors, log and allow the user to try again
+        console.error('Error generating questions:', err);
+      }
+    }
   };
 
   if (isAnalyzing) {
@@ -334,9 +350,9 @@ export function JobAnalysis({ onNext, onBack }: JobAnalysisProps) {
         </button>
         <button
           onClick={handleProceed}
-          disabled={isGeneratingQuestions}
+          disabled={isGeneratingQuestions || isRateLimited}
           className={`flex items-center gap-2 px-8 py-3 font-medium rounded-xl shadow-md transition-all ${
-            isGeneratingQuestions
+            isGeneratingQuestions || isRateLimited
               ? 'bg-gray-400 cursor-not-allowed'
               : 'bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 hover:shadow-lg'
           }`}
@@ -351,6 +367,18 @@ export function JobAnalysis({ onNext, onBack }: JobAnalysisProps) {
           }
         </button>
       </div>
+
+      {/* Rate Limit Modal */}
+      <RateLimitModal
+        isOpen={isRateLimited}
+        message={rateLimitError || undefined}
+        onRetry={handleProceed}
+        onClose={() => {
+          setIsRateLimited(false);
+          setRateLimitError(null);
+        }}
+        countdownSeconds={60}
+      />
     </div>
   );
 }

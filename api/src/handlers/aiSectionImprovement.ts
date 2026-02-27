@@ -2,7 +2,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { aiService } from '../services/aiService';
 import { ImproveSectionRequest, ImproveSectionResponse } from '../types';
 import { checkRateLimit, logSuspiciousActivity, refundRateLimit } from '../middleware/rateLimiter';
-import { sanitizeUserInput, validateInput, sanitizeSectionType, sanitizeLanguage } from '../utils/inputSanitizer';
+import { sanitizeUserInput, validateInput, sanitizeSectionType, sanitizeLanguage, sanitizeForPrompt } from '../utils/inputSanitizer';
 import { getUserById } from '../services/dynamodb';
 import { verifyResumeOwnership } from '../services/resumeService';
 
@@ -149,26 +149,32 @@ export const improveSectionWithAI = async (
     }
 
     const sanitizedLanguage = sanitizeLanguage(requestData.language);
-    const sanitizedInstructions = sanitizeUserInput(requestData.userInstructions);
+    const isAutoEnhance = requestData.autoEnhance === true;
+    
+    // Only sanitize and validate user instructions if not auto-enhancing
+    let sanitizedInstructions = '';
+    if (!isAutoEnhance) {
+      sanitizedInstructions = sanitizeUserInput(requestData.userInstructions || '');
 
-    // 5. Validar instrucciones del usuario
-    const inputValidation = validateInput(sanitizedInstructions);
-    if (!inputValidation.isValid) {
-      await logSuspiciousActivity(userId, endpoint, `Invalid input: ${inputValidation.reason}`, sanitizedInstructions);
-      return {
-        statusCode: 400,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-          'Access-Control-Allow-Methods': 'POST,OPTIONS',
-        },
-        body: JSON.stringify({
-          success: false,
-          error: 'Invalid input',
-          message: inputValidation.reason || 'Input validation failed'
-        } as ImproveSectionResponse)
-      };
+      // 5. Validar instrucciones del usuario (only for custom prompts)
+      const inputValidation = validateInput(sanitizedInstructions);
+      if (!inputValidation.isValid) {
+        await logSuspiciousActivity(userId, endpoint, `Invalid input: ${inputValidation.reason}`, sanitizedInstructions);
+        return {
+          statusCode: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+            'Access-Control-Allow-Methods': 'POST,OPTIONS',
+          },
+          body: JSON.stringify({
+            success: false,
+            error: 'Invalid input',
+            message: inputValidation.reason || 'Input validation failed'
+          } as ImproveSectionResponse)
+        };
+      }
     }
 
     // 6. Validar texto original
@@ -188,6 +194,9 @@ export const improveSectionWithAI = async (
         } as ImproveSectionResponse)
       };
     }
+
+    // 6.5 Sanitize original text to prevent prompt injection via resume content
+    const sanitizedOriginalText = sanitizeForPrompt(requestData.originalText, 5000);
 
     // 7. Sanitize gathered context if provided
     let sanitizedGatheredContext: Array<{ questionId: string; answer: string }> | undefined;
@@ -220,19 +229,39 @@ export const improveSectionWithAI = async (
     }
 
     // 8. Llamar AI service con inputs sanitizados
+    // Note: We force the cheap Groq model for ALL section enhancements to reduce costs
     try {
-      const improvedText = await aiService.improveSectionWithUserInstructions(
-        sanitizedSectionType as 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language',
-        requestData.originalText,
-        sanitizedInstructions,
-        sanitizedLanguage,
-        sanitizedGatheredContext,
-        {
-          userId,
-          resumeId: requestData.resumeId,
-          isPremium: user.isPremium
-        }
-      );
+      let improvedText: string;
+      
+      if (isAutoEnhance) {
+        // Auto-enhance mode: use automatic improvement prompts
+        improvedText = await aiService.autoEnhanceSection(
+          sanitizedSectionType as 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language',
+          sanitizedOriginalText,
+          sanitizedLanguage,
+          {
+            userId,
+            resumeId: requestData.resumeId,
+            isPremium: user.isPremium,
+            forceModel: 'openai/gpt-oss-20b' // Force cheap model for cost reduction
+          }
+        );
+      } else {
+        // Custom prompt mode: use user instructions
+        improvedText = await aiService.improveSectionWithUserInstructions(
+          sanitizedSectionType as 'summary' | 'experience' | 'education' | 'certification' | 'project' | 'achievement' | 'language',
+          sanitizedOriginalText,
+          sanitizedInstructions,
+          sanitizedLanguage,
+          sanitizedGatheredContext,
+          {
+            userId,
+            resumeId: requestData.resumeId,
+            isPremium: user.isPremium,
+            forceModel: 'openai/gpt-oss-20b' // Force cheap model for cost reduction
+          }
+        );
+      }
 
       const response: ImproveSectionResponse = {
         success: true,

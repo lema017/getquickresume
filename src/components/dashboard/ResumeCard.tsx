@@ -235,7 +235,7 @@ export const ResumeCard = memo(function ResumeCard({
                   )}
                   {onTailorForJob && (
                     <button
-                      onClick={() => onTailorForJob(resume)}
+                      onClick={() => handleAIToolClick('tailorForJob', () => onTailorForJob(resume))}
                       className="w-full px-4 py-2 text-left text-sm text-orange-600 hover:bg-orange-50 flex items-center gap-2"
                     >
                       <Target className="w-4 h-4" />

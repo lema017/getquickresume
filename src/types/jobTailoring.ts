@@ -1,4 +1,5 @@
 // Job Tailoring Types
+import { GeneratedResume } from '@/types';
 
 // URL Validation Types
 export interface UrlValidationResult {
@@ -45,7 +46,7 @@ export interface JobPostingInfo {
   employmentType?: string;
 }
 
-// Job Analysis Result
+// Job Analysis Result (Enhanced with ATS breakdown and keyword analysis)
 export interface JobAnalysisResult {
   jobInfo: JobPostingInfo;
   matchScore: number;        // 0-100 percentage
@@ -57,6 +58,19 @@ export interface JobAnalysisResult {
     context?: string;
   }[];
   suggestions: string[];
+  // NEW fields for Tailoring Summary page
+  atsBreakdown: ATSBreakdown;           // Detailed ATS analysis
+  keywordAnalysis: KeywordAnalysis;     // Comprehensive keyword analysis
+  strengths: string[];                  // Resume strengths for this position
+  weaknesses: string[];                 // Resume weaknesses/gaps
+}
+
+// Claimed Keyword - when user claims to have experience with a missing keyword
+export interface ClaimedKeyword {
+  keyword: string;
+  importance: 'critical' | 'important' | 'nice_to_have';
+  userContext: string;        // User's description of their experience
+  enhancedContext?: string;   // AI-enhanced version
 }
 
 // Clarification Question Types
@@ -147,6 +161,7 @@ export interface KeywordMatchAnalysis {
   matchedList: KeywordMatch[];      // Keywords found in both
   missingCritical: KeywordItem[];   // Critical job keywords NOT in resume
   missingImportant: KeywordItem[];  // Important job keywords NOT in resume
+  missingNiceToHave?: KeywordItem[]; // Nice-to-have job keywords NOT in resume
   extraResumeKeywords: KeywordItem[]; // Resume keywords not in job (may still be valuable)
 }
 
@@ -192,8 +207,9 @@ export interface TailoredResumeMetadata {
   createdAt: string;
 }
 
-// Wizard State Types
-export type TailoringWizardStep = 1 | 2 | 3 | 4 | 5;
+// Wizard State Types - Now 4 steps instead of 5
+// Flow: 1. Job Input -> 2. Tailoring Summary (NEW) -> 3. Review Changes -> 4. Save
+export type TailoringWizardStep = 1 | 2 | 3 | 4;
 
 export interface TailoringWizardState {
   currentStep: TailoringWizardStep;
@@ -206,26 +222,30 @@ export interface TailoringWizardState {
   urlValidation: UrlValidationResult | null;
   isValidatingUrl: boolean;
 
-  // Step 2: Job Analysis
+  // Step 2: Tailoring Summary (combines Job Analysis + replaces Clarification Questions)
   jobAnalysis: JobAnalysisResult | null;
   isAnalyzing: boolean;
   editedJobInfo: JobPostingInfo | null;
+  // Claimed keywords (user claims to have experience with missing keywords)
+  claimedKeywords: ClaimedKeyword[];
+  isEnhancingClaim: boolean;  // Loading state for AI enhancement of claim text
 
-  // Step 3: Clarification Questions
+  // DEPRECATED: Clarification Questions (kept for backward compatibility during transition)
   questions: ClarificationQuestion[];
   answers: ClarificationAnswer[];
   isGeneratingQuestions: boolean;
+  questionOptions: Map<string, string[]>;
+  selectedOptions: Map<string, number>;
+  generatingOptionsFor: string | null;
 
-  // Answer options (NEW)
-  questionOptions: Map<string, string[]>; // questionId -> array of 3 options
-  selectedOptions: Map<string, number>;   // questionId -> selected index
-  generatingOptionsFor: string | null;    // questionId currently generating
-
-  // Step 4: Review Changes
+  // Step 3: Review Changes
   tailoringResult: TailoringResult | null;
   isGeneratingTailored: boolean;
 
-  // Step 5: Save
+  // Keyword incorporation
+  isIncorporatingKeyword: boolean;
+
+  // Step 4: Save
   tailoredResumeTitle: string;
   isSaving: boolean;
   savedResumeId: string | null;
@@ -246,7 +266,7 @@ export interface GenerateTailoredResumeRequest {
   resumeId: string;
   jobInfo: JobPostingInfo;
   answers: ClarificationAnswer[];
-  language?: 'en' | 'es';
+  language?: string;              // Accepts any language, normalized by service for API
   matchScoreBefore: number;       // Initial match score from job analysis
   matchingSkills?: string[];      // Skills already identified as matching in initial analysis
 }
@@ -255,7 +275,7 @@ export interface EnhanceAnswerRequest {
   text: string;
   context: string;
   questionId: string;
-  language: 'en' | 'es';
+  language?: string;              // Accepts any language, normalized by service for API
 }
 
 // Premium/Rate Limiting
@@ -265,4 +285,33 @@ export interface TailoringLimits {
   resetDate?: string;
   isPremium: boolean;
 }
+
+// Incorporate Keyword Types
+export interface IncorporateKeywordRequest {
+  resumeId: string;            // The tailored resume being edited
+  keyword: string;             // The keyword to incorporate
+  userContext: string;         // User's brief description of their experience
+  importance: 'critical' | 'important' | 'nice_to_have';
+  language: 'en' | 'es';
+  currentResume: GeneratedResume;  // Current state of tailored resume
+  jobInfo: JobPostingInfo;     // Job context for better incorporation
+}
+
+export interface IncorporateKeywordResponse {
+  success: boolean;
+  data?: {
+    updatedSections: {
+      skills?: GeneratedResume['skills'];
+      professionalSummary?: string;
+      experience?: GeneratedResume['experience'];
+    };
+    changesSummary: string[];  // e.g., ["Added AWS to Technical Skills", "Updated summary to mention cloud experience"]
+  };
+  error?: string;
+  code?: string;
+  message?: string;
+  remainingRequests?: number;
+  resetTime?: number;
+}
+
 

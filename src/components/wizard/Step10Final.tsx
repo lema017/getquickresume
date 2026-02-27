@@ -23,6 +23,7 @@ import { ResumeTranslationModal } from '@/components/ResumeTranslationModal';
 import { ShareResumeModal } from '@/components/ShareResumeModal';
 import toast from 'react-hot-toast';
 import { A4_DIMENSIONS } from '@/utils/a4Dimensions';
+import { trackPdfDownloadAttempt, trackResumeDownloadCompleted } from '@/services/marketingAnalytics';
 
 export function Step10Final() {
   const { t } = useTranslation();
@@ -205,7 +206,8 @@ export function Step10Final() {
   const handleRegenerateCV = async () => {
     // Check if user can use AI features - show CTA if not
     if (!canUseAIFeatures) {
-      setShowRegeneratePremiumModal(true);
+      setPremiumFeature('regenerate');
+      setShowFeaturePremiumModal(true);
       return;
     }
 
@@ -223,6 +225,9 @@ export function Step10Final() {
   };
 
   const handleDownload = async () => {
+    // Track download attempt
+    trackPdfDownloadAttempt(currentResumeId || undefined);
+    
     if (!templateContainerRef.current) {
       toast.error('Template no disponible para descargar');
       return;
@@ -332,6 +337,9 @@ export function Step10Final() {
 
       // Generate PDF by capturing each page individually from visible container
       await generateResumePDFFromPages(container as HTMLElement, fileName);
+      
+      // Track successful download completion
+      trackResumeDownloadCompleted(currentResumeId || undefined, selectedTemplate?.id);
       
       toast.success('PDF generado exitosamente');
     } catch (error) {

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { useAuthStore } from '@/stores/authStore';
 import { useDashboardStore } from '@/stores/dashboardStore';
 import { Resume } from '@/types';
@@ -90,7 +91,11 @@ export function DashboardPage() {
     // Clear localStorage before editing resume
     localStorage.removeItem('resume_wizard_v1');
     localStorage.removeItem('generated-resume');
-    navigate(`/wizard/manual/step-1?resumeId=${resume.id}`);
+    
+    // If resume has been AI-enhanced, go to Step 8 for editing
+    // Otherwise, go to Step 1 to complete the wizard
+    const targetStep = resume.generatedResume ? 8 : 1;
+    navigate(`/wizard/manual/step-${targetStep}?resumeId=${resume.id}`);
   };
 
   const handleDownloadResume = async (resume: Resume) => {
@@ -355,7 +360,13 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      <Helmet>
+        <title>Dashboard - GetQuickResume</title>
+        <meta name="description" content="Your resume dashboard" />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -372,10 +383,11 @@ export function DashboardPage() {
               {!user?.isPremium && (
                 <button
                   onClick={() => navigate('/premium')}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-600 text-white rounded-lg hover:from-amber-600 hover:to-yellow-700 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-600 text-white rounded-lg hover:from-amber-600 hover:to-yellow-700 transition-colors text-sm sm:text-base leading-snug"
                 >
-                  <TrendingUp className="w-4 h-4" />
-                  Upgrade to Premium
+                  <TrendingUp className="w-4 h-4 flex-shrink-0" />
+                  <span className="hidden sm:inline">Upgrade to Premium</span>
+                  <span className="sm:hidden">Premium</span>
                 </button>
               )}
             </div>
@@ -483,6 +495,7 @@ export function DashboardPage() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

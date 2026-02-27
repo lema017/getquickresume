@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { useResumeStore } from '@/stores/resumeStore';
 import { useAuthStore } from '@/stores/authStore';
 import { resumeService } from '@/services/resumeService';
 import toast from 'react-hot-toast';
+import { trackWizardStarted } from '@/services/marketingAnalytics';
 
 // Wizard Components
 import { ResumeCreationMode } from '@/components/wizard/ResumeCreationMode';
@@ -40,7 +42,7 @@ function ManualWizardStep({ stepComponent: StepComponent }: ManualWizardStepProp
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const { loadResumeData, setCurrentResumeId, currentResumeId, resetResume, setGeneratedResume, setHasLoadedExistingResume, resumeData, wizardState } = useResumeStore();
+  const { loadResumeData, setCurrentResumeId, currentResumeId, resetResume, setGeneratedResume, setHasLoadedExistingResume, resumeData, wizardState, setCurrentStep, generatedResume } = useResumeStore();
   const { user } = useAuthStore();
   
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
@@ -130,6 +132,34 @@ function ManualWizardStep({ stepComponent: StepComponent }: ManualWizardStepProp
 
     loadResumeFromUrl();
   }, [location.search, currentResumeId, resetResume, setCurrentResumeId, setGeneratedResume, setHasLoadedExistingResume, loadResumeData, resumeData]);
+
+  // Sync URL step to store when browser navigation changes the route (back/forward)
+  useEffect(() => {
+    const stepMatch = location.pathname.match(/\/step-(\d+)/);
+    if (stepMatch) {
+      const stepFromUrl = parseInt(stepMatch[1], 10);
+      if (stepFromUrl !== wizardState.currentStep) {
+        setCurrentStep(stepFromUrl);
+      }
+    }
+  }, [location.pathname, wizardState.currentStep, setCurrentStep]);
+
+  // Route guard: Redirect to Step 8 if trying to access locked steps (1-7) after AI generation
+  useEffect(() => {
+    const stepMatch = location.pathname.match(/\/step-(\d+)/);
+    if (!stepMatch) return;
+    
+    const stepFromUrl = parseInt(stepMatch[1], 10);
+    const hasGeneratedResume = generatedResume !== null;
+    
+    // If user has generatedResume and tries to access steps 1-7, redirect to Step 8
+    if (hasGeneratedResume && stepFromUrl < 8) {
+      // Preserve query params (resumeId)
+      const searchParams = new URLSearchParams(location.search);
+      navigate(`/wizard/manual/step-8?${searchParams.toString()}`, { replace: true });
+      return;
+    }
+  }, [location.pathname, location.search, generatedResume, navigate]);
 
   const handleSaveAndExit = async () => {
     try {
@@ -344,6 +374,13 @@ export function WizardPage() {
   // Check if this is an edit (has resumeId in URL) - editing existing resumes is always allowed
   const isEditingExistingResume = location.search.includes('resumeId');
 
+  // Track wizard started (only on new resume creation)
+  useEffect(() => {
+    if (!isEditingExistingResume) {
+      trackWizardStarted();
+    }
+  }, [isEditingExistingResume]);
+
   useEffect(() => {
     // Auto-save every 30 seconds
     const interval = setInterval(() => {
@@ -367,32 +404,39 @@ export function WizardPage() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-full">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Routes>
-          {/* Main wizard routes */}
-          <Route path="/" element={<ResumeCreationMode />} />
-          <Route path="/upload" element={<UploadResume />} />
-          <Route path="/upload/language" element={<UploadLanguageSelection />} />
-          <Route path="/upload/processing" element={<UploadProcessing />} />
-          <Route path="/upload/review" element={<ResumeExtractionReview />} />
-          <Route path="/linkedin" element={<LinkedInImport />} />
-          
-          {/* Manual creation wizard */}
-          <Route path="/manual" element={<Navigate to="/wizard/manual/step-1" replace />} />
-          <Route path="/manual/step-1" element={<ManualWizardStep stepComponent={Step1Profile} />} />
-          <Route path="/manual/step-2" element={<ManualWizardStep stepComponent={Step2Skills} />} />
-          <Route path="/manual/step-3" element={<ManualWizardStep stepComponent={Step3Experience} />} />
-          <Route path="/manual/step-4" element={<ManualWizardStep stepComponent={Step4Education} />} />
-          <Route path="/manual/step-5" element={<ManualWizardStep stepComponent={Step5Projects} />} />
-          <Route path="/manual/step-6" element={<ManualWizardStep stepComponent={Step6Achievements} />} />
-          <Route path="/manual/step-7" element={<ManualWizardStep stepComponent={Step7Summary} />} />
-          <Route path="/manual/step-8" element={<ManualWizardStep stepComponent={Step8Preview} />} />
-          <Route path="/manual/step-9" element={<ManualWizardStep stepComponent={Step9Score} />} />
-          <Route path="/manual/step-10" element={<ManualWizardStep stepComponent={Step9Preview} />} />
-          <Route path="/manual/step-11" element={<ManualWizardStep stepComponent={Step10Final} />} />
-        </Routes>
+    <>
+      <Helmet>
+        <title>Resume Wizard - GetQuickResume</title>
+        <meta name="description" content="Create your professional resume" />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <div className="bg-gray-50 min-h-full">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Routes>
+            {/* Main wizard routes */}
+            <Route path="/" element={<ResumeCreationMode />} />
+            <Route path="/upload" element={<UploadResume />} />
+            <Route path="/upload/language" element={<UploadLanguageSelection />} />
+            <Route path="/upload/processing" element={<UploadProcessing />} />
+            <Route path="/upload/review" element={<ResumeExtractionReview />} />
+            <Route path="/linkedin" element={<LinkedInImport />} />
+            
+            {/* Manual creation wizard */}
+            <Route path="/manual" element={<Navigate to="/wizard/manual/step-1" replace />} />
+            <Route path="/manual/step-1" element={<ManualWizardStep stepComponent={Step1Profile} />} />
+            <Route path="/manual/step-2" element={<ManualWizardStep stepComponent={Step2Skills} />} />
+            <Route path="/manual/step-3" element={<ManualWizardStep stepComponent={Step3Experience} />} />
+            <Route path="/manual/step-4" element={<ManualWizardStep stepComponent={Step4Education} />} />
+            <Route path="/manual/step-5" element={<ManualWizardStep stepComponent={Step5Projects} />} />
+            <Route path="/manual/step-6" element={<ManualWizardStep stepComponent={Step6Achievements} />} />
+            <Route path="/manual/step-7" element={<ManualWizardStep stepComponent={Step7Summary} />} />
+            <Route path="/manual/step-8" element={<ManualWizardStep stepComponent={Step8Preview} />} />
+            <Route path="/manual/step-9" element={<ManualWizardStep stepComponent={Step9Score} />} />
+            <Route path="/manual/step-10" element={<ManualWizardStep stepComponent={Step9Preview} />} />
+            <Route path="/manual/step-11" element={<ManualWizardStep stepComponent={Step10Final} />} />
+          </Routes>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -137,14 +137,16 @@ class SuggestionService {
    * Obtiene sugerencias de habilidades para una profesión específica
    * La API ya retorna solo skills unificado
    * @param profession - La profesión para la cual obtener sugerencias
-   * @param language - El idioma del currículum ('es' | 'en'), por defecto 'es'
+   * @param language - El idioma del currículum, por defecto 'es'. Falls back to 'en' for unsupported languages.
    * @param resumeId - Optional resume ID for AI cost tracking
    */
-  async getSkillsSuggestions(profession: string, language: 'es' | 'en' = 'es', resumeId?: string): Promise<string[]> {
+  async getSkillsSuggestions(profession: string, language?: string, resumeId?: string): Promise<string[]> {
+    // Normalize language to supported API values ('es' | 'en')
+    const apiLanguage: 'es' | 'en' = language === 'es' ? 'es' : 'en';
     const normalizedProfession = profession.toLowerCase().trim();
     
     // Verificar cache específico para habilidades con idioma
-    const cacheKey = `${normalizedProfession}-${language}-skills`;
+    const cacheKey = `${normalizedProfession}-${apiLanguage}-skills`;
     if (this.cache.has(cacheKey)) {
       const cached = this.cache.get(cacheKey)!;
       return cached.skills || [];
@@ -159,7 +161,7 @@ class SuggestionService {
     try {
       const encodedProfession = encodeURIComponent(profession);
       // Obtener sugerencias de la API (solo skills)
-      let url = `api/suggestions/${encodedProfession}?language=${language}`;
+      let url = `api/suggestions/${encodedProfession}?language=${apiLanguage}`;
       if (resumeId) {
         url += `&resumeId=${encodeURIComponent(resumeId)}`;
       }
@@ -202,11 +204,12 @@ class SuggestionService {
   /**
    * Verifica si las habilidades están siendo cargadas para una profesión
    * @param profession - La profesión a verificar
-   * @param language - El idioma del currículum ('es' | 'en'), por defecto 'es'
+   * @param language - El idioma del currículum, por defecto 'es'
    */
-  isLoadingSkills(profession: string, language: 'es' | 'en' = 'es'): boolean {
+  isLoadingSkills(profession: string, language?: string): boolean {
+    const apiLanguage: 'es' | 'en' = language === 'es' ? 'es' : 'en';
     const normalizedProfession = profession.toLowerCase().trim();
-    return this.loadingStates.get(`${normalizedProfession}-${language}-skills`) || false;
+    return this.loadingStates.get(`${normalizedProfession}-${apiLanguage}-skills`) || false;
   }
 
   /**
