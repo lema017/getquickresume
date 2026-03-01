@@ -297,7 +297,7 @@ export function ResumeForJobDescriptionPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-emerald-400" />
-                  <span>{trust.editAnytime}</span>
+                  <span>{trust.privacyNote}</span>
                 </div>
               </div>
             </div>

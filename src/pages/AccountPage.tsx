@@ -250,7 +250,7 @@ export function AccountPage() {
   const hasResumes = totalResumes > 0;
   const coverLettersUsed = user.isPremium 
     ? (user.premiumCoverLetterCount || 0) 
-    : (user.freeCoverLetterUsed ? 1 : 0);
+    : 0;
   const totalDownloads = user.totalDownloads || 0;
 
   // Subscription info

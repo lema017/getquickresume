@@ -91,6 +91,13 @@ export function CoverLetterPage() {
     }
   }, [isAuthenticated, navigate]);
 
+  // Redirect non-premium users to premium page
+  useEffect(() => {
+    if (isAuthenticated && user && !user.isPremium) {
+      navigate('/premium');
+    }
+  }, [isAuthenticated, user, navigate]);
+
   const handleGenerate = async () => {
     // Validate required fields
     if (!currentCoverLetter.companyName.trim()) {

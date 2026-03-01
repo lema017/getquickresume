@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
-import { ArrowRight, CheckCircle, Linkedin, RefreshCw } from 'lucide-react';
+import { ArrowRight, CheckCircle, Linkedin, RefreshCw, Crown } from 'lucide-react';
 import { countries } from '@/utils/countries';
 import { resumeService } from '@/services/resumeService';
 import { ResumeGenerationProgress } from './ResumeGenerationProgress';
@@ -13,6 +13,7 @@ import toast from 'react-hot-toast';
 import { useAuthStore } from '@/stores/authStore';
 import { formatName, formatProfession } from '@/utils/textFormatting';
 import { trackResumeGeneratedAI } from '@/services/marketingAnalytics';
+import { buildGeneratedResumeFromResumeData } from '@/utils/resumeDataConverter';
 
 export function Step8Preview() {
   const { t } = useTranslation();
@@ -64,12 +65,19 @@ export function Step8Preview() {
         return;
       }
       
-      // Check if free user has used their quota - show CTA instead of making API call
+      // Free user with exhausted quota: build GeneratedResume locally without AI
       if (!canUseAIFeatures && !generatedResume && !hasAttemptedGeneration) {
-        console.log('🔍 Free user quota exhausted - showing premium CTA');
+        console.log('🔍 Free user quota exhausted - building resume locally without AI');
         setHasAttemptedGeneration(true);
-        setPremiumFeature('regenerate');
-        setShowPremiumModal(true);
+        const localResume = buildGeneratedResumeFromResumeData(resumeData);
+        setGeneratedResume(localResume);
+        if (currentResumeId) {
+          resumeService.updateResume(currentResumeId, {
+            generatedResume: localResume,
+            status: 'generated' as any,
+            updatedAt: new Date(),
+          }).catch(err => console.error('Failed to persist local generatedResume:', err));
+        }
         return;
       }
       
@@ -112,7 +120,7 @@ export function Step8Preview() {
             setScore(response.score);
           }
           
-          toast.success('¡CV generado y analizado exitosamente!');
+          toast.success(t('wizard.steps.preview.ui.states.generationSuccess', 'Resume generated and analyzed successfully!'));
         } catch (error: any) {
           console.error('Error generating CV:', error);
           // Check for premium required error (from API protection)
@@ -129,7 +137,7 @@ export function Step8Preview() {
             setGenerationError(error?.response?.data?.message || error.message);
             toast.error(error?.response?.data?.message || error.message);
           } else {
-            const errorMessage = error instanceof Error ? error.message : 'Error al generar el CV';
+            const errorMessage = error instanceof Error ? error.message : t('wizard.errors.generationError');
             setGenerationError(errorMessage);
             toast.error(errorMessage);
             // Keep hasAttemptedGeneration true to prevent infinite loop
@@ -147,7 +155,7 @@ export function Step8Preview() {
 
   const handleNext = () => {
     if (!generatedResume) {
-      toast.error('Debes generar el CV antes de continuar');
+      toast.error(t('wizard.errors.mustGenerateFirst'));
       return;
     }
     markStepCompleted(8);
@@ -195,7 +203,7 @@ export function Step8Preview() {
         setScore(response.score);
       }
       
-      toast.success('¡CV regenerado y analizado exitosamente!');
+      toast.success(t('wizard.steps.preview.ui.states.generationSuccess', 'Resume generated and analyzed successfully!'));
     } catch (error: any) {
       console.error('Error regenerating CV:', error);
       // Check for limit errors
@@ -205,7 +213,7 @@ export function Step8Preview() {
         setGenerationError(error?.response?.data?.message || error.message);
         toast.error(error?.response?.data?.message || error.message);
       } else {
-        const errorMessage = error instanceof Error ? error.message : 'Error al regenerar el CV';
+        const errorMessage = error instanceof Error ? error.message : t('wizard.errors.regenerationError');
         setGenerationError(errorMessage);
         toast.error(errorMessage);
       }
@@ -292,10 +300,10 @@ export function Step8Preview() {
                 </svg>
               </div>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-orange-800">Servidor no disponible</h3>
+                <h3 className="text-sm font-medium text-orange-800">{t('wizard.errors.serverUnavailable')}</h3>
                 <p className="mt-1 text-sm text-orange-700">{backendError}</p>
                 <p className="mt-2 text-sm text-orange-600">
-                  Puedes ver y editar tu información, pero no se puede generar un nuevo CV en este momento.
+                  {t('wizard.errors.serverUnavailableDetail')}
                 </p>
               </div>
             </div>
@@ -312,7 +320,7 @@ export function Step8Preview() {
                 </svg>
               </div>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">Error al generar CV</h3>
+                <h3 className="text-sm font-medium text-red-800">{t('wizard.errors.generationError')}</h3>
                 <p className="mt-1 text-sm text-red-700">{generationError}</p>
                 {canUseAIFeatures && (
                   <div className="mt-3">
@@ -321,7 +329,7 @@ export function Step8Preview() {
                       disabled={isGeneratingCV}
                       className="text-sm font-medium text-red-600 hover:text-red-500 disabled:opacity-50"
                     >
-                      Intentar de nuevo
+                      {t('wizard.errors.retryGeneration')}
                     </button>
                   </div>
                 )}
@@ -331,24 +339,39 @@ export function Step8Preview() {
         )}
       </div>
 
+      {/* No-AI Premium Upgrade Banner */}
+      {!canUseAIFeatures && generatedResume && (
+        <div className="mb-6 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl">
+          <div className="flex items-start gap-3">
+            <Crown className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-medium text-amber-900">{t('wizard.noAi.banner')}</p>
+              <p className="text-sm text-amber-700 mt-1">{t('wizard.noAi.upgradeCta')}</p>
+            </div>
+            <a
+              href="/premium"
+              className="flex-shrink-0 px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-600 text-white text-sm font-medium rounded-lg hover:from-amber-600 hover:to-yellow-700 transition-all"
+            >
+              {t('wizard.noAi.upgradeButton')}
+            </a>
+          </div>
+        </div>
+      )}
+
       {/* CV Preview - Editable */}
       <div className="bg-white border border-gray-200 rounded-lg p-8 mb-8">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-semibold text-gray-900">
-            {generatedResume ? 'CV Generado con IA' : 'Tu CV - Haz clic en cualquier sección para editar'}
+            {generatedResume ? t('wizard.steps.preview.ui.generatedTitle', 'AI Generated Resume') : t('wizard.noAi.cvTitle') + ' - ' + t('wizard.noAi.cvSubtitle')}
           </h3>
-          {generatedResume && (
+          {generatedResume && canUseAIFeatures && (
             <button
               onClick={handleRegenerateCV}
               disabled={isGeneratingCV || !!backendError}
-              className={`inline-flex items-center px-3 py-2 rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 ${
-                canUseAIFeatures
-                  ? 'border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-blue-500'
-                  : 'bg-gradient-to-r from-amber-500 to-yellow-600 text-white hover:from-amber-600 hover:to-yellow-700 focus:ring-amber-500'
-              }`}
+              className="inline-flex items-center px-3 py-2 rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-blue-500"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${isGeneratingCV ? 'animate-spin' : ''}`} />
-              {backendError ? 'Servidor no disponible' : canUseAIFeatures ? t('wizard.steps.preview.ui.regenerate') : t('dashboard.premiumAction.regenerate.cta')}
+              {backendError ? t('wizard.errors.serverUnavailable') : t('wizard.steps.preview.ui.regenerate')}
             </button>
           )}
         </div>

@@ -32,8 +32,7 @@ class ResumeService {
       
       // Handle authentication errors (401/403) - but check if it's a premium required error first
       if (response.status === 401 || response.status === 403) {
-        // Only handle as auth error if it's not a premium required error
-        if (errorData.code !== 'PREMIUM_REQUIRED') {
+        if (errorData.code !== 'PREMIUM_REQUIRED' && errorData.code !== 'RESUME_LIMIT_REACHED') {
           handleAuthError();
         }
       }

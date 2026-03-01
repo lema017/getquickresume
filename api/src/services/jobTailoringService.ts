@@ -34,7 +34,7 @@ function getGroqModelForUser(isPremium: boolean): string {
 // Tailoring limits
 export const TAILORING_LIMITS = {
   FREE: { total: 1 },           // Free users get 1 tailored resume lifetime
-  PREMIUM: { monthly: 40 }      // Premium users get 40 per month
+  PREMIUM: { monthly: 30 }      // Premium users get 30 per month
 };
 
 // ============================================================================

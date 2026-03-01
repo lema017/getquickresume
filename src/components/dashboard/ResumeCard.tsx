@@ -188,7 +188,6 @@ export const ResumeCard = memo(function ResumeCard({
                 {t('resumeCard.actions.edit')}
               </button>
               {resume.generatedResume && (
-                <>
                 <button
                   onClick={() => onDownload(resume)}
                   className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
@@ -196,53 +195,52 @@ export const ResumeCard = memo(function ResumeCard({
                   <Download className="w-4 h-4" />
                   {t('resumeCard.actions.download')}
                 </button>
-                  {onTranslate && (
-                    <button
-                      onClick={() => onTranslate(resume)}
-                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                    >
-                      <Globe className="w-4 h-4" />
-                      {t('resumeCard.actions.translate')}
-                    </button>
-                  )}
-                  {onShare && (
-                    <button
-                      onClick={() => onShare(resume)}
-                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                    >
-                      <Share2 className="w-4 h-4" />
-                      {t('resumeCard.actions.share')}
-                    </button>
-                  )}
-                  {onEnhance && (
-                    <button
-                      onClick={() => onEnhance(resume)}
-                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                    >
-                      <Sparkles className="w-4 h-4" />
-                      {t('resumeCard.actions.enhance')}
-                    </button>
-                  )}
-                  {onRescore && (
-                    <button
-                      onClick={() => onRescore(resume)}
-                      disabled={isRescoring}
-                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <RefreshCw className={`w-4 h-4 ${isRescoring ? 'animate-spin' : ''}`} />
-                      {t('resumeCard.actions.rescore')}
-                    </button>
-                  )}
-                  {onTailorForJob && (
-                    <button
-                      onClick={() => handleAIToolClick('tailorForJob', () => onTailorForJob(resume))}
-                      className="w-full px-4 py-2 text-left text-sm text-orange-600 hover:bg-orange-50 flex items-center gap-2"
-                    >
-                      <Target className="w-4 h-4" />
-                      {t('resumeCard.actions.tailorForJob') || 'Tailor for Job'}
-                    </button>
-                  )}
-                </>
+              )}
+              {onTranslate && (
+                <button
+                  onClick={() => handleAIToolClick('translate', () => onTranslate(resume))}
+                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                >
+                  <Globe className="w-4 h-4" />
+                  {t('resumeCard.actions.translate')}
+                </button>
+              )}
+              {onShare && (
+                <button
+                  onClick={() => handleAIToolClick('share', () => onShare(resume))}
+                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                >
+                  <Share2 className="w-4 h-4" />
+                  {t('resumeCard.actions.share')}
+                </button>
+              )}
+              {onEnhance && (
+                <button
+                  onClick={() => handleAIToolClick('enhance', () => onEnhance(resume))}
+                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  {t('resumeCard.actions.enhance')}
+                </button>
+              )}
+              {onRescore && (
+                <button
+                  onClick={() => handleAIToolClick('rescore', () => onRescore(resume))}
+                  disabled={isRescoring}
+                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <RefreshCw className={`w-4 h-4 ${isRescoring ? 'animate-spin' : ''}`} />
+                  {t('resumeCard.actions.rescore')}
+                </button>
+              )}
+              {onTailorForJob && (
+                <button
+                  onClick={() => handleAIToolClick('tailorForJob', () => onTailorForJob(resume))}
+                  className="w-full px-4 py-2 text-left text-sm text-orange-600 hover:bg-orange-50 flex items-center gap-2"
+                >
+                  <Target className="w-4 h-4" />
+                  {t('resumeCard.actions.tailorForJob') || 'Tailor for Job'}
+                </button>
               )}
               <hr className="my-1" />
               <button
@@ -368,86 +366,79 @@ export const ResumeCard = memo(function ResumeCard({
           </button>
         </div>
         
-        {/* AI Tools Action Bar */}
-        {resume.generatedResume && (
-          <div className="space-y-2">
-            <div className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-purple-500" />
-              <span className="text-xs font-medium text-gray-500">{t('resumeCard.aiTools.title')}</span>
-            </div>
-            
-            <div className="grid grid-cols-5 gap-1.5">
-              {/* Share & Track - Blue */}
+        {/* AI Tools Action Bar - always visible, premium CTA for free users */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-purple-500" />
+            <span className="text-xs font-medium text-gray-500">{t('resumeCard.aiTools.title')}</span>
+          </div>
+          
+          <div className="grid grid-cols-5 gap-1.5">
+            <button
+              onClick={() => handleAIToolClick('share', () => navigate(`/resume/${resume.id}/share`))}
+              className="group flex flex-col items-center gap-1 p-2 rounded-lg transition-all bg-blue-50 hover:bg-blue-100 text-blue-700"
+              title={t('resumeCard.actions.shareAndTrack')}
+            >
+              <Share2 className="w-4 h-4 text-blue-600" />
+              <span className="text-[10px] font-medium leading-tight text-center">
+                {t('resumeCard.aiTools.share')}
+              </span>
+            </button>
+
+            {onTranslate && (
               <button
-                onClick={() => handleAIToolClick('share', () => navigate(`/resume/${resume.id}/share`))}
-                className="group flex flex-col items-center gap-1 p-2 rounded-lg transition-all bg-blue-50 hover:bg-blue-100 text-blue-700"
-                title={t('resumeCard.actions.shareAndTrack')}
+                onClick={() => handleAIToolClick('translate', () => onTranslate(resume))}
+                className="group flex flex-col items-center gap-1 p-2 rounded-lg transition-all bg-green-50 hover:bg-green-100 text-green-700"
+                title={t('resumeCard.actions.translate')}
               >
-                <Share2 className="w-4 h-4 text-blue-600" />
+                <Globe className="w-4 h-4 text-green-600" />
                 <span className="text-[10px] font-medium leading-tight text-center">
-                  {t('resumeCard.aiTools.share')}
+                  {t('resumeCard.aiTools.translate')}
                 </span>
               </button>
+            )}
 
-              {/* Translate - Green */}
-              {onTranslate && (
-                <button
-                  onClick={() => handleAIToolClick('translate', () => onTranslate(resume))}
-                  className="group flex flex-col items-center gap-1 p-2 rounded-lg transition-all bg-green-50 hover:bg-green-100 text-green-700"
-                  title={t('resumeCard.actions.translate')}
-                >
-                  <Globe className="w-4 h-4 text-green-600" />
-                  <span className="text-[10px] font-medium leading-tight text-center">
-                    {t('resumeCard.aiTools.translate')}
-                  </span>
-                </button>
-              )}
+            {onTailorForJob && (
+              <button
+                onClick={() => handleAIToolClick('tailorForJob', () => onTailorForJob(resume))}
+                className="group flex flex-col items-center gap-1 p-2 rounded-lg transition-all bg-orange-50 hover:bg-orange-100 text-orange-700"
+                title={t('resumeCard.actions.tailorForJob')}
+              >
+                <Target className="w-4 h-4 text-orange-600" />
+                <span className="text-[10px] font-medium leading-tight text-center">
+                  {t('resumeCard.aiTools.tailor')}
+                </span>
+              </button>
+            )}
 
-              {/* Tailor for Job - Orange */}
-              {onTailorForJob && (
-                <button
-                  onClick={() => handleAIToolClick('tailorForJob', () => onTailorForJob(resume))}
-                  className="group flex flex-col items-center gap-1 p-2 rounded-lg transition-all bg-orange-50 hover:bg-orange-100 text-orange-700"
-                  title={t('resumeCard.actions.tailorForJob')}
-                >
-                  <Target className="w-4 h-4 text-orange-600" />
-                  <span className="text-[10px] font-medium leading-tight text-center">
-                    {t('resumeCard.aiTools.tailor')}
-                  </span>
-                </button>
-              )}
+            {onEnhance && (
+              <button
+                onClick={() => handleAIToolClick('enhance', () => onEnhance(resume))}
+                className="group flex flex-col items-center gap-1 p-2 rounded-lg transition-all bg-purple-50 hover:bg-purple-100 text-purple-700"
+                title={t('resumeCard.actions.enhance')}
+              >
+                <Sparkles className="w-4 h-4 text-purple-600" />
+                <span className="text-[10px] font-medium leading-tight text-center">
+                  {t('resumeCard.aiTools.enhance')}
+                </span>
+              </button>
+            )}
 
-              {/* AI Enhance - Purple */}
-              {onEnhance && (
-                <button
-                  onClick={() => handleAIToolClick('enhance', () => onEnhance(resume))}
-                  className="group flex flex-col items-center gap-1 p-2 rounded-lg transition-all bg-purple-50 hover:bg-purple-100 text-purple-700"
-                  title={t('resumeCard.actions.enhance')}
-                >
-                  <Sparkles className="w-4 h-4 text-purple-600" />
-                  <span className="text-[10px] font-medium leading-tight text-center">
-                    {t('resumeCard.aiTools.enhance')}
-                  </span>
-                </button>
-              )}
-
-              {/* Re-score - Indigo */}
-              {onRescore && (
-                <button
-                  onClick={() => handleAIToolClick('rescore', () => onRescore(resume))}
-                  disabled={isRescoring}
-                  className="group flex flex-col items-center gap-1 p-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-indigo-50 hover:bg-indigo-100 text-indigo-700"
-                  title={t('resumeCard.actions.rescore')}
-                >
-                  <RefreshCw className={`w-4 h-4 text-indigo-600 ${isRescoring ? 'animate-spin' : ''}`} />
-                  <span className="text-[10px] font-medium leading-tight text-center">
-                    {t('resumeCard.aiTools.rescore')}
-                  </span>
-                </button>
-              )}
-            </div>
+            {onRescore && (
+              <button
+                onClick={() => handleAIToolClick('rescore', () => onRescore(resume))}
+                disabled={isRescoring}
+                className="group flex flex-col items-center gap-1 p-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-indigo-50 hover:bg-indigo-100 text-indigo-700"
+                title={t('resumeCard.actions.rescore')}
+              >
+                <RefreshCw className={`w-4 h-4 text-indigo-600 ${isRescoring ? 'animate-spin' : ''}`} />
+                <span className="text-[10px] font-medium leading-tight text-center">
+                  {t('resumeCard.aiTools.rescore')}
+                </span>
+              </button>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
       {/* Premium Action Modal */}

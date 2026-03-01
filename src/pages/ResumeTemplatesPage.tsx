@@ -9,64 +9,52 @@ import {
   Shield,
   Target,
   Layout,
-  Crown,
   Sparkles
 } from 'lucide-react';
 import { getPageSEO, BASE_URL } from '@/utils/seoConfig';
 import { useResumeStore } from '@/stores/resumeStore';
 import { trackLandingView, trackCtaClickStart } from '@/services/marketingAnalytics';
+import { TEMPLATE_CATALOG } from '@/utils/templateCatalog';
 
-// Production template data for SEO landing page
-const STATIC_TEMPLATES = [
-  { 
-    id: 'template-1767380776281', 
-    name: 'Modern', 
-    description: 'Clean contemporary design with professional blue accents',
-    category: 'free' as const, 
-    layout: 'single-column',
-    image: '/images/templates/template-1767380776281.png'
-  },
-  { 
-    id: 'template-1767380776281-grey', 
-    name: 'Modern Grey', 
-    description: 'Elegant grey-toned professional layout',
-    category: 'free' as const, 
-    layout: 'single-column',
-    image: '/images/templates/template-1767380776281-grey.png'
-  },
-  { 
-    id: 'template-1767380355237', 
-    name: 'Minimalistic', 
-    description: 'Streamlined layout that lets your content shine',
-    category: 'free' as const, 
-    layout: 'single-column',
-    image: '/images/templates/template-1767380355237.png'
-  },
-  { 
-    id: 'template-1767381172466', 
-    name: 'Premium', 
-    description: 'Professional design with dark header and clean sections',
-    category: 'premium' as const, 
-    layout: 'single-column',
-    image: '/images/templates/template-1767381172466.png'
-  },
-  { 
-    id: 'template-1767381172467', 
-    name: 'Premium Blue', 
-    description: 'Sophisticated design with elegant blue header',
-    category: 'premium' as const, 
-    layout: 'single-column',
-    image: '/images/templates/template-1767381172467.png'
-  },
-  { 
-    id: 'template-1767382508222-gray', 
-    name: 'Premium Grey', 
-    description: 'Executive grey-toned premium design',
-    category: 'premium' as const, 
-    layout: 'single-column',
-    image: '/images/templates/template-1767382508222-gray.png'
-  },
-];
+const TEMPLATE_DESCRIPTIONS: Record<string, string> = {
+  'gqr-resume-classic': 'Timeless elegance with clean lines and balanced spacing',
+  'gqr-resume-corporate': 'Polished professional layout for business environments',
+  'gqr-resume-mercury': 'Dynamic modern design with bold visual hierarchy',
+  'gqr-resume-finance': 'Structured precision ideal for finance and consulting',
+  'gqr-resume-steady': 'Reliable balanced layout with steady visual flow',
+  'gqr-resume-charcoal': 'Warm dark tones with a sophisticated glow effect',
+  'gqr-resume-pristine': 'Ultra-clean minimalist design with crisp typography',
+  'gqr-resume-saffron': 'Vibrant warm accents with an energetic feel',
+  'gqr-resume-obsidian': 'Sharp dark-themed design with bold edge details',
+  'gqr-resume-cobalt': 'Rich blue tones with a contemporary professional look',
+  'gqr-resume-precision': 'Geometric precision with meticulous alignment',
+  'gqr-resume-silver': 'Refined metallic-inspired elegance',
+  'gqr-resume-mckinsey': 'Strategy-grade consulting style with authority',
+  'gqr-resume-designer': 'Creative layout for design-oriented professionals',
+  'gqr-resume-slate': 'Calm, distraction-free design with serene balance',
+  'gqr-resume-desert': 'Earthy warm tones with rugged character',
+  'gqr-resume-fineline': 'Delicate line work with expansive white space',
+  'gqr-resume-minty': 'Fresh cool palette with a light, airy feel',
+  'gqr-resume-atlantic': 'Deep ocean-inspired blues with commanding presence',
+  'gqr-resume-happy': 'Bright, optimistic design radiating positive energy',
+  'gqr-resume-darkbg': 'Bold dark canvas that makes content stand out',
+  'gqr-resume-webworker': 'Tech-forward layout for digital professionals',
+  'gqr-resume-seapearl': 'Soft iridescent tones with coastal serenity',
+  'gqr-resume-redaccent': 'Striking red highlights on a clean foundation',
+  'gqr-resume-blueaccent': 'Classic blue highlights for a trustworthy impression',
+  'gqr-resume-typewriter': 'Nostalgic editorial style with literary charm',
+  'gqr-resume-monochrome': 'Pure black and white for maximum readability',
+  'gqr-resume-navybar': 'Commanding navy header with structured sections',
+  'gqr-resume-executive': 'Senior-level design conveying authority and experience',
+  'gqr-resume-boldname': 'Attention-grabbing name display with confident presence',
+};
+
+const STATIC_TEMPLATES = TEMPLATE_CATALOG.slice(0, 6).map(t => ({
+  id: t.id,
+  name: t.name,
+  description: TEMPLATE_DESCRIPTIONS[t.id] || 'Professional ATS-friendly resume template',
+  category: t.category,
+}));
 
 export function ResumeTemplatesPage() {
   const { t, i18n } = useTranslation();
@@ -206,27 +194,21 @@ export function ResumeTemplatesPage() {
                   key={template.id}
                   className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group"
                 >
-                  {/* Template Preview Image */}
-                  <div className="relative h-64 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
-                    <img 
-                      src={template.image} 
-                      alt={`${template.name} resume template preview`}
-                      className="w-full h-full object-cover object-top"
-                      loading="lazy"
-                    />
+                  {/* Template Preview */}
+                  <div className="relative h-64 bg-gradient-to-br from-slate-50 via-white to-blue-50 overflow-hidden flex items-center justify-center">
+                    <div className="text-center px-6">
+                      <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+                        <Layout className="w-8 h-8 text-white" />
+                      </div>
+                      <p className="text-xl font-bold text-gray-800">{template.name}</p>
+                      <p className="text-xs text-gray-400 mt-1">ATS-Friendly</p>
+                    </div>
                     
                     {/* Category Badge */}
                     <div className="absolute top-3 right-3">
-                      {template.category === 'premium' ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-semibold shadow-sm">
-                          <Crown className="w-3 h-3" />
-                          {t('resumeTemplatesPage.gallery.premium')}
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold shadow-sm">
-                          {t('resumeTemplatesPage.gallery.free')}
-                        </span>
-                      )}
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold shadow-sm">
+                        {t('resumeTemplatesPage.gallery.free')}
+                      </span>
                     </div>
                   </div>
 

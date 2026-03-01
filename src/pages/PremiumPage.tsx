@@ -3,9 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { useAuthStore } from '@/stores/authStore';
-import { Check, Crown, Loader2, ArrowDown, ChevronDown, ChevronUp } from 'lucide-react';
+import { Check, Crown, Loader2, ArrowDown, ChevronDown, ChevronUp, Lock, X } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { paypalService, PlanType } from '@/services/paypalService';
+import { paypalService } from '@/services/paypalService';
 import { 
   getPageSEO, 
   BASE_URL, 
@@ -215,27 +215,6 @@ export function PremiumPage() {
     document.getElementById('plans-section')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const subscriptionPlans = [
-    {
-      id: 'monthly',
-      name: t('landing.plans.monthly.name'),
-      price: t('landing.plans.monthly.price'),
-      period: t('landing.plans.monthly.period'),
-      features: t('landing.plans.monthly.features', { returnObjects: true }) as unknown as string[],
-      highlight: false,
-    },
-    {
-      id: 'yearly',
-      name: t('landing.plans.yearly.name'),
-      price: t('landing.plans.yearly.price'),
-      period: t('landing.plans.yearly.period'),
-      savings: t('landing.plans.yearly.savings'),
-      badge: t('landing.plans.yearly.badge'),
-      features: t('landing.plans.yearly.features', { returnObjects: true }) as unknown as string[],
-      highlight: true,
-    },
-  ];
-
   const premiumFeatures = [
     {
       icon: 'brain',
@@ -249,23 +228,23 @@ export function PremiumPage() {
     },
     {
       icon: 'globe',
-      title: 'Traducción Multi-idioma',
-      description: 'Traduce tu CV a los 10 idiomas más usados del mundo',
+      title: t('premium.features.translation.title'),
+      description: t('premium.features.translation.description'),
     },
     {
       icon: 'qr-code',
-      title: 'Compartir con QR',
-      description: 'Comparte tu CV con código QR y analiza quién lo ve',
+      title: t('premium.features.onlineResume.title'),
+      description: t('premium.features.onlineResume.description'),
     },
     {
       icon: 'bar-chart-2',
-      title: 'Analíticas Avanzadas',
-      description: 'Estadísticas de visualización, dispositivos y ubicaciones',
+      title: t('premium.features.analytics.title'),
+      description: t('premium.features.analytics.description'),
     },
     {
       icon: 'target',
-      title: 'Optimización ATS',
-      description: 'Optimiza tu CV para sistemas de seguimiento de candidatos',
+      title: t('premium.features.jobOptimizer.title'),
+      description: t('premium.features.jobOptimizer.description'),
     },
   ];
 
@@ -396,113 +375,135 @@ export function PremiumPage() {
         </div>
       </section>
 
-      {/* Subscription Plans - Moved to TOP */}
+      {/* Feature Comparison Table */}
       <section id="plans-section" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">
-              Choose Your Plan
-            </h2>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Select the plan that works best for you
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {subscriptionPlans.map((plan) => {
-              const isYearly = plan.id === 'yearly';
-              
-              return (
-                <div
-                  key={plan.id}
-                  className={`relative p-8 rounded-3xl shadow-xl flex flex-col h-full ${
-                    isYearly
-                      ? 'bg-gradient-to-br from-blue-600 to-indigo-700 text-white transform scale-105 border-4 border-amber-400'
-                      : 'bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200'
-                  }`}
-                >
-                  {isYearly && plan.badge && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-900 text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
-                      {plan.badge}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4 text-center">
+            {t('landing.plans.comparisonTitle')}
+          </h2>
+          <p className="text-lg text-slate-500 text-center mb-12">
+            {t('landing.plans.subtitle')}
+          </p>
+
+          <div className="overflow-x-auto rounded-2xl border border-slate-200 shadow-lg">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b-2 border-slate-200">
+                  <th className="py-8 px-6 text-sm font-medium text-slate-500 w-[28%]" />
+                  <th className="py-8 px-5 text-center w-[24%]">
+                    <div className="text-xl font-bold text-slate-900">{t('landing.plans.free.name')}</div>
+                    <div className="text-slate-500 text-sm mt-1">{t('landing.plans.free.description')}</div>
+                    <div className="mt-3">
+                      <span className="text-3xl font-extrabold text-slate-900">{t('landing.plans.free.price')}</span>
+                      <span className="text-slate-500 text-sm ml-1">/{t('landing.plans.free.period')}</span>
                     </div>
-                  )}
-                  
-                  <h3 className={`text-2xl font-bold mb-4 ${isYearly ? 'text-white' : 'text-slate-900'}`}>
-                    {plan.name}
-                  </h3>
-                  
-                  <div className="mb-6">
-                    <p className={`text-5xl font-extrabold mb-2 ${
-                      isYearly ? 'text-white' : 'text-blue-600'
-                    }`}>
-                      {plan.price}
-                      <span className="text-2xl">/{plan.period}</span>
-                    </p>
-                    {isYearly && plan.savings && (
-                      <p className="text-sm text-blue-100 mt-1">
-                        {plan.savings}
-                      </p>
-                    )}
-                  </div>
-                  
-                  <ul className="space-y-3 flex-grow mb-8">
-                    {plan.features.slice(0, 5).map((feature, i) => (
-                      <li key={i} className="flex items-start">
-                        <Check className={`w-5 h-5 mr-3 flex-shrink-0 mt-0.5 ${
-                          isYearly ? 'text-amber-400' : 'text-blue-600'
-                        }`} />
-                        <span className={isYearly ? 'text-blue-100' : 'text-slate-700'}>
-                          {feature}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  {/* Show PayPal buttons when this plan is selected */}
-                  {showPayPalButtons === plan.id ? (
-                    <div className="mt-auto">
-                      <div 
-                        ref={plan.id === 'monthly' ? monthlyButtonRef : yearlyButtonRef}
-                        className="paypal-button-container min-h-[45px]"
-                      />
-                      <button
-                        onClick={() => setShowPayPalButtons(null)}
-                        className="w-full mt-3 py-2 text-sm text-center opacity-70 hover:opacity-100 transition-opacity"
-                      >
-                        Cancel
-                      </button>
+                  </th>
+                  <th className="py-8 px-5 text-center w-[24%]">
+                    <div className="text-xl font-bold text-slate-900">{t('landing.plans.monthly.name')}</div>
+                    <div className="text-slate-500 text-sm mt-1">{t('landing.plans.monthly.description')}</div>
+                    <div className="mt-3">
+                      <span className="text-3xl font-extrabold text-blue-600">{t('landing.plans.monthly.price')}</span>
+                      <span className="text-slate-500 text-sm ml-1">/{t('landing.plans.monthly.period')}</span>
                     </div>
-                  ) : (
-                    <button
-                      onClick={() => handleCheckout(plan.id as 'monthly' | 'yearly')}
-                      disabled={loadingPlan !== null || !paypalReady}
-                      className={`mt-auto w-full py-4 rounded-lg font-semibold text-center transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${
-                          isYearly
-                            ? 'bg-white text-blue-700 hover:bg-blue-50'
-                            : 'bg-blue-600 text-white hover:bg-blue-700'
-                        }`}
-                      >
-                      {loadingPlan === plan.id ? (
-                        <>
-                          <Loader2 className="w-5 h-5 animate-spin" />
-                          {t('checkout.processing')}
-                        </>
-                      ) : !paypalReady ? (
-                        <>
-                          <Loader2 className="w-5 h-5 animate-spin" />
-                          Loading...
-                        </>
+                  </th>
+                  <th className="py-8 px-5 text-center w-[24%] bg-blue-50/50">
+                    <div className="inline-block bg-amber-400 text-slate-900 text-xs font-bold px-4 py-1.5 rounded-full shadow-lg mb-3">
+                      {t('landing.plans.yearly.badge')}
+                    </div>
+                    <div className="text-xl font-bold text-slate-900">{t('landing.plans.yearly.name')}</div>
+                    <div className="text-slate-500 text-sm mt-1">{t('landing.plans.yearly.description')}</div>
+                    <div className="mt-3">
+                      <span className="text-3xl font-extrabold text-blue-600">{t('landing.plans.yearly.price')}</span>
+                      <span className="text-slate-500 text-sm ml-1">/{t('landing.plans.yearly.period')}</span>
+                    </div>
+                    <div className="text-xs text-emerald-600 font-semibold mt-1">{t('landing.plans.yearly.savings')}</div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {Object.entries(
+                  t('landing.plans.comparisonFeatures', { returnObjects: true }) as Record<string, { name: string; free: string | boolean; premium: string | boolean }>
+                ).map(([key, feature]) => (
+                  <tr key={key} className="hover:bg-slate-50/60 transition-colors">
+                    <td className="py-4 px-6 text-sm font-medium text-slate-700">{feature.name}</td>
+                    <td className="py-4 px-5 text-center">
+                      {feature.free === true ? (
+                        <Check className="w-5 h-5 text-emerald-500 mx-auto" />
+                      ) : feature.free === false ? (
+                        <Lock className="w-4 h-4 text-slate-300 mx-auto" />
                       ) : (
-                        <>
-                          <Crown className="w-5 h-5" />
-                          Upgrade Now
-                        </>
+                        <span className="text-sm font-semibold text-slate-700">{feature.free}</span>
+                      )}
+                    </td>
+                    <td className="py-4 px-5 text-center">
+                      {feature.premium === true ? (
+                        <Check className="w-5 h-5 text-emerald-500 mx-auto" />
+                      ) : feature.premium === false ? (
+                        <X className="w-5 h-5 text-slate-300 mx-auto" />
+                      ) : (
+                        <span className="text-sm font-semibold text-blue-600">{feature.premium}</span>
+                      )}
+                    </td>
+                    <td className="py-4 px-5 text-center bg-blue-50/30">
+                      {feature.premium === true ? (
+                        <Check className="w-5 h-5 text-emerald-500 mx-auto" />
+                      ) : feature.premium === false ? (
+                        <X className="w-5 h-5 text-slate-300 mx-auto" />
+                      ) : (
+                        <span className="text-sm font-semibold text-blue-600">{feature.premium}</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr className="border-t-2 border-slate-200">
+                  <td className="py-6 px-6" />
+                  <td className="py-6 px-5 text-center">
+                    <Link
+                      to={isAuthenticated ? '/dashboard' : '/login'}
+                      className="inline-block px-6 py-2.5 rounded-lg font-semibold text-sm border-2 border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white transition-all duration-200"
+                    >
+                      {t('landing.plans.free.cta')}
+                    </Link>
+                  </td>
+                  <td className="py-6 px-5 text-center">
+                    {showPayPalButtons === 'monthly' ? (
+                      <div>
+                        <div ref={monthlyButtonRef} className="paypal-button-container min-h-[45px]" />
+                        <button onClick={() => setShowPayPalButtons(null)} className="mt-2 text-sm text-slate-500 hover:text-slate-700">Cancel</button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => handleCheckout('monthly')}
+                        disabled={loadingPlan !== null || !paypalReady}
+                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold text-sm bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {loadingPlan === 'monthly' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Crown className="w-4 h-4" />}
+                        {t('landing.plans.monthly.cta')}
+                      </button>
                     )}
-                    </button>
-                  )}
-                </div>
-              );
-            })}
+                  </td>
+                  <td className="py-6 px-5 text-center bg-blue-50/30">
+                    {showPayPalButtons === 'yearly' ? (
+                      <div>
+                        <div ref={yearlyButtonRef} className="paypal-button-container min-h-[45px]" />
+                        <button onClick={() => setShowPayPalButtons(null)} className="mt-2 text-sm text-slate-500 hover:text-slate-700">Cancel</button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => handleCheckout('yearly')}
+                        disabled={loadingPlan !== null || !paypalReady}
+                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold text-sm bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {loadingPlan === 'yearly' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Crown className="w-4 h-4" />}
+                        {t('landing.plans.yearly.cta')}
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
           </div>
         </div>
       </section>
@@ -516,10 +517,10 @@ export function PremiumPage() {
           >
             <div className="text-left">
               <h2 className="text-2xl font-bold text-slate-900 mb-2">
-                All Premium Features
+                {t('premium.featuresSection.title')}
           </h2>
               <p className="text-slate-600">
-                See everything you get with Premium
+                {t('premium.featuresSection.subtitle')}
               </p>
             </div>
             {showFeatures ? (

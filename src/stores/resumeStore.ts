@@ -28,6 +28,7 @@ interface ResumeStore {
   scoreError: string | null;
   isPollingScore: boolean;
   rateLimitInfo: RateLimitInfo | null;
+  isOverSaveLimit: boolean;
 
   // Actions
   updateResumeData: (updates: Partial<ResumeData>) => void;
@@ -96,6 +97,8 @@ interface ResumeStore {
   ) => Promise<void>;
   // Persist generatedResume to API without re-scoring (for Step 8 enhancements)
   persistGeneratedResume: () => Promise<void>;
+  // Resume save limit
+  setIsOverSaveLimit: (value: boolean) => void;
 }
 
 const initialResumeData: ResumeData = {
@@ -167,6 +170,7 @@ export const useResumeStore = create<ResumeStore>((set, get) => ({
       scoreError: null,
       isPollingScore: false,
       rateLimitInfo: null,
+      isOverSaveLimit: false,
 
       updateResumeData: (updates) => {
         set((state) => {
@@ -204,14 +208,16 @@ export const useResumeStore = create<ResumeStore>((set, get) => ({
               };
               
               if (currentResumeId) {
-                // Update existing resume
                 await resumeService.updateResume(currentResumeId, {
                   resumeData: resumeDataToSave,
                   updatedAt: new Date(),
                 });
                 set({ isDirty: false, lastSaved: new Date() });
               } else {
-                // Create new resume on first save
+                // Skip API create if already flagged as over limit
+                if (get().isOverSaveLimit) {
+                  return;
+                }
                 const newResume = await resumeService.createResume(resumeDataToSave);
                 set({ 
                   currentResumeId: newResume.id,
@@ -219,9 +225,12 @@ export const useResumeStore = create<ResumeStore>((set, get) => ({
                   lastSaved: new Date(),
                 });
               }
-            } catch (error) {
-              console.error('Error auto-saving resume:', error);
-              // Keep isDirty as true if save failed
+            } catch (error: any) {
+              if (error?.code === 'RESUME_LIMIT_REACHED') {
+                set({ isOverSaveLimit: true });
+              } else {
+                console.error('Error auto-saving resume:', error);
+              }
             } finally {
               isSaving = false;
             }
@@ -272,14 +281,15 @@ export const useResumeStore = create<ResumeStore>((set, get) => ({
           };
           
           if (currentResumeId) {
-            // Update existing resume
             await resumeService.updateResume(currentResumeId, {
               resumeData: resumeDataToSave,
               updatedAt: new Date(),
             });
             set({ isDirty: false, lastSaved: new Date() });
           } else {
-            // Create new resume on first save
+            if (get().isOverSaveLimit) {
+              return;
+            }
             const newResume = await resumeService.createResume(resumeDataToSave);
             set({ 
               currentResumeId: newResume.id,
@@ -287,9 +297,13 @@ export const useResumeStore = create<ResumeStore>((set, get) => ({
               lastSaved: new Date(),
             });
           }
-        } catch (error) {
+        } catch (error: any) {
+          if (error?.code === 'RESUME_LIMIT_REACHED') {
+            set({ isOverSaveLimit: true });
+            return;
+          }
           console.error('Error saving resume immediately:', error);
-          throw error; // Re-throw so caller can handle it
+          throw error;
         } finally {
           isSaving = false;
         }
@@ -635,6 +649,7 @@ export const useResumeStore = create<ResumeStore>((set, get) => ({
           isGenerating: false,
           currentResumeId: null,
           hasLoadedExistingResume: false,
+          isOverSaveLimit: false,
         });
         
         // Clear localStorage entries related to resume
@@ -657,6 +672,8 @@ export const useResumeStore = create<ResumeStore>((set, get) => ({
       },
 
       setCurrentResumeId: (resumeId) => set({ currentResumeId: resumeId }),
+
+      setIsOverSaveLimit: (value) => set({ isOverSaveLimit: value }),
 
       // Resume Editing Actions
       startEditingResume: () => {

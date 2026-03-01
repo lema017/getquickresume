@@ -21,6 +21,7 @@ const supportTicketsTableName = process.env.SUPPORT_TICKETS_TABLE || 'getquickre
 const resumeViewsTableName = process.env.RESUME_VIEWS_TABLE || 'getquickresume-api-resume-views-dev';
 const aiUsageLogsTableName = process.env.AI_USAGE_LOGS_TABLE || 'getquickresume-api-ai-usage-logs-dev';
 const validatedProfessionsTableName = process.env.VALIDATED_PROFESSIONS_TABLE || 'getquickresume-api-validated-professions-dev';
+const marketingLeadsTableName = process.env.MARKETING_LEADS_TABLE || 'marketing-leads';
 
 /**
  * Creates the Users table
@@ -568,6 +569,43 @@ async function createValidatedProfessionsTable() {
   }
 }
 
+async function createMarketingLeadsTable() {
+  try {
+    console.log(`Creating table: ${marketingLeadsTableName}`);
+    
+    const command = new CreateTableCommand({
+      TableName: marketingLeadsTableName,
+      AttributeDefinitions: [
+        {
+          AttributeName: 'email',
+          AttributeType: 'S'
+        }
+      ],
+      KeySchema: [
+        {
+          AttributeName: 'email',
+          KeyType: 'HASH'
+        }
+      ],
+      TimeToLiveSpecification: {
+        AttributeName: 'ttl',
+        Enabled: true
+      },
+      BillingMode: 'PAY_PER_REQUEST'
+    });
+
+    await client.send(command);
+    console.log(`✅ Table ${marketingLeadsTableName} created successfully!`);
+  } catch (error) {
+    if (error.name === 'ResourceInUseException') {
+      console.log(`ℹ️  Table ${marketingLeadsTableName} already exists`);
+    } else {
+      console.error('❌ Error creating table:', error);
+      throw error;
+    }
+  }
+}
+
 async function main() {
   try {
     console.log('🚀 Setting up DynamoDB local tables...');
@@ -585,6 +623,7 @@ async function main() {
     console.log(`Resume Views Table: ${resumeViewsTableName}`);
     console.log(`AI Usage Logs Table: ${aiUsageLogsTableName}`);
     console.log(`Validated Professions Table: ${validatedProfessionsTableName}`);
+    console.log(`Marketing Leads Table: ${marketingLeadsTableName}`);
     console.log('');
 
     await createUsersTable();
@@ -598,6 +637,7 @@ async function main() {
     await createResumeViewsTable();
     await createAIUsageLogsTable();
     await createValidatedProfessionsTable();
+    await createMarketingLeadsTable();
     
     console.log('');
     console.log('✅ All tables created successfully!');

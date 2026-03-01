@@ -380,14 +380,11 @@ export const generateCoverLetterHandler = async (
     const currentMonth = new Date().toISOString().slice(0, 7);
 
     if (!user.isPremium) {
-      // Free user: 1 lifetime cover letter
-      if (user.freeCoverLetterUsed) {
-        return errorResponse(403, 'Free cover letter limit reached', 'You have already used your free cover letter. Please upgrade to premium to generate more.', 'PREMIUM_REQUIRED');
-      }
+      return errorResponse(403, 'Premium required', 'Cover letter generation is a premium feature. Please upgrade to generate cover letters.', 'PREMIUM_REQUIRED');
     } else {
-      // Premium user: 40 cover letters per month
-      if (user.premiumCoverLetterMonth === currentMonth && user.premiumCoverLetterCount >= 40) {
-        return errorResponse(403, 'Monthly limit reached', 'You have reached your monthly limit of 40 cover letters. Your limit will reset on the 1st of next month.');
+      // Premium user: 30 cover letters per month
+      if (user.premiumCoverLetterMonth === currentMonth && user.premiumCoverLetterCount >= 30) {
+        return errorResponse(403, 'Monthly limit reached', 'You have reached your monthly limit of 30 cover letters. Your limit will reset on the 1st of next month.');
       }
     }
 

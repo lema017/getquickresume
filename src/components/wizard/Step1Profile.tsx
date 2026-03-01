@@ -1,9 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useResumeStore } from '@/stores/resumeStore';
-import { useWizardNavigation } from '@/hooks/useWizardNavigation';
+import { useWizardStore } from '@/hooks/useWizardStore';
+import { useWizardNav } from '@/hooks/useWizardNav';
+import { useWizardContext } from '@/contexts/WizardContext';
 import { useAuthStore } from '@/stores/authStore';
+import { capturePublicLead } from '@/services/leadCaptureService';
 import { ArrowRight, ArrowLeft, CheckCircle, Linkedin, Lightbulb } from 'lucide-react';
 import { countries } from '@/utils/countries';
 import { validateProfile, FieldValidation } from '@/utils/validation';
@@ -15,10 +17,11 @@ import { formatName, formatProfession } from '@/utils/textFormatting';
 import { DevResumePreloader } from './DevResumePreloader';
 
 export function Step1Profile() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { navigateToStep } = useWizardNavigation();
-  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep } = useResumeStore();
+  const { navigateToStep } = useWizardNav();
+  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep } = useWizardStore();
+  const { isPublicMode } = useWizardContext();
   const { user } = useAuthStore();
   const [errors, setErrors] = useState<FieldValidation>({});
   const [formData, setFormData] = useState({
@@ -26,7 +29,7 @@ export function Step1Profile() {
     lastName: formatName(resumeData.lastName || user?.lastName || user?.fullName?.split(' ').slice(1).join(' ') || ''),
     country: resumeData.country || user?.country || '',
     linkedin: resumeData.linkedin || user?.linkedin || '',
-    language: resumeData.language || 'es',
+    language: isPublicMode ? (i18n.language as 'en' | 'es') : (resumeData.language || 'es'),
     targetLevel: resumeData.targetLevel || 'mid',
     profession: resumeData.profession || '',
     tone: resumeData.tone || 'professional',
@@ -44,7 +47,7 @@ export function Step1Profile() {
       lastName: formatName(resumeData.lastName || user?.lastName || user?.fullName?.split(' ').slice(1).join(' ') || ''),
       country: resumeData.country || user?.country || '',
       linkedin: resumeData.linkedin || user?.linkedin || '',
-      language: resumeData.language || 'es',
+      language: isPublicMode ? (i18n.language as 'en' | 'es') : (resumeData.language || 'es'),
       targetLevel: resumeData.targetLevel || 'mid',
       profession: resumeData.profession || '',
       tone: resumeData.tone || 'professional',
@@ -53,7 +56,7 @@ export function Step1Profile() {
     });
     
     console.log('🔧 Step1Profile - Updated formData with profession:', resumeData.profession || '');
-  }, [resumeData, user]);
+  }, [resumeData, user, isPublicMode, i18n.language]);
 
   const handleChange = (field: string, value: any) => {
     // Format profession field to Title Case
@@ -122,13 +125,25 @@ export function Step1Profile() {
       // Continue navigation even if save fails - data is still in store
     }
     
+    if (isPublicMode) {
+      capturePublicLead({
+        email: formData.email,
+        phone: formData.phone,
+        country: formData.country,
+      });
+    }
+
     markStepCompleted(1);
     setCurrentStep(2);
     navigateToStep(2);
   };
 
   const handleBack = () => {
-    navigate('/');
+    if (isPublicMode) {
+      navigate('/');
+    } else {
+      navigate('/wizard/manual');
+    }
   };
 
   // Recalcular validación cuando formData cambia
@@ -151,7 +166,7 @@ export function Step1Profile() {
       </div>
 
       {/* Dev-only: Quick fill resume data for testing */}
-      <DevResumePreloader onLoadMockData={updateResumeData} />
+      <DevResumePreloader onLoadMockData={updateResumeData} onNavigateToPreview={() => navigateToStep(7)} />
 
       {/* Guided Questions */}
       <div className="mb-8">
@@ -319,19 +334,21 @@ export function Step1Profile() {
 
       {/* Additional Settings */}
       <div className="space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t('wizard.steps.profile.cvLanguage')}
-          </label>
-          <select
-            value={formData.language}
-            onChange={(e) => handleChange('language', e.target.value)}
-            className="input-field"
-          >
-            <option value="es">{t('translation.languages.es')}</option>
-            <option value="en">{t('translation.languages.en')}</option>
-          </select>
-        </div>
+        {!isPublicMode && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('wizard.steps.profile.cvLanguage')}
+            </label>
+            <select
+              value={formData.language}
+              onChange={(e) => handleChange('language', e.target.value)}
+              className="input-field"
+            >
+              <option value="es">{t('translation.languages.es')}</option>
+              <option value="en">{t('translation.languages.en')}</option>
+            </select>
+          </div>
+        )}
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">

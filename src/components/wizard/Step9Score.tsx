@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
-import { ArrowRight, ArrowLeft, X, Sparkles, Crown } from 'lucide-react';
+import { ArrowRight, ArrowLeft, X, Sparkles, Crown, CheckCircle, SkipForward } from 'lucide-react';
 import { ResumeScoreCard } from '@/components/resume/ResumeScoreCard';
 import { RateLimitWarning } from '@/components/RateLimitWarning';
 import toast from 'react-hot-toast';
@@ -32,6 +32,7 @@ export function Step9Score() {
     clearRateLimitInfo
   } = useResumeStore();
   const { user } = useAuthStore();
+  const canUseAIFeatures = user?.isPremium || !user?.freeResumeUsed;
   const [hasFetchedScore, setHasFetchedScore] = useState(false);
   const [showRateLimitModal, setShowRateLimitModal] = useState(false);
   const hasTrackedScoreRef = useRef(false);
@@ -154,7 +155,7 @@ export function Step9Score() {
   const handleNext = () => {
     markStepCompleted(9);
     setCurrentStep(10);
-    navigateToStep(10);
+    navigateToStep(10); // Step 10 is now Final Preview + Download
   };
 
   const handleBack = () => {
@@ -174,6 +175,73 @@ export function Step9Score() {
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Go Back to Step 8
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // No-AI path: show premium CTA + skip button instead of scoring UI
+  if (!canUseAIFeatures) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            {t('wizard.noAi.scoringTitle')}
+          </h2>
+          <p className="text-gray-600">
+            {t('wizard.noAi.scoringDescription')}
+          </p>
+        </div>
+
+        <div className="bg-gradient-to-br from-amber-50 to-yellow-50 border border-amber-200 rounded-2xl p-8 mb-8">
+          <div className="flex flex-col items-center text-center">
+            <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mb-4">
+              <Crown className="w-8 h-8 text-amber-600" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">
+              {t('wizard.noAi.scoringTitle')}
+            </h3>
+            <p className="text-gray-600 max-w-md mb-6">
+              {t('wizard.noAi.scoringDescription')}
+            </p>
+
+            <div className="space-y-3 mb-8 text-left w-full max-w-sm">
+              <div className="flex items-center gap-3">
+                <CheckCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                <span className="text-gray-700">{t('wizard.noAi.scoringFeature1')}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <CheckCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                <span className="text-gray-700">{t('wizard.noAi.scoringFeature2')}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <CheckCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                <span className="text-gray-700">{t('wizard.noAi.scoringFeature3')}</span>
+              </div>
+            </div>
+
+            <a
+              href="/premium"
+              className="px-8 py-3 bg-gradient-to-r from-amber-500 to-yellow-600 text-white font-semibold rounded-lg hover:from-amber-600 hover:to-yellow-700 transition-all shadow-md hover:shadow-lg"
+            >
+              {t('wizard.noAi.upgradeButton')}
+            </a>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div className="flex justify-between">
+          <button onClick={handleBack} className="btn-outline flex items-center">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            {t('common.back')}
+          </button>
+          <button
+            onClick={handleNext}
+            className="btn-primary flex items-center"
+          >
+            {t('wizard.noAi.skipScoring')}
+            <SkipForward className="w-4 h-4 ml-2" />
           </button>
         </div>
       </div>

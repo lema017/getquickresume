@@ -23,8 +23,7 @@ export function CoverLetterList({ onDelete }: CoverLetterListProps) {
   const [coverLetterToDelete, setCoverLetterToDelete] = useState<CoverLetter | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Check if user can create new cover letter (premium OR free user who hasn't used their quota)
-  const canCreateNew = user?.isPremium || !user?.freeCoverLetterUsed;
+  const canCreateNew = !!user?.isPremium;
 
   useEffect(() => {
     loadCoverLetters();
@@ -150,14 +149,14 @@ export function CoverLetterList({ onDelete }: CoverLetterListProps) {
               <Plus className="w-5 h-5" />
               {canCreateNew 
                 ? t('dashboard.coverLetters.createButton') 
-                : t('dashboard.premiumAction.upgrade') || 'Upgrade to Create'}
+                : t('dashboard.premiumAction.upgradeButton') || 'Upgrade to Create'}
             </button>
           </div>
         </div>
         <PremiumActionModal
           isOpen={showPremiumModal}
           onClose={() => setShowPremiumModal(false)}
-          feature="enhance"
+          feature="coverLetter"
         />
       </>
     );
@@ -190,7 +189,7 @@ export function CoverLetterList({ onDelete }: CoverLetterListProps) {
             }`}
           >
             <Plus className="w-4 h-4" />
-            {canCreateNew ? t('dashboard.coverLetters.createNew') || 'New' : 'Upgrade'}
+            {canCreateNew ? t('dashboard.coverLetters.createNew') || 'New' : t('dashboard.premiumAction.upgradeButton') || 'Upgrade'}
           </button>
         </div>
 
@@ -262,7 +261,7 @@ export function CoverLetterList({ onDelete }: CoverLetterListProps) {
       <PremiumActionModal
         isOpen={showPremiumModal}
         onClose={() => setShowPremiumModal(false)}
-        feature="enhance"
+        feature="coverLetter"
       />
 
       {/* Delete Confirmation Modal */}

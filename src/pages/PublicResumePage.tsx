@@ -98,7 +98,7 @@ export function PublicResumePage() {
   
   // Generate dynamic SEO based on resume data
   const fullName = `${resumeData.firstName || ''} ${resumeData.lastName || ''}`.trim() || 'Professional Resume';
-  const jobTitle = resumeData.profession || resumeData.targetFunction || undefined;
+  const jobTitle = resumeData.profession || undefined;
   const description = resumeData.summary 
     ? `${resumeData.summary.substring(0, 155)}...`
     : `Professional resume of ${fullName}${jobTitle ? `, ${jobTitle}` : ''}. View complete resume details and experience.`;

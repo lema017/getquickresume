@@ -7,10 +7,10 @@ import { useAuthStore } from '@/stores/authStore';
 import { ArrowLeft, Download, Share2, Eye, CheckCircle, Sparkles, RefreshCw, Linkedin, FileText, Zap, Edit3, Globe, Target, Crown, BarChart3, LucideIcon } from 'lucide-react';
 import { countries } from '@/utils/countries';
 import { ResumeEditModal } from './ResumeEditModal';
-import { templatesService, ResumeTemplate } from '@/services/templatesService';
+import { ResumeTemplate } from '@/services/templatesService';
+import { loadLocalTemplate } from '@/utils/templateCatalog';
 import { WebComponentRenderer } from './WebComponentRenderer';
-import { convertResumeDataToTemplateFormat, filterDataForPage, TemplateDataFormat } from '@/utils/resumeDataToTemplateFormat';
-import { convertGeneratedResumeToResumeData } from './TemplatePreviewModal';
+import { filterResumeDataForPage } from '@/utils/resumePageFilter';
 import { ResumeData } from '@/types';
 import { generateResumePDFFromPages } from '@/utils/pdfGenerator';
 import { calculatePagination } from '@/services/paginationService';
@@ -34,7 +34,7 @@ export function Step10Final() {
   const [isGenerated, setIsGenerated] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [showFeaturePremiumModal, setShowFeaturePremiumModal] = useState(false);
-  const [premiumFeature, setPremiumFeature] = useState<'enhance' | 'rescore' | 'edit' | 'aiSuggestions' | 'regenerate' | 'createResume' | 'premiumTemplate' | 'translate' | 'tailorForJob' | 'share'>('enhance');
+  const [premiumFeature, setPremiumFeature] = useState<'enhance' | 'rescore' | 'edit' | 'aiSuggestions' | 'regenerate' | 'createResume' | 'translate' | 'tailorForJob' | 'share'>('enhance');
   const [showEditModal, setShowEditModal] = useState(false);
   const [showTranslationModal, setShowTranslationModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
@@ -48,9 +48,9 @@ export function Step10Final() {
   const [loadingTemplate, setLoadingTemplate] = useState(false);
   const [generatingPDF, setGeneratingPDF] = useState(false);
   const [calculatingPagination, setCalculatingPagination] = useState(false);
-  const [templateData, setTemplateData] = useState<TemplateDataFormat | null>(null);
+  const [templateData, setTemplateData] = useState<ResumeData | null>(null);
   const [totalPages, setTotalPages] = useState(1);
-  const [paginatedPages, setPaginatedPages] = useState<TemplateDataFormat[]>([]);
+  const [paginatedPages, setPaginatedPages] = useState<ResumeData[]>([]);
   const [modifiedJsCode, setModifiedJsCode] = useState<string>('');
   const templateContainerRef = useRef<HTMLDivElement>(null);
   const lastCalculatedTemplateRef = useRef<string | null>(null);
@@ -71,12 +71,17 @@ export function Step10Final() {
 
       setLoadingTemplate(true);
       try {
-        const templates = await templatesService.getTemplates();
-        const template = templates.find(t => t.id === selectedTemplateId);
-        setSelectedTemplate(template || null);
+        let template: ResumeTemplate | null = null;
+
+        const local = await loadLocalTemplate(selectedTemplateId);
+        if (local) {
+          template = { ...local, layout: 'single-column' };
+        }
+
+        setSelectedTemplate(template);
       } catch (error) {
         console.error('Error loading template:', error);
-        toast.error('Error al cargar el template');
+        toast.error(t('wizard.errors.errorLoadingTemplates'));
       } finally {
         setLoadingTemplate(false);
       }
@@ -92,115 +97,56 @@ export function Step10Final() {
     setModifiedJsCode(selectedTemplate.jsCode);
   }, [selectedTemplate?.jsCode]);
 
-  // Calculate pagination and convert data when template and resume are available
+  // Calculate pagination when template and resume data are available
   useEffect(() => {
-    if (!selectedTemplate || !generatedResume) {
+    if (!selectedTemplate || !storeResumeData?.firstName) {
       if (!selectedTemplate) {
         lastCalculatedTemplateRef.current = null;
       }
       return;
     }
 
-    // Create a unique key for this template/resume combination
-    const templateKey = `${selectedTemplate.id}-${generatedResume.contactInfo.fullName}`;
-    
-    // Skip if we've already calculated for this combination
+    const templateKey = `${selectedTemplate.id}-${storeResumeData.firstName}-${storeResumeData.lastName}`;
     if (lastCalculatedTemplateRef.current === templateKey) {
       return;
     }
 
-    const calculatePaginationAndConvert = async () => {
+    const runPagination = async () => {
       setCalculatingPagination(true);
       try {
-        // Read storeResumeData inside the effect (gets current value without being a dependency)
-        const currentResumeData = storeResumeData;
-        
-        // Use existing resumeData from store if available and complete, otherwise convert from generatedResume
-        let resumeData: ResumeData;
-        if (currentResumeData && currentResumeData.firstName && currentResumeData.experience && currentResumeData.experience.length > 0) {
-          // Use existing data from store to preserve all fields (profession, targetLevel, etc.)
-          resumeData = currentResumeData;
-        } else {
-          // Fallback: convert from generatedResume if store data is incomplete
-          resumeData = convertGeneratedResumeToResumeData(generatedResume);
-        }
-        
-        // Calculate pagination
+        const resumeData = storeResumeData;
         const pagination = await calculatePagination(resumeData, selectedTemplate);
         const paginatedResumeData = calculateAndAssignPageNumbers(resumeData, pagination);
-        
-        // Convert to template format
-        const converted = convertResumeDataToTemplateFormat(paginatedResumeData);
-        setTemplateData(converted);
-        
-        // Calculate total pages from paginated data
-        const allPageNumbers = new Set<number>();
-        if (converted.profilePageNumber) allPageNumbers.add(converted.profilePageNumber);
-        if (converted.experience) {
-          converted.experience.forEach(exp => {
-            if (exp.pageNumber) allPageNumbers.add(exp.pageNumber);
-          });
-        }
-        if (converted.projects) {
-          converted.projects.forEach(proj => {
-            if (proj.pageNumber) allPageNumbers.add(proj.pageNumber);
-          });
-        }
-        if (converted.education) {
-          converted.education.forEach(edu => {
-            if (edu.pageNumber) allPageNumbers.add(edu.pageNumber);
-          });
-        }
-        if (converted.skillsPageNumbers) {
-          converted.skillsPageNumbers.forEach(pn => allPageNumbers.add(pn));
-        }
-        if (converted.languagesPageNumbers) {
-          converted.languagesPageNumbers.forEach(pn => allPageNumbers.add(pn));
-        }
-        if (converted.achievementsPageNumbers) {
-          converted.achievementsPageNumbers.forEach(pn => allPageNumbers.add(pn));
-        }
-        if (converted.certificationsPageNumbers) {
-          converted.certificationsPageNumbers.forEach(pn => allPageNumbers.add(pn));
-        }
 
-        const calculatedTotalPages = Math.max(...Array.from(allPageNumbers), 1);
-        setTotalPages(calculatedTotalPages);
+        setTemplateData(paginatedResumeData);
+        setTotalPages(pagination.totalPages);
 
-        // Create paginated pages array
-        const pages: TemplateDataFormat[] = [];
-        for (let pageNum = 1; pageNum <= calculatedTotalPages; pageNum++) {
-          pages.push(filterDataForPage(converted, pageNum));
+        const pages: ResumeData[] = [];
+        for (let pageNum = 1; pageNum <= pagination.totalPages; pageNum++) {
+          pages.push(filterResumeDataForPage(paginatedResumeData, pageNum));
         }
         setPaginatedPages(pages);
-        
-        // Extract only pagination fields to preserve existing data
+
         const paginationFields = extractPaginationFields(paginatedResumeData);
-        
-        // Update store with only pagination fields (preserves profession, targetLevel, etc.)
         updateResumeData(paginationFields);
-        
-        // Mark this template as calculated
+
         lastCalculatedTemplateRef.current = templateKey;
       } catch (error) {
         console.error('Error calculating pagination:', error);
-        toast.error('Error al calcular la paginación del template');
-        // Fallback: convert without pagination
-        const resumeData = convertGeneratedResumeToResumeData(generatedResume);
-        const converted = convertResumeDataToTemplateFormat(resumeData);
-        setTemplateData(converted);
+        toast.error(t('wizard.errors.errorCalculatingPagination'));
+        setTemplateData(storeResumeData);
         setTotalPages(1);
-        setPaginatedPages([converted]);
+        setPaginatedPages([storeResumeData]);
       } finally {
         setCalculatingPagination(false);
       }
     };
 
-    calculatePaginationAndConvert();
-  }, [selectedTemplate, generatedResume]);
+    runPagination();
+  }, [selectedTemplate, storeResumeData?.firstName, generatedResume]);
 
   const handleBack = () => {
-    navigateToStep(10);
+    navigateToStep(9);
   };
 
   const handleRegenerateCV = async () => {
@@ -229,12 +175,12 @@ export function Step10Final() {
     trackPdfDownloadAttempt(currentResumeId || undefined);
     
     if (!templateContainerRef.current) {
-      toast.error('Template no disponible para descargar');
+      toast.error(t('wizard.errors.templateUnavailable'));
       return;
     }
 
     if (!selectedTemplate) {
-      toast.error('No hay template seleccionado');
+      toast.error(t('wizard.errors.noTemplateSelected'));
       return;
     }
 
@@ -277,7 +223,7 @@ export function Step10Final() {
       const container = templateContainerRef.current;
       
       if (!container) {
-        toast.error('No se pudo encontrar el contenedor del template');
+        toast.error(t('wizard.errors.templateUnavailable'));
         return;
       }
 
@@ -291,7 +237,7 @@ export function Step10Final() {
       // Verify all page containers are present
       const pageContainers = container.querySelectorAll('.a4-page-container');
       if (pageContainers.length === 0) {
-        toast.error('No se encontraron páginas para generar el PDF');
+        toast.error(t('wizard.errors.noPagesFound'));
         return;
       }
 
@@ -341,10 +287,10 @@ export function Step10Final() {
       // Track successful download completion
       trackResumeDownloadCompleted(currentResumeId || undefined, selectedTemplate?.id);
       
-      toast.success('PDF generado exitosamente');
+      toast.success(t('wizard.errors.pdfGeneratedSuccess'));
     } catch (error) {
       console.error('Error generating PDF:', error);
-      toast.error('Error al generar el PDF');
+      toast.error(t('wizard.errors.pdfGenerationError'));
     } finally {
       setGeneratingPDF(false);
     }
@@ -500,7 +446,7 @@ export function Step10Final() {
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
             </div>
-            <p className="text-gray-600">Cargando template...</p>
+            <p className="text-gray-600">{t('wizard.errors.loadingTemplate')}</p>
           </div>
         ) : isGenerating ? (
           <div className="text-center py-12">
@@ -515,9 +461,9 @@ export function Step10Final() {
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
             </div>
-            <p className="text-gray-600">Calculando paginación...</p>
+            <p className="text-gray-600">{t('wizard.errors.calculatingPagination')}</p>
           </div>
-        ) : generatedResume && selectedTemplate && modifiedJsCode ? (
+        ) : (generatedResume || storeResumeData?.firstName) && selectedTemplate && modifiedJsCode ? (
           <div className="flex justify-center">
             <div
               ref={templateContainerRef}
@@ -606,16 +552,16 @@ export function Step10Final() {
               ) : null}
             </div>
           </div>
-        ) : generatedResume ? (
+        ) : (generatedResume || storeResumeData?.firstName) ? (
           <div className="text-center py-12">
             <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No hay template seleccionado</h3>
-            <p className="text-gray-600 mb-4">Por favor, selecciona un template en el paso anterior</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('wizard.errors.noTemplateSelected')}</h3>
+            <p className="text-gray-600 mb-4">{t('wizard.errors.selectTemplateInPreviousStep')}</p>
             <button
-              onClick={() => navigateToStep(10)}
+              onClick={() => navigate('/wizard/manual')}
               className="btn-primary"
             >
-              Volver a Seleccionar Template
+              {t('wizard.errors.goBackToSelectTemplate')}
             </button>
           </div>
         ) : (
@@ -658,7 +604,7 @@ export function Step10Final() {
             description={t('wizard.steps.final.features.cards.download.description')}
             onClick={handleDownload}
             colorScheme="gray"
-            disabled={generatingPDF || !selectedTemplate || !generatedResume}
+            disabled={generatingPDF || !selectedTemplate || (!generatedResume && !storeResumeData?.firstName)}
             loading={generatingPDF}
           />
 

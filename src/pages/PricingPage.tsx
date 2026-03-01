@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { useState, useEffect, useRef } from 'react';
-import { Check, ArrowRight, Crown, Loader2 } from 'lucide-react';
+import { Check, ArrowRight, Crown, Loader2, Lock, X } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import toast from 'react-hot-toast';
 import { getPageSEO, generateFAQSchema, commonFAQs, BASE_URL } from '@/utils/seoConfig';
@@ -241,14 +241,14 @@ export function PricingPage() {
               {
                 "@type": "Offer",
                 "name": "Premium Monthly",
-                "price": "15",
+                "price": "10",
                 "priceCurrency": "USD",
                 "availability": "https://schema.org/InStock"
               },
               {
                 "@type": "Offer",
                 "name": "Premium Yearly",
-                "price": "126",
+                "price": "60",
                 "priceCurrency": "USD",
                 "availability": "https://schema.org/InStock"
               }
@@ -273,173 +273,141 @@ export function PricingPage() {
         </div>
       </section>
 
-      {/* Pricing Cards */}
-      <section className="py-20 lg:py-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {/* Free Plan */}
-            <div className="relative p-8 rounded-3xl bg-white border-2 border-slate-200 shadow-lg flex flex-col h-full">
-              <h3 className="text-2xl font-bold text-slate-900 mb-4">
-                {t('landing.plans.free.name')}
-              </h3>
-              <div className="mb-6">
-                <p className="text-5xl font-extrabold text-slate-900 mb-2">
-                  {t('landing.plans.free.price')}
-                </p>
-                <p className="text-sm text-slate-500">
-                  {t('landing.plans.free.period')}
-                </p>
-              </div>
-              
-              <ul className="space-y-4 flex-grow mb-8">
-                {(t('landing.plans.free.features', { returnObjects: true }) as unknown as string[]).map((feature, i) => (
-                  <li key={i} className="flex items-start">
-                    <Check className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              
-              <Link
-                to="/login"
-                className="mt-auto w-full py-3 rounded-lg font-semibold text-center transition-all duration-300 bg-slate-900 text-white hover:bg-slate-800"
-              >
-                {t('landing.plans.free.cta')}
-              </Link>
-            </div>
+      {/* Feature Comparison Table */}
+      <section className="py-20 lg:py-28 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4 text-center">
+            {t('landing.plans.comparisonTitle')}
+          </h2>
+          <p className="text-lg text-slate-500 text-center mb-12">
+            {t('landing.plans.subtitle')}
+          </p>
 
-            {/* Premium Monthly */}
-            <div className="relative p-8 rounded-3xl bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 shadow-xl flex flex-col h-full">
-              <h3 className="text-2xl font-bold text-slate-900 mb-4">
-                {t('landing.plans.monthly.name')}
-              </h3>
-              <div className="mb-6">
-                <p className="text-5xl font-extrabold text-blue-600 mb-2">
-                  {t('landing.plans.monthly.price')}
-                  <span className="text-2xl">/{t('landing.plans.monthly.period')}</span>
-                </p>
-              </div>
-              
-              <ul className="space-y-4 flex-grow mb-8">
-                {(t('landing.plans.monthly.features', { returnObjects: true }) as unknown as string[]).map((feature, i) => (
-                  <li key={i} className="flex items-start">
-                    <Check className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">{feature}</span>
-                  </li>
+          <div className="overflow-x-auto rounded-2xl border border-slate-200 shadow-lg">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b-2 border-slate-200">
+                  <th className="py-8 px-6 text-sm font-medium text-slate-500 w-[28%]" />
+                  <th className="py-8 px-5 text-center w-[24%]">
+                    <div className="text-xl font-bold text-slate-900">{t('landing.plans.free.name')}</div>
+                    <div className="text-slate-500 text-sm mt-1">{t('landing.plans.free.description')}</div>
+                    <div className="mt-3">
+                      <span className="text-3xl font-extrabold text-slate-900">{t('landing.plans.free.price')}</span>
+                      <span className="text-slate-500 text-sm ml-1">/{t('landing.plans.free.period')}</span>
+                    </div>
+                  </th>
+                  <th className="py-8 px-5 text-center w-[24%]">
+                    <div className="text-xl font-bold text-slate-900">{t('landing.plans.monthly.name')}</div>
+                    <div className="text-slate-500 text-sm mt-1">{t('landing.plans.monthly.description')}</div>
+                    <div className="mt-3">
+                      <span className="text-3xl font-extrabold text-blue-600">{t('landing.plans.monthly.price')}</span>
+                      <span className="text-slate-500 text-sm ml-1">/{t('landing.plans.monthly.period')}</span>
+                    </div>
+                  </th>
+                  <th className="py-8 px-5 text-center w-[24%] bg-blue-50/50">
+                    <div className="inline-block bg-amber-400 text-slate-900 text-xs font-bold px-4 py-1.5 rounded-full shadow-lg mb-3">
+                      {t('landing.plans.yearly.badge')}
+                    </div>
+                    <div className="text-xl font-bold text-slate-900">{t('landing.plans.yearly.name')}</div>
+                    <div className="text-slate-500 text-sm mt-1">{t('landing.plans.yearly.description')}</div>
+                    <div className="mt-3">
+                      <span className="text-3xl font-extrabold text-blue-600">{t('landing.plans.yearly.price')}</span>
+                      <span className="text-slate-500 text-sm ml-1">/{t('landing.plans.yearly.period')}</span>
+                    </div>
+                    <div className="text-xs text-emerald-600 font-semibold mt-1">{t('landing.plans.yearly.savings')}</div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {Object.entries(
+                  t('landing.plans.comparisonFeatures', { returnObjects: true }) as Record<string, { name: string; free: string | boolean; premium: string | boolean }>
+                ).map(([key, feature]) => (
+                  <tr key={key} className="hover:bg-slate-50/60 transition-colors">
+                    <td className="py-4 px-6 text-sm font-medium text-slate-700">{feature.name}</td>
+                    <td className="py-4 px-5 text-center">
+                      {feature.free === true ? (
+                        <Check className="w-5 h-5 text-emerald-500 mx-auto" />
+                      ) : feature.free === false ? (
+                        <Lock className="w-4 h-4 text-slate-300 mx-auto" />
+                      ) : (
+                        <span className="text-sm font-semibold text-slate-700">{feature.free}</span>
+                      )}
+                    </td>
+                    <td className="py-4 px-5 text-center">
+                      {feature.premium === true ? (
+                        <Check className="w-5 h-5 text-emerald-500 mx-auto" />
+                      ) : feature.premium === false ? (
+                        <X className="w-5 h-5 text-slate-300 mx-auto" />
+                      ) : (
+                        <span className="text-sm font-semibold text-blue-600">{feature.premium}</span>
+                      )}
+                    </td>
+                    <td className="py-4 px-5 text-center bg-blue-50/30">
+                      {feature.premium === true ? (
+                        <Check className="w-5 h-5 text-emerald-500 mx-auto" />
+                      ) : feature.premium === false ? (
+                        <X className="w-5 h-5 text-slate-300 mx-auto" />
+                      ) : (
+                        <span className="text-sm font-semibold text-blue-600">{feature.premium}</span>
+                      )}
+                    </td>
+                  </tr>
                 ))}
-              </ul>
-              
-              {showPayPalButtons === 'monthly' ? (
-                <div className="mt-auto">
-                  <div 
-                    ref={monthlyButtonRef}
-                    className="paypal-button-container min-h-[45px]"
-                  />
-                  <button
-                    onClick={() => setShowPayPalButtons(null)}
-                    className="w-full mt-3 py-2 text-sm text-slate-600 text-center opacity-70 hover:opacity-100 transition-opacity"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => handleCheckout('monthly')}
-                  disabled={loadingPlan !== null || !paypalReady}
-                  className="mt-auto w-full py-3 rounded-lg font-semibold text-center transition-all duration-300 bg-blue-600 text-white hover:bg-blue-700 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loadingPlan === 'monthly' ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      {t('checkout.processing')}
-                    </>
-                  ) : !paypalReady ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Loading...
-                    </>
-                  ) : (
-                    <>
-                      <Crown className="w-4 h-4" />
-                      {t('landing.plans.monthly.cta')}
-                    </>
-                  )}
-                </button>
-              )}
-            </div>
-
-            {/* Premium Yearly - Best Value */}
-            <div className="relative p-8 rounded-3xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-2xl transform scale-105 border-4 border-amber-400 flex flex-col h-full">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-900 text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
-                {t('landing.plans.yearly.badge')}
-              </div>
-              
-              <h3 className="text-2xl font-bold text-white mb-4">
-                {t('landing.plans.yearly.name')}
-              </h3>
-              <div className="mb-6">
-                <p className="text-5xl font-extrabold text-white mb-2">
-                  {t('landing.plans.yearly.price')}
-                  <span className="text-2xl">/{t('landing.plans.yearly.period')}</span>
-                </p>
-                <p className="text-sm text-blue-100">
-                  {t('landing.plans.yearly.savings')}
-                </p>
-              </div>
-              
-              <ul className="space-y-4 flex-grow mb-8">
-                {(t('landing.plans.yearly.features', { returnObjects: true }) as unknown as string[]).map((feature, i) => (
-                  <li key={i} className="flex items-start">
-                    <Check className="w-5 h-5 text-amber-400 mr-3 flex-shrink-0 mt-0.5" />
-                    <span className="text-blue-100">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              
-              {showPayPalButtons === 'yearly' ? (
-                <div className="mt-auto">
-                  <div 
-                    ref={yearlyButtonRef}
-                    className="paypal-button-container min-h-[45px]"
-                  />
-                  <button
-                    onClick={() => setShowPayPalButtons(null)}
-                    className="w-full mt-3 py-2 text-sm text-blue-100 text-center opacity-70 hover:opacity-100 transition-opacity"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => handleCheckout('yearly')}
-                  disabled={loadingPlan !== null || !paypalReady}
-                  className="mt-auto w-full py-3 rounded-lg font-semibold text-center transition-all duration-300 bg-white text-blue-700 hover:bg-blue-50 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loadingPlan === 'yearly' ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      {t('checkout.processing')}
-                    </>
-                  ) : !paypalReady ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Loading...
-                    </>
-                  ) : (
-                    <>
-                      <Crown className="w-4 h-4" />
-                      {t('landing.plans.yearly.cta')}
-                    </>
-                  )}
-                </button>
-              )}
-            </div>
+              </tbody>
+              <tfoot>
+                <tr className="border-t-2 border-slate-200">
+                  <td className="py-6 px-6" />
+                  <td className="py-6 px-5 text-center">
+                    <Link
+                      to={isAuthenticated ? '/dashboard' : '/login'}
+                      className="inline-block px-6 py-2.5 rounded-lg font-semibold text-sm border-2 border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white transition-all duration-200"
+                    >
+                      {t('landing.plans.free.cta')}
+                    </Link>
+                  </td>
+                  <td className="py-6 px-5 text-center">
+                    {showPayPalButtons === 'monthly' ? (
+                      <div>
+                        <div ref={monthlyButtonRef} className="paypal-button-container min-h-[45px]" />
+                        <button onClick={() => setShowPayPalButtons(null)} className="mt-2 text-sm text-slate-500 hover:text-slate-700">Cancel</button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => handleCheckout('monthly')}
+                        disabled={loadingPlan !== null || !paypalReady}
+                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold text-sm bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {loadingPlan === 'monthly' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Crown className="w-4 h-4" />}
+                        {t('landing.plans.monthly.cta')}
+                      </button>
+                    )}
+                  </td>
+                  <td className="py-6 px-5 text-center bg-blue-50/30">
+                    {showPayPalButtons === 'yearly' ? (
+                      <div>
+                        <div ref={yearlyButtonRef} className="paypal-button-container min-h-[45px]" />
+                        <button onClick={() => setShowPayPalButtons(null)} className="mt-2 text-sm text-slate-500 hover:text-slate-700">Cancel</button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => handleCheckout('yearly')}
+                        disabled={loadingPlan !== null || !paypalReady}
+                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold text-sm bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {loadingPlan === 'yearly' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Crown className="w-4 h-4" />}
+                        {t('landing.plans.yearly.cta')}
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
           </div>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-slate-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-12 text-center">
             {t('landing.faq.title')}
@@ -475,7 +443,7 @@ export function PricingPage() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center px-4 sm:px-0">
             <Link 
-              to="/login" 
+              to={isAuthenticated ? '/dashboard' : '/login'}
               className="w-full sm:w-auto px-6 sm:px-8 py-4 bg-white text-blue-900 rounded-xl font-semibold text-base sm:text-lg shadow-2xl hover:shadow-white/20 transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 text-center leading-snug"
             >
               <span>{t('landing.cta.ctaPrimary')}</span>

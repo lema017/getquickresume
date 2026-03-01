@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useResumeStore } from '@/stores/resumeStore';
-import { useWizardNavigation } from '@/hooks/useWizardNavigation';
+import { useWizardStore } from '@/hooks/useWizardStore';
+import { useWizardNav } from '@/hooks/useWizardNav';
+import { useWizardContext } from '@/contexts/WizardContext';
 import { useAuthStore } from '@/stores/authStore';
 import { ArrowRight, ArrowLeft, CheckCircle, Sparkles, Lightbulb, Loader2, X, Wand2 } from 'lucide-react';
 import { MandatoryFieldLabel } from '@/components/MandatoryFieldLabel';
@@ -13,8 +14,9 @@ import { summarySuggestionService } from '@/services/summarySuggestionService';
 
 export function Step7Summary() {
   const { t } = useTranslation();
-  const { navigateToStep } = useWizardNavigation();
-  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep, currentResumeId } = useResumeStore();
+  const { navigateToStep } = useWizardNav();
+  const { isPublicMode, onAIFeatureClick } = useWizardContext();
+  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep, currentResumeId } = useWizardStore();
   const { user } = useAuthStore();
   const [summary, setSummary] = useState(resumeData.summary);
   const [jobDescription, setJobDescription] = useState(resumeData.jobDescription);
@@ -106,6 +108,10 @@ export function Step7Summary() {
 
   // Función para cargar sugerencias de experiencia
   const loadExperienceSuggestions = async () => {
+    if (isPublicMode) {
+      onAIFeatureClick('AI Suggestions');
+      return;
+    }
     // Check if user can use AI features - show CTA if not
     if (!canUseAIFeatures) {
       setShowPremiumModal(true);
@@ -113,7 +119,7 @@ export function Step7Summary() {
     }
 
     if (!resumeData.profession || resumeData.profession.trim() === '') {
-      setExperienceError('No hay profesión definida. Completa el paso anterior primero.');
+      setExperienceError(t('wizard.steps.summary.ui.guided.fillProfessionHint'));
       return;
     }
 
@@ -160,6 +166,10 @@ export function Step7Summary() {
 
   // Función para cargar sugerencias de diferenciadores
   const loadDifferentiatorsSuggestions = async () => {
+    if (isPublicMode) {
+      onAIFeatureClick('AI Suggestions');
+      return;
+    }
     // Check if user can use AI features - show CTA if not
     if (!canUseAIFeatures) {
       setShowPremiumModal(true);
@@ -167,7 +177,7 @@ export function Step7Summary() {
     }
 
     if (!resumeData.profession || resumeData.profession.trim() === '') {
-      setDifferentiatorsError('No hay profesión definida. Completa el paso anterior primero.');
+      setDifferentiatorsError(t('wizard.steps.summary.ui.guided.fillProfessionHint'));
       return;
     }
 
@@ -255,6 +265,10 @@ export function Step7Summary() {
 
   // Handlers for Enhance with AI
   const handleEnhanceSummary = () => {
+    if (isPublicMode) {
+      onAIFeatureClick('Enhance with AI');
+      return;
+    }
     if (!canUseAIFeatures) {
       setShowPremiumModal(true);
       return;
@@ -263,6 +277,10 @@ export function Step7Summary() {
   };
 
   const handleEnhanceDifferentiators = () => {
+    if (isPublicMode) {
+      onAIFeatureClick('Enhance with AI');
+      return;
+    }
     if (!canUseAIFeatures) {
       setShowPremiumModal(true);
       return;
@@ -313,7 +331,7 @@ export function Step7Summary() {
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
         <h3 className="text-lg font-semibold text-blue-900 mb-4 flex items-center">
           <Lightbulb className="w-5 h-5 mr-2" />
-          Preguntas Guiadas
+          {t('wizard.steps.summary.ui.guided.title')}
         </h3>
         
         <div className="space-y-4">
@@ -357,7 +375,7 @@ export function Step7Summary() {
               onChange={(e) => setSummary(e.target.value)}
               className="w-full px-3 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows={4}
-              placeholder="Describe tu experiencia profesional en 3-4 líneas..."
+              placeholder={t('wizard.steps.summary.ui.placeholders.summary')}
             />
             <div className="flex justify-between items-center mt-2">
               <span className={`text-sm ${
@@ -419,7 +437,7 @@ export function Step7Summary() {
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="text-md font-medium text-purple-800 flex items-center">
                     <Sparkles className="w-4 h-4 mr-2" />
-                    Sugerencias de IA para Experiencia
+                    {t('wizard.steps.summary.ui.ai.expPanelTitle')}
                   </h4>
                   <button
                     onClick={() => setShowExperienceSuggestions(false)}
@@ -515,7 +533,7 @@ export function Step7Summary() {
               onChange={(e) => setJobDescription(e.target.value)}
               className="w-full px-3 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows={3}
-              placeholder="¿Qué te diferencia de otros profesionales en tu área?"
+              placeholder={t('wizard.steps.summary.ui.placeholders.differentiators')}
             />
             <div className="flex justify-between items-center mt-2">
               <span className={`text-sm ${
@@ -577,7 +595,7 @@ export function Step7Summary() {
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="text-md font-medium text-purple-800 flex items-center">
                     <Sparkles className="w-4 h-4 mr-2" />
-                    Sugerencias de IA para Diferenciadores
+                    {t('wizard.steps.summary.ui.ai.diffPanelTitle')}
                   </h4>
                   <button
                     onClick={() => setShowDifferentiatorsSuggestions(false)}

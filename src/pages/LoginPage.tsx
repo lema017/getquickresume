@@ -5,7 +5,7 @@ import { Helmet } from 'react-helmet-async';
 import { useAuthStore } from '@/stores/authStore';
 import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 import { GoogleLogin } from '@react-oauth/google';
-import { Facebook } from 'lucide-react';
+import { Facebook, Crown, ArrowRight, FileText } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getPageSEO, BASE_URL } from '@/utils/seoConfig';
 
@@ -34,7 +34,15 @@ const GoogleIcon = ({ className }: { className?: string }) => (
 export function LoginPage() {
   const { t, i18n } = useTranslation();
   const { login, setLoading } = useAuthStore();
-  const { handleGoogleLogin, handleError, isLoading: googleLoading } = useGoogleAuth();
+  const {
+    handleGoogleLogin,
+    handleError,
+    isLoading: googleLoading,
+    showResumeLimitModal,
+    setShowResumeLimitModal,
+    handleResumeLimitUpgrade,
+    handleResumeLimitContinue,
+  } = useGoogleAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const lang = (i18n.language === 'es' ? 'es' : 'en') as 'en' | 'es';
@@ -168,6 +176,59 @@ export function LoginPage() {
         </p>
       </div>
       </div>
+
+      {/* Resume Limit Choice Modal */}
+      {showResumeLimitModal && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={(e) => { if (e.target === e.currentTarget) setShowResumeLimitModal(false); }}
+        >
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border-t-4 border-t-amber-500">
+            <div className="p-6">
+              <div className="bg-amber-50 rounded-2xl p-6 mb-6 text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-100 rounded-2xl mb-4">
+                  <Crown className="w-8 h-8 text-amber-600" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  {t('premiumModal.resumeLimit.headline')}
+                </h2>
+                <p className="text-gray-600">
+                  {t('premiumModal.resumeLimit.subheadline')}
+                </p>
+              </div>
+
+              <div className="space-y-3 mb-4">
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
+                  <FileText className="w-5 h-5 text-amber-600" />
+                  <span className="text-sm text-gray-700">{t('premiumModal.resumeLimit.benefit1')}</span>
+                </div>
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
+                  <FileText className="w-5 h-5 text-amber-600" />
+                  <span className="text-sm text-gray-700">{t('premiumModal.resumeLimit.benefit2')}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="px-6 pb-6 pt-2">
+              <div className="flex gap-3">
+                <button
+                  onClick={handleResumeLimitContinue}
+                  className="flex-1 px-4 py-3 text-gray-600 font-medium hover:bg-gray-100 rounded-xl transition-colors"
+                >
+                  {t('premiumModal.resumeLimit.continueLocal')}
+                </button>
+                <button
+                  onClick={handleResumeLimitUpgrade}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                >
+                  {t('premiumModal.resumeLimit.cta')}
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

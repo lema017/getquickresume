@@ -64,4 +64,12 @@ export interface PublicAtsCheckValidationResult {
  * Returns sanitized text on success, or a rejection reason on failure.
  */
 export declare function validatePublicAtsCheckInput(body: string | null, contentType: string | undefined): PublicAtsCheckValidationResult;
+export interface LeadCaptureValidationResult {
+    isValid: boolean;
+    reason?: string;
+    sanitizedEmail?: string;
+    sanitizedPhone?: string;
+    sanitizedCountry?: string;
+}
+export declare function validateLeadCaptureInput(body: string | null, contentType: string | undefined): LeadCaptureValidationResult;
 //# sourceMappingURL=inputSanitizer.d.ts.map

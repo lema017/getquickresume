@@ -73,6 +73,8 @@ const ResumeForJobDescriptionPage = lazy(() => import('@/pages/ResumeForJobDescr
 
 // Public
 const PublicResumePage = lazy(() => import('@/pages/PublicResumePage').then(m => ({ default: m.PublicResumePage })));
+const TemplateSelectionPage = lazy(() => import('@/pages/TemplateSelectionPage').then(m => ({ default: m.TemplateSelectionPage })));
+const PublicWizardPage = lazy(() => import('@/pages/PublicWizardPage').then(m => ({ default: m.PublicWizardPage })));
 
 // ============================================================================
 // Loading Fallback Component
@@ -247,6 +249,18 @@ function App() {
             <Route path="/best-resume-translators" element={
               <MainLayout>
                 <BestResumeTranslator />
+              </MainLayout>
+            } />
+
+            {/* Public Wizard Routes */}
+            <Route path="/create" element={
+              <MainLayout>
+                <TemplateSelectionPage />
+              </MainLayout>
+            } />
+            <Route path="/create/*" element={
+              <MainLayout>
+                <PublicWizardPage />
               </MainLayout>
             } />
 

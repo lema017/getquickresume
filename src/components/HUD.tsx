@@ -22,13 +22,12 @@ export function HUD() {
     { number: 7, key: 'summary', title: t('hud.stepTitles.summary') },
     { number: 8, key: 'generate', title: t('hud.stepTitles.generate') },
     { number: 9, key: 'score', title: t('hud.stepTitles.score') },
-    { number: 10, key: 'template', title: t('hud.stepTitles.template') },
-    { number: 11, key: 'final', title: t('hud.stepTitles.final') },
+    { number: 10, key: 'final', title: t('hud.stepTitles.final') },
   ];
 
   // Filter steps based on wizard phase
   // Steps 1-7: Pre-generation phase (data entry)
-  // Steps 8-11: Post-generation phase (AI enhancement)
+  // Steps 8-10: Post-generation phase (AI enhancement)
   const hasGeneratedResume = generatedResume !== null;
   const isPostGeneration = hasGeneratedResume || wizardState.currentStep >= 8;
   const visibleSteps = isPostGeneration 

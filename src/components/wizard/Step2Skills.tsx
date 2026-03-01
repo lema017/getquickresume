@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useResumeStore } from '@/stores/resumeStore';
-import { useWizardNavigation } from '@/hooks/useWizardNavigation';
+import { useWizardStore } from '@/hooks/useWizardStore';
+import { useWizardNav } from '@/hooks/useWizardNav';
+import { useWizardContext } from '@/contexts/WizardContext';
 import { useAuthStore } from '@/stores/authStore';
 import { ArrowRight, ArrowLeft, Plus, X, CheckCircle, Lightbulb, Loader2, Sparkles } from 'lucide-react';
 import { validateSkills, FieldValidation } from '@/utils/validation';
@@ -13,8 +14,9 @@ import { suggestionService } from '@/services/suggestionService';
 
 export function Step2Skills() {
   const { t } = useTranslation();
-  const { navigateToStep } = useWizardNavigation();
-  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep, currentResumeId } = useResumeStore();
+  const { navigateToStep } = useWizardNav();
+  const { isPublicMode, onAIFeatureClick } = useWizardContext();
+  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep, currentResumeId } = useWizardStore();
   const { user } = useAuthStore();
   const [errors, setErrors] = useState<FieldValidation>({});
   const [skills, setSkills] = useState(resumeData.skillsRaw || []);
@@ -148,6 +150,10 @@ export function Step2Skills() {
 
   // Handler para controlar la visibilidad de las sugerencias
   const handleLoadSuggestions = async () => {
+    if (isPublicMode) {
+      onAIFeatureClick(t('wizard.steps.skills.ui.ai.suggestionsButton'));
+      return;
+    }
     // Check if user can use AI features - show CTA if not
     if (!canUseAIFeatures) {
       setShowPremiumModal(true);

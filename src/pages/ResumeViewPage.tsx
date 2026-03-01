@@ -31,7 +31,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { convertGeneratedResumeToResumeData } from '@/components/wizard/TemplatePreviewModal';
 import { calculatePagination } from '@/services/paginationService';
 import { calculateAndAssignPageNumbers } from '@/components/wizard/Step9Preview';
-import { convertResumeDataToTemplateFormat, filterDataForPage, TemplateDataFormat } from '@/utils/resumeDataToTemplateFormat';
+import { filterResumeDataForPage } from '@/utils/resumePageFilter';
 import { generateResumePDFFromPages } from '@/utils/pdfGenerator';
 import { WebComponentRenderer } from '@/components/wizard/WebComponentRenderer';
 import { A4_DIMENSIONS } from '@/utils/a4Dimensions';
@@ -58,8 +58,8 @@ export function ResumeViewPage() {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [generatingProgress, setGeneratingProgress] = useState<string>('');
   const [calculatingPagination, setCalculatingPagination] = useState(false);
-  const [templateData, setTemplateData] = useState<TemplateDataFormat | null>(null);
-  const [paginatedPages, setPaginatedPages] = useState<TemplateDataFormat[]>([]);
+  const [templateData, setTemplateData] = useState<ResumeData | null>(null);
+  const [paginatedPages, setPaginatedPages] = useState<ResumeData[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [modifiedJsCode, setModifiedJsCode] = useState<string>('');
 
@@ -268,49 +268,14 @@ export function ResumeViewPage() {
       const pagination = await calculatePagination(resumeData, template);
       const paginatedResumeData = calculateAndAssignPageNumbers(resumeData, pagination);
 
-      // Step 3: Convert to template format
+      // Step 3: Set paginated data directly (templates expect ResumeData)
       setGeneratingProgress(t('resumeView.download.rendering'));
-      const converted = convertResumeDataToTemplateFormat(paginatedResumeData);
-      setTemplateData(converted);
+      setTemplateData(paginatedResumeData);
+      setTotalPages(pagination.totalPages);
 
-      // Step 4: Calculate total pages and create paginated pages array
-      const allPageNumbers = new Set<number>();
-      if (converted.profilePageNumber) allPageNumbers.add(converted.profilePageNumber);
-      if (converted.experience) {
-        converted.experience.forEach(exp => {
-          if (exp.pageNumber) allPageNumbers.add(exp.pageNumber);
-        });
-      }
-      if (converted.projects) {
-        converted.projects.forEach(proj => {
-          if (proj.pageNumber) allPageNumbers.add(proj.pageNumber);
-        });
-      }
-      if (converted.education) {
-        converted.education.forEach(edu => {
-          if (edu.pageNumber) allPageNumbers.add(edu.pageNumber);
-        });
-      }
-      if (converted.skillsPageNumbers) {
-        converted.skillsPageNumbers.forEach(pn => allPageNumbers.add(pn));
-      }
-      if (converted.languagesPageNumbers) {
-        converted.languagesPageNumbers.forEach(pn => allPageNumbers.add(pn));
-      }
-      if (converted.achievementsPageNumbers) {
-        converted.achievementsPageNumbers.forEach(pn => allPageNumbers.add(pn));
-      }
-      if (converted.certificationsPageNumbers) {
-        converted.certificationsPageNumbers.forEach(pn => allPageNumbers.add(pn));
-      }
-
-      const calculatedTotalPages = Math.max(...Array.from(allPageNumbers), 1);
-      setTotalPages(calculatedTotalPages);
-
-      // Create paginated pages array
-      const pages: TemplateDataFormat[] = [];
-      for (let pageNum = 1; pageNum <= calculatedTotalPages; pageNum++) {
-        pages.push(filterDataForPage(converted, pageNum));
+      const pages: ResumeData[] = [];
+      for (let pageNum = 1; pageNum <= pagination.totalPages; pageNum++) {
+        pages.push(filterResumeDataForPage(paginatedResumeData, pageNum));
       }
       setPaginatedPages(pages);
 

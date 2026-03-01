@@ -6,7 +6,7 @@
  */
 
 import { useState } from 'react';
-import { Beaker, ChevronDown, ChevronUp, Zap } from 'lucide-react';
+import { Beaker, ChevronDown, ChevronUp, Zap, FastForward } from 'lucide-react';
 import { 
   generateDevMockResume, 
   MOCK_RESUME_SIZE_INFO,
@@ -16,11 +16,13 @@ import type { ResumeData } from '@/types';
 
 interface DevResumePreloaderProps {
   onLoadMockData: (data: Partial<ResumeData>) => void;
+  onNavigateToPreview?: () => void;
 }
 
-export function DevResumePreloader({ onLoadMockData }: DevResumePreloaderProps) {
+export function DevResumePreloader({ onLoadMockData, onNavigateToPreview }: DevResumePreloaderProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState<MockResumeSize | null>(null);
+  const [loadedSize, setLoadedSize] = useState<MockResumeSize | null>(null);
 
   // Only render in development mode
   if (!import.meta.env.DEV) {
@@ -30,16 +32,23 @@ export function DevResumePreloader({ onLoadMockData }: DevResumePreloaderProps) 
   const handleLoadMockData = (size: MockResumeSize) => {
     setIsLoading(size);
     
-    // Small delay to show loading state and make it feel more intentional
     setTimeout(() => {
       const mockData = generateDevMockResume(size);
       onLoadMockData(mockData);
       setIsLoading(null);
-      setIsExpanded(false);
+      setLoadedSize(size);
     }, 300);
   };
 
-  const sizes: MockResumeSize[] = ['small', 'medium', 'large', 'xlarge'];
+  const handleSkipToStep7 = () => {
+    if (!loadedSize) {
+      const mockData = generateDevMockResume('small');
+      onLoadMockData(mockData);
+    }
+    onNavigateToPreview?.();
+  };
+
+  const sizes: MockResumeSize[] = ['small', 'medium', 'large', 'xlarge', 'xxlarge', 'xxxlarge'];
 
   return (
     <div className="mb-6 border-2 border-dashed border-amber-400 bg-amber-50 rounded-lg overflow-hidden">
@@ -68,10 +77,11 @@ export function DevResumePreloader({ onLoadMockData }: DevResumePreloaderProps) 
             Select a resume size to instantly fill all wizard steps with mock data:
           </p>
           
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
             {sizes.map((size) => {
               const info = MOCK_RESUME_SIZE_INFO[size];
               const isLoadingThis = isLoading === size;
+              const isLoaded = loadedSize === size;
               
               return (
                 <button
@@ -82,7 +92,9 @@ export function DevResumePreloader({ onLoadMockData }: DevResumePreloaderProps) 
                     relative flex flex-col items-center p-3 rounded-lg border-2 transition-all
                     ${isLoadingThis 
                       ? 'border-amber-500 bg-amber-100' 
-                      : 'border-amber-300 bg-white hover:border-amber-500 hover:bg-amber-50'
+                      : isLoaded
+                        ? 'border-green-500 bg-green-50'
+                        : 'border-amber-300 bg-white hover:border-amber-500 hover:bg-amber-50'
                     }
                     ${isLoading !== null && !isLoadingThis ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                   `}
@@ -102,6 +114,17 @@ export function DevResumePreloader({ onLoadMockData }: DevResumePreloaderProps) 
               );
             })}
           </div>
+
+          {onNavigateToPreview && (
+            <button
+              onClick={handleSkipToStep7}
+              disabled={isLoading !== null}
+              className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border-2 border-indigo-400 bg-indigo-50 text-indigo-800 font-medium text-sm hover:bg-indigo-100 hover:border-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <FastForward className="h-4 w-4" />
+              {loadedSize ? `Skip to Step 7 (${loadedSize} loaded)` : 'Fill (small) & Skip to Step 7'}
+            </button>
+          )}
 
           <p className="text-xs text-amber-600 mt-3 italic">
             ⚠️ This panel is only visible in development mode

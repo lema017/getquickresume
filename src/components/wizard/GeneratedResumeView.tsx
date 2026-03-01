@@ -59,11 +59,11 @@ const parseDurationToDateFields = (duration: string): { startDate?: string; endD
       apr: '04', april: '04', may: '05', jun: '06', june: '06',
       jul: '07', july: '07', aug: '08', august: '08', sep: '09', sept: '09', september: '09',
       oct: '10', october: '10', nov: '11', november: '11', dec: '12', december: '12',
-      // Spanish
-      ene: '01', enero: '01', febrero: '02', mar: '03', marzo: '03',
-      abr: '04', abril: '04', mayo: '05', jun: '06', junio: '06',
-      jul: '07', julio: '07', ago: '08', agosto: '08', septiembre: '09',
-      oct: '10', octubre: '10', nov: '11', noviembre: '11', dic: '12', diciembre: '12'
+      // Spanish (shared abbreviations mar, jun, jul, oct, nov already defined above)
+      ene: '01', enero: '01', febrero: '02', marzo: '03',
+      abr: '04', abril: '04', mayo: '05', junio: '06',
+      julio: '07', ago: '08', agosto: '08', septiembre: '09',
+      octubre: '10', noviembre: '11', dic: '12', diciembre: '12'
     };
     
     const month = monthMap[monthStr.toLowerCase()];
@@ -262,7 +262,7 @@ function ContactInfoSection({
 }: { 
   contactInfo: GeneratedResume['contactInfo']; 
   onUpdate: (data: GeneratedResume['contactInfo']) => void;
-  t: (key: string) => string;
+  t: (key: string, options?: Record<string, unknown>) => string;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState(contactInfo);
@@ -421,7 +421,7 @@ function SummarySection({
   canUseAIFeatures?: boolean; 
   resumeId?: string | null;
   language?: 'en' | 'es';
-  t: (key: string) => string;
+  t: (key: string, options?: Record<string, unknown>) => string;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState(summary);
@@ -542,7 +542,7 @@ function ExperienceSection({
   canUseAIFeatures?: boolean; 
   resumeId?: string | null;
   language?: 'en' | 'es';
-  t: (key: string) => string;
+  t: (key: string, options?: Record<string, unknown>) => string;
 }) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editData, setEditData] = useState<GeneratedResume['experience'][0] | null>(null);
@@ -1077,7 +1077,7 @@ function SkillsSection({
 }: { 
   skills: GeneratedResume['skills']; 
   onUpdate: (data: GeneratedResume['skills']) => void;
-  t: (key: string) => string;
+  t: (key: string, options?: Record<string, unknown>) => string;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState(skills);
@@ -1271,7 +1271,7 @@ function EducationSection({
   canUseAIFeatures?: boolean;
   resumeId?: string | null;
   language?: 'en' | 'es';
-  t: (key: string) => string;
+  t: (key: string, options?: Record<string, unknown>) => string;
 }) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editData, setEditData] = useState<GeneratedResume['education'][0] | null>(null);
@@ -1730,7 +1730,7 @@ function CertificationsSection({
   canUseAIFeatures?: boolean;
   resumeId?: string | null;
   language?: 'en' | 'es';
-  t: (key: string) => string;
+  t: (key: string, options?: Record<string, unknown>) => string;
 }) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editData, setEditData] = useState<GeneratedResume['certifications'][0] | null>(null);
@@ -2078,7 +2078,7 @@ function ProjectsSection({
   canUseAIFeatures?: boolean;
   resumeId?: string | null;
   language?: 'en' | 'es';
-  t: (key: string) => string;
+  t: (key: string, options?: Record<string, unknown>) => string;
 }) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editData, setEditData] = useState<GeneratedResume['projects'][0] | null>(null);
@@ -2154,10 +2154,10 @@ function ProjectsSection({
       name: '',
       duration: '',
       description: '',
-      technologies: [], // AI-generated, not user-editable
+      technologies: [],
       url: '',
-      achievements: [], // AI-generated, not user-editable
-      // Raw date fields for editing (matching Step5 format)
+      achievements: [],
+      impact: '',
       startDate: '',
       endDate: '',
       isOngoing: false
@@ -2511,7 +2511,7 @@ function AchievementsSection({
 }: { 
   achievements: string[]; 
   onUpdate: (data: string[]) => void;
-  t: (key: string) => string;
+  t: (key: string, options?: Record<string, unknown>) => string;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState<string[]>(achievements);
@@ -2630,7 +2630,7 @@ function LanguagesSection({
   canUseAIFeatures?: boolean;
   resumeId?: string | null;
   language?: 'en' | 'es';
-  t: (key: string) => string;
+  t: (key: string, options?: Record<string, unknown>) => string;
 }) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editData, setEditData] = useState<GeneratedResume['languages'][0] | null>(null);

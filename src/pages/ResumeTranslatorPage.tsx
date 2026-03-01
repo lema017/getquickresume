@@ -371,7 +371,7 @@ export function ResumeTranslatorPage() {
       const { replaceTextInPdf } = await import('@/utils/pdfTextReplacer');
       const modifiedPdfBytes = await replaceTextInPdf(originalPdfBytes, translatedText);
 
-      const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
+      const blob = new Blob([modifiedPdfBytes as unknown as BlobPart], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

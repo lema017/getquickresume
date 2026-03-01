@@ -431,3 +431,50 @@ export const getFirstError = (errors: FieldValidation): string | null => {
   const firstError = Object.values(errors).find(error => !error.isValid);
   return firstError?.message || null;
 };
+
+/**
+ * Validates education entries for date coherence.
+ * Returns error messages keyed by education entry id.
+ */
+export function validateEducation(education: Array<{ id: string; institution: string; degree: string; startDate?: string; endDate?: string; isCompleted?: boolean }>): Record<string, string> {
+  const errors: Record<string, string> = {};
+  for (const edu of education) {
+    if (edu.startDate && edu.endDate && edu.isCompleted) {
+      if (new Date(edu.endDate) < new Date(edu.startDate)) {
+        errors[edu.id] = 'End date must be after start date';
+      }
+    }
+  }
+  return errors;
+}
+
+/**
+ * Validates certification entries.
+ * Returns error messages keyed by certification entry id.
+ */
+export function validateCertifications(certifications: Array<{ id: string; name: string; date?: string }>): Record<string, string> {
+  const errors: Record<string, string> = {};
+  for (const cert of certifications) {
+    if (cert.date) {
+      const certDate = new Date(cert.date);
+      if (isNaN(certDate.getTime())) {
+        errors[cert.id] = 'Invalid date format';
+      } else if (certDate > new Date()) {
+        errors[cert.id] = 'Certification date cannot be in the future';
+      }
+    }
+  }
+  return errors;
+}
+
+/**
+ * Validates that a date is not unreasonably far in the future.
+ */
+export function validateNotFutureDate(date: string, maxYearsAhead = 1): boolean {
+  if (!date) return true;
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return false;
+  const maxDate = new Date();
+  maxDate.setFullYear(maxDate.getFullYear() + maxYearsAhead);
+  return d <= maxDate;
+}

@@ -135,7 +135,7 @@ export function LinkedInImport() {
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
-                    <span>{t('wizard.linkedinImportPage.premiumRequired.benefit2') || '40 resumes per month'}</span>
+                    <span>{t('wizard.linkedinImportPage.premiumRequired.benefit2') || '30 resumes per month'}</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />

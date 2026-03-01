@@ -5,7 +5,7 @@ import { GeneratedResume, ResumeData } from '@/types';
 import { WebComponentRenderer } from './WebComponentRenderer';
 import { A4_DIMENSIONS, calculateA4PreviewScale } from '@/utils/a4Dimensions';
 import toast from 'react-hot-toast';
-import { convertResumeDataToTemplateFormat, filterDataForPage, TemplateDataFormat } from '@/utils/resumeDataToTemplateFormat';
+import { filterResumeDataForPage } from '@/utils/resumePageFilter';
 import { calculatePagination } from '@/services/paginationService';
 import { calculateAndAssignPageNumbers, extractPaginationFields } from './Step9Preview';
 import { useResumeStore } from '@/stores/resumeStore';
@@ -186,9 +186,9 @@ export function TemplatePreviewModal({
   const [scale, setScale] = useState(0.7);
   const [modifiedJsCode, setModifiedJsCode] = useState(template.jsCode);
   const [calculatingPagination, setCalculatingPagination] = useState(false);
-  const [templateData, setTemplateData] = useState<TemplateDataFormat | null>(null);
+  const [templateData, setTemplateData] = useState<ResumeData | null>(null);
   const [totalPages, setTotalPages] = useState(1);
-  const [paginatedPages, setPaginatedPages] = useState<TemplateDataFormat[]>([]);
+  const [paginatedPages, setPaginatedPages] = useState<ResumeData[]>([]);
 
   // Set template JS code (templates now include multi-page CSS built-in)
   useEffect(() => {
@@ -300,86 +300,47 @@ export function TemplatePreviewModal({
     const calculatePaginationAndConvert = async () => {
       setCalculatingPagination(true);
       try {
-        // Read storeResumeData inside the effect (gets current value without being a dependency)
         const currentResumeData = storeResumeData;
-        
-        // Always convert from generatedResume to get enhanced content (description, skills, etc.)
-        let resumeData: ResumeData = convertGeneratedResumeToResumeData(generatedResume);
-        // Preserve specific fields from storeResumeData if they exist
-        if (currentResumeData) {
-          if (currentResumeData.profession) resumeData.profession = currentResumeData.profession;
-          if (currentResumeData.targetLevel) resumeData.targetLevel = currentResumeData.targetLevel;
-          if (currentResumeData.linkedin) resumeData.linkedin = currentResumeData.linkedin;
-          if (currentResumeData.jobDescription) resumeData.jobDescription = currentResumeData.jobDescription;
-          if (currentResumeData.totalCharacters) resumeData.totalCharacters = currentResumeData.totalCharacters;
+
+        let resumeData: ResumeData;
+        if (currentResumeData && currentResumeData.firstName && currentResumeData.experience?.length > 0) {
+          resumeData = currentResumeData;
+        } else {
+          resumeData = convertGeneratedResumeToResumeData(generatedResume);
+          if (currentResumeData) {
+            if (currentResumeData.profession) resumeData.profession = currentResumeData.profession;
+            if (currentResumeData.targetLevel) resumeData.targetLevel = currentResumeData.targetLevel;
+            if (currentResumeData.linkedin) resumeData.linkedin = currentResumeData.linkedin;
+            if (currentResumeData.jobDescription) resumeData.jobDescription = currentResumeData.jobDescription;
+            if (currentResumeData.totalCharacters) resumeData.totalCharacters = currentResumeData.totalCharacters;
+          }
         }
-        
-        // Calculate pagination
+
         const pagination = await calculatePagination(resumeData, template);
         const paginatedResumeData = calculateAndAssignPageNumbers(resumeData, pagination);
-        
-        // Convert to template format
-        const converted = convertResumeDataToTemplateFormat(paginatedResumeData);
-        setTemplateData(converted);
-        
-        // Calculate total pages from paginated data
-        const allPageNumbers = new Set<number>();
-        if (converted.profilePageNumber) allPageNumbers.add(converted.profilePageNumber);
-        if (converted.experience) {
-          converted.experience.forEach(exp => {
-            if (exp.pageNumber) allPageNumbers.add(exp.pageNumber);
-          });
-        }
-        if (converted.projects) {
-          converted.projects.forEach(proj => {
-            if (proj.pageNumber) allPageNumbers.add(proj.pageNumber);
-          });
-        }
-        if (converted.education) {
-          converted.education.forEach(edu => {
-            if (edu.pageNumber) allPageNumbers.add(edu.pageNumber);
-          });
-        }
-        if (converted.skillsPageNumbers) {
-          converted.skillsPageNumbers.forEach(pn => allPageNumbers.add(pn));
-        }
-        if (converted.languagesPageNumbers) {
-          converted.languagesPageNumbers.forEach(pn => allPageNumbers.add(pn));
-        }
-        if (converted.achievementsPageNumbers) {
-          converted.achievementsPageNumbers.forEach(pn => allPageNumbers.add(pn));
-        }
-        if (converted.certificationsPageNumbers) {
-          converted.certificationsPageNumbers.forEach(pn => allPageNumbers.add(pn));
-        }
 
-        const calculatedTotalPages = Math.max(...Array.from(allPageNumbers), 1);
-        setTotalPages(calculatedTotalPages);
+        setTemplateData(paginatedResumeData);
+        setTotalPages(pagination.totalPages);
 
-        // Create paginated pages array
-        const pages: TemplateDataFormat[] = [];
-        for (let pageNum = 1; pageNum <= calculatedTotalPages; pageNum++) {
-          pages.push(filterDataForPage(converted, pageNum));
+        const pages: ResumeData[] = [];
+        for (let pageNum = 1; pageNum <= pagination.totalPages; pageNum++) {
+          pages.push(filterResumeDataForPage(paginatedResumeData, pageNum));
         }
         setPaginatedPages(pages);
-        
-        // Extract only pagination fields to preserve existing data
+
         const paginationFields = extractPaginationFields(paginatedResumeData);
-        
-        // Update store with only pagination fields (preserves profession, targetLevel, etc.)
         updateResumeData(paginationFields);
-        
-        // Mark this template as calculated
+
         lastCalculatedTemplateRef.current = templateKey;
       } catch (error) {
         console.error('Error calculating pagination:', error);
         toast.error('Error al calcular la paginación del template');
-        // Fallback: convert without pagination
-        const resumeData = convertGeneratedResumeToResumeData(generatedResume);
-        const converted = convertResumeDataToTemplateFormat(resumeData);
-        setTemplateData(converted);
+        const resumeData = storeResumeData?.firstName
+          ? storeResumeData
+          : convertGeneratedResumeToResumeData(generatedResume);
+        setTemplateData(resumeData);
         setTotalPages(1);
-        setPaginatedPages([converted]);
+        setPaginatedPages([resumeData]);
       } finally {
         setCalculatingPagination(false);
       }
@@ -388,13 +349,13 @@ export function TemplatePreviewModal({
     calculatePaginationAndConvert();
   }, [isOpen, generatedResume, template, updateResumeData]);
 
-  // Fallback: convert data without pagination if calculation fails
   useEffect(() => {
     if (!isOpen || templateData || !generatedResume) return;
-    
-    const resumeData = convertGeneratedResumeToResumeData(generatedResume);
-    const converted = convertResumeDataToTemplateFormat(resumeData);
-    setTemplateData(converted);
+
+    const resumeData = storeResumeData?.firstName
+      ? storeResumeData
+      : convertGeneratedResumeToResumeData(generatedResume);
+    setTemplateData(resumeData);
   }, [isOpen, generatedResume, templateData]);
 
   const handleSelectTemplate = () => {

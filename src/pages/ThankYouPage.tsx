@@ -16,8 +16,8 @@ interface PaymentState {
 
 // Plan display names and prices
 const PLAN_DETAILS = {
-  monthly: { name: 'Monthly Premium', price: '$15', period: 'month' },
-  yearly: { name: 'Yearly Premium', price: '$126', period: 'year' },
+  monthly: { name: 'Monthly Premium', price: '$10', period: 'month' },
+  yearly: { name: 'Yearly Premium', price: '$60', period: 'year' },
 };
 
 export function ThankYouPage() {

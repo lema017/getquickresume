@@ -1,26 +1,23 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
-import { useAuthStore } from '@/stores/authStore';
-import { templatesService, ResumeTemplate } from '@/services/templatesService';
+
+import { ResumeTemplate } from '@/services/templatesService';
+import { loadAllLocalTemplates } from '@/utils/templateCatalog';
 import { TemplatePreview } from './TemplatePreview';
-import { ArrowLeft, ArrowRight, Crown, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { FixedSizeList as List, ListChildComponentProps } from 'react-window';
 
 export function Step8Templates() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { navigateToStep } = useWizardNavigation();
-  const { resumeData, markStepCompleted, setCurrentStep, selectedTemplateId, selectedTemplateCategory, setSelectedTemplate } = useResumeStore();
-  const { user } = useAuthStore();
-
+  const { resumeData, markStepCompleted, setCurrentStep, selectedTemplateId, setSelectedTemplate } = useResumeStore();
   const [templates, setTemplates] = useState<ResumeTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mainTemplateId, setMainTemplateId] = useState<string | undefined>(selectedTemplateId);
-  const [showPremiumBlock, setShowPremiumBlock] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -28,7 +25,7 @@ export function Step8Templates() {
       try {
         setLoading(true);
         setError(null);
-        const list = await templatesService.getTemplates();
+        const list = await loadAllLocalTemplates() as ResumeTemplate[];
         if (!mounted) return;
         setTemplates(list);
         if (!selectedTemplateId && list.length > 0) {
@@ -55,10 +52,6 @@ export function Step8Templates() {
   const handleBack = () => navigateToStep(7);
 
   const handleNext = () => {
-    if (selectedTemplateCategory === 'premium' && !user?.isPremium) {
-      setShowPremiumBlock(true);
-      return;
-    }
     markStepCompleted(8);
     setCurrentStep(9);
     navigateToStep(9);
@@ -107,23 +100,6 @@ export function Step8Templates() {
         <button onClick={handleNext} className="btn-primary flex items-center">{t('common.next')}<ArrowRight className="w-4 h-4 ml-2" /></button>
       </div>
 
-      {showPremiumBlock && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl">
-            <div className="flex justify-between items-start">
-              <h3 className="text-lg font-semibold text-gray-900">Template Premium</h3>
-              <button className="p-1 hover:bg-gray-100 rounded" onClick={() => setShowPremiumBlock(false)} aria-label="Cerrar">
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-            <p className="text-gray-700 mt-3">El template seleccionado es Premium. Para descargar tu resume con este diseño, actualiza tu plan.</p>
-            <div className="mt-6 flex gap-3">
-              <button className="flex-1 btn-outline" onClick={() => setShowPremiumBlock(false)}>Seguir viendo templates</button>
-              <button className="flex-1 btn-primary" onClick={() => { setShowPremiumBlock(false); navigate('/premium'); }}>Ver planes</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -137,7 +113,6 @@ function Gallery({ templates, selectedId, onSelect, resumeData }: { templates: R
         <div className={`border rounded-md p-2 cursor-pointer ${isSelected ? 'ring-2 ring-blue-500' : 'hover:border-gray-300'}`} onClick={() => onSelect(tpl)} aria-pressed={isSelected} role="button" tabIndex={0}>
           <div className="flex items-center justify-between mb-2">
             <div className="text-sm font-medium text-gray-800 truncate mr-2">{tpl.name || 'Template'}</div>
-            {tpl.category === 'premium' && <Crown className="w-4 h-4 text-amber-500" aria-label="Premium" />}
           </div>
           <TemplatePreview code={tpl.jsCode} resumeData={resumeData} />
         </div>

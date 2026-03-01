@@ -136,11 +136,11 @@ export const generateResume = async (
         };
       }
     } else {
-      // Premium user: 40 resumes per month
+      // Premium user: 30 resumes per month
       // Check if it's a new month (reset counter)
       if (user.premiumResumeMonth !== currentMonth) {
         // Month has changed, counter will be reset when we increment
-      } else if (user.premiumResumeCount >= 40) {
+      } else if (user.premiumResumeCount >= 30) {
         return {
           statusCode: 403,
           headers: {
@@ -152,7 +152,7 @@ export const generateResume = async (
           body: JSON.stringify({
             success: false,
             error: 'Monthly limit reached',
-            message: `You have reached your monthly limit of 40 resumes. Your limit will reset on the 1st of next month.`
+            message: `You have reached your monthly limit of 30 resumes. Your limit will reset on the 1st of next month.`
           })
         };
       }
@@ -459,6 +459,29 @@ export const createResumeHandler = async (
           error: 'Resume data is required'
         })
       };
+    }
+
+    // Enforce 1-resume limit for non-premium users
+    const user = await getUserById(userId);
+    if (user && !user.isPremium) {
+      const existingResumes = await getResumesByUserId(userId);
+      if (existingResumes.length >= 1) {
+        return {
+          statusCode: 403,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+            'Access-Control-Allow-Methods': 'POST,OPTIONS'
+          },
+          body: JSON.stringify({
+            success: false,
+            error: 'Free resume limit reached',
+            message: 'Free users can save up to 1 resume. Upgrade to premium for unlimited resumes.',
+            code: 'RESUME_LIMIT_REACHED'
+          })
+        };
+      }
     }
 
     const resume = await createResume(userId, resumeData, title);

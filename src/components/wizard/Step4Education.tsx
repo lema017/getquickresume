@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useResumeStore } from '@/stores/resumeStore';
-import { useWizardNavigation } from '@/hooks/useWizardNavigation';
+import { useWizardStore } from '@/hooks/useWizardStore';
+import { useWizardNav } from '@/hooks/useWizardNav';
 import { ArrowRight, ArrowLeft, Plus, X, CheckCircle } from 'lucide-react';
 import { MonthYearPicker } from '@/components/MonthYearPicker';
 import { Education, Certification } from '@/types';
 
 export function Step4Education() {
   const { t } = useTranslation();
-  const { navigateToStep } = useWizardNavigation();
-  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep } = useResumeStore();
+  const { navigateToStep } = useWizardNav();
+  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep } = useWizardStore();
   const [education, setEducation] = useState(resumeData.education);
   const [certifications, setCertifications] = useState(resumeData.certifications);
   const [isSkipped, setIsSkipped] = useState(false);

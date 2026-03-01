@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Crown, Loader2 } from 'lucide-react';
-import { templatesService, ResumeTemplate } from '@/services/templatesService';
+import { X, Loader2 } from 'lucide-react';
+import { ResumeTemplate } from '@/services/templatesService';
+import { loadAllLocalTemplates } from '@/utils/templateCatalog';
 import { WebComponentRenderer } from '@/components/wizard/WebComponentRenderer';
 import { generateSmallMockResumeData } from '@/utils/mockResumeData';
 import { calculateA4PreviewScale, getA4ContainerStyles, getA4WrapperSize } from '@/utils/a4Dimensions';
@@ -31,7 +32,7 @@ export function TemplateSelectionModal({
       try {
         setLoading(true);
         setError(null);
-        const list = await templatesService.getTemplates();
+        const list = await loadAllLocalTemplates() as ResumeTemplate[];
         setTemplates(list);
       } catch (err) {
         console.error('Error loading templates:', err);
@@ -268,12 +269,6 @@ function TemplatePreviewCard({
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <h3 className="font-semibold text-gray-900 truncate">{template.name}</h3>
-          {template.category === 'premium' && (
-            <Crown
-              className="w-4 h-4 text-amber-500 flex-shrink-0"
-              aria-label="Premium"
-            />
-          )}
         </div>
       </div>
 

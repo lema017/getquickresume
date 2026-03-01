@@ -481,6 +481,66 @@ export function validatePublicAtsCheckInput(
   return { isValid: true, sanitizedText, sanitizedProfession };
 }
 
+// ============================================================================
+// Public Lead Capture Endpoint Validation
+// ============================================================================
+
+export interface LeadCaptureValidationResult {
+  isValid: boolean;
+  reason?: string;
+  sanitizedEmail?: string;
+  sanitizedPhone?: string;
+  sanitizedCountry?: string;
+}
+
+export function validateLeadCaptureInput(
+  body: string | null,
+  contentType: string | undefined
+): LeadCaptureValidationResult {
+  if (!contentType || !contentType.includes('application/json')) {
+    return { isValid: false, reason: 'Invalid content type' };
+  }
+
+  if (!body || body.length > 2048) {
+    return { isValid: false, reason: 'Invalid or oversized body' };
+  }
+
+  let parsed: any;
+  try {
+    parsed = JSON.parse(body);
+  } catch {
+    return { isValid: false, reason: 'Invalid JSON' };
+  }
+
+  if (parsed._hp !== undefined && parsed._hp !== '') {
+    return { isValid: false, reason: 'Bot detected' };
+  }
+
+  const email = typeof parsed.email === 'string' ? parsed.email.trim() : '';
+  const phone = typeof parsed.phone === 'string' ? parsed.phone.trim() : '';
+  const country = typeof parsed.country === 'string' ? parsed.country.trim() : '';
+
+  if (!email || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { isValid: false, reason: 'Invalid email' };
+  }
+
+  const phoneDigits = phone.replace(/[\s\-\(\)]/g, '');
+  if (!phoneDigits || phoneDigits.length > 20 || !/^\+?[0-9]{7,15}$/.test(phoneDigits)) {
+    return { isValid: false, reason: 'Invalid phone' };
+  }
+
+  if (!country || country.length > 100 || !/^[a-zA-Z0-9\s]+$/.test(country)) {
+    return { isValid: false, reason: 'Invalid country' };
+  }
+
+  return {
+    isValid: true,
+    sanitizedEmail: sanitizeUserInput(email),
+    sanitizedPhone: sanitizeUserInput(phoneDigits),
+    sanitizedCountry: sanitizeUserInput(country),
+  };
+}
+
 /**
  * Extended input validation for public endpoints.
  * Uses the same patterns as validateInput() but with a higher length limit

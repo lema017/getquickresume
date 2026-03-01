@@ -4,18 +4,19 @@ import { useTranslation } from 'react-i18next';
 import { useResumeStore } from '@/stores/resumeStore';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { useAuthStore } from '@/stores/authStore';
-import { templatesService, ResumeTemplate } from '@/services/templatesService';
+import { ResumeTemplate } from '@/services/templatesService';
+import { loadAllLocalTemplates } from '@/utils/templateCatalog';
 import { TemplatePreviewModal } from './TemplatePreviewModal';
-import { PremiumActionModal } from '@/components/PremiumActionModal';
+
 import { PremiumDownloadModal } from '@/components/PremiumDownloadModal';
 import { WebComponentRenderer } from './WebComponentRenderer';
-import { ArrowLeft, ArrowRight, Crown, Eye, RefreshCw } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Eye, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { convertGeneratedResumeToResumeData } from './TemplatePreviewModal';
 import { calculateA4PreviewScale, getA4ContainerStyles, getA4WrapperSize, A4_DIMENSIONS } from '@/utils/a4Dimensions';
 import { ResumeData, SkillPageRange } from '@/types';
 import { calculatePagination } from '@/services/paginationService';
-import { convertResumeDataToTemplateFormat, filterDataForPage, TemplateDataFormat } from '@/utils/resumeDataToTemplateFormat';
+import { filterResumeDataForPage } from '@/utils/resumePageFilter';
 import { generateSmallMockResumeData } from '@/utils/mockResumeData';
 import { generateResumePDFFromPages } from '@/utils/pdfGenerator';
 import { downloadService } from '@/services/downloadService';
@@ -203,6 +204,26 @@ export function calculateAndAssignPageNumbers(
       updatedData.skillsPagination.push(skillsRange);
     }
 
+    // Process sidebar languages if present (two-column layouts)
+    if (page.sections.sidebar?.languages && page.sections.sidebar.languages.length > 0) {
+      page.sections.sidebar.languages.forEach((langId) => {
+        const lang = updatedData.languages.find((l) => l.id === langId);
+        if (lang) {
+          lang.pageNumber = pageNum;
+        }
+      });
+    }
+
+    // Process sidebar education if present (two-column layouts)
+    if (page.sections.sidebar?.education && page.sections.sidebar.education.length > 0) {
+      page.sections.sidebar.education.forEach((eduId) => {
+        const edu = updatedData.education.find((e) => e.id === eduId);
+        if (edu) {
+          edu.pageNumber = pageNum;
+        }
+      });
+    }
+
     // Process sidebar skills if present
     if (page.sections.sidebar?.skills) {
       const sidebarSkillsRange: SkillPageRange = {
@@ -249,18 +270,17 @@ export function Step9Preview() {
   const [error, setError] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplateState] = useState<ResumeTemplate | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [showDownloadPremiumModal, setShowDownloadPremiumModal] = useState(false);
   const [calculatingPagination, setCalculatingPagination] = useState(false);
   const [generatingPDF, setGeneratingPDF] = useState(false);
-  const [templateData, setTemplateData] = useState<TemplateDataFormat | null>(null);
-  const [paginatedPages, setPaginatedPages] = useState<TemplateDataFormat[]>([]);
+  const [templateData, setTemplateData] = useState<ResumeData | null>(null);
+  const [paginatedPages, setPaginatedPages] = useState<ResumeData[]>([]);
   const templateContainerRef = useRef<HTMLDivElement>(null);
 
   // Validate that generatedResume exists
   useEffect(() => {
     if (!generatedResume) {
-      toast.error('Debes generar tu CV primero');
+      toast.error(t('wizard.errors.generateFirst'));
       navigateToStep(9);
     }
   }, [generatedResume, navigateToStep]);
@@ -272,13 +292,13 @@ export function Step9Preview() {
       try {
         setLoading(true);
         setError(null);
-        const list = await templatesService.getTemplates();
+        const list = await loadAllLocalTemplates() as ResumeTemplate[];
         if (!mounted) return;
         setTemplates(list);
       } catch (e: any) {
         if (!mounted) return;
-        setError(e?.message || 'Error cargando templates');
-        toast.error('Error al cargar templates');
+        setError(e?.message || t('wizard.errors.errorLoadingTemplates'));
+        toast.error(t('wizard.errors.errorLoadingTemplates'));
       } finally {
         if (mounted) setLoading(false);
       }
@@ -296,84 +316,38 @@ export function Step9Preview() {
       console.log('🔍 [DEBUG] Starting pagination calculation for template:', template.name);
       setCalculatingPagination(true);
       try {
-        // Always convert from generatedResume to get enhanced content (description, skills, etc.)
-        // Then preserve specific fields from storeResumeData
         let resumeData: ResumeData;
-        // Always use convertGeneratedResumeToResumeData to include enhanced content
-        resumeData = convertGeneratedResumeToResumeData(generatedResume);
-        // Preserve fields from storeResumeData if they exist
-        if (storeResumeData) {
-          if (storeResumeData.profession) resumeData.profession = storeResumeData.profession;
-          if (storeResumeData.targetLevel) resumeData.targetLevel = storeResumeData.targetLevel;
-          if (storeResumeData.linkedin) resumeData.linkedin = storeResumeData.linkedin;
-          if (storeResumeData.jobDescription) resumeData.jobDescription = storeResumeData.jobDescription;
-          if (storeResumeData.totalCharacters) resumeData.totalCharacters = storeResumeData.totalCharacters;
+        if (storeResumeData && storeResumeData.firstName && storeResumeData.experience?.length > 0) {
+          resumeData = storeResumeData;
+        } else {
+          resumeData = convertGeneratedResumeToResumeData(generatedResume);
+          if (storeResumeData) {
+            if (storeResumeData.profession) resumeData.profession = storeResumeData.profession;
+            if (storeResumeData.targetLevel) resumeData.targetLevel = storeResumeData.targetLevel;
+            if (storeResumeData.linkedin) resumeData.linkedin = storeResumeData.linkedin;
+            if (storeResumeData.jobDescription) resumeData.jobDescription = storeResumeData.jobDescription;
+            if (storeResumeData.totalCharacters) resumeData.totalCharacters = storeResumeData.totalCharacters;
+          }
         }
-        
-        console.log('🔍 [DEBUG] Resume data ready, calling calculatePagination...');
+
         const pagination = await calculatePagination(resumeData, template);
-        console.log('🔍 [DEBUG] Pagination calculated:', pagination);
         const paginatedResumeData = calculateAndAssignPageNumbers(resumeData, pagination);
-        console.log('🔍 [DEBUG] Page numbers assigned, extracting pagination fields...');
-        
-        // Extract only pagination fields to preserve existing data
+
         const paginationFields = extractPaginationFields(paginatedResumeData);
-        console.log('🔍 [DEBUG] Pagination fields extracted, updating store...');
-        
-        // Update store with only pagination fields (preserves profession, targetLevel, etc.)
         updateResumeData(paginationFields);
-        console.log('🔍 [DEBUG] Store updated with pagination fields only');
-        
-        // Convert to template format for preview/download
-        const converted = convertResumeDataToTemplateFormat(paginatedResumeData);
-        setTemplateData(converted);
-        
-        // Calculate total pages and create paginated pages array
-        const allPageNumbers = new Set<number>();
-        if (converted.profilePageNumber) allPageNumbers.add(converted.profilePageNumber);
-        if (converted.experience) {
-          converted.experience.forEach(exp => {
-            if (exp.pageNumber) allPageNumbers.add(exp.pageNumber);
-          });
-        }
-        if (converted.projects) {
-          converted.projects.forEach(proj => {
-            if (proj.pageNumber) allPageNumbers.add(proj.pageNumber);
-          });
-        }
-        if (converted.education) {
-          converted.education.forEach(edu => {
-            if (edu.pageNumber) allPageNumbers.add(edu.pageNumber);
-          });
-        }
-        if (converted.skillsPageNumbers) {
-          converted.skillsPageNumbers.forEach(pn => allPageNumbers.add(pn));
-        }
-        if (converted.languagesPageNumbers) {
-          converted.languagesPageNumbers.forEach(pn => allPageNumbers.add(pn));
-        }
-        if (converted.achievementsPageNumbers) {
-          converted.achievementsPageNumbers.forEach(pn => allPageNumbers.add(pn));
-        }
-        if (converted.certificationsPageNumbers) {
-          converted.certificationsPageNumbers.forEach(pn => allPageNumbers.add(pn));
-        }
-        
-        const calculatedTotalPages = Math.max(...Array.from(allPageNumbers), 1);
-        
-        // Create paginated pages array
-        const pages: TemplateDataFormat[] = [];
-        for (let pageNum = 1; pageNum <= calculatedTotalPages; pageNum++) {
-          pages.push(filterDataForPage(converted, pageNum));
+
+        setTemplateData(paginatedResumeData);
+
+        const pages: ResumeData[] = [];
+        for (let pageNum = 1; pageNum <= pagination.totalPages; pageNum++) {
+          pages.push(filterResumeDataForPage(paginatedResumeData, pageNum));
         }
         setPaginatedPages(pages);
-        
       } catch (error) {
-        console.error('🔍 [DEBUG] Error calculating pagination:', error);
-        toast.error('Error al calcular la paginación del template');
+        console.error('Error calculating pagination:', error);
+        toast.error(t('wizard.errors.errorCalculatingPagination'));
       } finally {
         setCalculatingPagination(false);
-        console.log('🔍 [DEBUG] Pagination calculation finished');
       }
     } else {
       console.log('🔍 [DEBUG] No generatedResume available, skipping pagination');
@@ -405,17 +379,12 @@ export function Step9Preview() {
 
   const handleDownload = async () => {
     if (!selectedTemplateId || !selectedTemplate) {
-      toast.error('Debes seleccionar un template antes de descargar');
+      toast.error(t('wizard.errors.selectTemplateFirst'));
       return;
     }
     
-    if (selectedTemplate?.category === 'premium' && !user?.isPremium) {
-      setShowPremiumModal(true);
-      return;
-    }
-
     if (!templateContainerRef.current) {
-      toast.error('Template no disponible para descargar');
+      toast.error(t('wizard.errors.templateUnavailable'));
       return;
     }
 
@@ -457,7 +426,7 @@ export function Step9Preview() {
       // Verify all page containers are present
       const pageContainers = container.querySelectorAll('.a4-page-container');
       if (pageContainers.length === 0) {
-        toast.error('No se encontraron páginas para generar el PDF');
+        toast.error(t('wizard.errors.noPagesFound'));
         return;
       }
 
@@ -505,10 +474,10 @@ export function Step9Preview() {
       // Mark step as completed after successful download
       markStepCompleted(10);
       
-      toast.success('PDF generado exitosamente');
+      toast.success(t('wizard.errors.pdfGeneratedSuccess'));
     } catch (error) {
       console.error('Error generating PDF:', error);
-      toast.error('Error al generar el PDF');
+      toast.error(t('wizard.errors.pdfGenerationError'));
     } finally {
       setGeneratingPDF(false);
     }
@@ -517,9 +486,9 @@ export function Step9Preview() {
   if (!generatedResume) {
     return (
       <div className="max-w-4xl mx-auto text-center py-12">
-        <p className="text-gray-600 mb-4">Debes generar tu CV primero</p>
+        <p className="text-gray-600 mb-4">{t('wizard.errors.generateFirst')}</p>
         <button onClick={() => navigateToStep(8)} className="btn-primary">
-          Ir a Generar CV
+          {t('wizard.errors.goToGenerate')}
         </button>
       </div>
     );
@@ -669,13 +638,6 @@ export function Step9Preview() {
         />
       )}
 
-      {/* Premium Action Modal for premium templates */}
-      <PremiumActionModal
-        isOpen={showPremiumModal}
-        onClose={() => setShowPremiumModal(false)}
-        feature="premiumTemplate"
-      />
-
       {/* Premium Download Modal for download limits */}
       <PremiumDownloadModal
         isOpen={showDownloadPremiumModal}
@@ -773,9 +735,6 @@ function TemplatePreviewCard({
           <h3 className="font-semibold text-gray-900 truncate">
             {template.name}
           </h3>
-          {template.category === 'premium' && (
-            <Crown className="w-4 h-4 text-amber-500 flex-shrink-0" aria-label="Premium" />
-          )}
         </div>
       </div>
 

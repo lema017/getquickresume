@@ -26,12 +26,13 @@ import { Step6Achievements } from '@/components/wizard/Step6Achievements';
 import { Step7Summary } from '@/components/wizard/Step6Summary';
 import { Step8Preview } from '@/components/wizard/Step8Preview';
 import { Step9Score } from '@/components/wizard/Step9Score';
-import { Step9Preview } from '@/components/wizard/Step9Preview';
 import { Step10Final } from '@/components/wizard/Step10Final';
+import { WizardTemplateSelection } from '@/components/wizard/WizardTemplateSelection';
 
 // Components
 import { HUD } from '@/components/HUD';
 import { ExitWizardModal } from '@/components/wizard/ExitWizardModal';
+import { PremiumActionModal } from '@/components/PremiumActionModal';
 
 // Manual Wizard Step Wrapper
 interface ManualWizardStepProps {
@@ -42,11 +43,12 @@ function ManualWizardStep({ stepComponent: StepComponent }: ManualWizardStepProp
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const { loadResumeData, setCurrentResumeId, currentResumeId, resetResume, setGeneratedResume, setHasLoadedExistingResume, resumeData, wizardState, setCurrentStep, generatedResume } = useResumeStore();
+  const { loadResumeData, setCurrentResumeId, currentResumeId, resetResume, setGeneratedResume, setHasLoadedExistingResume, resumeData, wizardState, setCurrentStep, generatedResume, isOverSaveLimit } = useResumeStore();
   const { user } = useAuthStore();
   
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
   const [isLoadingResume, setIsLoadingResume] = useState(false);
+  const [showResumeLimitModal, setShowResumeLimitModal] = useState(false);
   const lastLoadedResumeIdRef = useRef<string | null>(null);
   const hasInitializedNoIdRef = useRef(false);
 
@@ -56,24 +58,20 @@ function ManualWizardStep({ stepComponent: StepComponent }: ManualWizardStepProp
     ? 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'  // Wider for Step 9
     : 'max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8'; // Normal for others
 
-  // Cargar resume si hay resumeId en la URL (solo una vez)
   useEffect(() => {
     const loadResumeFromUrl = async () => {
       const urlParams = new URLSearchParams(location.search);
       const resumeId = urlParams.get('resumeId');
       
-      // If no resumeId, this is a new resume - clear everything
+      
       if (!resumeId) {
-        // Prevent wiping in-progress data on step navigation
         if (hasInitializedNoIdRef.current) {
           return;
         }
-        // Only reset if we're not already in edit mode
         if (!currentResumeId) {
           resetResume();
         }
         hasInitializedNoIdRef.current = true;
-        // Reset the ref when there's no resumeId
         lastLoadedResumeIdRef.current = null;
         return;
       }
@@ -162,8 +160,13 @@ function ManualWizardStep({ stepComponent: StepComponent }: ManualWizardStepProp
   }, [location.pathname, location.search, generatedResume, navigate]);
 
   const handleSaveAndExit = async () => {
+    // If user is over the save limit and there's no existing resume, show upgrade modal
+    if (!currentResumeId && isOverSaveLimit) {
+      setShowResumeLimitModal(true);
+      return;
+    }
+
     try {
-      // Sync wizardState.completedSteps and currentStep to resumeData before saving
       const resumeDataToSave = {
         ...resumeData,
         completedSteps: wizardState.completedSteps,
@@ -171,20 +174,22 @@ function ManualWizardStep({ stepComponent: StepComponent }: ManualWizardStepProp
       };
       
       if (currentResumeId) {
-        // Edit mode: update existing resume in backend
         await resumeService.updateResume(currentResumeId, {
           resumeData: resumeDataToSave,
           updatedAt: new Date()
         });
         toast.success('Resume actualizado exitosamente');
       } else {
-        // New resume: create in API
         const newResume = await resumeService.createResume(resumeDataToSave);
         setCurrentResumeId(newResume.id);
         toast.success(t('wizard.notifications.progressSavedLocal'));
       }
       navigate('/dashboard');
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.code === 'RESUME_LIMIT_REACHED') {
+        setShowResumeLimitModal(true);
+        return;
+      }
       console.error('Error saving resume:', error);
       toast.error(t('wizard.notifications.saveError'));
     }
@@ -257,6 +262,13 @@ function ManualWizardStep({ stepComponent: StepComponent }: ManualWizardStepProp
           onClose={() => setIsExitModalOpen(false)}
           onSaveAndExit={handleSaveAndExit}
           onExitWithoutSaving={handleExitWithoutSaving}
+        />
+
+        {/* Resume Limit Modal */}
+        <PremiumActionModal
+          isOpen={showResumeLimitModal}
+          onClose={() => setShowResumeLimitModal(false)}
+          feature="resumeLimit"
         />
       </div>
     </div>
@@ -368,9 +380,6 @@ export function WizardPage() {
   const { wizardState, setCurrentStep } = useResumeStore();
   const { user } = useAuthStore();
 
-  // Check if user can create new resume (premium OR free user who hasn't used their quota)
-  const canCreateResume = user?.isPremium || !user?.freeResumeUsed;
-  
   // Check if this is an edit (has resumeId in URL) - editing existing resumes is always allowed
   const isEditingExistingResume = location.search.includes('resumeId');
 
@@ -390,18 +399,9 @@ export function WizardPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Route guard: redirect free users who have used their quota and are not editing
-  useEffect(() => {
-    if (!canCreateResume && !isEditingExistingResume) {
-      toast.error(t('wizard.errors.freeQuotaUsed') || 'You have already used your free resume. Please upgrade to premium to create more resumes.');
-      navigate('/dashboard');
-    }
-  }, [canCreateResume, isEditingExistingResume, navigate, t]);
-
-  // Don't render anything while redirecting
-  if (!canCreateResume && !isEditingExistingResume) {
-    return null;
-  }
+  // Free users with exhausted quota are allowed into the wizard.
+  // AI features are gated at the individual step level (Steps 2,3,5,6,7 show PremiumActionModal).
+  // Steps 8-10 handle the no-AI path with local GeneratedResume creation.
 
   return (
     <>
@@ -421,8 +421,8 @@ export function WizardPage() {
             <Route path="/upload/review" element={<ResumeExtractionReview />} />
             <Route path="/linkedin" element={<LinkedInImport />} />
             
-            {/* Manual creation wizard */}
-            <Route path="/manual" element={<Navigate to="/wizard/manual/step-1" replace />} />
+            {/* Manual creation wizard - template selection is the entry point */}
+            <Route path="/manual" element={<ManualWizardStep stepComponent={WizardTemplateSelection} />} />
             <Route path="/manual/step-1" element={<ManualWizardStep stepComponent={Step1Profile} />} />
             <Route path="/manual/step-2" element={<ManualWizardStep stepComponent={Step2Skills} />} />
             <Route path="/manual/step-3" element={<ManualWizardStep stepComponent={Step3Experience} />} />
@@ -432,8 +432,7 @@ export function WizardPage() {
             <Route path="/manual/step-7" element={<ManualWizardStep stepComponent={Step7Summary} />} />
             <Route path="/manual/step-8" element={<ManualWizardStep stepComponent={Step8Preview} />} />
             <Route path="/manual/step-9" element={<ManualWizardStep stepComponent={Step9Score} />} />
-            <Route path="/manual/step-10" element={<ManualWizardStep stepComponent={Step9Preview} />} />
-            <Route path="/manual/step-11" element={<ManualWizardStep stepComponent={Step10Final} />} />
+            <Route path="/manual/step-10" element={<ManualWizardStep stepComponent={Step10Final} />} />
           </Routes>
         </div>
       </div>

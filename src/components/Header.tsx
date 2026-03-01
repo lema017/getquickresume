@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Menu, X, User, LogOut, Globe } from 'lucide-react';
+import { Menu, X, User, LogOut, Globe, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { Avatar } from './Avatar';
 import { formatName } from '@/utils/textFormatting';
@@ -197,9 +197,10 @@ export function Header() {
             ) : (
               <Link
                 to="/login"
-                className="btn-primary hidden sm:inline-flex text-sm"
+                className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-full font-semibold text-sm hover:bg-slate-800 transition-colors shadow-lg hover:shadow-xl"
               >
                 {t('landing.hero.ctaPrimary')}
+                <ArrowRight className="w-4 h-4" />
               </Link>
             )}
 

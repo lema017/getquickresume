@@ -1,11 +1,11 @@
-import { X, Globe, Target, Sparkles, Share2, RefreshCw, Zap, Clock, Check, TrendingUp, BarChart3, QrCode, Eye, MapPin, FileText, Award, ArrowRight } from 'lucide-react';
+import { X, Globe, Target, Sparkles, Share2, RefreshCw, Zap, Clock, Check, TrendingUp, BarChart3, QrCode, Eye, MapPin, FileText, Award, ArrowRight, Crown, Lock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 interface PremiumActionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  feature: 'enhance' | 'rescore' | 'edit' | 'aiSuggestions' | 'regenerate' | 'createResume' | 'premiumTemplate' | 'translate' | 'tailorForJob' | 'share';
+  feature: 'enhance' | 'rescore' | 'edit' | 'aiSuggestions' | 'regenerate' | 'createResume' | 'translate' | 'tailorForJob' | 'share' | 'resumeLimit' | 'coverLetter';
 }
 
 // Feature-specific configurations
@@ -66,6 +66,28 @@ const featureConfigs = {
       button: 'from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700',
     },
   },
+  resumeLimit: {
+    icon: Crown,
+    colors: {
+      bg: 'bg-amber-50',
+      bgGradient: 'from-amber-500 to-orange-600',
+      accent: 'text-amber-600',
+      border: 'border-amber-200',
+      iconBg: 'bg-amber-100',
+      button: 'from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700',
+    },
+  },
+  coverLetter: {
+    icon: FileText,
+    colors: {
+      bg: 'bg-violet-50',
+      bgGradient: 'from-violet-500 to-purple-600',
+      accent: 'text-violet-600',
+      border: 'border-violet-200',
+      iconBg: 'bg-violet-100',
+      button: 'from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700',
+    },
+  },
   // Fallback for other features
   default: {
     icon: Sparkles,
@@ -113,6 +135,10 @@ export function PremiumActionModal({
         return <ShareModalContent colors={colors} t={t} />;
       case 'rescore':
         return <RescoreModalContent colors={colors} t={t} />;
+      case 'resumeLimit':
+        return <ResumeLimitModalContent colors={colors} t={t} />;
+      case 'coverLetter':
+        return <CoverLetterModalContent colors={colors} t={t} />;
       default:
         return <DefaultModalContent feature={feature} colors={colors} t={t} />;
     }
@@ -532,6 +558,104 @@ function RescoreModalContent({ colors, t }: { colors: typeof featureConfigs.defa
           <div className="flex-1">
             <p className="font-semibold text-gray-900 text-sm">{t('premiumModal.rescore.unlimited')}</p>
             <p className="text-xs text-gray-500">{t('premiumModal.rescore.unlimitedDesc')}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Resume Limit Modal Content
+function ResumeLimitModalContent({ colors, t }: { colors: typeof featureConfigs.default.colors; t: any }) {
+  return (
+    <div className="p-6">
+      <div className={`${colors.bg} rounded-2xl p-6 mb-6 text-center`}>
+        <div className={`inline-flex items-center justify-center w-16 h-16 ${colors.iconBg} rounded-2xl mb-4`}>
+          <Crown className={`w-8 h-8 ${colors.accent}`} />
+        </div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          {t('premiumModal.resumeLimit.headline')}
+        </h2>
+        <p className="text-gray-600">
+          {t('premiumModal.resumeLimit.subheadline')}
+        </p>
+      </div>
+
+      <div className="space-y-3 mb-4">
+        <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
+          <div className={`${colors.iconBg} p-2 rounded-lg`}>
+            <FileText className={`w-4 h-4 ${colors.accent}`} />
+          </div>
+          <div className="flex-1">
+            <p className="font-semibold text-gray-900 text-sm">{t('premiumModal.resumeLimit.unlimitedResumes')}</p>
+            <p className="text-xs text-gray-500">{t('premiumModal.resumeLimit.unlimitedResumesDesc')}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
+          <div className={`${colors.iconBg} p-2 rounded-lg`}>
+            <Sparkles className={`w-4 h-4 ${colors.accent}`} />
+          </div>
+          <div className="flex-1">
+            <p className="font-semibold text-gray-900 text-sm">{t('premiumModal.resumeLimit.aiFeatures')}</p>
+            <p className="text-xs text-gray-500">{t('premiumModal.resumeLimit.aiFeaturesDesc')}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
+          <div className={`${colors.iconBg} p-2 rounded-lg`}>
+            <Lock className={`w-4 h-4 ${colors.accent}`} />
+          </div>
+          <div className="flex-1">
+            <p className="font-semibold text-gray-900 text-sm">{t('premiumModal.resumeLimit.cloudSave')}</p>
+            <p className="text-xs text-gray-500">{t('premiumModal.resumeLimit.cloudSaveDesc')}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Cover Letter Modal Content
+function CoverLetterModalContent({ colors, t }: { colors: typeof featureConfigs.default.colors; t: any }) {
+  return (
+    <div className="p-6">
+      <div className={`${colors.bg} rounded-2xl p-6 mb-6 text-center`}>
+        <div className={`inline-flex items-center justify-center w-16 h-16 ${colors.iconBg} rounded-2xl mb-4`}>
+          <FileText className={`w-8 h-8 ${colors.accent}`} />
+        </div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          {t('premiumModal.coverLetter.headline')}
+        </h2>
+        <p className="text-gray-600">
+          {t('premiumModal.coverLetter.subheadline')}
+        </p>
+      </div>
+
+      <div className="space-y-3 mb-4">
+        <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
+          <div className={`${colors.iconBg} p-2 rounded-lg`}>
+            <Sparkles className={`w-4 h-4 ${colors.accent}`} />
+          </div>
+          <div className="flex-1">
+            <p className="font-semibold text-gray-900 text-sm">{t('premiumModal.coverLetter.aiPowered')}</p>
+            <p className="text-xs text-gray-500">{t('premiumModal.coverLetter.aiPoweredDesc')}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
+          <div className={`${colors.iconBg} p-2 rounded-lg`}>
+            <Target className={`w-4 h-4 ${colors.accent}`} />
+          </div>
+          <div className="flex-1">
+            <p className="font-semibold text-gray-900 text-sm">{t('premiumModal.coverLetter.tailored')}</p>
+            <p className="text-xs text-gray-500">{t('premiumModal.coverLetter.tailoredDesc')}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
+          <div className={`${colors.iconBg} p-2 rounded-lg`}>
+            <Zap className={`w-4 h-4 ${colors.accent}`} />
+          </div>
+          <div className="flex-1">
+            <p className="font-semibold text-gray-900 text-sm">{t('premiumModal.coverLetter.monthly')}</p>
+            <p className="text-xs text-gray-500">{t('premiumModal.coverLetter.monthlyDesc')}</p>
           </div>
         </div>
       </div>

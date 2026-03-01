@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useResumeStore } from '@/stores/resumeStore';
-import { useWizardNavigation } from '@/hooks/useWizardNavigation';
+import { useWizardStore } from '@/hooks/useWizardStore';
+import { useWizardNav } from '@/hooks/useWizardNav';
+import { useWizardContext } from '@/contexts/WizardContext';
 import { useAuthStore } from '@/stores/authStore';
 import { ArrowRight, ArrowLeft, Plus, X, CheckCircle, Trophy, Sparkles, Loader2, Wand2 } from 'lucide-react';
 import { MandatoryFieldLabel } from '@/components/MandatoryFieldLabel';
@@ -13,8 +14,9 @@ import { AchievementSuggestion } from '@/types';
 
 export function Step6Achievements() {
   const { t } = useTranslation();
-  const { navigateToStep } = useWizardNavigation();
-  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep, currentResumeId } = useResumeStore();
+  const { navigateToStep } = useWizardNav();
+  const { isPublicMode, onAIFeatureClick } = useWizardContext();
+  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep, currentResumeId } = useWizardStore();
   const { user } = useAuthStore();
   const [achievements, setAchievements] = useState(resumeData.achievements || []);
 
@@ -76,6 +78,10 @@ export function Step6Achievements() {
   };
 
   const loadAISuggestions = async () => {
+    if (isPublicMode) {
+      onAIFeatureClick('AI Suggestions');
+      return;
+    }
     // Check if user can use AI features - show CTA if not
     if (!canUseAIFeatures) {
       setShowPremiumModal(true);
@@ -138,6 +144,10 @@ export function Step6Achievements() {
 
   // AI Enhancement for individual achievement descriptions
   const handleEnhanceDescription = async (achievementId: string) => {
+    if (isPublicMode) {
+      onAIFeatureClick('Enhance with AI');
+      return;
+    }
     // Check if user can use AI features
     if (!canUseAIFeatures) {
       setShowPremiumModal(true);

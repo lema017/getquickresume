@@ -38,6 +38,7 @@ provider:
     PAYPAL_CLIENT_ID: ${ssm:/getquickresume/${self:provider.stage}/paypal-client-id}
     PAYPAL_CLIENT_SECRET: ${ssm:/getquickresume/${self:provider.stage}/paypal-client-secret}
     PAYPAL_ENVIRONMENT: ${ssm:/getquickresume/${self:provider.stage}/paypal-environment}
+    MARKETING_LEADS_TABLE: marketing-leads
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -69,6 +70,7 @@ provider:
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-ai-usage-logs-${self:provider.stage}/index/*"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-cover-letters-${self:provider.stage}"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-cover-letters-${self:provider.stage}/index/*"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/marketing-leads"
     - Effect: Allow
       Action:
         - s3:GetObject
@@ -1449,6 +1451,23 @@ functions:
               - Authorization
             allowCredentials: false
 
+  # Public lead capture (no auth, IP rate-limited)
+  publicLeadCapture:
+    handler: dist/handlers/publicLeadCapture.handler
+    events:
+      - http:
+          path: /api/public/lead-capture
+          method: post
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+            allowCredentials: false
+          throttle:
+            burstLimit: 100
+            rateLimit: 50
+    reservedConcurrency: 5
+
   # Scheduled task to expire premium subscriptions
   expireSubscriptions:
     handler: dist/handlers/scheduledTasks.expireSubscriptions
@@ -1713,6 +1732,21 @@ resources:
           AttributeName: ttl
           Enabled: true
         BillingMode: PAY_PER_REQUEST
+
+    MarketingLeadsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: marketing-leads
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+        TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true
 
     CoverLettersTable:
       Type: AWS::DynamoDB::Table

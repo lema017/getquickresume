@@ -535,6 +535,7 @@ export function DataEditModal({
               isCurrent: exp.isCurrent || exp.duration.toLowerCase().includes('present'),
               description: exp.description,
               achievements: exp.achievements || [],
+              responsibilities: [],
               pageNumber: null,
             })),
           };

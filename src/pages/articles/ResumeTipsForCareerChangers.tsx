@@ -136,10 +136,9 @@ export function ResumeTipsForCareerChangers() {
       </p>
 
       <ArticleCTA 
-        variant="card"
+        variant="inline"
         title="Need help rephrasing your experience?"
         description="GetQuickResume's AI can rewrite your bullet points to highlight transferable skills for your new career path."
-        buttonText="Optimize My Resume Now"
       />
 
       <SectionDivider icon={ArrowRightCircle}>Key Takeaways for Career Changers</SectionDivider>

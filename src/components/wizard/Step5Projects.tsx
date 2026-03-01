@@ -1,7 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useResumeStore } from '@/stores/resumeStore';
-import { useWizardNavigation } from '@/hooks/useWizardNavigation';
+import { useWizardStore } from '@/hooks/useWizardStore';
+import { useWizardNav } from '@/hooks/useWizardNav';
+import { useWizardContext } from '@/contexts/WizardContext';
 import { ArrowRight, ArrowLeft, Plus, X, CheckCircle, Wand2 } from 'lucide-react';
 import { MonthYearPicker } from '@/components/MonthYearPicker';
 import { MandatoryFieldLabel } from '@/components/MandatoryFieldLabel';
@@ -12,8 +13,9 @@ import { Project, Language } from '@/types';
 
 export function Step5Projects() {
   const { t } = useTranslation();
-  const { navigateToStep } = useWizardNavigation();
-  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep, currentResumeId } = useResumeStore();
+  const { navigateToStep } = useWizardNav();
+  const { isPublicMode, onAIFeatureClick } = useWizardContext();
+  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep, currentResumeId } = useWizardStore();
   const [projects, setProjects] = useState(resumeData.projects);
   const [languages, setLanguages] = useState(resumeData.languages);
 
@@ -62,6 +64,10 @@ export function Step5Projects() {
 
   // AI Functions
   const openEnhanceModal = useCallback((projectId: string, description: string, projectName: string) => {
+    if (isPublicMode) {
+      onAIFeatureClick('Enhance with AI');
+      return;
+    }
     if (!description.trim()) {
       setErrorMessage('Por favor, ingresa una descripción del proyecto para mejorar con IA');
       setShowErrorModal(true);

@@ -1,8 +1,9 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useResumeStore } from '@/stores/resumeStore';
-import { useWizardNavigation } from '@/hooks/useWizardNavigation';
+import { useWizardStore } from '@/hooks/useWizardStore';
+import { useWizardNav } from '@/hooks/useWizardNav';
 import { useAuthStore } from '@/stores/authStore';
+import { useWizardContext } from '@/contexts/WizardContext';
 import { ArrowRight, ArrowLeft, Plus, X, CheckCircle, Lightbulb, Sparkles, Wand2 } from 'lucide-react';
 import { WorkExperience } from '@/types';
 import { MonthYearPicker } from '@/components/MonthYearPicker';
@@ -15,8 +16,9 @@ import { ValidationError } from '@/components/ValidationError';
 
 export function Step3Experience() {
   const { t } = useTranslation();
-  const { navigateToStep } = useWizardNavigation();
-  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep, addWorkExperience, currentResumeId } = useResumeStore();
+  const { navigateToStep } = useWizardNav();
+  const { isPublicMode, onAIFeatureClick } = useWizardContext();
+  const { resumeData, updateResumeData, saveResumeDataImmediately, markStepCompleted, setCurrentStep, addWorkExperience, currentResumeId } = useWizardStore();
   const { user } = useAuthStore();
   const [experiences, setExperiences] = useState(resumeData.experience);
 
@@ -117,6 +119,10 @@ export function Step3Experience() {
 
   // AI Functions
   const openSuggestionsModal = useCallback((expId: string, jobTitle: string) => {
+    if (isPublicMode) {
+      onAIFeatureClick('AI Suggestions');
+      return;
+    }
     // Check if user can use AI features - show CTA if not
     if (!canUseAIFeatures) {
       setShowPremiumModal(true);
@@ -129,7 +135,7 @@ export function Step3Experience() {
     }
     setAiValidationError(null);
     setSuggestionsModal({ isOpen: true, jobTitle: jobTitle.trim(), expId });
-  }, [canUseAIFeatures]);
+  }, [canUseAIFeatures, isPublicMode, onAIFeatureClick]);
 
   const handleSuggestionsSelect = useCallback((suggestions: string[]) => {
     setExperiences(prevExperiences => {
@@ -144,6 +150,10 @@ export function Step3Experience() {
   }, [suggestionsModal.expId]);
 
   const openEnhanceModal = useCallback((expId: string, achIndex: number, text: string, jobTitle: string) => {
+    if (isPublicMode) {
+      onAIFeatureClick('Enhance with AI');
+      return;
+    }
     // Check if user can use AI features - show CTA if not
     if (!canUseAIFeatures) {
       setShowPremiumModal(true);
@@ -161,7 +171,7 @@ export function Step3Experience() {
       achIndex, 
       jobTitle: jobTitle.trim() 
     });
-  }, [canUseAIFeatures]);
+  }, [canUseAIFeatures, isPublicMode, onAIFeatureClick]);
 
   const handleEnhanceApprove = useCallback((enhancedText: string) => {
     setExperiences(prevExperiences => {
