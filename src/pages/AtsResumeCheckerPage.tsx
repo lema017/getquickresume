@@ -862,7 +862,7 @@ export function AtsResumeCheckerPage() {
                 Translate your resume
               </Link>{' '}
               while keeping it ATS-friendly. For a deeper look at translation options, read our{' '}
-              <Link to="/best-resume-translators" className="text-blue-600 font-medium hover:underline">
+              <Link to="/resume-translator" className="text-blue-600 font-medium hover:underline">
                 resume translation guide
               </Link>.
             </p>

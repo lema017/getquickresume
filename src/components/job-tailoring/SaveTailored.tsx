@@ -98,7 +98,7 @@ export function SaveTailored({ onBack }: SaveTailoredProps) {
   const handleViewResume = () => {
     if (savedResumeId) {
       reset();
-      navigate(`/resume/${savedResumeId}`);
+      navigate(`/my-resumes/${savedResumeId}`);
     }
   };
 

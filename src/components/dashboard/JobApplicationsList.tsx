@@ -105,7 +105,7 @@ export function JobApplicationsList() {
   };
 
   const handleView = (item: TailoredResumeItem) => {
-    navigate(`/resume/${item.id}`);
+    navigate(`/my-resumes/${item.id}`);
   };
 
   const handleEdit = (item: TailoredResumeItem) => {

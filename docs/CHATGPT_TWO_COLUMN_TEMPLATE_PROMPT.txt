@@ -1,0 +1,257 @@
+# GetQuickResume — Prompt for Two-Column Resume Templates (ChatGPT)
+
+Use this document to generate a **two-column** resume template (sidebar + main column) that is compatible with GetQuickResume: data shape, hydration (pagination), project/experience/education structures, and section order rules.
+
+Copy the sections below into ChatGPT and add your style description at the end.
+
+---
+
+## Role and output
+
+You are an expert at building resume templates as **vanilla JavaScript Web Components**. Generate a **two-column** resume template that integrates with GetQuickResume. Output a single **.js file** only (no HTML/CSS files). The template must consume the app’s `data` object, respect section order, and use the DOM structure required for hydration (pagination).
+
+---
+
+## Technical format
+
+- **Single file**: one `.js` file wrapped in an IIFE: `(function() { 'use strict'; ... })();`
+- **Custom Element**: extends `HTMLElement`; tag name exactly `gqr-resume-XXXX` (e.g. `gqr-resume-dock`); class name `GQRResumeXxxx` (PascalCase of the suffix); register with `customElements.define('gqr-resume-XXXX', GQRResumeXxxx)` only if not already defined.
+- **Shadow DOM**: use `attachShadow({ mode: 'open' })`; all markup and styles live in the shadow root.
+- **Header comment** (JSDoc at top of file):
+  ```
+  /**
+   * name: gqr-resume-XXXX
+   * description: "Two-column resume with [brief visual description: sidebar/main style, colors, typography]."
+   */
+  ```
+- **Data**: the component receives a `data` object via a **property** (getter/setter). Do not use attributes for resume content.
+- **Language**: support attribute `language` ('en' | 'es'). Implement `getLanguage()` that returns `this.getAttribute('language')` or `this.data?.language` or `'en'`.
+- **i18n**: provide an `i18n` object with keys for `es` and `en`: profile, experience, education, projects, certifications, languages, achievements, skills, contact, present. Provide `levelMap` for language levels: basic, intermediate, advanced, native (in both es and en).
+- **Helpers**: implement `safeStr(v)`, `safeArr(v)`, `escapeHtml(t)`, and a date-range formatter that uses "Present" / "Presente" when the job or degree is current (`isCurrent` / `isCompleted === false`). Use short dates (e.g. "Jan 2024", "Ene 2024") according to `language`.
+
+---
+
+## Data structure (ResumeData) — must match exactly
+
+The app passes the same **ResumeData** object to all templates. The template must read only these fields and nested shapes.
+
+### Top-level fields
+
+| Field            | Type     | Description |
+|------------------|----------|-------------|
+| firstName        | string   | First name |
+| lastName         | string   | Last name |
+| profession       | string   | Job title / profession |
+| summary          | string   | Professional summary |
+| email            | string   | Email |
+| phone            | string   | Phone |
+| country          | string   | Location / country |
+| linkedin         | string   | LinkedIn URL or handle |
+| language         | string   | 'en' \| 'es' (and others; template uses mainly en/es for i18n) |
+| skillsRaw        | string[] | List of skill names |
+| toolsRaw         | string[] | Optional; list of tools. Often merged with skillsRaw for display (merge and dedupe). |
+
+### experience (array)
+
+Each item:
+
+| Field          | Type     | Description |
+|----------------|----------|-------------|
+| id             | string   | Unique id (use for data-entry-id) |
+| title          | string   | Job title |
+| company        | string   | Company name |
+| location       | string   | Optional location |
+| startDate      | string   | e.g. "2020-01" |
+| endDate        | string   | Optional |
+| isCurrent      | boolean  | If true, show "Present" / "Presente" |
+| achievements   | string[] | Bullet points |
+| responsibilities | string[] | Additional bullets (often concatenated with achievements) |
+
+### education (array)
+
+Each item:
+
+| Field        | Type     | Description |
+|--------------|----------|-------------|
+| id           | string   | Unique id (use for data-entry-id) |
+| institution  | string   | School name |
+| degree       | string   | Degree name |
+| field        | string   | Field of study |
+| startDate    | string   | e.g. "2016-09" |
+| endDate      | string   | Optional |
+| isCompleted  | boolean  | If false, treat as ongoing ("Present") |
+| gpa          | string   | Optional |
+
+### projects (array)
+
+Each item:
+
+| Field         | Type     | Description |
+|---------------|----------|-------------|
+| id            | string   | Unique id (use for data-entry-id) |
+| name          | string   | Project name |
+| description   | string   | Project description |
+| technologies  | string[] | Tech stack / tags |
+| url           | string   | Optional link |
+| startDate     | string   | Optional |
+| endDate       | string   | Optional |
+| isOngoing     | boolean  | Optional |
+
+### certifications (array)
+
+Each item:
+
+| Field  | Type   | Description |
+|--------|--------|-------------|
+| id     | string | Unique id (use for data-entry-id) |
+| name   | string | Certification name |
+| issuer | string | Issuing organization |
+| date   | string | Optional (e.g. "2022") |
+
+### languages (array)
+
+Each item:
+
+| Field | Type   | Description |
+|-------|--------|-------------|
+| id    | string | Unique id (use for data-entry-id) |
+| name  | string | Language name |
+| level | string | 'basic' \| 'intermediate' \| 'advanced' \| 'native' — show translated via levelMap |
+
+### achievements (array)
+
+Each item:
+
+| Field       | Type   | Description |
+|-------------|--------|-------------|
+| id         | string | Unique id (use for data-entry-id) |
+| title      | string | Achievement title |
+| description| string | Description |
+| year       | string | Optional year |
+
+Always use `safeStr()` and `safeArr()` when reading these fields so missing or null values do not break the template.
+
+---
+
+## Section order rules (two-column)
+
+Order is **strict**. Only render a section if it has data. Do not change the order.
+
+### Sidebar (narrow column) — only these three sections
+
+All sidebar content must be inside a single container with **class `sidebar`** so the app can detect two-column layout and run pagination correctly.
+
+| Order | Section   | data-section value |
+|-------|-----------|--------------------|
+| 1     | Contact   | contact            |
+| 2     | Languages | languages          |
+| 3     | Skills    | skills             |
+
+- **Contact**: email, phone, country, linkedin (any subset present).
+- **Languages**: list of languages with name and level (use levelMap for translated level).
+- **Skills**: combine `skillsRaw` and `toolsRaw` (if present), dedupe; render as badges. Use `data-entry-id="skill-0"`, `skill-1`, … for each skill so pagination can split skills if needed. **Skills layout**: use a flex-wrap container so badges flow horizontally and wrap to multiple rows (e.g. `display: flex; flex-wrap: wrap; gap: 6px` on the wrapper, and each skill as an inline-block span with `white-space: nowrap`). Do not stack skills vertically (one per row); that wastes horizontal space in the sidebar.
+
+### Main column (wide column) — only these sections
+
+All main content must be inside a single container with **class `main`**.
+
+| Order | Section      | data-section value |
+|-------|--------------|--------------------|
+| 1     | Header       | header             |
+| 2     | Profile      | profile            |
+| 3     | Work Experience | experience      |
+| 4     | Projects     | projects           |
+| 5     | Achievements | achievements       |
+| 6     | Education    | education          |
+| 7     | Certifications | certifications   |
+
+- **Header**: full name (firstName + lastName), profession. Can be the first block inside `.main`, or a full-width bar above both columns (still use data-section="header").
+- **Profile**: summary text.
+- **Experience / Education**: each entry must have `data-entry-id` equal to the item’s `id` (e.g. exp.id, edu.id).
+- **Projects / Achievements / Certifications**: same — each entry must have `data-entry-id` equal to the item’s `id`.
+
+Do **not** put contact, languages, or skills in the main column if they are already in the sidebar. Do **not** put profile, experience, projects, achievements, education, or certifications in the sidebar. The app’s pagination logic only recognizes sidebar sections as contact, languages, and skills.
+
+---
+
+## Hydration and pagination requirements
+
+GetQuickResume measures the template’s DOM to distribute content across A4 pages. For two-column layout it:
+
+1. Looks for an element with **class `sidebar`** and an element with **class `main`** inside the root page container.
+2. For every element with attribute **`data-section`**, it checks whether that element is inside `.sidebar` or `.main` and assigns it to the sidebar or main column.
+3. For list sections (experience, education, projects, achievements, certifications, languages, skills), it uses **`data-entry-id`** on each item to know which entries belong to which page when content overflows.
+
+To be compatible:
+
+- **Root container**: a single element with class **`page`** (e.g. `<div class="page">`), containing:
+  - Optionally a full-width **header** block (name + profession) with `data-section="header"`.
+  - A single element with class **`sidebar`** containing only the three sidebar sections (contact, languages, skills), in that order, each with the correct `data-section` and `data-entry-id` where applicable.
+  - A single element with class **`main`** containing header (if not full-width), profile, experience, projects, achievements, education, certifications, in that order, each with the correct `data-section` and `data-entry-id` on every list item.
+- **Section wrappers**: each logical section must be wrapped in an element that has **`data-section="<section>"`** with one of: contact, languages, skills, header, profile, experience, projects, achievements, education, certifications.
+- **List items**: every item in experience, education, projects, achievements, certifications, and languages must have **`data-entry-id="<id>"`** set to that item’s `id`. For skills use `data-entry-id="skill-0"`, `skill-1`, etc.
+
+Example structure:
+
+```html
+<div class="page">
+  <!-- optional: full-width header -->
+  <div class="sidebar">
+    <div data-section="contact">...</div>
+    <div data-section="languages">...</div>
+    <div data-section="skills">...</div>
+  </div>
+  <div class="main">
+    <div data-section="header">...</div>
+    <div data-section="profile">...</div>
+    <div data-section="experience">
+      <div data-entry-id="exp-1">...</div>
+    </div>
+    <div data-section="projects">
+      <div data-entry-id="proj-1">...</div>
+    </div>
+    ...
+  </div>
+</div>
+```
+
+- **Page dimensions**: `.page` should have `width: 210mm`, `min-height: 297mm`, `height: auto`, `overflow: visible`. Include `@media print { .page { width: 210mm; min-height: 297mm; } }`. If the template uses colored backgrounds, set `-webkit-print-color-adjust: exact; print-color-adjust: exact;` on `:host`.
+
+---
+
+## Layout and styling
+
+- **Sidebar**: typically 30–38% width; often a distinct background color; text and icons sized for a narrow column.
+- **Main**: remaining width (e.g. 62–70%); usually white or light background; same A4 and print rules as above.
+- **No images or photos** in the template.
+- Use system fonts or a single Google Font if desired; keep the template self-contained in one .js file.
+
+---
+
+## Checklist before delivering
+
+- [ ] IIFE and `'use strict'`.
+- [ ] JSDoc header with `name` and `description`.
+- [ ] Custom element with `data` get/set, `connectedCallback`, `attributeChangedCallback` for `language`, and `render()` that writes to `this.shadowRoot.innerHTML`.
+- [ ] `getLanguage()` returning attribute or `data.language` or `'en'`.
+- [ ] i18n (es/en) and levelMap for language levels.
+- [ ] `.page` contains exactly `.sidebar` and `.main` (and optional full-width header).
+- [ ] Sidebar: only contact, languages, skills, in that order, with correct `data-section` and `data-entry-id` for languages and skills.
+- [ ] Main: header (if not full-width), profile, experience, projects, achievements, education, certifications, in that order, with correct `data-section` and `data-entry-id` on every list item.
+- [ ] All `data` reads use `safeStr` / `safeArr`; all user-facing strings passed through `escapeHtml`.
+- [ ] Date ranges use "Present" / "Presente" when appropriate.
+- [ ] File is valid as `gqr-resume-XXXX.js` (extension lowercase .js).
+
+Deliver only the contents of the single .js file.
+
+---
+
+## After generating the template
+
+1. Save the script as `public/templates/designs/gqr-resume-XXXX.js` (lowercase .js).
+2. In `src/utils/templateCatalog.ts`, add to `TEMPLATE_CATALOG`: `{ id: 'gqr-resume-XXXX', name: 'Display Name', category: 'free' }`. The template selection page and `/create` read the list from this catalog only; no other file needs to be edited.
+3. Restart or refresh the app; the new template will appear in the template list and on `/create`.
+
+---
+
+**Style description for this two-column template:** [Describe here: sidebar color and width, main column style, how to show contact/languages/skills in the sidebar, header placement (in main vs full-width bar), typography and section titles, and the template name, e.g. "gqr-resume-dock" with navy sidebar, pill-style contact, dot-rated languages, skill pills, white main column with uppercase section titles.]

@@ -1,0 +1,1077 @@
+{
+  "version": "2026-03-13",
+  "count": 153,
+  "templates": [
+    {
+      "id": "gqr-resume-almond",
+      "name": "gqr-resume-almond",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-almond.webp",
+      "js": "/templates/designs/gqr-resume-almond.js"
+    },
+    {
+      "id": "gqr-resume-anchorage",
+      "name": "gqr-resume-anchorage",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-anchorage.webp",
+      "js": "/templates/designs/gqr-resume-anchorage.js"
+    },
+    {
+      "id": "gqr-resume-arch-v1",
+      "name": "Arch V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-arch-v1.webp",
+      "js": "/templates/designs/gqr-resume-arch-v1.js"
+    },
+    {
+      "id": "gqr-resume-arch-v2",
+      "name": "Arch V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-arch-v2.webp",
+      "js": "/templates/designs/gqr-resume-arch-v2.js"
+    },
+    {
+      "id": "gqr-resume-atelier",
+      "name": "gqr-resume-atelier",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-atelier.webp",
+      "js": "/templates/designs/gqr-resume-atelier.js"
+    },
+    {
+      "id": "gqr-resume-atlantic",
+      "name": "gqr-resume-atlantic",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-atlantic.webp",
+      "js": "/templates/designs/gqr-resume-atlantic.js"
+    },
+    {
+      "id": "gqr-resume-aura-v1",
+      "name": "Aura V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-aura-v1.webp",
+      "js": "/templates/designs/gqr-resume-aura-v1.js"
+    },
+    {
+      "id": "gqr-resume-aura-v2",
+      "name": "Aura V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-aura-v2.webp",
+      "js": "/templates/designs/gqr-resume-aura-v2.js"
+    },
+    {
+      "id": "gqr-resume-azurite",
+      "name": "gqr-resume-azurite",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-azurite.webp",
+      "js": "/templates/designs/gqr-resume-azurite.js"
+    },
+    {
+      "id": "gqr-resume-beach-v1",
+      "name": "gqr-resume-beach-v1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-beach-v1.webp",
+      "js": "/templates/designs/gqr-resume-beach-v1.js"
+    },
+    {
+      "id": "gqr-resume-beach-v2",
+      "name": "gqr-resume-beach-v2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-beach-v2.webp",
+      "js": "/templates/designs/gqr-resume-beach-v2.js"
+    },
+    {
+      "id": "gqr-resume-beam-v1",
+      "name": "Beam V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-beam-v1.webp",
+      "js": "/templates/designs/gqr-resume-beam-v1.js"
+    },
+    {
+      "id": "gqr-resume-beam-v2",
+      "name": "Beam V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-beam-v2.webp",
+      "js": "/templates/designs/gqr-resume-beam-v2.js"
+    },
+    {
+      "id": "gqr-resume-beige-column",
+      "name": "gqr-resume-beige-column",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-beige-column.webp",
+      "js": "/templates/designs/gqr-resume-beige-column.js"
+    },
+    {
+      "id": "gqr-resume-blaze-v1",
+      "name": "Blaze V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-blaze-v1.webp",
+      "js": "/templates/designs/gqr-resume-blaze-v1.js"
+    },
+    {
+      "id": "gqr-resume-blaze-v2",
+      "name": "Blaze V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-blaze-v2.webp",
+      "js": "/templates/designs/gqr-resume-blaze-v2.js"
+    },
+    {
+      "id": "gqr-resume-bloom-v1",
+      "name": "Bloom V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-bloom-v1.webp",
+      "js": "/templates/designs/gqr-resume-bloom-v1.js"
+    },
+    {
+      "id": "gqr-resume-bloom-v2",
+      "name": "Bloom V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-bloom-v2.webp",
+      "js": "/templates/designs/gqr-resume-bloom-v2.js"
+    },
+    {
+      "id": "gqr-resume-blueaccent",
+      "name": "gqr-resume-blueaccent",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-blueaccent.webp",
+      "js": "/templates/designs/gqr-resume-blueaccent.js"
+    },
+    {
+      "id": "gqr-resume-boldname",
+      "name": "gqr-resume-boldname",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-boldname.webp",
+      "js": "/templates/designs/gqr-resume-boldname.js"
+    },
+    {
+      "id": "gqr-resume-breeze",
+      "name": "Breeze",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-breeze.webp",
+      "js": "/templates/designs/gqr-resume-breeze.js"
+    },
+    {
+      "id": "gqr-resume-cedar-v1",
+      "name": "gqr-resume-cedar-v1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-cedar-v1.webp",
+      "js": "/templates/designs/gqr-resume-cedar-v1.js"
+    },
+    {
+      "id": "gqr-resume-cedar-v2",
+      "name": "Cedar V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-cedar-v2.webp",
+      "js": "/templates/designs/gqr-resume-cedar-v2.js"
+    },
+    {
+      "id": "gqr-resume-charcoal",
+      "name": "gqr-resume-charcoal",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-charcoal.webp",
+      "js": "/templates/designs/gqr-resume-charcoal.js"
+    },
+    {
+      "id": "gqr-resume-chart-v1",
+      "name": "gqr-resume-chart-v1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-chart-v1.webp",
+      "js": "/templates/designs/gqr-resume-chart-v1.js"
+    },
+    {
+      "id": "gqr-resume-chart-v2",
+      "name": "gqr-resume-chart-v2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-chart-v2.webp",
+      "js": "/templates/designs/gqr-resume-chart-v2.js"
+    },
+    {
+      "id": "gqr-resume-classic",
+      "name": "gqr-resume-classic",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-classic.webp",
+      "js": "/templates/designs/gqr-resume-classic.js"
+    },
+    {
+      "id": "gqr-resume-cliff-v1",
+      "name": "Cliff V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-cliff-v1.webp",
+      "js": "/templates/designs/gqr-resume-cliff-v1.js"
+    },
+    {
+      "id": "gqr-resume-cliff-v2",
+      "name": "Cliff V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-cliff-v2.webp",
+      "js": "/templates/designs/gqr-resume-cliff-v2.js"
+    },
+    {
+      "id": "gqr-resume-coal-v1",
+      "name": "gqr-resume-coal-v1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-coal-v1.webp",
+      "js": "/templates/designs/gqr-resume-coal-v1.js"
+    },
+    {
+      "id": "gqr-resume-coal-v2",
+      "name": "gqr-resume-coal-v2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-coal-v2.webp",
+      "js": "/templates/designs/gqr-resume-coal-v2.js"
+    },
+    {
+      "id": "gqr-resume-cobalt",
+      "name": "gqr-resume-cobalt",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-cobalt.webp",
+      "js": "/templates/designs/gqr-resume-cobalt.js"
+    },
+    {
+      "id": "gqr-resume-compass-v1",
+      "name": "gqr-resume-compass-v1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-compass-v1.webp",
+      "js": "/templates/designs/gqr-resume-compass-v1.js"
+    },
+    {
+      "id": "gqr-resume-compass-v2",
+      "name": "gqr-resume-compass-v2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-compass-v2.webp",
+      "js": "/templates/designs/gqr-resume-compass-v2.js"
+    },
+    {
+      "id": "gqr-resume-copper-v1",
+      "name": "gqr-resume-copper-v1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-copper-v1.webp",
+      "js": "/templates/designs/gqr-resume-copper-v1.js"
+    },
+    {
+      "id": "gqr-resume-copper-v2",
+      "name": "gqr-resume-copper-v2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-copper-v2.webp",
+      "js": "/templates/designs/gqr-resume-copper-v2.js"
+    },
+    {
+      "id": "gqr-resume-coral-v1",
+      "name": "Coral V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-coral-v1.webp",
+      "js": "/templates/designs/gqr-resume-coral-v1.js"
+    },
+    {
+      "id": "gqr-resume-coral-v2",
+      "name": "Coral V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-coral-v2.webp",
+      "js": "/templates/designs/gqr-resume-coral-v2.js"
+    },
+    {
+      "id": "gqr-resume-corporate",
+      "name": "gqr-resume-corporate",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-corporate.webp",
+      "js": "/templates/designs/gqr-resume-corporate.js"
+    },
+    {
+      "id": "gqr-resume-cove-v1",
+      "name": "Cove V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-cove-v1.webp",
+      "js": "/templates/designs/gqr-resume-cove-v1.js"
+    },
+    {
+      "id": "gqr-resume-darkbg",
+      "name": "gqr-resume-darkbg",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-darkbg.webp",
+      "js": "/templates/designs/gqr-resume-darkbg.js"
+    },
+    {
+      "id": "gqr-resume-dawn-v1",
+      "name": "Dawn V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-dawn-v1.webp",
+      "js": "/templates/designs/gqr-resume-dawn-v1.js"
+    },
+    {
+      "id": "gqr-resume-dawn-v2",
+      "name": "Dawn V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-dawn-v2.webp",
+      "js": "/templates/designs/gqr-resume-dawn-v2.js"
+    },
+    {
+      "id": "gqr-resume-deck-v1",
+      "name": "gqr-resume-deck-v1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-deck-v1.webp",
+      "js": "/templates/designs/gqr-resume-deck-v1.js"
+    },
+    {
+      "id": "gqr-resume-deck-v2",
+      "name": "gqr-resume-deck-v2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-deck-v2.webp",
+      "js": "/templates/designs/gqr-resume-deck-v2.js"
+    },
+    {
+      "id": "gqr-resume-desert",
+      "name": "gqr-resume-desert",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-desert.webp",
+      "js": "/templates/designs/gqr-resume-desert.js"
+    },
+    {
+      "id": "gqr-resume-designer",
+      "name": "gqr-resume-designer",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-designer.webp",
+      "js": "/templates/designs/gqr-resume-designer.js"
+    },
+    {
+      "id": "gqr-resume-dune-v1",
+      "name": "Dune V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-dune-v1.webp",
+      "js": "/templates/designs/gqr-resume-dune-v1.js"
+    },
+    {
+      "id": "gqr-resume-dune-v2",
+      "name": "Dune V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-dune-v2.webp",
+      "js": "/templates/designs/gqr-resume-dune-v2.js"
+    },
+    {
+      "id": "gqr-resume-echo-v1",
+      "name": "gqr-resume-echo-v1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-echo-v1.webp",
+      "js": "/templates/designs/gqr-resume-echo-v1.js"
+    },
+    {
+      "id": "gqr-resume-echo-v2",
+      "name": "gqr-resume-echo-v2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-echo-v2.webp",
+      "js": "/templates/designs/gqr-resume-echo-v2.js"
+    },
+    {
+      "id": "gqr-resume-executive",
+      "name": "gqr-resume-executive",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-executive.webp",
+      "js": "/templates/designs/gqr-resume-executive.js"
+    },
+    {
+      "id": "gqr-resume-finance",
+      "name": "gqr-resume-finance",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-finance.webp",
+      "js": "/templates/designs/gqr-resume-finance.js"
+    },
+    {
+      "id": "gqr-resume-fineline",
+      "name": "gqr-resume-fineline",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-fineline.webp",
+      "js": "/templates/designs/gqr-resume-fineline.js"
+    },
+    {
+      "id": "gqr-resume-flame-v1",
+      "name": "Flame V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-flame-v1.webp",
+      "js": "/templates/designs/gqr-resume-flame-v1.js"
+    },
+    {
+      "id": "gqr-resume-flame-v2",
+      "name": "Flame V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-flame-v2.webp",
+      "js": "/templates/designs/gqr-resume-flame-v2.js"
+    },
+    {
+      "id": "gqr-resume-flare-v1",
+      "name": "Flare V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-flare-v1.webp",
+      "js": "/templates/designs/gqr-resume-flare-v1.js"
+    },
+    {
+      "id": "gqr-resume-flare-v2",
+      "name": "Flare V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-flare-v2.webp",
+      "js": "/templates/designs/gqr-resume-flare-v2.js"
+    },
+    {
+      "id": "gqr-resume-fog",
+      "name": "gqr-resume-fog",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-fog.webp",
+      "js": "/templates/designs/gqr-resume-fog.js"
+    },
+    {
+      "id": "gqr-resume-frost-v1",
+      "name": "Frost V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-frost-v1.webp",
+      "js": "/templates/designs/gqr-resume-frost-v1.js"
+    },
+    {
+      "id": "gqr-resume-frost-v2",
+      "name": "Frost V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-frost-v2.webp",
+      "js": "/templates/designs/gqr-resume-frost-v2.js"
+    },
+    {
+      "id": "gqr-resume-glen-v1",
+      "name": "Glen V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-glen-v1.webp",
+      "js": "/templates/designs/gqr-resume-glen-v1.js"
+    },
+    {
+      "id": "gqr-resume-glen-v2",
+      "name": "Glen V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-glen-v2.webp",
+      "js": "/templates/designs/gqr-resume-glen-v2.js"
+    },
+    {
+      "id": "gqr-resume-glow-v1",
+      "name": "Glow V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-glow-v1.webp",
+      "js": "/templates/designs/gqr-resume-glow-v1.js"
+    },
+    {
+      "id": "gqr-resume-glow-v2",
+      "name": "Glow V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-glow-v2.webp",
+      "js": "/templates/designs/gqr-resume-glow-v2.js"
+    },
+    {
+      "id": "gqr-resume-gust-v1",
+      "name": "Gust V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-gust-v1.webp",
+      "js": "/templates/designs/gqr-resume-gust-v1.js"
+    },
+    {
+      "id": "gqr-resume-gust-v2",
+      "name": "Gust V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-gust-v2.webp",
+      "js": "/templates/designs/gqr-resume-gust-v2.js"
+    },
+    {
+      "id": "gqr-resume-happy",
+      "name": "gqr-resume-happy",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-happy.webp",
+      "js": "/templates/designs/gqr-resume-happy.js"
+    },
+    {
+      "id": "gqr-resume-harbor",
+      "name": "gqr-resume-harbor",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-harbor.webp",
+      "js": "/templates/designs/gqr-resume-harbor.js"
+    },
+    {
+      "id": "gqr-resume-helm-v1",
+      "name": "gqr-resume-helm-v1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-helm-v1.webp",
+      "js": "/templates/designs/gqr-resume-helm-v1.js"
+    },
+    {
+      "id": "gqr-resume-helm-v2",
+      "name": "gqr-resume-helm-v2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-helm-v2.webp",
+      "js": "/templates/designs/gqr-resume-helm-v2.js"
+    },
+    {
+      "id": "gqr-resume-ivy-v1",
+      "name": "Ivy V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-ivy-v1.webp",
+      "js": "/templates/designs/gqr-resume-ivy-v1.js"
+    },
+    {
+      "id": "gqr-resume-ivy-v2",
+      "name": "gqr-resume-ivy-v2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-ivy-v2.webp",
+      "js": "/templates/designs/gqr-resume-ivy-v2.js"
+    },
+    {
+      "id": "gqr-resume-jade-v1",
+      "name": "Jade V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-jade-v1.webp",
+      "js": "/templates/designs/gqr-resume-jade-v1.js"
+    },
+    {
+      "id": "gqr-resume-jade-v2",
+      "name": "Jade V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-jade-v2.webp",
+      "js": "/templates/designs/gqr-resume-jade-v2.js"
+    },
+    {
+      "id": "gqr-resume-lake-v1",
+      "name": "gqr-resume-lake-v1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-lake-v1.webp",
+      "js": "/templates/designs/gqr-resume-lake-v1.js"
+    },
+    {
+      "id": "gqr-resume-lake-v2",
+      "name": "gqr-resume-lake-v2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-lake-v2.webp",
+      "js": "/templates/designs/gqr-resume-lake-v2.js"
+    },
+    {
+      "id": "gqr-resume-ledger",
+      "name": "gqr-resume-ledger",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-ledger.webp",
+      "js": "/templates/designs/gqr-resume-ledger.js"
+    },
+    {
+      "id": "gqr-resume-mckinsey",
+      "name": "gqr-resume-mckinsey",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-mckinsey.webp",
+      "js": "/templates/designs/gqr-resume-mckinsey.js"
+    },
+    {
+      "id": "gqr-resume-mercury",
+      "name": "gqr-resume-mercury",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-mercury.webp",
+      "js": "/templates/designs/gqr-resume-mercury.js"
+    },
+    {
+      "id": "gqr-resume-minimal-axis",
+      "name": "gqr-resume-minimal-axis",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-minimal-axis.webp",
+      "js": "/templates/designs/gqr-resume-minimal-axis.js"
+    },
+    {
+      "id": "gqr-resume-mint-v1",
+      "name": "gqr-resume-mint-v1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-mint-v1.webp",
+      "js": "/templates/designs/gqr-resume-mint-v1.js"
+    },
+    {
+      "id": "gqr-resume-mint-v2",
+      "name": "gqr-resume-mint-v2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-mint-v2.webp",
+      "js": "/templates/designs/gqr-resume-mint-v2.js"
+    },
+    {
+      "id": "gqr-resume-minty",
+      "name": "gqr-resume-minty",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-minty.webp",
+      "js": "/templates/designs/gqr-resume-minty.js"
+    },
+    {
+      "id": "gqr-resume-mist",
+      "name": "gqr-resume-mist",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-mist.webp",
+      "js": "/templates/designs/gqr-resume-mist.js"
+    },
+    {
+      "id": "gqr-resume-monochrome",
+      "name": "gqr-resume-monochrome",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-monochrome.webp",
+      "js": "/templates/designs/gqr-resume-monochrome.js"
+    },
+    {
+      "id": "gqr-resume-monolith",
+      "name": "gqr-resume-monolith",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-monolith.webp",
+      "js": "/templates/designs/gqr-resume-monolith.js"
+    },
+    {
+      "id": "gqr-resume-morning",
+      "name": "gqr-resume-morning",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-morning.webp",
+      "js": "/templates/designs/gqr-resume-morning.js"
+    },
+    {
+      "id": "gqr-resume-moss-v1",
+      "name": "Moss V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-moss-v1.webp",
+      "js": "/templates/designs/gqr-resume-moss-v1.js"
+    },
+    {
+      "id": "gqr-resume-moss-v2",
+      "name": "gqr-resume-moss-v2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-moss-v2.webp",
+      "js": "/templates/designs/gqr-resume-moss-v2.js"
+    },
+    {
+      "id": "gqr-resume-navybar",
+      "name": "gqr-resume-navybar",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-navybar.webp",
+      "js": "/templates/designs/gqr-resume-navybar.js"
+    },
+    {
+      "id": "gqr-resume-noirline",
+      "name": "gqr-resume-noirline",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-noirline.webp",
+      "js": "/templates/designs/gqr-resume-noirline.js"
+    },
+    {
+      "id": "gqr-resume-oak-v1",
+      "name": "Oak V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-oak-v1.webp",
+      "js": "/templates/designs/gqr-resume-oak-v1.js"
+    },
+    {
+      "id": "gqr-resume-oak-v2",
+      "name": "Oak V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-oak-v2.webp",
+      "js": "/templates/designs/gqr-resume-oak-v2.js"
+    },
+    {
+      "id": "gqr-resume-oak-v3",
+      "name": "Oak V3",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-oak-v3.webp",
+      "js": "/templates/designs/gqr-resume-oak-v3.js"
+    },
+    {
+      "id": "gqr-resume-oak-v4",
+      "name": "Oak V4",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-oak-v4.webp",
+      "js": "/templates/designs/gqr-resume-oak-v4.js"
+    },
+    {
+      "id": "gqr-resume-oak-v5",
+      "name": "Oak V5",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-oak-v5.webp",
+      "js": "/templates/designs/gqr-resume-oak-v5.js"
+    },
+    {
+      "id": "gqr-resume-obsidian",
+      "name": "gqr-resume-obsidian",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-obsidian.webp",
+      "js": "/templates/designs/gqr-resume-obsidian.js"
+    },
+    {
+      "id": "gqr-resume-onyx",
+      "name": "gqr-resume-onyx",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-onyx.webp",
+      "js": "/templates/designs/gqr-resume-onyx.js"
+    },
+    {
+      "id": "gqr-resume-opal-v1",
+      "name": "gqr-resume-opal-v1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-opal-v1.webp",
+      "js": "/templates/designs/gqr-resume-opal-v1.js"
+    },
+    {
+      "id": "gqr-resume-opal-v2",
+      "name": "gqr-resume-opal-v2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-opal-v2.webp",
+      "js": "/templates/designs/gqr-resume-opal-v2.js"
+    },
+    {
+      "id": "gqr-resume-peak-v1",
+      "name": "Peak V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-peak-v1.webp",
+      "js": "/templates/designs/gqr-resume-peak-v1.js"
+    },
+    {
+      "id": "gqr-resume-peak-v2",
+      "name": "Peak V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-peak-v2.webp",
+      "js": "/templates/designs/gqr-resume-peak-v2.js"
+    },
+    {
+      "id": "gqr-resume-pearl-v1",
+      "name": "gqr-resume-pearl-v1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-pearl-v1.webp",
+      "js": "/templates/designs/gqr-resume-pearl-v1.js"
+    },
+    {
+      "id": "gqr-resume-pearl-v2",
+      "name": "gqr-resume-pearl-v2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-pearl-v2.webp",
+      "js": "/templates/designs/gqr-resume-pearl-v2.js"
+    },
+    {
+      "id": "gqr-resume-pebble",
+      "name": "gqr-resume-pebble",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-pebble.webp",
+      "js": "/templates/designs/gqr-resume-pebble.js"
+    },
+    {
+      "id": "gqr-resume-pine-v1",
+      "name": "Pine V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-pine-v1.webp",
+      "js": "/templates/designs/gqr-resume-pine-v1.js"
+    },
+    {
+      "id": "gqr-resume-pine-v2",
+      "name": "Pine V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-pine-v2.webp",
+      "js": "/templates/designs/gqr-resume-pine-v2.js"
+    },
+    {
+      "id": "gqr-resume-precision",
+      "name": "gqr-resume-precision",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-precision.webp",
+      "js": "/templates/designs/gqr-resume-precision.js"
+    },
+    {
+      "id": "gqr-resume-prism-v1",
+      "name": "gqr-resume-prism-v1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-prism-v1.webp",
+      "js": "/templates/designs/gqr-resume-prism-v1.js"
+    },
+    {
+      "id": "gqr-resume-prism-v2",
+      "name": "gqr-resume-prism-v2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-prism-v2.webp",
+      "js": "/templates/designs/gqr-resume-prism-v2.js"
+    },
+    {
+      "id": "gqr-resume-pristine",
+      "name": "gqr-resume-pristine",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-pristine.webp",
+      "js": "/templates/designs/gqr-resume-pristine.js"
+    },
+    {
+      "id": "gqr-resume-pulse-v1",
+      "name": "Pulse V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-pulse-v1.webp",
+      "js": "/templates/designs/gqr-resume-pulse-v1.js"
+    },
+    {
+      "id": "gqr-resume-pulse-v2",
+      "name": "Pulse V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-pulse-v2.webp",
+      "js": "/templates/designs/gqr-resume-pulse-v2.js"
+    },
+    {
+      "id": "gqr-resume-quartz-v1",
+      "name": "Quartz V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-quartz-v1.webp",
+      "js": "/templates/designs/gqr-resume-quartz-v1.js"
+    },
+    {
+      "id": "gqr-resume-quartz-v2",
+      "name": "Quartz V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-quartz-v2.webp",
+      "js": "/templates/designs/gqr-resume-quartz-v2.js"
+    },
+    {
+      "id": "gqr-resume-raven",
+      "name": "gqr-resume-raven",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-raven.webp",
+      "js": "/templates/designs/gqr-resume-raven.js"
+    },
+    {
+      "id": "gqr-resume-redaccent",
+      "name": "gqr-resume-redaccent",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-redaccent.webp",
+      "js": "/templates/designs/gqr-resume-redaccent.js"
+    },
+    {
+      "id": "gqr-resume-reed-v1",
+      "name": "gqr-resume-reed-v1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-reed-v1.webp",
+      "js": "/templates/designs/gqr-resume-reed-v1.js"
+    },
+    {
+      "id": "gqr-resume-reed-v2",
+      "name": "gqr-resume-reed-v2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-reed-v2.webp",
+      "js": "/templates/designs/gqr-resume-reed-v2.js"
+    },
+    {
+      "id": "gqr-resume-river-v1",
+      "name": "River V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-river-v1.webp",
+      "js": "/templates/designs/gqr-resume-river-v1.js"
+    },
+    {
+      "id": "gqr-resume-river-v2",
+      "name": "River V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-river-v2.webp",
+      "js": "/templates/designs/gqr-resume-river-v2.js"
+    },
+    {
+      "id": "gqr-resume-rose-v1",
+      "name": "gqr-resume-rose-v1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-rose-v1.webp",
+      "js": "/templates/designs/gqr-resume-rose-v1.js"
+    },
+    {
+      "id": "gqr-resume-rose-v2",
+      "name": "gqr-resume-rose-v2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-rose-v2.webp",
+      "js": "/templates/designs/gqr-resume-rose-v2.js"
+    },
+    {
+      "id": "gqr-resume-saffron",
+      "name": "gqr-resume-saffron",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-saffron.webp",
+      "js": "/templates/designs/gqr-resume-saffron.js"
+    },
+    {
+      "id": "gqr-resume-sand-v1",
+      "name": "Sand V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-sand-v1.webp",
+      "js": "/templates/designs/gqr-resume-sand-v1.js"
+    },
+    {
+      "id": "gqr-resume-sand-v2",
+      "name": "Sand V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-sand-v2.webp",
+      "js": "/templates/designs/gqr-resume-sand-v2.js"
+    },
+    {
+      "id": "gqr-resume-seapearl",
+      "name": "gqr-resume-seapearl",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-seapearl.webp",
+      "js": "/templates/designs/gqr-resume-seapearl.js"
+    },
+    {
+      "id": "gqr-resume-shadow-v1",
+      "name": "gqr-resume-shadow-v1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-shadow-v1.webp",
+      "js": "/templates/designs/gqr-resume-shadow-v1.js"
+    },
+    {
+      "id": "gqr-resume-shadow-v2",
+      "name": "Shadow V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-shadow-v2.webp",
+      "js": "/templates/designs/gqr-resume-shadow-v2.js"
+    },
+    {
+      "id": "gqr-resume-shore-v1",
+      "name": "Shore V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-shore-v1.webp",
+      "js": "/templates/designs/gqr-resume-shore-v1.js"
+    },
+    {
+      "id": "gqr-resume-shore-v2",
+      "name": "Shore V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-shore-v2.webp",
+      "js": "/templates/designs/gqr-resume-shore-v2.js"
+    },
+    {
+      "id": "gqr-resume-silver",
+      "name": "gqr-resume-silver",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-silver.webp",
+      "js": "/templates/designs/gqr-resume-silver.js"
+    },
+    {
+      "id": "gqr-resume-skyline",
+      "name": "gqr-resume-skyline",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-skyline.webp",
+      "js": "/templates/designs/gqr-resume-skyline.js"
+    },
+    {
+      "id": "gqr-resume-slate",
+      "name": "gqr-resume-slate",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-slate.webp",
+      "js": "/templates/designs/gqr-resume-slate.js"
+    },
+    {
+      "id": "gqr-resume-snow-v1",
+      "name": "Snow V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-snow-v1.webp",
+      "js": "/templates/designs/gqr-resume-snow-v1.js"
+    },
+    {
+      "id": "gqr-resume-snow-v2",
+      "name": "Snow V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-snow-v2.webp",
+      "js": "/templates/designs/gqr-resume-snow-v2.js"
+    },
+    {
+      "id": "gqr-resume-steady",
+      "name": "gqr-resume-steady",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-steady.webp",
+      "js": "/templates/designs/gqr-resume-steady.js"
+    },
+    {
+      "id": "gqr-resume-stone-v1",
+      "name": "gqr-resume-stone-v1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-stone-v1.webp",
+      "js": "/templates/designs/gqr-resume-stone-v1.js"
+    },
+    {
+      "id": "gqr-resume-stone-v2",
+      "name": "gqr-resume-stone-v2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-stone-v2.webp",
+      "js": "/templates/designs/gqr-resume-stone-v2.js"
+    },
+    {
+      "id": "gqr-resume-storm-v1",
+      "name": "gqr-resume-storm-v1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-storm-v1.webp",
+      "js": "/templates/designs/gqr-resume-storm-v1.js"
+    },
+    {
+      "id": "gqr-resume-storm-v2",
+      "name": "gqr-resume-storm-v2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-storm-v2.webp",
+      "js": "/templates/designs/gqr-resume-storm-v2.js"
+    },
+    {
+      "id": "gqr-resume-surge-v1",
+      "name": "Surge V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-surge-v1.webp",
+      "js": "/templates/designs/gqr-resume-surge-v1.js"
+    },
+    {
+      "id": "gqr-resume-surge-v2",
+      "name": "Surge V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-surge-v2.webp",
+      "js": "/templates/designs/gqr-resume-surge-v2.js"
+    },
+    {
+      "id": "gqr-resume-tide",
+      "name": "gqr-resume-tide",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-tide.webp",
+      "js": "/templates/designs/gqr-resume-tide.js"
+    },
+    {
+      "id": "gqr-resume-typewriter",
+      "name": "gqr-resume-typewriter",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-typewriter.webp",
+      "js": "/templates/designs/gqr-resume-typewriter.js"
+    },
+    {
+      "id": "gqr-resume-vale-v1",
+      "name": "Vale V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-vale-v1.webp",
+      "js": "/templates/designs/gqr-resume-vale-v1.js"
+    },
+    {
+      "id": "gqr-resume-vale-v2",
+      "name": "Vale V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-vale-v2.webp",
+      "js": "/templates/designs/gqr-resume-vale-v2.js"
+    },
+    {
+      "id": "gqr-resume-wave-v1",
+      "name": "gqr-resume-wave-v1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-wave-v1.webp",
+      "js": "/templates/designs/gqr-resume-wave-v1.js"
+    },
+    {
+      "id": "gqr-resume-wave-v2",
+      "name": "gqr-resume-wave-v2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-wave-v2.webp",
+      "js": "/templates/designs/gqr-resume-wave-v2.js"
+    },
+    {
+      "id": "gqr-resume-webworker",
+      "name": "gqr-resume-webworker",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-webworker.webp",
+      "js": "/templates/designs/gqr-resume-webworker.js"
+    },
+    {
+      "id": "gqr-resume-zenith-v1",
+      "name": "Zenith V1",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-zenith-v1.webp",
+      "js": "/templates/designs/gqr-resume-zenith-v1.js"
+    },
+    {
+      "id": "gqr-resume-zenith-v2",
+      "name": "Zenith V2",
+      "category": "free",
+      "thumbnail": "/templates/thumbnails/gqr-resume-zenith-v2.webp",
+      "js": "/templates/designs/gqr-resume-zenith-v2.js"
+    }
+  ]
+}

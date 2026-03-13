@@ -84,7 +84,7 @@ export function DashboardPage() {
   }, [isAuthenticated, navigate]);
 
   const handleViewResume = (resume: Resume) => {
-    navigate(`/resume/${resume.id}`);
+    navigate(`/my-resumes/${resume.id}`);
   };
 
   const handleEditResume = (resume: Resume) => {
@@ -105,7 +105,7 @@ export function DashboardPage() {
     }
     
     // Navigate to resume view page where download functionality is available
-    navigate(`/resume/${resume.id}`);
+    navigate(`/my-resumes/${resume.id}`);
   };
 
   const handleTranslateResume = (resume: Resume) => {
@@ -140,7 +140,7 @@ export function DashboardPage() {
     }
 
     // Navigate to resume view where enhancement options are available
-    navigate(`/resume/${resume.id}`);
+    navigate(`/my-resumes/${resume.id}`);
   };
 
   const handleTailorForJob = (resume: Resume) => {

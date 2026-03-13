@@ -55,7 +55,8 @@ export function PublicPreviewPage() {
       setTemplateLoading(true);
       setTemplateError(null);
       try {
-        const response = await fetch(`/templates/designs/${tagName}.js?v=${Date.now()}`);
+        const { getTemplateJsUrl } = await import('@/utils/templateCatalog');
+        const response = await fetch(getTemplateJsUrl(tagName));
         if (!response.ok) throw new Error(`Failed to load template: ${response.status}`);
         const code = await response.text();
         if (mounted) {

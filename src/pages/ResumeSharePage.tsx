@@ -141,7 +141,7 @@ export function ResumeSharePage() {
         <div className="max-w-4xl mx-auto">
           {/* Back button */}
           <Link 
-            to={`/resume/${id}`}
+            to={`/my-resumes/${id}`}
             className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -206,7 +206,7 @@ export function ResumeSharePage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link 
-                to={`/resume/${id}`}
+                to={`/my-resumes/${id}`}
                 className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
               >
                 <ArrowLeft className="w-5 h-5 text-gray-600" />

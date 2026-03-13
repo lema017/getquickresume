@@ -4,26 +4,28 @@
 User-agent: *
 Allow: /
 
-# Disallow private/authenticated pages
-Disallow: /dashboard
-Disallow: /wizard
-Disallow: /account
-Disallow: /resume/
-Disallow: /support
-Disallow: /thank-you
 
-# Allow search engines to crawl public pages
 Allow: /blog
 Allow: /pricing
 Allow: /about
 Allow: /contact
 Allow: /legal/
 Allow: /ats-resume-checker
-Allow: /resume-for-job-description
-Allow: /ai-resume-builder
 Allow: /resume-translator
-Allow: /resume-templates
-Allow: /best-resume-translators
+Allow: /create
+Allow: /login
+Allow: /premium
+
+# Disallow private/authenticated and dynamic pages
+Disallow: /dashboard
+Disallow: /wizard
+Disallow: /account
+Disallow: /resume/
+Disallow: /support
+Disallow: /thank-you
+Disallow: /cover-letter/
+Disallow: /job-tailoring
+Disallow: /share/
 
 # Sitemap location
 Sitemap: https://getquickresume.com/sitemap.xml

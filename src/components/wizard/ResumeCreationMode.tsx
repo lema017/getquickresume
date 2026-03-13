@@ -44,7 +44,7 @@ export function ResumeCreationMode() {
   }, [canCreateResume]);
 
   const handleManualCreation = () => {
-    navigateToStep(1);
+    navigate('/wizard/manual');
   };
 
   const handleUploadResume = () => {

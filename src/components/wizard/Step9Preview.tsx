@@ -5,7 +5,7 @@ import { useResumeStore } from '@/stores/resumeStore';
 import { useWizardNavigation } from '@/hooks/useWizardNavigation';
 import { useAuthStore } from '@/stores/authStore';
 import { ResumeTemplate } from '@/services/templatesService';
-import { loadAllLocalTemplates } from '@/utils/templateCatalog';
+import { TEMPLATE_CATALOG, loadLocalTemplate, getTemplateThumbnailUrl } from '@/utils/templateCatalog';
 import { TemplatePreviewModal } from './TemplatePreviewModal';
 
 import { PremiumDownloadModal } from '@/components/PremiumDownloadModal';
@@ -13,11 +13,10 @@ import { WebComponentRenderer } from './WebComponentRenderer';
 import { ArrowLeft, ArrowRight, Eye, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { convertGeneratedResumeToResumeData } from './TemplatePreviewModal';
-import { calculateA4PreviewScale, getA4ContainerStyles, getA4WrapperSize, A4_DIMENSIONS } from '@/utils/a4Dimensions';
+import { A4_DIMENSIONS } from '@/utils/a4Dimensions';
 import { ResumeData, SkillPageRange } from '@/types';
 import { calculatePagination } from '@/services/paginationService';
 import { filterResumeDataForPage } from '@/utils/resumePageFilter';
-import { generateSmallMockResumeData } from '@/utils/mockResumeData';
 import { generateResumePDFFromPages } from '@/utils/pdfGenerator';
 import { downloadService } from '@/services/downloadService';
 import { trackResumeDownloadCompleted } from '@/services/marketingAnalytics';
@@ -265,10 +264,8 @@ export function Step9Preview() {
   const { generatedResume, markStepCompleted, setCurrentStep, selectedTemplateId, setSelectedTemplate, resumeData: storeResumeData, updateResumeData, currentResumeId } = useResumeStore();
   const { user } = useAuthStore();
 
-  const [templates, setTemplates] = useState<ResumeTemplate[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplateState] = useState<ResumeTemplate | null>(null);
+  const [loadingTemplate, setLoadingTemplate] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showDownloadPremiumModal, setShowDownloadPremiumModal] = useState(false);
   const [calculatingPagination, setCalculatingPagination] = useState(false);
@@ -285,30 +282,26 @@ export function Step9Preview() {
     }
   }, [generatedResume, navigateToStep]);
 
-  // Load templates
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const list = await loadAllLocalTemplates() as ResumeTemplate[];
-        if (!mounted) return;
-        setTemplates(list);
-      } catch (e: any) {
-        if (!mounted) return;
-        setError(e?.message || t('wizard.errors.errorLoadingTemplates'));
-        toast.error(t('wizard.errors.errorLoadingTemplates'));
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
+  const handleSelectTemplate = async (templateId: string) => {
+    const meta = TEMPLATE_CATALOG.find((t) => t.id === templateId);
+    if (!meta) return;
 
-  const handleSelectTemplate = async (template: ResumeTemplate) => {
-    console.log('🔍 [DEBUG] Template selected:', template.name, template.id);
-    setSelectedTemplate(template.id, template.category);
+    setSelectedTemplate(meta.id, meta.category);
+    setLoadingTemplate(true);
+
+    let template: ResumeTemplate | null = null;
+    try {
+      const loaded = await loadLocalTemplate(meta.id);
+      if (loaded) {
+        template = { ...loaded, layout: 'single-column' };
+      }
+    } catch {
+      toast.error(t('wizard.errors.errorLoadingTemplates'));
+      setLoadingTemplate(false);
+      return;
+    }
+    setLoadingTemplate(false);
+    if (!template) return;
     setSelectedTemplateState(template);
     
     // Calculate pagination when template is selected
@@ -354,9 +347,19 @@ export function Step9Preview() {
     }
   };
 
-  const handlePreviewTemplate = (template: ResumeTemplate) => {
-    setSelectedTemplateState(template);
-    setShowModal(true);
+  const handlePreviewTemplate = async (templateId: string) => {
+    setLoadingTemplate(true);
+    try {
+      const loaded = await loadLocalTemplate(templateId);
+      if (loaded) {
+        setSelectedTemplateState({ ...loaded, layout: 'single-column' });
+        setShowModal(true);
+      }
+    } catch {
+      toast.error(t('wizard.errors.errorLoadingTemplates'));
+    } finally {
+      setLoadingTemplate(false);
+    }
   };
 
   const handleCloseModal = () => {
@@ -512,46 +515,56 @@ export function Step9Preview() {
       </div>
 
       {/* Loading State */}
-      {(loading || calculatingPagination) && (
+      {(loadingTemplate || calculatingPagination) && (
         <div className="py-16 text-center">
           <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">
-            {loading ? 'Cargando templates...' : 'Calculando paginación...'}
+            {loadingTemplate ? 'Cargando template...' : 'Calculando paginación...'}
           </p>
         </div>
       )}
 
-      {/* Error State */}
-      {error && (
-        <div className="py-6 text-center">
-          <div className="inline-block bg-red-50 text-red-700 border border-red-200 rounded px-4 py-2 mb-3">
-            {error}
-          </div>
-          <button
-            className="btn-primary"
-            onClick={() => window.location.reload()}
-          >
-            Reintentar
-          </button>
-        </div>
-      )}
-
-      {/* Templates Grid */}
-      {!loading && !error && templates.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {templates.map((template) => {
-            // Use mock data for gallery previews (small, fast rendering)
-            const mockTemplateData = generateSmallMockResumeData();
+      {/* Templates Grid — thumbnail-based */}
+      {!loadingTemplate && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {TEMPLATE_CATALOG.map((meta) => {
+            const isSelected = meta.id === selectedTemplateId;
             return (
-              <TemplatePreviewCard
-                key={template.id}
-                template={template}
-                templateData={mockTemplateData}
-                isSelected={template.id === selectedTemplateId}
-                onSelect={() => handleSelectTemplate(template)}
-                onPreview={() => handlePreviewTemplate(template)}
-                resumeLanguage={(storeResumeData?.language as 'en' | 'es') || 'en'}
-              />
+              <div
+                key={meta.id}
+                className={`border rounded-lg p-4 bg-white hover:shadow-lg transition-shadow cursor-pointer ${
+                  isSelected ? 'ring-2 ring-blue-500 border-blue-500' : 'border-gray-200'
+                }`}
+                onClick={() => handleSelectTemplate(meta.id)}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-semibold text-gray-900 truncate">{meta.name}</h3>
+                </div>
+                <div className="border border-gray-200 rounded mb-3 bg-gray-50 overflow-hidden">
+                  <img
+                    src={getTemplateThumbnailUrl(meta.id)}
+                    alt={meta.name}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full"
+                    style={{ aspectRatio: '210/297', objectFit: 'cover', objectPosition: 'top' }}
+                  />
+                </div>
+                <div className="flex gap-2 items-center">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handlePreviewTemplate(meta.id); }}
+                    className="flex-1 btn-outline text-sm py-2 flex items-center justify-center"
+                  >
+                    <Eye className="w-4 h-4 mr-1" />
+                    {t('common.preview')}
+                  </button>
+                  {isSelected && (
+                    <div className="flex items-center text-blue-600 text-sm px-2">
+                      <span className="font-medium">Seleccionado</span>
+                    </div>
+                  )}
+                </div>
+              </div>
             );
           })}
         </div>
@@ -644,154 +657,6 @@ export function Step9Preview() {
         onClose={() => setShowDownloadPremiumModal(false)}
       />
 
-    </div>
-  );
-}
-
-// Component for individual template preview card with dynamic scaling
-function TemplatePreviewCard({
-  template,
-  templateData,
-  isSelected,
-  onSelect,
-  onPreview,
-  resumeLanguage = 'en',
-}: {
-  template: ResumeTemplate;
-  templateData: ReturnType<typeof generateSmallMockResumeData>;
-  isSelected: boolean;
-  onSelect: () => void;
-  onPreview: () => void;
-  resumeLanguage?: 'en' | 'es';
-}) {
-  const { t } = useTranslation();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0.5);
-  const [containerHeight, setContainerHeight] = useState<number | null>(null);
-
-  // Calculate scale dynamically based on container width (not height)
-  useEffect(() => {
-    const updateScale = () => {
-      if (cardRef.current && cardRef.current.clientWidth > 0) {
-        // Get the card width to calculate available space for template
-        const cardWidth = cardRef.current.clientWidth;
-        // Subtract card padding (16px * 2 = 32px) and preview padding (16px * 2 = 32px) and border (2px * 2 = 4px)
-        const containerWidth = cardWidth - 32 - 32 - 4;
-        
-        if (containerWidth > 0) {
-          // Use a large height value to calculate scale based on width constraint only
-          const calculatedScale = calculateA4PreviewScale(containerWidth, 10000);
-          setScale(calculatedScale);
-          
-          // Calculate the actual height needed for the scaled template
-          const wrapperSize = getA4WrapperSize(calculatedScale);
-          // Add only the padding needed (16px top + 16px bottom = 32px total)
-          // Use exact height to avoid extra space
-          const calculatedHeight = wrapperSize.height + 32;
-          setContainerHeight(Math.ceil(calculatedHeight));
-        }
-      }
-    };
-
-    // Use ResizeObserver to watch for card width changes
-    const resizeObserver = new ResizeObserver(() => {
-      updateScale();
-    });
-
-    // Wait a bit for the card to be rendered
-    const timeoutId = setTimeout(() => {
-      if (cardRef.current) {
-        resizeObserver.observe(cardRef.current);
-        // Calculate initial scale
-        updateScale();
-      }
-    }, 100);
-
-    // Also recalculate on window resize
-    window.addEventListener('resize', updateScale);
-
-    return () => {
-      clearTimeout(timeoutId);
-      resizeObserver.disconnect();
-      window.removeEventListener('resize', updateScale);
-    };
-  }, []);
-
-  const a4Styles = getA4ContainerStyles(scale);
-  const wrapperSize = getA4WrapperSize(scale);
-
-  return (
-    <div
-      ref={cardRef}
-      className={`border rounded-lg p-4 bg-white hover:shadow-lg transition-shadow cursor-pointer ${
-        isSelected ? 'ring-2 ring-blue-500 border-blue-500' : 'border-gray-200'
-      }`}
-      onClick={onSelect}
-    >
-      {/* Template Header */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <h3 className="font-semibold text-gray-900 truncate">
-            {template.name}
-          </h3>
-        </div>
-      </div>
-
-      {/* Template Preview */}
-      <div
-        ref={containerRef}
-        className="border border-gray-200 rounded mb-3 bg-gray-50"
-        style={{
-          height: containerHeight ? `${containerHeight}px` : 'auto',
-          minHeight: containerHeight ? undefined : '400px',
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'center',
-          padding: '16px',
-          overflow: 'auto',
-        }}
-      >
-        <div
-          style={{
-            width: `${wrapperSize.width}px`,
-            height: `${wrapperSize.height}px`,
-            display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'center',
-            flexShrink: 0,
-          }}
-        >
-          <div style={a4Styles}>
-            <WebComponentRenderer
-              tagName={template.tagName}
-              jsCode={template.jsCode}
-              data={templateData as any}
-              language={resumeLanguage}
-              style={{ width: '100%', height: '100%' }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Actions */}
-      <div className="flex gap-2 items-center">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onPreview();
-          }}
-          className="flex-1 btn-outline text-sm py-2 flex items-center justify-center"
-        >
-          <Eye className="w-4 h-4 mr-1" />
-          {t('common.preview')}
-        </button>
-        {isSelected && (
-          <div className="flex items-center text-blue-600 text-sm px-2">
-            <span className="font-medium">Seleccionado</span>
-          </div>
-        )}
-      </div>
     </div>
   );
 }

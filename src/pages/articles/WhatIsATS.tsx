@@ -374,7 +374,7 @@ export function WhatIsATS() {
           Check your ATS score
         </Link>{' '}
         with our free tool, or explore the{' '}
-        <Link to="/best-resume-translators" className="text-blue-600 hover:underline">
+        <Link to="/resume-translator" className="text-blue-600 hover:underline">
           best resume translators
         </Link>{' '}
         if you're applying internationally.

@@ -493,7 +493,7 @@ export function ResumeTranslatorPage() {
               </p>
               <p className="mt-3 text-sm text-blue-200/80 max-w-xl mx-auto">
                 Looking for alternatives? See our roundup of the{' '}
-                <Link to="/best-resume-translators" className="text-white underline underline-offset-2 hover:text-blue-100">
+                <Link to="/resume-translator" className="text-white underline underline-offset-2 hover:text-blue-100">
                   best resume translators
                 </Link>{' '}
                 to find the right fit.

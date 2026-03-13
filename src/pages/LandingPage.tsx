@@ -152,10 +152,12 @@ export function LandingPage() {
 
   useEffect(() => {
     let mounted = true;
-    fetch(`/templates/designs/${HERO_TEMPLATE_ID}.js?v=${Date.now()}`)
-      .then((res) => (res.ok ? res.text() : null))
-      .then((code) => { if (mounted && code) setHeroTemplateCode(code); })
-      .catch(() => {});
+    import('@/utils/templateCatalog').then(({ getTemplateJsUrl }) => {
+      fetch(getTemplateJsUrl(HERO_TEMPLATE_ID))
+        .then((res) => (res.ok ? res.text() : null))
+        .then((code) => { if (mounted && code) setHeroTemplateCode(code); })
+        .catch(() => {});
+    });
     return () => { mounted = false; };
   }, []);
 

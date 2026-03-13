@@ -81,7 +81,7 @@ export function ResumeTranslationModal({
       );
       
       // Navigate to the new translated resume
-      navigate(`/resume/${translatedResume.id}`);
+      navigate(`/my-resumes/${translatedResume.id}`);
       onClose();
     } catch (err: any) {
       console.error('Error translating resume:', err);

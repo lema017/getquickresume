@@ -171,7 +171,7 @@ export function HowToMakeGoodResume() {
           translate your resume into another language
         </Link>{' '}
         using specialized tools. See our list of the{' '}
-        <Link to="/best-resume-translators" className="text-blue-600 hover:underline">
+        <Link to="/resume-translator" className="text-blue-600 hover:underline">
           best resume translators in 2026
         </Link>{' '}
         for recommendations.

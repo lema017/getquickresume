@@ -375,7 +375,7 @@ export const ResumeCard = memo(function ResumeCard({
           
           <div className="grid grid-cols-5 gap-1.5">
             <button
-              onClick={() => handleAIToolClick('share', () => navigate(`/resume/${resume.id}/share`))}
+              onClick={() => handleAIToolClick('share', () => navigate(`/my-resumes/${resume.id}/share`))}
               className="group flex flex-col items-center gap-1 p-2 rounded-lg transition-all bg-blue-50 hover:bg-blue-100 text-blue-700"
               title={t('resumeCard.actions.shareAndTrack')}
             >

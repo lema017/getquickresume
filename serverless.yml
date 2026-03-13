@@ -181,6 +181,19 @@ resources:
               Compress: true
               CachePolicyId: !Ref StaticAssetsCachePolicy
               ResponseHeadersPolicyId: !Ref StaticAssetsHeadersPolicy
+            # Cache behavior for template assets (JS designs + thumbnails)
+            - PathPattern: "/templates/*"
+              TargetOriginId: S3Origin
+              ViewerProtocolPolicy: redirect-to-https
+              AllowedMethods:
+                - GET
+                - HEAD
+              CachedMethods:
+                - GET
+                - HEAD
+              Compress: true
+              CachePolicyId: !Ref StaticAssetsCachePolicy
+              ResponseHeadersPolicyId: !Ref StaticAssetsHeadersPolicy
           
           # Default behavior for HTML and other files (short cache)
           DefaultCacheBehavior:

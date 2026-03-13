@@ -86,7 +86,7 @@ export function ResumeHeader({ resume, onEdit, onDownload, onTranslate, onShare,
           )}
           {resume.generatedResume && (
             <button
-              onClick={() => navigate(`/resume/${resume.id}/share`)}
+              onClick={() => navigate(`/my-resumes/${resume.id}/share`)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
                 resume.isPubliclyShared
                   ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 shadow-sm'

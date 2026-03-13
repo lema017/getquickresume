@@ -97,18 +97,6 @@ export const pageSEO: Record<string, PageSEO> = {
       noIndex: true,
     },
   },
-  resumeForJobDescription: {
-    en: {
-      title: 'Resume Tailored to Job Description - Match What Employers Want | GetQuickResume',
-      description: 'Stop sending generic resumes. Paste a job description and tailor your resume to match keywords, requirements, and ATS filters. Free to start.',
-      ogType: 'website',
-    },
-    es: {
-      title: 'CV Adaptado a la Descripción del Puesto - Lo Que Buscan los Empleadores | GetQuickResume',
-      description: 'Deja de enviar CVs genéricos. Pega una descripción del puesto y adapta tu CV para coincidir con palabras clave, requisitos y filtros ATS. Gratis para comenzar.',
-      ogType: 'website',
-    },
-  },
   atsResumeChecker: {
     en: {
       title: 'Free ATS Resume Checker — Get Your Score Now | GetQuickResume',
@@ -130,30 +118,6 @@ export const pageSEO: Record<string, PageSEO> = {
     es: {
       title: 'Traducción de CV — Traduce tu Currículum para Trabajos Globales | GetQuickResume',
       description: 'Traduce tu CV a más de 10 idiomas sin perder el tono profesional, logros ni la estructura compatible con ATS. Gratis para comenzar.',
-      ogType: 'website',
-    },
-  },
-  aiResumeBuilder: {
-    en: {
-      title: 'AI Resume Builder — Create a Professional Resume in Minutes | GetQuickResume',
-      description: 'Generate a recruiter-ready resume from your real experience, optimize for ATS, and tailor it for the jobs you want. Free AI resume builder.',
-      ogType: 'website',
-    },
-    es: {
-      title: 'Creador de CV con IA — Crea un Currículum Profesional en Minutos | GetQuickResume',
-      description: 'Genera un currículum listo para reclutadores desde tu experiencia real, optimiza para ATS y adáptalo a los trabajos que deseas. Creador de CV con IA gratis.',
-      ogType: 'website',
-    },
-  },
-  resumeTemplates: {
-    en: {
-      title: 'Professional Resume Templates — ATS-Friendly & Recruiter-Ready | GetQuickResume',
-      description: 'Choose from our collection of professional, ATS-friendly resume templates designed for modern job seekers. Clean layouts that hiring systems can read.',
-      ogType: 'website',
-    },
-    es: {
-      title: 'Plantillas de CV Profesionales — Compatibles con ATS | GetQuickResume',
-      description: 'Elige entre nuestra colección de plantillas de CV profesionales y compatibles con ATS, diseñadas para el mercado laboral actual.',
       ogType: 'website',
     },
   },
@@ -491,6 +455,56 @@ export const commonFAQs = {
     },
   ],
 };
+
+/**
+ * Generate SEO metadata for a programmatic profession page
+ */
+export function generateProfessionPageSEO(profession: {
+  slug: string;
+  title: string;
+  keywords: string[];
+  totalMonthlySearches: number;
+}) {
+  const { title, slug, keywords } = profession;
+  const canonicalUrl = buildCanonicalUrl(`/resume/${slug}`);
+  const topKeywords = keywords.slice(0, 5).join(', ');
+
+  return {
+    title: `${title} Resume: Examples, Templates & ATS Keywords (2025) | ${SITE_NAME}`,
+    description: `Create a professional ${title} resume with our free AI resume builder. Browse ${title} resume examples, ATS-optimized templates, and top skills. ${topKeywords}.`,
+    canonicalUrl,
+    ogImage: DEFAULT_OG_IMAGE,
+    ogType: 'website' as const,
+    keywords: topKeywords,
+  };
+}
+
+/**
+ * Generate WebPage structured data for profession pages
+ */
+export function generateProfessionWebPageSchema(profession: {
+  slug: string;
+  title: string;
+  keywords: string[];
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: `${profession.title} Resume Templates & Examples`,
+    description: `Free ${profession.title} resume templates, examples, ATS keywords, and top skills. Build your resume now.`,
+    url: buildCanonicalUrl(`/resume/${profession.slug}`),
+    isPartOf: {
+      '@type': 'WebSite',
+      name: SITE_NAME,
+      url: BASE_URL,
+    },
+    about: {
+      '@type': 'Thing',
+      name: profession.title,
+    },
+    keywords: profession.keywords.join(', '),
+  };
+}
 
 export { BASE_URL, SITE_NAME, DEFAULT_OG_IMAGE };
 

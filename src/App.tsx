@@ -51,10 +51,8 @@ const SupportPage = lazy(() => import('@/pages/SupportPage').then(m => ({ defaul
 
 // SEO Landing pages
 const AtsResumeCheckerPage = lazy(() => import('@/pages/AtsResumeCheckerPage').then(m => ({ default: m.AtsResumeCheckerPage })));
-const AiResumeBuilderPage = lazy(() => import('@/pages/AiResumeBuilderPage').then(m => ({ default: m.AiResumeBuilderPage })));
 const ResumeTranslatorPage = lazy(() => import('@/pages/ResumeTranslatorPage').then(m => ({ default: m.ResumeTranslatorPage })));
-const ResumeTemplatesPage = lazy(() => import('@/pages/ResumeTemplatesPage').then(m => ({ default: m.ResumeTemplatesPage })));
-
+const ProfessionResumePage = lazy(() => import('@/pages/ProfessionResumePage').then(m => ({ default: m.ProfessionResumePage })));
 // Legal pages
 const PrivacyPage = lazy(() => import('@/pages/PrivacyPage').then(m => ({ default: m.PrivacyPage })));
 const TermsPage = lazy(() => import('@/pages/TermsPage').then(m => ({ default: m.TermsPage })));
@@ -66,10 +64,6 @@ const HowToMakeGoodResume = lazy(() => import('@/pages/articles/HowToMakeGoodRes
 const WhatIsATS = lazy(() => import('@/pages/articles/WhatIsATS').then(m => ({ default: m.WhatIsATS })));
 const ResumeTipsForCareerChangers = lazy(() => import('@/pages/articles/ResumeTipsForCareerChangers').then(m => ({ default: m.ResumeTipsForCareerChangers })));
 const CommonResumeMistakes = lazy(() => import('@/pages/articles/CommonResumeMistakes').then(m => ({ default: m.CommonResumeMistakes })));
-const BestResumeTranslator = lazy(() => import('@/pages/articles/BestResumeTranslator').then(m => ({ default: m.BestResumeTranslator })));
-
-// SEO Landing Pages
-const ResumeForJobDescriptionPage = lazy(() => import('@/pages/ResumeForJobDescriptionPage').then(m => ({ default: m.ResumeForJobDescriptionPage })));
 
 // Public
 const PublicResumePage = lazy(() => import('@/pages/PublicResumePage').then(m => ({ default: m.PublicResumePage })));
@@ -172,24 +166,19 @@ function App() {
               </MainLayout>
             } />
 
-            <Route path="/ai-resume-builder" element={
-              <MainLayout>
-                <AiResumeBuilderPage />
-              </MainLayout>
-            } />
-
             <Route path="/resume-translator" element={
               <MainLayout>
                 <ResumeTranslatorPage />
               </MainLayout>
             } />
 
-            <Route path="/resume-templates" element={
+            {/* Programmatic SEO: Profession Resume Pages */}
+            <Route path="/resume/:slug" element={
               <MainLayout>
-                <ResumeTemplatesPage />
+                <ProfessionResumePage />
               </MainLayout>
             } />
-            
+
             <Route path="/legal/privacy" element={
               <MainLayout>
                 <PrivacyPage />
@@ -236,19 +225,6 @@ function App() {
             <Route path="/blog/common-resume-mistakes" element={
               <MainLayout>
                 <CommonResumeMistakes />
-              </MainLayout>
-            } />
-
-            {/* SEO Landing Pages */}
-            <Route path="/resume-for-job-description" element={
-              <MainLayout>
-                <ResumeForJobDescriptionPage />
-              </MainLayout>
-            } />
-
-            <Route path="/best-resume-translators" element={
-              <MainLayout>
-                <BestResumeTranslator />
               </MainLayout>
             } />
 
@@ -322,8 +298,8 @@ function App() {
                 </MainLayout>
               </ProtectedRoute>
             } />
-            
-            <Route path="/resume/:id" element={
+
+            <Route path="/my-resumes/:id" element={
               <ProtectedRoute>
                 <MainLayout>
                   <ResumeViewPage />
@@ -331,7 +307,7 @@ function App() {
               </ProtectedRoute>
             } />
             
-            <Route path="/resume/:id/share" element={
+            <Route path="/my-resumes/:id/share" element={
               <ProtectedRoute>
                 <MainLayout>
                   <ResumeSharePage />

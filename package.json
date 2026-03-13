@@ -7,13 +7,16 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "build:dev": "VITE_API_URL=http://localhost:3001/dev VITE_PAYPAL_CLIENT_ID=AdMVsZO63epz-Fqg0O2Hh47QP1ATtUovxq7JUqbwU8iXEJIPKaFN7DG7iMOqJI1FpoiKak3jlkpVNeCV vite build",
-    "build:prod": "VITE_API_URL=https://api.getquickresume.com VITE_GOOGLE_CLIENT_ID=639420865993-5j49j494dv0dr5paeddjpl18aq2latlb.apps.googleusercontent.com VITE_LINKEDIN_CLIENT_ID=78gy4pl3ps34f0 VITE_PAYPAL_CLIENT_ID=ARYOpApRtahgN477XBh-_CHK41wVvsb7a86G0ihTne-LWrzLym_z3hccyMfs1WLMat8_UpZcNf1XI0UA vite build",
+    "build:prod": "VITE_TEMPLATE_VERSION=$(date +%s) VITE_API_URL=https://api.getquickresume.com VITE_GOOGLE_CLIENT_ID=639420865993-5j49j494dv0dr5paeddjpl18aq2latlb.apps.googleusercontent.com VITE_LINKEDIN_CLIENT_ID=78gy4pl3ps34f0 VITE_PAYPAL_CLIENT_ID=ARYOpApRtahgN477XBh-_CHK41wVvsb7a86G0ihTne-LWrzLym_z3hccyMfs1WLMat8_UpZcNf1XI0UA vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "type-check": "tsc --noEmit",
     "deploy:frontend": "npm run build:prod && npx serverless deploy --stage prod && npx serverless s3sync --stage prod && npm run invalidate:cloudfront",
     "deploy:frontend:dev": "npm run build:dev && serverless deploy --stage dev",
     "invalidate:cloudfront": "echo '🔄 Invalidating CloudFront cache...' && DIST_ID=$(aws cloudformation describe-stacks --stack-name getquickresume-frontend-prod --query 'Stacks[0].Outputs[?OutputKey==`CloudFrontDistributionId`].OutputValue' --output text) && echo \"Distribution ID: $DIST_ID\" && aws cloudfront create-invalidation --distribution-id $DIST_ID --paths '/*' && echo '✅ CloudFront invalidation created successfully'",
+    "generate:thumbnails": "node scripts/generate-thumbnails.mjs",
+    "generate:manifest": "node scripts/generate-manifest.mjs",
+    "generate:templates": "npm run generate:thumbnails && npm run generate:manifest",
     "deploy:api": "cd api && serverless deploy --stage prod",
     "deploy:api:dev": "cd api && serverless deploy --stage dev"
   },
@@ -44,6 +47,7 @@
     "react-live": "^4.1.8",
     "react-router-dom": "^6.20.1",
     "react-window": "^1.8.10",
+    "swiper": "^12.1.2",
     "tailwind-merge": "^2.2.0",
     "zod": "^3.22.4",
     "zustand": "^4.4.7"
@@ -61,12 +65,14 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "postcss": "^8.4.32",
+    "puppeteer": "^24.39.0",
     "serverless": "^3.40.0",
     "serverless-s3-sync": "^3.5.0",
     "tailwindcss": "^3.3.6",
     "terser": "^5.46.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.2.2",
-    "vite": "^5.0.8"
+    "vite": "^5.0.8",
+    "xlsx": "^0.18.5"
   }
 }

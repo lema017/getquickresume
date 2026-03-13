@@ -384,7 +384,7 @@ export function Step10Final() {
     }
     // For premium users, navigate to resume view page with enhancement options
     if (currentResumeId) {
-      navigate(`/resume/${currentResumeId}`);
+      navigate(`/my-resumes/${currentResumeId}`);
     }
   };
 

@@ -61,23 +61,8 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/resume-for-job-description" className="text-gray-400 hover:text-white transition-colors">
-                  {t('footer.toolLinks.jobTailoring')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/ai-resume-builder" className="text-gray-400 hover:text-white transition-colors">
-                  {t('footer.toolLinks.aiBuilder')}
-                </Link>
-              </li>
-              <li>
                 <Link to="/resume-translator" className="text-gray-400 hover:text-white transition-colors">
                   {t('footer.toolLinks.translator')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/resume-templates" className="text-gray-400 hover:text-white transition-colors">
-                  {t('footer.toolLinks.templates')}
                 </Link>
               </li>
             </ul>
@@ -109,7 +94,7 @@ export function Footer() {
               </li>
               {SHOW_PILLAR_FOOTER_LINK && (
                 <li>
-                  <Link to="/best-resume-translators" className="text-gray-400 hover:text-white transition-colors">
+                  <Link to="/resume-translator" className="text-gray-400 hover:text-white transition-colors">
                     Best Resume Translators
                   </Link>
                 </li>

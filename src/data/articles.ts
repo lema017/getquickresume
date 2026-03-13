@@ -42,15 +42,6 @@ export const articles: Record<SupportedLanguage, ArticleMeta[]> = {
       publishDate: '2025-02-06',
       imageUrl: '/images/blog/common-resume-mistakes.png',
     },
-    {
-      slug: 'best-resume-translators',
-      title: 'Best Resume Translators in 2026: 8 Tools Compared',
-      excerpt: 'Compare the top resume translation tools for applying to jobs abroad. Find out which AI-powered translators preserve formatting, context, and professional tone.',
-      category: 'Career Advice',
-      readTime: 14,
-      publishDate: '2026-02-17',
-      imageUrl: '/images/blog/best-resume-translators.png',
-    },
   ],
   es: [
     {
@@ -88,15 +79,6 @@ export const articles: Record<SupportedLanguage, ArticleMeta[]> = {
       readTime: 5,
       publishDate: '2025-02-06',
       imageUrl: '/images/blog/common-resume-mistakes.png',
-    },
-    {
-      slug: 'best-resume-translators',
-      title: 'Mejores Traductores de CV en 2026: 8 Herramientas Comparadas',
-      excerpt: 'Compara las mejores herramientas de traducción de CV para aplicar a empleos en el extranjero. Descubre cuáles preservan el formato, el contexto y el tono profesional.',
-      category: 'Consejos de Carrera',
-      readTime: 14,
-      publishDate: '2026-02-17',
-      imageUrl: '/images/blog/best-resume-translators.png',
     },
   ],
 };
