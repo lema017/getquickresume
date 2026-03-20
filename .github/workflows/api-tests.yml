@@ -1,15 +1,23 @@
-name: API tests
+# All unit tests live under api/ (Vitest). Failing this workflow blocks visibility of a green check on the commit.
+# Email alerts: https://github.com/settings/notifications → Actions → enable failed workflow notifications.
+
+name: Unit tests
+
+concurrency:
+  group: unit-tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 on:
-  workflow_dispatch:
-  pull_request:
   push:
-    branches:
-      - main
-      - master
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   api:
+    name: API (typecheck + Vitest + coverage)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -31,5 +39,24 @@ jobs:
       - name: Typecheck
         run: npm run type-check
 
-      - name: Build and unit tests
+      - name: Unit tests (with coverage gates)
         run: npm run build
+
+  notify-on-failure:
+    name: Tests failed — see api job
+    runs-on: ubuntu-latest
+    needs: api
+    if: failure()
+    steps:
+      - name: Summary and annotation
+        run: |
+          {
+            echo "## Unit tests failed"
+            echo ""
+            echo "Open the **API (typecheck + Vitest + coverage)** job logs above."
+            echo ""
+            echo "Reproduce locally: \`cd api && npm ci && npm run build\`"
+            echo ""
+            echo "**Email when CI breaks:** [GitHub → Settings → Notifications](https://github.com/settings/notifications) → *Actions* → turn on failed workflow notifications (and watch the repo if you want commit emails)."
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "::error title=Unit tests failed::api/: typecheck, Vitest, or coverage thresholds failed. Run: cd api && npm run build"

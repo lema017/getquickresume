@@ -63,9 +63,10 @@ npm run build            # tsc + vitest run --coverage (enforces thresholds)
 
 ## CI (GitHub Actions)
 
-- **Workflow**: [.github/workflows/api-tests.yml](../.github/workflows/api-tests.yml)
-- **Triggers**: all **pull requests**, pushes to `main` / `master`, and **workflow_dispatch** (manual run in the Actions tab).
+- **Workflow**: [.github/workflows/api-tests.yml](../.github/workflows/api-tests.yml) (workflow name: **Unit tests**).
+- **Triggers**: **every push** to any branch, all **pull requests**, and **workflow_dispatch** (manual run in the Actions tab). Concurrent runs on the same branch cancel older runs.
 - **Steps**: `npm ci` → `npm run type-check` → `npm run build` (compile + tests + coverage thresholds).
+- **Notifications**: failed runs mark the commit red and add an error annotation; enable **GitHub → Settings → Notifications → Actions** (failed workflows) if you want email.
 
 ## Production deploy (tests gate deploy)
 
