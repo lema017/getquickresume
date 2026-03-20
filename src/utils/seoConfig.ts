@@ -268,13 +268,6 @@ export function generateSoftwareApplicationSchema() {
       priceCurrency: 'USD',
       description: 'Free tier with essential resume building features',
     },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      ratingCount: '150',
-      bestRating: '5',
-      worstRating: '1',
-    },
     featureList: [
       'AI-powered content suggestions',
       'ATS-optimized templates',
@@ -459,19 +452,34 @@ export const commonFAQs = {
 /**
  * Generate SEO metadata for a programmatic profession page
  */
-export function generateProfessionPageSEO(profession: {
-  slug: string;
-  title: string;
-  keywords: string[];
-  totalMonthlySearches: number;
-}) {
+export function generateProfessionPageSEO(
+  profession: {
+    slug: string;
+    title: string;
+    keywords: string[];
+    totalMonthlySearches: number;
+  },
+  language: 'en' | 'es' = 'en'
+) {
   const { title, slug, keywords } = profession;
   const canonicalUrl = buildCanonicalUrl(`/resume/${slug}`);
   const topKeywords = keywords.slice(0, 5).join(', ');
+  const year = new Date().getFullYear();
+
+  if (language === 'es') {
+    return {
+      title: `Currículum de ${title}: Ejemplos, Plantillas y Palabras Clave ATS (${year}) | ${SITE_NAME}`,
+      description: `Crea un currículum profesional de ${title} con nuestro creador de CV gratuito con IA. Ejemplos reales de currículum de ${title.toLowerCase()}, plantillas ATS y habilidades clave para destacar en ${year}.`,
+      canonicalUrl,
+      ogImage: DEFAULT_OG_IMAGE,
+      ogType: 'website' as const,
+      keywords: topKeywords,
+    };
+  }
 
   return {
-    title: `${title} Resume: Examples, Templates & ATS Keywords (2025) | ${SITE_NAME}`,
-    description: `Create a professional ${title} resume with our free AI resume builder. Browse ${title} resume examples, ATS-optimized templates, and top skills. ${topKeywords}.`,
+    title: `${title} Resume: Examples, Templates & ATS Keywords (${year}) | ${SITE_NAME}`,
+    description: `Build a standout ${title} resume with our free AI resume builder. Real ${title} resume examples, ATS-optimized templates, top skills & keywords — updated for ${year}.`,
     canonicalUrl,
     ogImage: DEFAULT_OG_IMAGE,
     ogType: 'website' as const,
@@ -480,29 +488,158 @@ export function generateProfessionPageSEO(profession: {
 }
 
 /**
- * Generate WebPage structured data for profession pages
+ * Generate WebPage + CollectionPage structured data for profession pages.
+ * CollectionPage is more accurate for pages that display a collection of resume templates.
  */
-export function generateProfessionWebPageSchema(profession: {
-  slug: string;
-  title: string;
-  keywords: string[];
-}) {
+export function generateProfessionWebPageSchema(
+  profession: {
+    slug: string;
+    title: string;
+    keywords: string[];
+  },
+  language: 'en' | 'es' = 'en'
+) {
+  const year = new Date().getFullYear();
+  const pageUrl = buildCanonicalUrl(`/resume/${profession.slug}`);
+  if (language === 'es') {
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: `Plantillas y ejemplos de currículum de ${profession.title} (${year})`,
+      description: `Plantillas de CV gratuitas para ${profession.title}, ejemplos reales, palabras clave ATS y habilidades clave. Crea tu currículum con nuestro creador con IA.`,
+      url: pageUrl,
+      isPartOf: {
+        '@type': 'WebSite',
+        name: SITE_NAME,
+        url: BASE_URL,
+      },
+      about: {
+        '@type': 'Occupation',
+        name: profession.title,
+      },
+      keywords: profession.keywords.join(', '),
+      dateModified: new Date().toISOString().split('T')[0],
+      inLanguage: 'es',
+      potentialAction: {
+        '@type': 'UseAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: `${BASE_URL}/create`,
+          actionPlatform: 'http://schema.org/DesktopWebPlatform',
+        },
+      },
+    };
+  }
   return {
     '@context': 'https://schema.org',
-    '@type': 'WebPage',
-    name: `${profession.title} Resume Templates & Examples`,
-    description: `Free ${profession.title} resume templates, examples, ATS keywords, and top skills. Build your resume now.`,
-    url: buildCanonicalUrl(`/resume/${profession.slug}`),
+    '@type': 'CollectionPage',
+    name: `${profession.title} resume templates and examples (${year})`,
+    description: `Free ${profession.title} resume templates, real examples, ATS keywords, and top skills. Build your ${profession.title} resume now with our AI-powered builder.`,
+    url: pageUrl,
     isPartOf: {
       '@type': 'WebSite',
       name: SITE_NAME,
       url: BASE_URL,
     },
     about: {
-      '@type': 'Thing',
+      '@type': 'Occupation',
       name: profession.title,
     },
     keywords: profession.keywords.join(', '),
+    dateModified: new Date().toISOString().split('T')[0],
+    inLanguage: 'en',
+    potentialAction: {
+      '@type': 'UseAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${BASE_URL}/create`,
+        actionPlatform: 'http://schema.org/DesktopWebPlatform',
+      },
+    },
+  };
+}
+
+export function generateSkillPageSEO(
+  skill: {
+    slug: string;
+    title: string;
+    keywords: string[];
+    totalMonthlySearches: number;
+  },
+  language: 'en' | 'es' = 'en'
+) {
+  const { title, slug, keywords } = skill;
+  const canonicalUrl = buildCanonicalUrl(`/resume-skills/${slug}`);
+  const topKeywords = keywords.slice(0, 5).join(', ');
+  const year = new Date().getFullYear();
+
+  if (language === 'es') {
+    return {
+      title: `Habilidades de ${title} para tu Currículum (${year}) | ${SITE_NAME}`,
+      description: `Descubre las mejores habilidades de ${title} para tu currículum. Cómo destacar tu experiencia en ${title.toLowerCase()}, ejemplos de logros, palabras clave ATS y profesiones relacionadas — actualizado ${year}.`,
+      canonicalUrl,
+      ogImage: DEFAULT_OG_IMAGE,
+      ogType: 'website' as const,
+      keywords: topKeywords,
+    };
+  }
+
+  return {
+    title: `Top ${title} Skills for Your Resume (${year}) | ${SITE_NAME}`,
+    description: `Discover the best ${title} skills for your resume. How to showcase ${title.toLowerCase()} expertise, resume bullet examples, ATS keywords, and related professions — updated for ${year}.`,
+    canonicalUrl,
+    ogImage: DEFAULT_OG_IMAGE,
+    ogType: 'website' as const,
+    keywords: topKeywords,
+  };
+}
+
+export function generateSkillWebPageSchema(
+  skill: {
+    slug: string;
+    title: string;
+    keywords: string[];
+  },
+  language: 'en' | 'es' = 'en'
+) {
+  const pageUrl = buildCanonicalUrl(`/resume-skills/${skill.slug}`);
+  if (language === 'es') {
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: `Habilidades de ${skill.title} para tu currículum`,
+      description: `Cómo incluir ${skill.title} en tu CV. Incluye ejemplos, palabras clave ATS, habilidades relacionadas y profesiones.`,
+      url: pageUrl,
+      isPartOf: {
+        '@type': 'WebSite',
+        name: SITE_NAME,
+        url: BASE_URL,
+      },
+      about: {
+        '@type': 'DefinedTerm',
+        name: skill.title,
+      },
+      keywords: skill.keywords.join(', '),
+      inLanguage: 'es',
+    };
+  }
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: `${skill.title} skills for your resume`,
+    description: `Learn how to add ${skill.title} to your resume. Includes resume examples, ATS keywords, related skills, and professions.`,
+    url: pageUrl,
+    isPartOf: {
+      '@type': 'WebSite',
+      name: SITE_NAME,
+      url: BASE_URL,
+    },
+    about: {
+      '@type': 'DefinedTerm',
+      name: skill.title,
+    },
+    keywords: skill.keywords.join(', '),
+    inLanguage: 'en',
   };
 }
 

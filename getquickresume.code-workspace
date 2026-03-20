@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "../getquickresume-e2e"
 		}
 	],
 	"settings": {

@@ -53,6 +53,7 @@ const SupportPage = lazy(() => import('@/pages/SupportPage').then(m => ({ defaul
 const AtsResumeCheckerPage = lazy(() => import('@/pages/AtsResumeCheckerPage').then(m => ({ default: m.AtsResumeCheckerPage })));
 const ResumeTranslatorPage = lazy(() => import('@/pages/ResumeTranslatorPage').then(m => ({ default: m.ResumeTranslatorPage })));
 const ProfessionResumePage = lazy(() => import('@/pages/ProfessionResumePage').then(m => ({ default: m.ProfessionResumePage })));
+const SkillResumePage = lazy(() => import('@/pages/SkillResumePage').then(m => ({ default: m.SkillResumePage })));
 // Legal pages
 const PrivacyPage = lazy(() => import('@/pages/PrivacyPage').then(m => ({ default: m.PrivacyPage })));
 const TermsPage = lazy(() => import('@/pages/TermsPage').then(m => ({ default: m.TermsPage })));
@@ -64,6 +65,10 @@ const HowToMakeGoodResume = lazy(() => import('@/pages/articles/HowToMakeGoodRes
 const WhatIsATS = lazy(() => import('@/pages/articles/WhatIsATS').then(m => ({ default: m.WhatIsATS })));
 const ResumeTipsForCareerChangers = lazy(() => import('@/pages/articles/ResumeTipsForCareerChangers').then(m => ({ default: m.ResumeTipsForCareerChangers })));
 const CommonResumeMistakes = lazy(() => import('@/pages/articles/CommonResumeMistakes').then(m => ({ default: m.CommonResumeMistakes })));
+const HowToWriteAResume = lazy(() => import('@/pages/articles/HowToWriteAResume').then(m => ({ default: m.HowToWriteAResume })));
+const HowToMakeAResume = lazy(() => import('@/pages/articles/HowToMakeAResume').then(m => ({ default: m.HowToMakeAResume })));
+const HowFarBackShouldResumeGo = lazy(() => import('@/pages/articles/HowFarBackShouldResumeGo').then(m => ({ default: m.HowFarBackShouldResumeGo })));
+const ShouldIPutGpaOnResume = lazy(() => import('@/pages/articles/ShouldIPutGpaOnResume').then(m => ({ default: m.ShouldIPutGpaOnResume })));
 
 // Public
 const PublicResumePage = lazy(() => import('@/pages/PublicResumePage').then(m => ({ default: m.PublicResumePage })));
@@ -179,6 +184,13 @@ function App() {
               </MainLayout>
             } />
 
+            {/* Programmatic SEO: Skill Resume Pages */}
+            <Route path="/resume-skills/:slug" element={
+              <MainLayout>
+                <SkillResumePage />
+              </MainLayout>
+            } />
+
             <Route path="/legal/privacy" element={
               <MainLayout>
                 <PrivacyPage />
@@ -225,6 +237,30 @@ function App() {
             <Route path="/blog/common-resume-mistakes" element={
               <MainLayout>
                 <CommonResumeMistakes />
+              </MainLayout>
+            } />
+
+            <Route path="/blog/how-to-write-a-resume" element={
+              <MainLayout>
+                <HowToWriteAResume />
+              </MainLayout>
+            } />
+
+            <Route path="/blog/how-to-make-a-resume" element={
+              <MainLayout>
+                <HowToMakeAResume />
+              </MainLayout>
+            } />
+
+            <Route path="/blog/how-far-back-should-a-resume-go" element={
+              <MainLayout>
+                <HowFarBackShouldResumeGo />
+              </MainLayout>
+            } />
+
+            <Route path="/blog/should-i-put-gpa-on-resume" element={
+              <MainLayout>
+                <ShouldIPutGpaOnResume />
               </MainLayout>
             } />
 

@@ -4,23 +4,10 @@
 User-agent: *
 Allow: /
 
-
-Allow: /blog
-Allow: /pricing
-Allow: /about
-Allow: /contact
-Allow: /legal/
-Allow: /ats-resume-checker
-Allow: /resume-translator
-Allow: /create
-Allow: /login
-Allow: /premium
-
 # Disallow private/authenticated and dynamic pages
 Disallow: /dashboard
 Disallow: /wizard
 Disallow: /account
-Disallow: /resume/
 Disallow: /support
 Disallow: /thank-you
 Disallow: /cover-letter/

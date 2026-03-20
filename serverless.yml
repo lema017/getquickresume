@@ -20,6 +20,10 @@ custom:
   hostedZoneId: Z01701462KOX9LVOTWQC1  # Route 53 hosted zone for getquickresume.com
   certificateArn: arn:aws:acm:us-east-1:408034543529:certificate/91e492ba-21e0-4dd6-a972-f1e553774107
   
+  # S3 sync: extensionless prerender files live at dist/resume/{slug} and
+  # dist/resume-skills/{slug}. serverless-s3-sync uses mime by extension; when
+  # unknown, defaultContentType applies — so those keys upload as text/html.
+  # Hashed assets (.js, .css, …) still get correct types from their extensions.
   s3Sync:
     - bucketName: ${self:custom.stages.${self:provider.stage}.bucketName}
       localDir: dist

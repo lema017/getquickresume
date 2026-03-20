@@ -1,0 +1,3008 @@
+import { buildResumeData } from './_helpers';
+import type { ProfessionEsData } from './index';
+
+export const translations: Record<string, ProfessionEsData> = {
+  'hotel-manager': {
+    slug: 'gerente-de-hotel',
+    title: 'Gerente de Hotel',
+    keywords: ['currículum de gerente de hotel', 'CV de gestión hotelera', 'currículum de gerente de hospitalidad', 'currículum de gerente general de hotel'],
+    searchIntents: ['cómo escribir un currículum de gerente de hotel', 'ejemplos de currículum de gerente de hotel', 'mejor plantilla de currículum de gestión hotelera'],
+    topSkills: ['Gestión de Ingresos', 'Relaciones con Huéspedes', 'Liderazgo de Personal', 'Presupuestos y Pronósticos', 'Sistemas de Gestión de Propiedades', 'Gestión de Operaciones', 'Resolución de Conflictos', 'Cumplimiento y Seguridad', 'Estrategia de Ventas', 'Relaciones con Proveedores'],
+    atsKeywords: ['operaciones hoteleras', 'satisfacción del huésped', 'gestión de ingresos', 'gestión de recepción', 'supervisión de limpieza', 'software PMS', 'programación de personal', 'gestión de P&L', 'industria hotelera', 'aseguramiento de calidad', 'tasa de ocupación'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Gregory',
+      lastName: 'Fontaine',
+      profession: 'Gerente de Hotel',
+      summary: 'Gerente de hotel con más de 10 años de experiencia supervisando propiedades de servicio completo que generan más de $12M en ingresos anuales. Historial comprobado de mejora en puntajes de satisfacción del huésped, optimización de tasas de ocupación y liderazgo de equipos de más de 80 empleados en todos los departamentos.',
+      skills: ['Gestión de Ingresos', 'Relaciones con Huéspedes', 'Opera PMS', 'Presupuestos', 'Liderazgo de Personal', 'Estrategia de Ventas', 'Cumplimiento', 'Negociación con Proveedores', 'Resolución de Conflictos', 'Gestión de P&L'],
+      experience: [
+        {
+          title: 'Gerente General',
+          company: 'Marriott International',
+          startDate: '2020-03',
+          isCurrent: true,
+          achievements: [
+            'Aumentó los ingresos anuales en un 22% a $14.5M mediante la implementación de estrategias de precios dinámicos y programas de ventas adicionales',
+            'Mejoró los puntajes de satisfacción del huésped del 82% al 94% al reestructurar los flujos de trabajo de recepción y conserjería',
+            'Redujo la rotación de personal en un 30% mediante un programa de mentoría y una estructura de compensación revisada para 85 empleados',
+          ],
+        },
+        {
+          title: 'Subgerente General',
+          company: 'Hilton Hotels & Resorts',
+          startDate: '2016-06',
+          endDate: '2020-02',
+          achievements: [
+            'Gestionó las operaciones diarias de una propiedad de 320 habitaciones con una tasa de ocupación promedio del 88%',
+            'Negoció contratos con proveedores ahorrando $180K anuales en ropa de cama, amenidades y suministros de alimentos',
+            'Lideró un proyecto de renovación completado 2 semanas antes de lo programado y $50K por debajo del presupuesto',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Cornell University', degree: 'Licenciatura', field: 'Administración Hotelera', startDate: '2008-08', endDate: '2012-05' },
+      ],
+      certifications: [
+        { name: 'Administrador de Hotel Certificado (CHA)', issuer: 'American Hotel & Lodging Educational Institute', date: '2018-09' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe destacar un gerente de hotel en su currículum?', answer: 'Enfóquese en el crecimiento de ingresos, tasas de ocupación, métricas de satisfacción del huésped, tamaño del equipo gestionado y mejoras operacionales. Incluya tamaños específicos de propiedades y cifras de ingresos anuales.' },
+      { question: '¿Qué certificaciones son valiosas para un currículum de gerente de hotel?', answer: 'El Administrador de Hotel Certificado (CHA) y el Supervisor de Hospitalidad Certificado (CHS) son altamente respetados. Las certificaciones en gestión de ingresos de HSMAI también son valoradas.' },
+      { question: '¿Cómo cuantifico logros en un currículum de gerente de hotel?', answer: 'Use métricas como aumentos de ingresos, mejoras en tasas de ocupación, cambios en puntajes de satisfacción del huésped, ahorros de costos, reducciones en rotación de personal y mejoras en calificaciones de TripAdvisor/reseñas.' },
+    ],
+  },
+  'restaurant-manager': {
+    slug: 'gerente-de-restaurante',
+    title: 'Gerente de Restaurante',
+    keywords: ['currículum de gerente de restaurante', 'CV de gestión de restaurantes', 'currículum de gerente de servicio de alimentos', 'currículum de gerente general de restaurante'],
+    searchIntents: ['cómo escribir un currículum de gerente de restaurante', 'ejemplos de currículum de gerente de restaurante', 'mejor plantilla de CV de gerente de restaurante'],
+    topSkills: ['Operaciones de Restaurante', 'Gestión de Personal', 'Control de Costos de Alimentos', 'Servicio al Cliente', 'Sistemas POS', 'Gestión de Inventario', 'Cumplimiento de Salud y Seguridad', 'Programación', 'Desarrollo de Menú', 'Optimización de Ingresos'],
+    atsKeywords: ['operaciones de restaurante', 'porcentaje de costo de alimentos', 'gestión de costos laborales', 'cumplimiento del departamento de salud', 'capacitación de personal', 'sistemas POS', 'control de inventario', 'satisfacción del cliente', 'ingeniería de menú', 'crecimiento de ingresos', 'gestión de sala'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Natalie',
+      lastName: 'Vega',
+      profession: 'Gerente de Restaurante',
+      summary: 'Gerente de restaurante con más de 8 años de experiencia liderando establecimientos de alto volumen que generan más de $3M en ventas anuales. Experta en optimización de costos de alimentos, desarrollo de personal y entrega de experiencias excepcionales para los comensales en conceptos de alta cocina y casual rápido.',
+      skills: ['Operaciones de Restaurante', 'Gestión de Personal', 'Control de Costos de Alimentos', 'Sistemas POS', 'Gestión de Inventario', 'Cumplimiento de Normas Sanitarias', 'Desarrollo de Menú', 'Programación', 'Servicio al Cliente', 'Optimización de Ingresos'],
+      experience: [
+        {
+          title: 'Gerente General',
+          company: 'Darden Restaurants',
+          startDate: '2021-01',
+          isCurrent: true,
+          achievements: [
+            'Aumentó los ingresos anuales en un 18% a $4.2M al introducir platillos de temporada y promociones dirigidas',
+            'Redujo el desperdicio de alimentos en un 25% mediante un mejor seguimiento de inventario y sistemas de control de porciones',
+            'Capacitó y gestionó un equipo de 45 empleados, logrando la menor rotación de personal en el distrito con un 22%',
+          ],
+        },
+        {
+          title: 'Subgerente',
+          company: 'The Cheesecake Factory',
+          startDate: '2017-04',
+          endDate: '2020-12',
+          achievements: [
+            'Mantuvo el costo de alimentos en un 28% contra un objetivo del 30% mediante negociaciones con proveedores y reducción de desperdicios',
+            'Mejoró las calificaciones de reseñas en línea de 3.8 a 4.5 estrellas al implementar protocolos de respuesta a comentarios de comensales',
+            'Gestionó la programación de 55 empleados de sala, reduciendo los costos de horas extras en un 15%',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'University of Nevada, Las Vegas', degree: 'Licenciatura', field: 'Gestión Hotelera', startDate: '2013-08', endDate: '2017-05' },
+      ],
+      certifications: [
+        { name: 'Certificación de Gerente ServSafe', issuer: 'National Restaurant Association', date: '2021-03' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué hace fuerte a un currículum de gerente de restaurante?', answer: 'Destaque el crecimiento de ingresos, control de costos de alimentos, tamaño del equipo gestionado, métricas de satisfacción del cliente y puntajes de inspecciones sanitarias. Incluya el tipo y volumen de restaurante que gestionó.' },
+      { question: '¿Debo incluir certificaciones de seguridad alimentaria en mi currículum?', answer: 'Absolutamente. La certificación ServSafe es frecuentemente requerida y debe figurar prominentemente. Los permisos estatales de manipulador de alimentos y las certificaciones de servicio de alcohol también son importantes.' },
+      { question: '¿Cómo demuestro habilidades de liderazgo en un currículum de gerente de restaurante?', answer: 'Cuantifique su experiencia en gestión de equipos con el tamaño del personal, reducción de rotación, programas de capacitación desarrollados y cualquier reconocimiento por el desempeño del equipo.' },
+    ],
+  },
+  'food-and-beverage-manager': {
+    slug: 'gerente-de-alimentos-y-bebidas',
+    title: 'Gerente de Alimentos y Bebidas',
+    keywords: ['currículum de gerente de alimentos y bebidas', 'CV de gerente de A&B', 'currículum de director de servicio de alimentos', 'plantilla de currículum de gerente de bebidas'],
+    searchIntents: ['cómo escribir un currículum de gerente de alimentos y bebidas', 'ejemplos de currículum de gerente de A&B', 'plantilla de currículum de director de alimentos y bebidas'],
+    topSkills: ['Operaciones de A&B', 'Ingeniería de Menú', 'Control de Costos', 'Gestión de Proveedores', 'Operaciones de Banquetes', 'Capacitación de Personal', 'Pronóstico de Ingresos', 'Normas de Salud y Seguridad', 'Gestión de Inventario', 'Experiencia del Huésped'],
+    atsKeywords: ['operaciones de alimentos y bebidas', 'ingeniería de menú', 'operaciones de banquetes', 'control de costos', 'negociaciones con proveedores', 'cumplimiento de inspecciones sanitarias', 'pronóstico de ingresos', 'desarrollo de personal', 'gestión de inventario', 'servicios de catering', 'supervisión de P&L'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Marcus',
+      lastName: 'Delaney',
+      profession: 'Gerente de Alimentos y Bebidas',
+      summary: 'Gerente de alimentos y bebidas con más de 9 años de experiencia dirigiendo operaciones de A&B para propiedades hoteleras de lujo. Gestionó departamentos con más de $8M en ingresos anuales, logrando consistentemente puntajes de satisfacción del huésped en el cuartil superior y manteniendo costos de alimentos por debajo de los estándares de la industria.',
+      skills: ['Operaciones de A&B', 'Ingeniería de Menú', 'Control de Costos', 'Gestión de Proveedores', 'Operaciones de Banquetes', 'Capacitación de Personal', 'Pronóstico de Ingresos', 'HACCP', 'Gestión de Inventario', 'Experiencia del Huésped'],
+      experience: [
+        {
+          title: 'Director de Alimentos y Bebidas',
+          company: 'Four Seasons Hotels and Resorts',
+          startDate: '2020-07',
+          isCurrent: true,
+          achievements: [
+            'Dirigió operaciones de A&B en 4 puntos de venta y servicios de banquetes generando $9.5M anuales con un margen de ganancia del 22%',
+            'Rediseñó menús de temporada resultando en un aumento del 15% en el gasto por cubierto y una calificación de 4.8/5.0 del huésped',
+            'Redujo el costo de alimentos del 34% al 29% al renegociar contratos con proveedores e implementar software de seguimiento de desperdicios',
+          ],
+        },
+        {
+          title: 'Gerente de A&B',
+          company: 'Hyatt Hotels Corporation',
+          startDate: '2016-02',
+          endDate: '2020-06',
+          achievements: [
+            'Gestionó un equipo de 60 personas en operaciones de restaurante, bar y servicio a habitaciones para una propiedad de 450 habitaciones',
+            'Aumentó los ingresos de banquetes en un 28% mediante nuevos paquetes de eventos corporativos y ofertas de bodas',
+            'Logró un puntaje del 98% en inspecciones sanitarias en todos los puntos de venta durante 3 años consecutivos',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Johnson & Wales University', degree: 'Licenciatura', field: 'Gestión de Servicios de Alimentos', startDate: '2010-08', endDate: '2014-05' },
+      ],
+      certifications: [
+        { name: 'Ejecutivo Certificado en Alimentos y Bebidas (CFBE)', issuer: 'American Hotel & Lodging Educational Institute', date: '2019-11' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un gerente de alimentos y bebidas en su currículum?', answer: 'Destaque los ingresos gestionados, logros en control de costos, tamaño del equipo, tipos de puntos de venta supervisados y métricas de satisfacción del huésped. Mencione marcas de propiedades específicas y tipos de operaciones de A&B.' },
+      { question: '¿Qué tan importante es la experiencia en ingeniería de menú para un currículum de gerente de A&B?', answer: 'Muy importante. Los empleadores quieren ver que puede optimizar menús para la rentabilidad. Incluya métricas como aumentos en el gasto por cubierto y reducciones en el porcentaje de costo de alimentos.' },
+      { question: '¿Debo enumerar la experiencia en banquetes y catering por separado?', answer: 'Si los banquetes y el catering representan una porción significativa de los ingresos que gestionó, destáquelos como un logro distinto. Incluya volúmenes de eventos, ingresos generados y resultados de satisfacción del cliente.' },
+    ],
+  },
+  'catering-manager': {
+    slug: 'gerente-de-catering',
+    title: 'Gerente de Catering',
+    keywords: ['currículum de gerente de catering', 'CV de director de catering', 'currículum de catering para eventos', 'currículum de gerente de ventas de catering'],
+    searchIntents: ['cómo escribir un currículum de gerente de catering', 'ejemplos de currículum de gerente de catering', 'plantilla de CV de gerente de catering'],
+    topSkills: ['Planificación de Eventos', 'Operaciones de Catering', 'Relaciones con Clientes', 'Planificación de Menú', 'Gestión de Presupuestos', 'Coordinación de Personal', 'Relaciones con Proveedores', 'Negociación de Contratos', 'Seguridad Alimentaria', 'Logística'],
+    atsKeywords: ['operaciones de catering', 'coordinación de eventos', 'gestión de relaciones con clientes', 'personalización de menú', 'gestión de presupuestos', 'adquisición de proveedores', 'cumplimiento de seguridad alimentaria', 'negociación de contratos', 'programación de personal', 'montaje de banquetes', 'generación de ingresos'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Isabelle',
+      lastName: 'Thornton',
+      profession: 'Gerente de Catering',
+      summary: 'Gerente de catering con más de 7 años de experiencia planificando y ejecutando más de 200 eventos anuales para clientes corporativos y sociales. Experta en gestión de relaciones con clientes, personalización de menús y coordinación logística para eventos de 50 a 2,000 invitados.',
+      skills: ['Planificación de Eventos', 'Operaciones de Catering', 'Relaciones con Clientes', 'Planificación de Menú', 'Gestión de Presupuestos', 'Coordinación de Personal', 'Relaciones con Proveedores', 'Negociación de Contratos', 'Seguridad Alimentaria', 'Logística'],
+      experience: [
+        {
+          title: 'Gerente Senior de Catering',
+          company: 'Sodexo',
+          startDate: '2021-03',
+          isCurrent: true,
+          achievements: [
+            'Generó $2.8M en ingresos anuales de catering al asegurar más de 35 cuentas corporativas y expandir los servicios de bodas',
+            'Coordinó más de 250 eventos por año con un puntaje promedio de satisfacción del cliente de 4.9/5.0',
+            'Redujo el desperdicio de alimentos por evento en un 20% al implementar modelos de pronóstico precisos y análisis de porciones',
+          ],
+        },
+        {
+          title: 'Coordinadora de Catering',
+          company: 'Compass Group',
+          startDate: '2017-08',
+          endDate: '2021-02',
+          achievements: [
+            'Gestionó la logística de eventos para 50 a 1,500 invitados, manteniendo un récord de entrega puntual del 99%',
+            'Aumentó las reservas de clientes recurrentes en un 40% mediante seguimientos personalizados y programas de precios de lealtad',
+            'Capacitó y supervisó un equipo de 20 empleados de catering, mejorando la eficiencia del servicio en un 25%',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'University of Houston', degree: 'Licenciatura', field: 'Gestión Hotelera', startDate: '2013-08', endDate: '2017-05' },
+      ],
+      certifications: [
+        { name: 'Profesional Certificado en Catering y Eventos (CPCE)', issuer: 'NACE International', date: '2020-06' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debo destacar en un currículum de gerente de catering?', answer: 'Enfatice el volumen de eventos, ingresos generados, puntajes de satisfacción del cliente, tamaño del equipo gestionado y tipos de eventos realizados. Incluya el rango de tamaños de eventos con los que tiene experiencia.' },
+      { question: '¿Cómo demuestro habilidades de ventas en un currículum de gerente de catering?', answer: 'Incluya cifras de ingresos, número de cuentas gestionadas, tasas de retención de clientes y logros en ventas adicionales. La gestión de catering está altamente impulsada por las ventas, así que cuantifique sus resultados de desarrollo de negocios.' },
+      { question: '¿Es importante la certificación en seguridad alimentaria para un currículum de gerente de catering?', answer: 'Sí. Las certificaciones ServSafe y CPCE demuestran profesionalismo y conocimiento de cumplimiento. Muchos venues y clientes requieren prueba de capacitación en seguridad alimentaria.' },
+    ],
+  },
+  'pastry-chef': {
+    slug: 'pastelero',
+    title: 'Pastelero',
+    keywords: ['currículum de pastelero', 'plantilla de CV de pastelero', 'ejemplo de currículum de panadero', 'currículum de artes de pastelería'],
+    searchIntents: ['cómo escribir un currículum de pastelero', 'ejemplos de currículum de pastelero', 'mejor formato de currículum de pastelero'],
+    topSkills: ['Producción de Pastelería', 'Técnicas de Horneado', 'Desarrollo de Menú', 'Trabajo con Chocolate', 'Arte en Azúcar', 'Desarrollo de Recetas', 'Costeo de Alimentos', 'Gestión de Cocina', 'Emplatado y Presentación', 'Control de Inventario'],
+    atsKeywords: ['producción de pastelería', 'técnicas de horneado', 'desarrollo de menú de postres', 'temperado de chocolate', 'trabajo con azúcar', 'estandarización de recetas', 'costeo de alimentos', 'gestión de cocina', 'presentación de emplatado', 'cumplimiento HACCP', 'artes de pastelería'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Claire',
+      lastName: 'Beaumont',
+      profession: 'Pastelero',
+      summary: 'Pastelero con más de 8 años de experiencia en cocinas de pastelería de alta cocina y hoteles de lujo. Especializado en técnicas de pastelería francesa, trabajo con chocolate y desarrollo creativo de menús de postres. Gestionó programas de pastelería que generan más de $500K en ingresos anuales por postres.',
+      skills: ['Producción de Pastelería', 'Técnicas Francesas', 'Temperado de Chocolate', 'Arte en Azúcar', 'Desarrollo de Menú', 'Estandarización de Recetas', 'Costeo de Alimentos', 'Liderazgo de Cocina', 'Emplatado', 'Control de Inventario'],
+      experience: [
+        {
+          title: 'Chef Pastelero Ejecutivo',
+          company: 'The Ritz-Carlton',
+          startDate: '2020-05',
+          isCurrent: true,
+          achievements: [
+            'Desarrolló un menú de postres de temporada que aumentó los ingresos de pastelería en un 35% a $650K anuales',
+            'Lideró un equipo de pastelería de 8 personas, produciendo más de 400 postres diarios para el restaurante, banquetes y servicio de té de la tarde',
+            'Creó una experiencia de degustación de chocolate exclusiva presentada en Food & Wine Magazine, impulsando un aumento del 20% en reservaciones',
+          ],
+        },
+        {
+          title: 'Chef de Partida de Pastelería',
+          company: 'Thomas Keller Restaurant Group',
+          startDate: '2016-09',
+          endDate: '2020-04',
+          achievements: [
+            'Produjo más de 200 artículos de pastelería diarios para un restaurante de 3 estrellas Michelin con cero quejas de calidad durante 4 años',
+            'Redujo el desperdicio de ingredientes en un 18% mediante el escalado preciso de recetas y la reutilización cruzada de recortes',
+            'Capacitó a 12 aprendices de pastelería, de los cuales 3 avanzaron a roles de liderazgo en 2 años',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'The Culinary Institute of America', degree: 'Técnico Superior', field: 'Artes de Panadería y Pastelería', startDate: '2013-08', endDate: '2015-05' },
+      ],
+      certifications: [
+        { name: 'Chef Pastelero Maestro Certificado', issuer: 'American Culinary Federation', date: '2022-01' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un pastelero en su currículum?', answer: 'Destaque sus especializaciones (chocolate, trabajo con azúcar, pan), volúmenes de producción, experiencia en desarrollo de menú y el calibre de los establecimientos donde ha trabajado. Incluya cualquier premio o aparición en medios.' },
+      { question: '¿Qué tan importante es la educación culinaria en un currículum de pastelero?', answer: 'Muy importante para roles de pastelería, ya que la formación formal en técnicas como temperado, laminado y trabajo con azúcar es altamente valorada. Liste su escuela culinaria, título y cualquier educación continua.' },
+      { question: '¿Debo incluir premios de competencias en mi currículum de pastelero?', answer: 'Absolutamente. Las competencias de pastelería demuestran habilidad, creatividad y dedicación. Incluya el nombre de la competencia, posición obtenida y año.' },
+    ],
+  },
+  'sous-chef': {
+    slug: 'sous-chef',
+    title: 'Sous Chef',
+    keywords: ['currículum de sous chef', 'plantilla de CV de sous chef', 'currículum de gestión de cocina', 'ejemplo de currículum de sous chef'],
+    searchIntents: ['cómo escribir un currículum de sous chef', 'ejemplos de currículum de sous chef', 'formato de CV de sous chef'],
+    topSkills: ['Gestión de Cocina', 'Desarrollo de Menú', 'Supervisión de Línea', 'Seguridad Alimentaria', 'Control de Inventario', 'Costeo de Recetas', 'Capacitación de Personal', 'Planificación de Preparación', 'Control de Calidad', 'Expedición'],
+    atsKeywords: ['operaciones de cocina', 'gestión de línea', 'desarrollo de menú', 'cumplimiento de seguridad alimentaria', 'gestión de inventario', 'costeo de recetas', 'capacitación de personal', 'preparación de alimentos', 'control de calidad', 'expedición', 'liderazgo de cocina'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Rafael',
+      lastName: 'Cortez',
+      profession: 'Sous Chef',
+      summary: 'Sous chef con más de 6 años de experiencia en cocinas de alta cocina y casual de alto nivel con alto volumen. Experto en gestión de línea, desarrollo de menú y mantenimiento de consistencia en más de 500 cubiertos por noche. Apasionado por la cocina de la granja a la mesa y la mentoría de personal.',
+      skills: ['Gestión de Cocina', 'Desarrollo de Menú', 'Supervisión de Línea', 'Seguridad Alimentaria', 'Control de Inventario', 'Costeo de Recetas', 'Capacitación de Personal', 'Planificación de Preparación', 'Control de Calidad', 'Expedición'],
+      experience: [
+        {
+          title: 'Sous Chef',
+          company: 'Union Square Hospitality Group',
+          startDate: '2021-06',
+          isCurrent: true,
+          achievements: [
+            'Gestionó una brigada de cocina de 15 personas en todas las estaciones, manteniendo consistencia para más de 600 cubiertos por noche',
+            'Desarrolló 12 platillos de menú de temporada que contribuyeron a un aumento del 10% en el ticket promedio',
+            'Redujo el costo de alimentos del 33% al 28% al implementar programas de reutilización cruzada y auditorías de precios de proveedores',
+          ],
+        },
+        {
+          title: 'Chef de Partida',
+          company: 'Nobu Restaurant Group',
+          startDate: '2018-03',
+          endDate: '2021-05',
+          achievements: [
+            'Lideró la estación de entradas calientes produciendo más de 300 platos por servicio con una tasa de aprobación de calidad del 99%',
+            'Capacitó a 8 commis chefs en técnicas de fusión japonesa, acelerando el tiempo de incorporación en un 40%',
+            'Mantuvo una tasa del 100% de aprobación en inspecciones sanitarias durante 3 años en auditorías trimestrales',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Le Cordon Bleu', degree: 'Diplôme', field: 'Artes Culinarias', startDate: '2015-09', endDate: '2017-06' },
+      ],
+      certifications: [
+        { name: 'Certificación de Gerente ServSafe', issuer: 'National Restaurant Association', date: '2021-08' },
+        { name: 'Sous Chef Certificado (CSC)', issuer: 'American Culinary Federation', date: '2022-05' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué hace fuerte a un currículum de sous chef?', answer: 'Demuestre su capacidad para gestionar una brigada de cocina, desarrollar menús, controlar costos y mantener estándares de seguridad alimentaria. Incluya conteos de cubiertos, tamaño del equipo y ahorros de costos logrados.' },
+      { question: '¿Cómo hago la transición de sous chef a chef ejecutivo en mi currículum?', answer: 'Enfatice el liderazgo, la creación de menús, el conocimiento de P&L y la gestión de proveedores. Demuestre que puede dirigir la cocina de manera independiente y contribuir a decisiones a nivel empresarial.' },
+      { question: '¿Debo enumerar cocinas específicas en mi currículum de sous chef?', answer: 'Sí. La especialización en cocina es un diferenciador clave. Liste los tipos de cocina que domina y cualquier capacitación cruzada en diferentes tradiciones culinarias.' },
+    ],
+  },
+  'line-cook': {
+    slug: 'cocinero-de-linea',
+    title: 'Cocinero de Línea',
+    keywords: ['currículum de cocinero de línea', 'plantilla de CV de cocinero de línea', 'ejemplo de currículum de cocinero', 'currículum de cocinero de línea de cocina'],
+    searchIntents: ['cómo escribir un currículum de cocinero de línea', 'ejemplos de currículum de cocinero de línea', 'plantilla de currículum de cocinero de nivel inicial'],
+    topSkills: ['Gestión de Estación', 'Preparación de Alimentos', 'Habilidades con Cuchillo', 'Operaciones de Parrilla', 'Técnicas de Salteado', 'Gestión del Tiempo', 'Seguridad Alimentaria', 'Ejecución de Recetas', 'Trabajo en Equipo', 'Mise en Place'],
+    atsKeywords: ['preparación de alimentos', 'gestión de estación', 'habilidades con cuchillo', 'operaciones de parrilla', 'seguridad alimentaria', 'ejecución de recetas', 'mise en place', 'saneamiento de cocina', 'cocina de línea', 'cocina de alto volumen', 'emplatado'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Tyler',
+      lastName: 'Brennan',
+      profession: 'Cocinero de Línea',
+      summary: 'Cocinero de línea con más de 4 años de experiencia trabajando en estaciones de parrilla, salteado y fritura en restaurantes de alto volumen que sirven más de 400 cubiertos por noche. Comprometido con la calidad consistente, ejecución rápida y gestión limpia de la estación.',
+      skills: ['Gestión de Estación', 'Preparación de Alimentos', 'Habilidades con Cuchillo', 'Operaciones de Parrilla', 'Técnicas de Salteado', 'Seguridad Alimentaria', 'Ejecución de Recetas', 'Mise en Place', 'Gestión del Tiempo', 'Trabajo en Equipo'],
+      experience: [
+        {
+          title: 'Cocinero de Línea',
+          company: 'Shake Shack',
+          startDate: '2022-04',
+          isCurrent: true,
+          achievements: [
+            'Gestionó la estación de parrilla durante horas pico produciendo más de 150 platos principales por turno con una tasa de precisión del 98%',
+            'Redujo los tiempos de ticket en un 20% al reorganizar la configuración de la estación y los flujos de preparación',
+            'Capacitación cruzada en 4 estaciones adicionales, proporcionando flexibilidad de cobertura que redujo los costos de horas extras en un 12%',
+          ],
+        },
+        {
+          title: 'Cocinero de Preparación',
+          company: 'Sweetgreen',
+          startDate: '2020-06',
+          endDate: '2022-03',
+          achievements: [
+            'Preparó el mise en place diario para una cocina que sirve a más de 500 comensales, completando toda la preparación 30 minutos antes de lo programado de manera consistente',
+            'Mantuvo un récord de cero desperdicios en el porcionado de proteínas durante 6 meses consecutivos',
+            'Aprobó todas las inspecciones sanitarias con puntajes del 95% o superior durante su permanencia',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Community College of Philadelphia', degree: 'Certificado', field: 'Artes Culinarias', startDate: '2019-09', endDate: '2020-05' },
+      ],
+      certifications: [
+        { name: 'Manipulador de Alimentos ServSafe', issuer: 'National Restaurant Association', date: '2022-05' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un cocinero de línea en su currículum?', answer: 'Liste las estaciones en las que ha trabajado, conteos de cubiertos, mejoras en tiempos de ticket y cumplimiento de seguridad alimentaria. Mencione cocinas específicas y técnicas de cocción en las que es competente.' },
+      { question: '¿Necesito educación formal para ser cocinero de línea?', answer: 'La educación formal no es requerida pero puede ser un plus. Enfóquese en la experiencia práctica, certificaciones como ServSafe y cualquier capacitación en el trabajo que haya completado.' },
+      { question: '¿Cómo avanzo de cocinero de línea a sous chef en mi currículum?', answer: 'Demuestre progresión destacando capacitación cruzada, momentos de liderazgo y contribuciones a ahorros de costos. Demostrar que puede gestionar una estación de manera independiente y capacitar a otros es clave.' },
+    ],
+  },
+  'food-service-worker': {
+    slug: 'trabajador-de-servicio-de-alimentos',
+    title: 'Trabajador de Servicio de Alimentos',
+    keywords: ['currículum de trabajador de servicio de alimentos', 'plantilla de currículum de servicio de alimentos', 'currículum de trabajador de cafetería', 'currículum de asociado de servicio de alimentos'],
+    searchIntents: ['cómo escribir un currículum de trabajador de servicio de alimentos', 'ejemplos de currículum de trabajador de servicio de alimentos', 'currículum de servicio de alimentos de nivel inicial'],
+    topSkills: ['Preparación de Alimentos', 'Servicio al Cliente', 'Saneamiento', 'Manejo de Efectivo', 'Servicio', 'Reabastecimiento', 'Seguridad Alimentaria', 'Trabajo en Equipo', 'Gestión del Tiempo', 'Comunicación'],
+    atsKeywords: ['preparación de alimentos', 'servicio al cliente', 'procedimientos de saneamiento', 'manejo de efectivo', 'servicio', 'seguridad alimentaria', 'reabastecimiento de inventario', 'operaciones de cafetería', 'cumplimiento dietético', 'regulaciones de salud'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Maria',
+      lastName: 'Santos',
+      profession: 'Trabajador de Servicio de Alimentos',
+      summary: 'Trabajadora de servicio de alimentos con más de 3 años de experiencia en entornos de comedor institucional y casual rápido. Experta en preparación de alimentos, servicio al cliente y mantenimiento de estándares de saneamiento en entornos que sirven más de 800 comidas diarias.',
+      skills: ['Preparación de Alimentos', 'Servicio al Cliente', 'Saneamiento', 'Manejo de Efectivo', 'Servicio', 'Reabastecimiento', 'Seguridad Alimentaria', 'Trabajo en Equipo', 'Gestión del Tiempo', 'Comunicación'],
+      experience: [
+        {
+          title: 'Trabajadora de Servicio de Alimentos',
+          company: 'Aramark',
+          startDate: '2022-08',
+          isCurrent: true,
+          achievements: [
+            'Preparó y sirvió más de 900 comidas diarias en una cafetería universitaria con una calificación de satisfacción del cliente de 4.6/5.0',
+            'Mantuvo estándares de saneamiento que resultaron en un puntaje del 98% en inspecciones sanitarias trimestrales',
+            'Asistió en la gestión de inventario, reduciendo el desperdicio de alimentos en un 15% mediante prácticas de rotación FIFO',
+          ],
+        },
+        {
+          title: 'Asociada de Servicio de Alimentos',
+          company: 'Panera Bread',
+          startDate: '2021-01',
+          endDate: '2022-07',
+          achievements: [
+            'Procesó más de 120 pedidos de clientes por turno con una tasa de precisión del 99%',
+            'Capacitó a 5 nuevos empleados en procedimientos de preparación de alimentos y operaciones del sistema POS',
+            'Reconocida como Empleada del Mes 3 veces por desempeño consistente y comentarios positivos de clientes',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Miami Dade College', degree: 'Técnico Superior', field: 'Gestión Hotelera', startDate: '2019-08', endDate: '2021-05' },
+      ],
+      certifications: [
+        { name: 'Manipulador de Alimentos ServSafe', issuer: 'National Restaurant Association', date: '2022-09' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un trabajador de servicio de alimentos en su currículum?', answer: 'Destaque los volúmenes de comidas servidas, habilidades de servicio al cliente, cumplimiento de saneamiento y cualquier capacitación cruzada. Incluya entornos específicos como hospitales, universidades o restaurantes.' },
+      { question: '¿Cómo hago que un currículum de servicio de alimentos de nivel inicial destaque?', answer: 'Enfóquese en la confiabilidad, trabajo en equipo, capacitación en seguridad alimentaria y cualquier contribución medible como reducción de desperdicios o puntajes de comentarios de clientes. Incluya experiencia voluntaria en servicio de alimentos si aplica.' },
+      { question: '¿Es necesaria la certificación de manipulador de alimentos para un currículum de servicio de alimentos?', answer: 'Sí. La mayoría de los empleadores requieren una tarjeta de manipulador de alimentos o certificación ServSafe. Inclúyala prominentemente ya que demuestra preparación para el cumplimiento.' },
+    ],
+  },
+  'dishwasher': {
+    slug: 'lavaplatos',
+    title: 'Lavaplatos',
+    keywords: ['currículum de lavaplatos', 'plantilla de CV de lavaplatos', 'currículum de utilidad de cocina', 'ejemplo de currículum de lavaplatos'],
+    searchIntents: ['cómo escribir un currículum de lavaplatos', 'ejemplos de currículum de lavaplatos', 'plantilla de currículum de lavaplatos de nivel inicial'],
+    topSkills: ['Operaciones de Lavado', 'Saneamiento de Cocina', 'Mantenimiento de Equipos', 'Gestión del Tiempo', 'Resistencia Física', 'Trabajo en Equipo', 'Seguridad con Químicos', 'Organización', 'Confiabilidad', 'Velocidad'],
+    atsKeywords: ['operaciones de lavado', 'saneamiento de cocina', 'mantenimiento de equipos', 'operación de lavaplatos comercial', 'seguridad con químicos', 'limpieza de cocina', 'área de lavado de alto volumen', 'seguridad alimentaria', 'lavado de ollas'],
+    sampleResumeData: buildResumeData({
+      firstName: 'James',
+      lastName: 'Kowalski',
+      profession: 'Lavaplatos',
+      summary: 'Lavaplatos confiable con más de 2 años de experiencia en cocinas de restaurantes de alto volumen. Experto en operación de lavaplatos comercial, saneamiento de cocina y mantenimiento de equipos. Conocido por su velocidad, consistencia y apoyo a las operaciones de cocina bajo presión.',
+      skills: ['Operaciones de Lavado', 'Saneamiento de Cocina', 'Mantenimiento de Equipos', 'Seguridad con Químicos', 'Gestión del Tiempo', 'Resistencia Física', 'Trabajo en Equipo', 'Organización', 'Lavado de Ollas', 'Confiabilidad'],
+      experience: [
+        {
+          title: 'Lavaplatos',
+          company: 'Ruth\'s Chris Steak House',
+          startDate: '2023-01',
+          isCurrent: true,
+          achievements: [
+            'Procesó más de 1,200 piezas por turno en un steakhouse de alto volumen que sirve más de 300 cubiertos por noche',
+            'Mantuvo cero tiempo de inactividad de equipos realizando verificaciones diarias de mantenimiento en lavaplatos comerciales',
+            'Redujo la rotura de vajilla en un 30% al reorganizar la disposición del área de lavado e implementar protocolos de clasificación',
+          ],
+        },
+        {
+          title: 'Trabajador de Utilidad de Cocina',
+          company: 'Cracker Barrel',
+          startDate: '2021-06',
+          endDate: '2022-12',
+          achievements: [
+            'Limpió y sanitizó un promedio de 800 artículos por turno cumpliendo todos los requisitos del código sanitario',
+            'Asistió con la preparación de alimentos durante horas pico, contribuyendo a una reducción del 10% en tiempos de ticket',
+            'Logró un récord de asistencia perfecta durante 18 meses consecutivos',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Eastfield College', degree: 'Equivalencia de Preparatoria', field: 'Estudios Generales', startDate: '2020-01', endDate: '2021-05' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Cómo escribo un currículum de lavaplatos con poca experiencia?', answer: 'Enfóquese en la confiabilidad, resistencia física, velocidad y disposición para aprender. Mencione cualquier experiencia en servicio de alimentos o limpieza, incluyendo trabajo voluntario. Destaque la asistencia y ética de trabajo.' },
+      { question: '¿Qué habilidades debe listar un lavaplatos en su currículum?', answer: 'Incluya operación de lavaplatos comercial, saneamiento de cocina, seguridad con químicos, gestión del tiempo y trabajo en equipo. Mencione cualquier capacitación cruzada en preparación de alimentos o tareas de cocina.' },
+      { question: '¿Puede un puesto de lavaplatos llevar a una carrera culinaria?', answer: 'Sí. Muchos chefs comenzaron como lavaplatos. Demuestre disposición para capacitación cruzada, asistir con la preparación y aprender operaciones de cocina. Los empleadores valoran la iniciativa y la confiabilidad.' },
+    ],
+  },
+  'server': {
+    slug: 'mesero',
+    title: 'Mesero',
+    keywords: ['currículum de mesero', 'plantilla de currículum de mesera', 'ejemplo de currículum de camarero', 'CV de mesero de restaurante'],
+    searchIntents: ['cómo escribir un currículum de mesero', 'ejemplos de currículum de mesero de restaurante', 'mejor plantilla de currículum de camarero'],
+    topSkills: ['Servicio al Comensal', 'Sistemas POS', 'Conocimiento del Menú', 'Ventas Adicionales', 'Conocimiento de Vinos y Bebidas', 'Multitarea', 'Precisión de Pedidos', 'Trabajo en Equipo', 'Manejo de Efectivo', 'Resolución de Conflictos'],
+    atsKeywords: ['servicio al comensal', 'sistemas POS', 'conocimiento del menú', 'técnicas de venta adicional', 'precisión de pedidos', 'gestión de mesas', 'servicio de vinos', 'manejo de efectivo', 'conocimiento de alérgenos alimentarios', 'operaciones de sala'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Olivia',
+      lastName: 'Chen',
+      profession: 'Mesero',
+      summary: 'Mesera experimentada con más de 5 años en entornos de comedor de alta gama, gestionando consistentemente secciones de 6-8 mesas mientras brinda experiencias excepcionales a los comensales. Experta en servicio de vinos, ventas adicionales y operaciones POS con un historial de superar objetivos de ventas.',
+      skills: ['Servicio al Comensal', 'Sistemas POS', 'Conocimiento del Menú', 'Ventas Adicionales', 'Conocimiento de Vinos', 'Multitarea', 'Precisión de Pedidos', 'Trabajo en Equipo', 'Manejo de Efectivo', 'Resolución de Conflictos'],
+      experience: [
+        {
+          title: 'Mesera',
+          company: 'STK Steakhouse',
+          startDate: '2022-02',
+          isCurrent: true,
+          achievements: [
+            'Logró consistentemente más de $1,800 en ventas diarias, posicionándose en el 10% superior de meseros en 5 sucursales',
+            'Aumentó el ticket promedio en un 22% mediante recomendaciones de maridaje de vinos y ventas adicionales de postres',
+            'Mantuvo una calificación de satisfacción del comensal de 4.9/5.0 en más de 500 reseñas en OpenTable',
+          ],
+        },
+        {
+          title: 'Mesera',
+          company: 'Olive Garden',
+          startDate: '2019-05',
+          endDate: '2022-01',
+          achievements: [
+            'Atendió un promedio de 50 comensales por turno en un entorno de comedor familiar de ritmo acelerado',
+            'Capacitó a 10 nuevos meseros en operaciones POS, conocimiento del menú y estándares de servicio',
+            'Ganó el premio de Mesero del Trimestre 4 veces por las mayores ventas y puntajes de satisfacción del comensal',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Arizona State University', degree: 'Licenciatura', field: 'Comunicaciones', startDate: '2015-08', endDate: '2019-05' },
+      ],
+      certifications: [
+        { name: 'Certificación TIPS de Alcohol', issuer: 'TIPS', date: '2022-03' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué hace un gran currículum de mesero?', answer: 'Destaque las cifras de ventas diarias, calificaciones de satisfacción del comensal, logros en ventas adicionales y tamaños de sección gestionados. Incluya certificaciones de vinos o bebidas y tipos específicos de restaurantes.' },
+      { question: '¿Los meseros deben incluir propinas o cifras de ventas en su currículum?', answer: 'Incluya cifras de ventas en lugar de montos de propinas. Los totales de ventas diarios o semanales, los tickets promedio y las clasificaciones de ventas demuestran efectivamente su desempeño.' },
+      { question: '¿Cómo demuestro crecimiento en un currículum de mesero?', answer: 'Muestre progresión a través de secciones más grandes, responsabilidades de capacitación, funciones de líder de turno y cualquier premio o reconocimiento recibido. Cuantifique las mejoras a lo largo del tiempo.' },
+    ],
+  },
+  'hostess': {
+    slug: 'anfitriona',
+    title: 'Anfitriona',
+    keywords: ['currículum de anfitriona', 'plantilla de currículum de host', 'CV de anfitriona de restaurante', 'currículum de host de sala'],
+    searchIntents: ['cómo escribir un currículum de anfitriona', 'ejemplos de currículum de anfitriona', 'plantilla de currículum de host de restaurante'],
+    topSkills: ['Recepción de Invitados', 'Gestión de Reservaciones', 'Coordinación de Asientos', 'Servicio al Cliente', 'Etiqueta Telefónica', 'Gestión de Lista de Espera', 'OpenTable/Resy', 'Multitarea', 'Comunicación', 'Resolución de Problemas'],
+    atsKeywords: ['recepción de invitados', 'gestión de reservaciones', 'coordinación de asientos', 'gestión de lista de espera', 'OpenTable', 'Resy', 'servicio al cliente', 'sala', 'reservaciones telefónicas', 'rotación de mesas'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Sophia',
+      lastName: 'Winters',
+      profession: 'Anfitriona',
+      summary: 'Anfitriona amable y organizada con más de 3 años de experiencia gestionando reservaciones y asientos para restaurantes que sirven a más de 300 comensales por noche. Competente en plataformas OpenTable y Resy con compromiso de crear primeras impresiones acogedoras.',
+      skills: ['Recepción de Invitados', 'Gestión de Reservaciones', 'Coordinación de Asientos', 'Servicio al Cliente', 'Etiqueta Telefónica', 'Gestión de Lista de Espera', 'OpenTable', 'Resy', 'Multitarea', 'Comunicación'],
+      experience: [
+        {
+          title: 'Anfitriona Principal',
+          company: 'The Capital Grille',
+          startDate: '2022-09',
+          isCurrent: true,
+          achievements: [
+            'Gestionó reservaciones y llegadas sin reservación para un restaurante de 200 asientos, logrando una tasa promedio de rotación de mesas de 2.5x durante horas pico',
+            'Redujo los tiempos de espera de los comensales en un 15% al implementar un sistema de rotación de asientos optimizado',
+            'Capacitó y supervisó a 4 hosts junior, asegurando estándares de servicio consistentes en todos los turnos',
+          ],
+        },
+        {
+          title: 'Anfitriona',
+          company: 'Red Lobster',
+          startDate: '2021-03',
+          endDate: '2022-08',
+          achievements: [
+            'Recibió y sentó a un promedio de 250 comensales por turno manteniendo una actitud positiva y acogedora',
+            'Gestionó una lista de espera digital de más de 40 grupos durante horas pico con una tasa de precisión del 95% en tiempos de espera estimados',
+            'Atendió más de 50 solicitudes diarias de reservaciones telefónicas con una calificación de satisfacción del cliente de 4.8/5.0',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'University of Central Florida', degree: 'Licenciatura', field: 'Gestión Hotelera', startDate: '2017-08', endDate: '2021-05' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir una anfitriona en su currículum?', answer: 'Incluya volúmenes de comensales gestionados, plataformas de reservación utilizadas, mejoras en tiempos de espera y métricas de satisfacción del cliente. Mencione el tipo y tamaño del restaurante.' },
+      { question: '¿Cómo describo las funciones de anfitriona en un currículum?', answer: 'Vaya más allá de listar funciones. Cuantifique su impacto: volúmenes de comensales sentados, reducciones en tiempos de espera, tasas de rotación de mesas y cualquier responsabilidad de capacitación.' },
+      { question: '¿Qué habilidades son más importantes para un currículum de anfitriona?', answer: 'Servicio al cliente, multitarea, dominio de sistemas de reservación, comunicación y la capacidad de mantener la calma bajo presión son habilidades esenciales para destacar.' },
+    ],
+  },
+  'sommelier': {
+    slug: 'sommelier',
+    title: 'Sommelier',
+    keywords: ['currículum de sommelier', 'CV de sommelier de vinos', 'currículum de director de vinos', 'plantilla de currículum de sommelier'],
+    searchIntents: ['cómo escribir un currículum de sommelier', 'ejemplos de currículum de sommelier', 'plantilla de CV de director de vinos'],
+    topSkills: ['Selección de Vinos', 'Maridaje de Vinos', 'Gestión de Cava', 'Curación de Carta de Vinos', 'Capacitación de Personal', 'Relaciones con Proveedores', 'Cata y Evaluación', 'Control de Costos de Bebidas', 'Educación al Cliente', 'Servicio de Alta Cocina'],
+    atsKeywords: ['selección de vinos', 'maridaje de vinos', 'gestión de cava', 'desarrollo de carta de vinos', 'programa de bebidas', 'capacitación de personal en vinos', 'negociaciones con proveedores', 'inventario de vinos', 'eventos de degustación', 'certificación de sommelier', 'servicio de alta cocina'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Laurent',
+      lastName: 'Mercier',
+      profession: 'Sommelier',
+      summary: 'Sommelier certificado con más de 7 años de experiencia curando programas de vinos para restaurantes galardonados de alta cocina. Gestionó inventarios de vinos valorados en más de $400K y capacitó a equipos de sala para impulsar los ingresos de bebidas mediante maridajes informados y participación con los comensales.',
+      skills: ['Selección de Vinos', 'Maridaje de Vinos', 'Gestión de Cava', 'Curación de Carta de Vinos', 'Capacitación de Personal', 'Relaciones con Proveedores', 'Cata y Evaluación', 'Control de Costos de Bebidas', 'Educación al Cliente', 'Servicio de Alta Cocina'],
+      experience: [
+        {
+          title: 'Sommelier Principal',
+          company: 'Le Bernardin',
+          startDate: '2021-01',
+          isCurrent: true,
+          achievements: [
+            'Curó una carta de vinos de 650 etiquetas que contribuyó a $1.8M en ingresos anuales de bebidas, un aumento del 20% en 2 años',
+            'Gestionó un inventario de cava valorado en $450K con menos del 1% de deterioro o pérdida',
+            'Capacitó a 15 meseros en servicio de vinos y técnicas de maridaje, aumentando las ventas de vino por mesa en un 25%',
+          ],
+        },
+        {
+          title: 'Sommelier',
+          company: 'Eleven Madison Park',
+          startDate: '2017-06',
+          endDate: '2020-12',
+          achievements: [
+            'Guió maridajes de vinos para un menú degustación que generó $2.4M en ingresos anuales de bebidas',
+            'Organizó cenas de vino mensuales atrayendo a más de 40 invitados por evento con una tasa de venta del 90%',
+            'Negoció directamente con más de 30 viñedos para asegurar asignaciones exclusivas reduciendo los costos de adquisición en un 12%',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'New York University', degree: 'Licenciatura', field: 'Estudios Alimentarios', startDate: '2011-08', endDate: '2015-05' },
+      ],
+      certifications: [
+        { name: 'Sommelier Avanzado', issuer: 'Court of Master Sommeliers', date: '2020-03' },
+        { name: 'Diploma WSET Nivel 4', issuer: 'Wine & Spirit Education Trust', date: '2019-08' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un sommelier en su currículum?', answer: 'Destaque su nivel de certificación, tamaño de carta de vinos gestionada, ingresos de bebidas generados, valor de cava supervisado y logros en capacitación de personal. Incluya regiones vinícolas específicas de experiencia.' },
+      { question: '¿Qué certificaciones de sommelier debo listar?', answer: 'Los niveles de Court of Master Sommeliers y las certificaciones WSET son el estándar de oro. Liste su nivel más alto alcanzado y cualquier certificación avanzada en curso.' },
+      { question: '¿Cómo demuestro impacto comercial en un currículum de sommelier?', answer: 'Incluya cifras de ingresos de bebidas, aumentos en ventas de vino por mesa, ahorros por negociaciones con proveedores e ingresos de eventos de cenas o degustaciones de vinos.' },
+    ],
+  },
+  'event-manager': {
+    slug: 'gerente-de-eventos',
+    title: 'Gerente de Eventos',
+    keywords: ['currículum de gerente de eventos', 'CV de gestión de eventos', 'currículum de coordinador de eventos', 'plantilla de currículum de director de eventos'],
+    searchIntents: ['cómo escribir un currículum de gerente de eventos', 'ejemplos de currículum de gerente de eventos', 'mejor plantilla de currículum de gestión de eventos'],
+    topSkills: ['Planificación de Eventos', 'Gestión de Presupuestos', 'Coordinación de Proveedores', 'Relaciones con Clientes', 'Gestión Logística', 'Negociación de Contratos', 'Colaboración de Marketing', 'Gestión en Sitio', 'Gestión de Cronogramas', 'Evaluación de Riesgos'],
+    atsKeywords: ['planificación de eventos', 'gestión de presupuestos', 'coordinación de proveedores', 'gestión de relaciones con clientes', 'logística', 'negociación de contratos', 'marketing de eventos', 'gestión en sitio', 'gestión de cronogramas', 'evaluación de riesgos', 'comunicación con interesados', 'análisis post-evento'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Diana',
+      lastName: 'Harrington',
+      profession: 'Gerente de Eventos',
+      summary: 'Gerente de eventos con más de 8 años de experiencia planificando y ejecutando conferencias corporativas, galas y ferias comerciales con presupuestos de $50K a $2M. Gestionó más de 100 eventos anuales con una tasa de satisfacción del cliente del 97% y un historial comprobado de entrega por debajo del presupuesto.',
+      skills: ['Planificación de Eventos', 'Gestión de Presupuestos', 'Coordinación de Proveedores', 'Relaciones con Clientes', 'Gestión Logística', 'Negociación de Contratos', 'Colaboración de Marketing', 'Gestión en Sitio', 'Gestión de Cronogramas', 'Evaluación de Riesgos'],
+      experience: [
+        {
+          title: 'Gerente Senior de Eventos',
+          company: 'Live Nation Entertainment',
+          startDate: '2020-04',
+          isCurrent: true,
+          achievements: [
+            'Gestionó más de 120 eventos anuales con asistencia combinada de más de 500K invitados y presupuestos totales de $8M',
+            'Negoció contratos con proveedores ahorrando $320K anuales mientras mantuvo o mejoró la calidad del servicio',
+            'Implementó un sistema de retroalimentación post-evento que aumentó la retención de clientes en un 35%',
+          ],
+        },
+        {
+          title: 'Gerente de Eventos',
+          company: 'Eventbrite',
+          startDate: '2016-09',
+          endDate: '2020-03',
+          achievements: [
+            'Planificó y ejecutó más de 80 eventos corporativos y sociales por año con presupuestos de $25K a $500K',
+            'Aumentó los ingresos por patrocinio de eventos en un 45% al desarrollar paquetes de patrocinio escalonados',
+            'Coordinó equipos multifuncionales de hasta 30 empleados y 15 proveedores por evento',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Boston University', degree: 'Licenciatura', field: 'Administración Hotelera', startDate: '2010-08', endDate: '2014-05' },
+      ],
+      certifications: [
+        { name: 'Profesional Certificado en Reuniones (CMP)', issuer: 'Events Industry Council', date: '2019-06' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe destacar un gerente de eventos en su currículum?', answer: 'Enfóquese en el volumen de eventos, tamaños de presupuesto gestionados, números de asistencia, tasas de satisfacción del cliente y ahorros de costos logrados. Incluya los tipos de eventos en los que se especializa.' },
+      { question: '¿Es importante la certificación CMP para un currículum de gerente de eventos?', answer: 'El Profesional Certificado en Reuniones (CMP) es el estándar de oro de la industria y altamente valorado por los empleadores. Demuestra experiencia y compromiso con la profesión.' },
+      { question: '¿Cómo demuestro liderazgo en un currículum de gerente de eventos?', answer: 'Cuantifique los tamaños de equipo coordinados, las relaciones con proveedores gestionadas y la colaboración interdepartamental. Incluya ejemplos de gestión de crisis y toma de decisiones en sitio.' },
+    ],
+  },
+  'event-planner': {
+    slug: 'planificador-de-eventos',
+    title: 'Planificador de Eventos',
+    keywords: ['currículum de planificador de eventos', 'plantilla de CV de planificador de eventos', 'currículum de planificador de bodas', 'ejemplo de currículum de planificación de eventos'],
+    searchIntents: ['cómo escribir un currículum de planificador de eventos', 'ejemplos de currículum de planificador de eventos', 'mejor formato de currículum de planificador de eventos'],
+    topSkills: ['Diseño de Eventos', 'Planificación de Presupuestos', 'Gestión de Proveedores', 'Consulta con Clientes', 'Desarrollo de Decoración y Temática', 'Creación de Cronogramas', 'Negociación', 'Resolución de Problemas', 'Comunicación', 'Atención al Detalle'],
+    atsKeywords: ['diseño de eventos', 'planificación de presupuestos', 'gestión de proveedores', 'consulta con clientes', 'desarrollo de temática', 'gestión de cronogramas', 'negociación de contratos', 'planificación de bodas', 'eventos corporativos', 'coordinación floral', 'contratación de entretenimiento'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Amanda',
+      lastName: 'Liu',
+      profession: 'Planificador de Eventos',
+      summary: 'Planificadora de eventos creativa con más de 6 años de experiencia diseñando y ejecutando bodas, retiros corporativos y eventos sociales. Planificó más de 150 eventos con presupuestos de $10K a $300K, entregando consistentemente experiencias a tema, dentro del presupuesto y con excelentes reseñas de clientes.',
+      skills: ['Diseño de Eventos', 'Planificación de Presupuestos', 'Gestión de Proveedores', 'Consulta con Clientes', 'Desarrollo de Temática', 'Creación de Cronogramas', 'Negociación', 'Resolución de Problemas', 'Comunicación', 'Atención al Detalle'],
+      experience: [
+        {
+          title: 'Planificadora Senior de Eventos',
+          company: 'David Tutera Events',
+          startDate: '2021-05',
+          isCurrent: true,
+          achievements: [
+            'Planificó y ejecutó más de 60 bodas y eventos sociales anuales con un presupuesto promedio de $120K y un récord de entrega puntual del 100%',
+            'Generó $500K en ingresos por referidos a través de una tasa de referencia de clientes del 92%',
+            'Construyó y mantuvo relaciones con más de 50 proveedores preferidos, negociando 15-20% por debajo de las tarifas de mercado',
+          ],
+        },
+        {
+          title: 'Planificadora de Eventos',
+          company: 'PSAV (Encore Global)',
+          startDate: '2018-03',
+          endDate: '2021-04',
+          achievements: [
+            'Coordinó más de 40 eventos corporativos por año para clientes Fortune 500 incluyendo lanzamientos de productos y retiros',
+            'Gestionó un portafolio anual de eventos de $1.5M, entregando todos los eventos dentro del 5% del presupuesto',
+            'Recibió un puntaje promedio de satisfacción del cliente de 4.9/5.0 en todos los eventos durante 3 años',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'George Washington University', degree: 'Licenciatura', field: 'Gestión de Eventos', startDate: '2014-08', endDate: '2018-05' },
+      ],
+      certifications: [
+        { name: 'Profesional Certificado en Eventos Especiales (CSEP)', issuer: 'International Live Events Association', date: '2021-09' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Cómo se diferencia un currículum de planificador de eventos de uno de gerente de eventos?', answer: 'Los currículum de planificador de eventos enfatizan la creatividad, el diseño y las relaciones con clientes, mientras que los de gerente de eventos se enfocan más en logística, operaciones y coordinación de equipos. Adapte su currículum al rol específico.' },
+      { question: '¿Debo incluir fotos de eventos que he planificado?', answer: 'No en el currículum en sí, pero haga referencia a un sitio web de portafolio o Instagram. Un portafolio visual fuerte puede ser un complemento poderoso para su currículum.' },
+      { question: '¿Qué métricas debe incluir un planificador de eventos?', answer: 'Incluya número de eventos planificados, rangos de presupuesto, puntajes de satisfacción del cliente, tasas de referencia, descuentos negociados con proveedores y récords de entrega puntual.' },
+    ],
+  },
+  'conference-coordinator': {
+    slug: 'coordinador-de-conferencias',
+    title: 'Coordinador de Conferencias',
+    keywords: ['currículum de coordinador de conferencias', 'CV de planificador de conferencias', 'currículum de coordinador de reuniones', 'currículum de organizador de conferencias'],
+    searchIntents: ['cómo escribir un currículum de coordinador de conferencias', 'ejemplos de currículum de coordinador de conferencias', 'plantilla de currículum de planificador de reuniones'],
+    topSkills: ['Planificación de Conferencias', 'Coordinación de Ponentes', 'Gestión de Registro', 'Coordinación de AV', 'Seguimiento de Presupuesto', 'Selección de Venues', 'Gestión de Patrocinios', 'Desarrollo de Agenda', 'Logística', 'Comunicación con Interesados'],
+    atsKeywords: ['planificación de conferencias', 'gestión de ponentes', 'sistemas de registro', 'coordinación de AV', 'seguimiento de presupuesto', 'selección de venues', 'coordinación de patrocinios', 'desarrollo de agenda', 'gestión de asistentes', 'logística de eventos', 'reportes post-evento'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Brian',
+      lastName: 'Calloway',
+      profession: 'Coordinador de Conferencias',
+      summary: 'Coordinador de conferencias con más de 5 años de experiencia organizando conferencias profesionales, simposios y ferias comerciales para 200 a 5,000 asistentes. Experto en gestión de ponentes, plataformas de registro y logística de eventos de varios días con presupuestos de hasta $800K.',
+      skills: ['Planificación de Conferencias', 'Coordinación de Ponentes', 'Gestión de Registro', 'Coordinación de AV', 'Seguimiento de Presupuesto', 'Selección de Venues', 'Gestión de Patrocinios', 'Desarrollo de Agenda', 'Logística', 'Comunicación con Interesados'],
+      experience: [
+        {
+          title: 'Coordinador Senior de Conferencias',
+          company: 'Informa Markets',
+          startDate: '2021-08',
+          isCurrent: true,
+          achievements: [
+            'Coordinó 8 conferencias anuales con asistencia combinada de más de 15,000 personas y presupuestos totales de $3.2M',
+            'Aumentó los ingresos por patrocinio en un 30% al crear niveles de patrocinio premium y paquetes para expositores',
+            'Gestionó lineups de más de 50 ponentes por evento, logrando una tasa de confirmación del 98% mediante gestión proactiva de relaciones',
+          ],
+        },
+        {
+          title: 'Coordinador de Conferencias',
+          company: 'American Medical Association',
+          startDate: '2019-02',
+          endDate: '2021-07',
+          achievements: [
+            'Organizó 4 conferencias médicas anuales para 1,000-3,000 asistentes con una tasa de satisfacción del 96%',
+            'Implementó la plataforma de registro Cvent reduciendo el tiempo de check-in en un 40% y la entrada manual de datos en un 80%',
+            'Coordinó con más de 25 proveedores de AV y venues para entregar sesiones multi-track sin problemas en eventos de 3 días',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Indiana University', degree: 'Licenciatura', field: 'Gestión de Eventos', startDate: '2015-08', endDate: '2019-05' },
+      ],
+      certifications: [
+        { name: 'Profesional Certificado en Reuniones (CMP)', issuer: 'Events Industry Council', date: '2022-04' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un coordinador de conferencias en su currículum?', answer: 'Destaque tamaños de conferencias, conteos de asistentes, presupuesto gestionado, número de ponentes e ingresos por patrocinio. Incluya plataformas de registro en las que es competente y tipos de conferencias organizadas.' },
+      { question: '¿Cómo demuestro habilidades técnicas en un currículum de coordinador de conferencias?', answer: 'Liste plataformas de registro (Cvent, Eventbrite), herramientas de AV, software de gestión de proyectos y plataformas de eventos virtuales. La competencia técnica es cada vez más importante en conferencias híbridas.' },
+      { question: '¿Es importante la especialización en la industria para un coordinador de conferencias?', answer: 'Sí. Especializarse en conferencias médicas, tecnológicas o financieras puede hacerlo más competitivo. Destaque el conocimiento de la industria y la experiencia relevante en cumplimiento regulatorio.' },
+    ],
+  },
+  'travel-agent': {
+    slug: 'agente-de-viajes',
+    title: 'Agente de Viajes',
+    keywords: ['currículum de agente de viajes', 'CV de consultor de viajes', 'plantilla de currículum de asesor de viajes', 'currículum de agencia de viajes'],
+    searchIntents: ['cómo escribir un currículum de agente de viajes', 'ejemplos de currículum de agente de viajes', 'plantilla de CV de consultor de viajes'],
+    topSkills: ['Planificación de Viajes', 'Servicio al Cliente', 'Sistemas GDS', 'Conocimiento de Destinos', 'Ventas', 'Gestión de Reservas', 'Diseño de Itinerarios', 'Gestión de Relaciones con Clientes', 'Resolución de Problemas', 'Comunicación'],
+    atsKeywords: ['planificación de viajes', 'sistemas GDS', 'Sabre', 'Amadeus', 'gestión de reservas', 'diseño de itinerarios', 'expertise en destinos', 'ventas de viajes', 'gestión de relaciones con clientes', 'coordinación de viajes grupales', 'seguros de viaje'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Priya',
+      lastName: 'Mehta',
+      profession: 'Agente de Viajes',
+      summary: 'Agente de viajes con más de 5 años de experiencia reservando viajes de placer y corporativos para más de 300 clientes anuales. Competente en plataformas GDS Sabre y Amadeus con expertise en destinos internacionales, viajes grupales y paquetes de cruceros generando más de $1.2M en reservas anuales.',
+      skills: ['Planificación de Viajes', 'Servicio al Cliente', 'Sabre GDS', 'Amadeus', 'Conocimiento de Destinos', 'Ventas', 'Gestión de Reservas', 'Diseño de Itinerarios', 'Relaciones con Clientes', 'Resolución de Problemas'],
+      experience: [
+        {
+          title: 'Asesora Senior de Viajes',
+          company: 'AAA Travel',
+          startDate: '2021-06',
+          isCurrent: true,
+          achievements: [
+            'Generó $1.5M en reservas anuales de viajes, superando los objetivos de ventas en un 20% durante 3 años consecutivos',
+            'Mantuvo una tasa de retención de clientes del 88% a través de servicio personalizado y planificación proactiva de viajes',
+            'Coordinó más de 25 paquetes de viajes grupales para 10-50 viajeros, logrando una calificación de satisfacción de 4.9/5.0',
+          ],
+        },
+        {
+          title: 'Consultora de Viajes',
+          company: 'Expedia CruiseShipCenters',
+          startDate: '2019-01',
+          endDate: '2021-05',
+          achievements: [
+            'Reservó más de 200 paquetes de viajes de placer anuales en más de 40 destinos internacionales',
+            'Aumentó las ventas de paquetes de cruceros en un 35% al desarrollar itinerarios temáticos y promociones de reserva anticipada',
+            'Resolvió más de 50 interrupciones de viaje incluyendo cancelaciones de vuelos y rereservaciones con una tasa de resolución del 100%',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Florida International University', degree: 'Licenciatura', field: 'Gestión de Turismo y Hospitalidad', startDate: '2015-08', endDate: '2019-05' },
+      ],
+      certifications: [
+        { name: 'Asociado de Viajes Certificado (CTA)', issuer: 'The Travel Institute', date: '2020-09' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un agente de viajes en su currículum?', answer: 'Destaque el volumen de reservas, ingresos generados, dominio de plataformas GDS, expertise en destinos y tasas de retención de clientes. Incluya tipos específicos de viaje como corporativo, de placer o grupal.' },
+      { question: '¿Son importantes las certificaciones GDS para un currículum de agente de viajes?', answer: 'Sí. Se espera el dominio de Sabre, Amadeus o Galileo. Incluya su certificación CTA o CTC de The Travel Institute si la tiene.' },
+      { question: '¿Cómo cuantifico la experiencia de agente de viajes?', answer: 'Use ingresos anuales por reservas, número de clientes atendidos, puntajes de satisfacción del cliente, tasas de retención y porcentajes de superación de objetivos de ventas.' },
+    ],
+  },
+  'tour-guide': {
+    slug: 'guia-turistico',
+    title: 'Guía Turístico',
+    keywords: ['currículum de guía turístico', 'plantilla de CV de guía turístico', 'currículum de guía de turismo', 'ejemplo de currículum de operador turístico'],
+    searchIntents: ['cómo escribir un currículum de guía turístico', 'ejemplos de currículum de guía turístico', 'plantilla de currículum de guía de turismo'],
+    topSkills: ['Oratoria', 'Narración de Historias', 'Conocimiento Local', 'Gestión de Grupos', 'Servicio al Cliente', 'Conciencia de Seguridad', 'Comunicación Multilingüe', 'Gestión del Tiempo', 'Conocimiento Histórico', 'Primeros Auxilios'],
+    atsKeywords: ['guía turístico', 'oratoria', 'gestión de grupos', 'expertise en historia local', 'participación del cliente', 'protocolos de seguridad', 'multilingüe', 'gestión de itinerarios', 'interpretación cultural', 'servicios turísticos'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Carlos',
+      lastName: 'Ramirez',
+      profession: 'Guía Turístico',
+      summary: 'Guía turístico dinámico con más de 4 años de experiencia liderando tours históricos, culturales y de aventura para grupos de 10-50 viajeros. Fluido en inglés y español con profundo conocimiento de la historia regional y pasión por crear experiencias memorables para los visitantes.',
+      skills: ['Oratoria', 'Narración de Historias', 'Conocimiento Local', 'Gestión de Grupos', 'Servicio al Cliente', 'Conciencia de Seguridad', 'Fluidez en Español', 'Gestión del Tiempo', 'Conocimiento Histórico', 'Primeros Auxilios'],
+      experience: [
+        {
+          title: 'Guía Turístico Senior',
+          company: 'Gray Line Tours',
+          startDate: '2022-03',
+          isCurrent: true,
+          achievements: [
+            'Lideró más de 500 tours anuales para grupos de 15-45 invitados, manteniendo una calificación promedio de 4.9/5.0 en TripAdvisor',
+            'Desarrolló 3 nuevas rutas de tours especializados que generaron $120K en ingresos anuales adicionales',
+            'Logró una tasa de reserva repetida del 40% mediante narración personalizada y participación del invitado',
+          ],
+        },
+        {
+          title: 'Guía Turístico',
+          company: 'Viator (a TripAdvisor company)',
+          startDate: '2020-05',
+          endDate: '2022-02',
+          achievements: [
+            'Condujo más de 300 tours de ciudad y culturales con un tamaño promedio de grupo de 20 y una tasa de reseñas positivas del 98%',
+            'Gestionó protocolos de seguridad para tours de aventura con cero incidentes durante 2 años',
+            'Capacitó a 5 nuevos guías turísticos en rutas, contenido histórico y técnicas de gestión de grupos',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'University of New Mexico', degree: 'Licenciatura', field: 'Historia', startDate: '2016-08', endDate: '2020-05' },
+      ],
+      certifications: [
+        { name: 'Certificado en RCP y Primeros Auxilios', issuer: 'American Red Cross', date: '2022-06' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un guía turístico en su currículum?', answer: 'Destaque el volumen de tours, tamaños de grupo, calificaciones de invitados, tours especializados desarrollados e idiomas hablados. Incluya los tipos de tours liderados y cualquier certificación de seguridad.' },
+      { question: '¿Son importantes las habilidades lingüísticas para un currículum de guía turístico?', answer: 'Extremadamente importantes. Los guías turísticos multilingües tienen alta demanda. Liste todos los idiomas con niveles de competencia y mencione cualquier tour realizado en múltiples idiomas.' },
+      { question: '¿Cómo demuestro servicio al cliente en un currículum de guía turístico?', answer: 'Incluya calificaciones de TripAdvisor o Google, tasas de reserva repetida y ejemplos específicos de manejo de situaciones difíciles o superación de expectativas de los invitados.' },
+    ],
+  },
+  'cruise-director': {
+    slug: 'director-de-crucero',
+    title: 'Director de Crucero',
+    keywords: ['currículum de director de crucero', 'CV de entretenimiento de crucero', 'currículum de director de actividades de crucero', 'currículum de director de línea de cruceros'],
+    searchIntents: ['cómo escribir un currículum de director de crucero', 'ejemplos de currículum de director de crucero', 'plantilla de CV de director de crucero'],
+    topSkills: ['Programación de Entretenimiento', 'Participación del Invitado', 'Liderazgo de Equipo', 'Coordinación de Eventos', 'Oratoria', 'Gestión de Presupuestos', 'Resolución de Conflictos', 'Gestión de Horarios', 'Comunicación Multicultural', 'Gestión de Crisis'],
+    atsKeywords: ['programación de entretenimiento', 'participación del invitado', 'operaciones de crucero', 'coordinación de eventos', 'oratoria', 'programación de actividades', 'liderazgo de equipo', 'entretenimiento a bordo', 'comunicación multicultural', 'satisfacción del pasajero', 'coordinación de excursiones en tierra'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Jonathan',
+      lastName: 'Marlowe',
+      profession: 'Director de Crucero',
+      summary: 'Director de crucero con más de 9 años de experiencia liderando entretenimiento y actividades a bordo para embarcaciones que transportan más de 3,000 pasajeros. Experto en programación de entretenimiento diverso, gestión de equipos de más de 40 empleados y logro de puntajes de satisfacción del invitado líderes en la industria.',
+      skills: ['Programación de Entretenimiento', 'Participación del Invitado', 'Liderazgo de Equipo', 'Coordinación de Eventos', 'Oratoria', 'Gestión de Presupuestos', 'Resolución de Conflictos', 'Gestión de Horarios', 'Comunicación Multicultural', 'Gestión de Crisis'],
+      experience: [
+        {
+          title: 'Director de Crucero',
+          company: 'Royal Caribbean International',
+          startDate: '2019-10',
+          isCurrent: true,
+          achievements: [
+            'Programó más de 150 eventos semanales de entretenimiento para embarcaciones de 3,500 pasajeros, logrando un puntaje de satisfacción del invitado del 94%',
+            'Gestionó un equipo de 45 empleados de entretenimiento en 12 departamentos con una tasa de satisfacción del empleado del 91%',
+            'Aumentó los ingresos de excursiones en tierra en un 18% mediante eventos promocionales a bordo e incentivos de reserva',
+          ],
+        },
+        {
+          title: 'Director Asistente de Crucero',
+          company: 'Carnival Cruise Line',
+          startDate: '2015-06',
+          endDate: '2019-09',
+          achievements: [
+            'Coordinó horarios diarios de actividades para embarcaciones de 2,800 pasajeros en itinerarios de 7 noches por el Caribe',
+            'Condujo más de 200 shows y eventos en vivo por travesía con una asistencia promedio del 80% de la capacidad del venue',
+            'Redujo los sobrecostos del presupuesto de entretenimiento en un 22% mediante renegociaciones con proveedores y optimización de horarios',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Emerson College', degree: 'Licenciatura', field: 'Artes Escénicas y Comunicación', startDate: '2009-08', endDate: '2013-05' },
+      ],
+      certifications: [
+        { name: 'Capacitación Básica de Seguridad STCW', issuer: 'Maritime Training Institute', date: '2015-04' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué hace fuerte a un currículum de director de crucero?', answer: 'Destaque tamaños de embarcación, conteos de pasajeros, volúmenes de eventos, puntajes de satisfacción del invitado y tamaños de equipo gestionados. Incluya expertise en programación de entretenimiento y experiencia en gestión de crisis.' },
+      { question: '¿Necesito certificaciones marítimas para un currículum de director de crucero?', answer: 'Sí. La Capacitación Básica de Seguridad STCW es obligatoria. Incluya cualquier certificación marítima adicional y capacitación en gestión de multitudes relevante para operaciones de crucero.' },
+      { question: '¿Cómo demuestro liderazgo en un currículum de director de crucero?', answer: 'Cuantifique el tamaño del equipo, describa la gestión de equipos multiculturales, incluya puntajes de satisfacción del empleado y mencione cualquier programa que haya desarrollado para mejorar el desempeño del equipo.' },
+    ],
+  },
+  'housekeeping-manager': {
+    slug: 'gerente-de-limpieza',
+    title: 'Gerente de Limpieza',
+    keywords: ['currículum de gerente de limpieza', 'CV de supervisor de limpieza', 'currículum de gerente de limpieza de hotel', 'currículum de ama de llaves ejecutiva'],
+    searchIntents: ['cómo escribir un currículum de gerente de limpieza', 'ejemplos de currículum de gerente de limpieza', 'plantilla de currículum de supervisor de limpieza de hotel'],
+    topSkills: ['Operaciones de Limpieza', 'Supervisión de Personal', 'Inspecciones de Calidad', 'Gestión de Inventario', 'Programación', 'Capacitación y Desarrollo', 'Gestión de Presupuestos', 'Satisfacción del Huésped', 'Cumplimiento de Seguridad', 'Relaciones con Proveedores'],
+    atsKeywords: ['operaciones de limpieza', 'supervisión de personal', 'inspecciones de calidad', 'gestión de inventario', 'programación', 'desarrollo de capacitación', 'gestión de presupuestos', 'satisfacción del huésped', 'cumplimiento de seguridad', 'gestión de blancos', 'estándares de inspección de habitaciones'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Patricia',
+      lastName: 'Okafor',
+      profession: 'Gerente de Limpieza',
+      summary: 'Gerente de limpieza con más de 7 años de experiencia supervisando operaciones de limpieza para hoteles de lujo con más de 400 habitaciones. Gestionó equipos de más de 50 empleados, manteniendo consistentemente altos estándares de limpieza y puntajes de satisfacción del huésped superiores al 95%.',
+      skills: ['Operaciones de Limpieza', 'Supervisión de Personal', 'Inspecciones de Calidad', 'Gestión de Inventario', 'Programación', 'Capacitación y Desarrollo', 'Gestión de Presupuestos', 'Satisfacción del Huésped', 'Cumplimiento de Seguridad', 'Relaciones con Proveedores'],
+      experience: [
+        {
+          title: 'Ama de Llaves Ejecutiva',
+          company: 'Waldorf Astoria Hotels & Resorts',
+          startDate: '2020-08',
+          isCurrent: true,
+          achievements: [
+            'Gestionó operaciones de limpieza para una propiedad de lujo de 500 habitaciones con un equipo de 65 empleados, manteniendo un puntaje de satisfacción del huésped del 96%',
+            'Redujo los costos de blancos y suministros en un 18% mediante optimización de inventario y renegociación de contratos con proveedores',
+            'Implementó una lista de verificación de inspección de habitaciones que mejoró las tasas de aprobación de calidad en primera instancia del 82% al 97%',
+          ],
+        },
+        {
+          title: 'Supervisora de Limpieza',
+          company: 'Westin Hotels & Resorts',
+          startDate: '2017-03',
+          endDate: '2020-07',
+          achievements: [
+            'Supervisó un equipo de 30 camaristas cubriendo 250 habitaciones diarias con un tiempo promedio de rotación de 15 minutos',
+            'Capacitó a más de 40 nuevos empleados en estándares de marca, protocolos de seguridad y prácticas de limpieza ecológica',
+            'Logró la calificación más alta de limpieza en TripAdvisor de la región durante 2 años consecutivos',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Temple University', degree: 'Licenciatura', field: 'Gestión Hotelera', startDate: '2013-08', endDate: '2017-05' },
+      ],
+      certifications: [
+        { name: 'Ama de Llaves Ejecutiva Certificada (CEH)', issuer: 'International Executive Housekeepers Association', date: '2021-05' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe destacar un gerente de limpieza en su currículum?', answer: 'Enfóquese en el tamaño de la propiedad, tamaño del equipo gestionado, puntajes de satisfacción del huésped, ahorros de costos y métricas de inspección de calidad. Incluya cualquier estándar de marca o certificación lograda.' },
+      { question: '¿Cómo demuestro mejoras de eficiencia en un currículum de gerente de limpieza?', answer: 'Cuantifique tiempos de rotación de habitaciones, tasas de aprobación de calidad en primera instancia, reducciones de costos de suministros y mejoras de productividad del personal. Incluya cualquier innovación de proceso que haya implementado.' },
+      { question: '¿Es valiosa la certificación CEH para un gerente de limpieza?', answer: 'Sí. La credencial de Ama de Llaves Ejecutiva Certificada demuestra expertise profesional y es reconocida en toda la industria hotelera. Puede diferenciarlo de otros candidatos.' },
+    ],
+  },
+  'housekeeper': {
+    slug: 'camarista',
+    title: 'Camarista',
+    keywords: ['currículum de camarista', 'CV de camarista de hotel', 'currículum de asistente de habitaciones', 'plantilla de currículum de limpieza'],
+    searchIntents: ['cómo escribir un currículum de camarista', 'ejemplos de currículum de camarista', 'plantilla de currículum de asistente de habitaciones de hotel'],
+    topSkills: ['Limpieza de Habitaciones', 'Saneamiento', 'Atención al Detalle', 'Gestión del Tiempo', 'Gestión de Blancos', 'Seguridad con Químicos', 'Resistencia Física', 'Organización', 'Trabajo en Equipo', 'Servicio al Huésped'],
+    atsKeywords: ['limpieza de habitaciones', 'procedimientos de saneamiento', 'gestión de blancos', 'seguridad con químicos', 'inspección de habitaciones', 'atención de solicitudes del huésped', 'limpieza de hotel', 'limpieza profunda', 'servicio de cobertura', 'operaciones de lavandería'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Rosa',
+      lastName: 'Gutierrez',
+      profession: 'Camarista',
+      summary: 'Camarista detallista con más de 4 años de experiencia manteniendo estándares de limpieza en propiedades hoteleras de lujo. Limpia consistentemente más de 16 habitaciones por turno según los estándares de marca con retroalimentación positiva de huéspedes y un sólido historial de confiabilidad.',
+      skills: ['Limpieza de Habitaciones', 'Saneamiento', 'Atención al Detalle', 'Gestión del Tiempo', 'Gestión de Blancos', 'Seguridad con Químicos', 'Resistencia Física', 'Organización', 'Trabajo en Equipo', 'Servicio al Huésped'],
+      experience: [
+        {
+          title: 'Asistente de Habitaciones',
+          company: 'JW Marriott',
+          startDate: '2022-05',
+          isCurrent: true,
+          achievements: [
+            'Limpió e inspeccionó 18 habitaciones por turno en una propiedad de lujo de 400 habitaciones, superando el estándar de 16 habitaciones en un 12%',
+            'Mantuvo una tasa de aprobación de inspección en primera instancia del 98%, la más alta del equipo de limpieza durante 2 años consecutivos',
+            'Recibió más de 45 tarjetas de comentarios positivos de huéspedes mencionando limpieza excepcional de habitaciones durante su permanencia',
+          ],
+        },
+        {
+          title: 'Camarista',
+          company: 'Hampton Inn by Hilton',
+          startDate: '2020-08',
+          endDate: '2022-04',
+          achievements: [
+            'Limpió un promedio de 16 habitaciones diarias manteniendo todos los estándares de limpieza de la marca',
+            'Redujo el tiempo de rotación de habitaciones en 10 minutos mediante una secuencia de limpieza optimizada',
+            'Capacitó a 6 nuevas camaristas en procedimientos de limpieza, manejo de químicos y protocolos de seguridad',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Riverside Community College', degree: 'Certificado', field: 'Servicios de Hospitalidad', startDate: '2019-09', endDate: '2020-06' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir una camarista en su currículum?', answer: 'Incluya habitaciones limpiadas por turno, tasas de aprobación de inspección, retroalimentación de huéspedes y cualquier habilidad especial de limpieza. Mencione el tipo y tamaño de la propiedad para dar contexto.' },
+      { question: '¿Cómo hago que un currículum de camarista destaque?', answer: 'Cuantifique su trabajo: habitaciones por turno, puntajes de inspección, tiempos de rotación y tarjetas de comentarios de huéspedes. Destaque la confiabilidad con registros de asistencia y cualquier premio recibido.' },
+      { question: '¿Debo listar experiencia de capacitación en mi currículum de camarista?', answer: 'Sí. Capacitar a nuevos empleados demuestra potencial de liderazgo y conocimiento profundo de los procedimientos. Incluya el número de personas que capacitó y cualquier mejora en su desempeño.' },
+    ],
+  },
+  'janitor': {
+    slug: 'conserje',
+    title: 'Conserje',
+    keywords: ['currículum de conserje', 'plantilla de currículum de custodio', 'CV de trabajador de limpieza', 'currículum de conserje de edificio'],
+    searchIntents: ['cómo escribir un currículum de conserje', 'ejemplos de currículum de conserje', 'plantilla de currículum de custodio'],
+    topSkills: ['Limpieza de Edificios', 'Cuidado de Pisos', 'Saneamiento', 'Operación de Equipos', 'Manejo de Químicos', 'Reparaciones Menores', 'Gestión de Residuos', 'Organización', 'Gestión del Tiempo', 'Cumplimiento de Seguridad'],
+    atsKeywords: ['limpieza de edificios', 'cuidado de pisos', 'saneamiento', 'operación de equipos', 'manejo de químicos', 'reparaciones menores', 'gestión de residuos', 'limpieza comercial', 'cumplimiento OSHA', 'mantenimiento de instalaciones'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Dennis',
+      lastName: 'Kowalczyk',
+      profession: 'Conserje',
+      summary: 'Conserje confiable con más de 5 años de experiencia manteniendo la limpieza y seguridad en edificios comerciales de más de 200,000 pies cuadrados. Experto en cuidado de pisos, operación de equipos y reparaciones menores de instalaciones con un sólido récord de confiabilidad y cumplimiento de seguridad.',
+      skills: ['Limpieza de Edificios', 'Cuidado de Pisos', 'Saneamiento', 'Operación de Equipos', 'Manejo de Químicos', 'Reparaciones Menores', 'Gestión de Residuos', 'Organización', 'Gestión del Tiempo', 'Cumplimiento de Seguridad'],
+      experience: [
+        {
+          title: 'Custodio Principal',
+          company: 'ABM Industries',
+          startDate: '2021-09',
+          isCurrent: true,
+          achievements: [
+            'Mantuvo la limpieza de un edificio de oficinas comerciales de 180,000 pies cuadrados en 3 pisos con cero violaciones de seguridad',
+            'Redujo los costos de suministros de limpieza en un 20% al implementar sistemas de control de dilución y compras al mayoreo',
+            'Capacitó y supervisó a 4 empleados de limpieza, mejorando la eficiencia del equipo y completando turnos 25 minutos antes de lo programado',
+          ],
+        },
+        {
+          title: 'Conserje',
+          company: 'ServiceMaster',
+          startDate: '2019-03',
+          endDate: '2021-08',
+          achievements: [
+            'Limpió y mantuvo una instalación escolar de 120,000 pies cuadrados que atiende a 1,200 estudiantes y personal',
+            'Realizó cuidado diario de pisos incluyendo decapado, encerado y pulido, logrando una calificación de inspección consistente del 95%',
+            'Respondió a más de 300 solicitudes de mantenimiento por año con un tiempo promedio de resolución de 2 horas',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Milwaukee Area Technical College', degree: 'Certificado', field: 'Mantenimiento de Edificios', startDate: '2018-01', endDate: '2018-12' },
+      ],
+      certifications: [
+        { name: 'OSHA 10 Horas Industria General', issuer: 'OSHA', date: '2021-11' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un conserje en su currículum?', answer: 'Liste los tamaños de edificios mantenidos, puntajes de inspección, equipos operados y cualquier tarea de mantenimiento realizada. Incluya certificaciones de capacitación en seguridad y registros de asistencia.' },
+      { question: '¿Cómo hago que un currículum de conserje destaque?', answer: 'Cuantifique su trabajo con pies cuadrados, calificaciones de inspección, ahorros de costos y tiempos de respuesta. Demuestre confiabilidad y destaque cualquier responsabilidad de liderazgo o capacitación.' },
+      { question: '¿Es importante la certificación OSHA para un currículum de conserje?', answer: 'Sí. La capacitación OSHA de 10 o 30 horas demuestra conciencia de seguridad y es cada vez más requerida por los empleadores, especialmente para roles de custodio principal.' },
+    ],
+  },
+  'building-superintendent': {
+    slug: 'superintendente-de-edificios',
+    title: 'Superintendente de Edificios',
+    keywords: ['currículum de superintendente de edificios', 'CV de super de edificio', 'currículum de superintendente de propiedad', 'currículum de superintendente de mantenimiento de edificios'],
+    searchIntents: ['cómo escribir un currículum de superintendente de edificios', 'ejemplos de currículum de superintendente de edificios', 'plantilla de currículum de super de edificio'],
+    topSkills: ['Mantenimiento de Edificios', 'Sistemas HVAC', 'Plomería', 'Sistemas Eléctricos', 'Relaciones con Inquilinos', 'Gestión de Proveedores', 'Supervisión de Presupuesto', 'Respuesta a Emergencias', 'Cumplimiento de Códigos', 'Supervisión de Personal'],
+    atsKeywords: ['mantenimiento de edificios', 'sistemas HVAC', 'reparaciones de plomería', 'sistemas eléctricos', 'relaciones con inquilinos', 'gestión de proveedores', 'cumplimiento de códigos', 'respuesta a emergencias', 'mantenimiento preventivo', 'inspecciones de edificios', 'mejoras de capital'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Frank',
+      lastName: 'Benedetto',
+      profession: 'Superintendente de Edificios',
+      summary: 'Superintendente de edificios con más de 10 años de experiencia gestionando propiedades residenciales y comerciales de hasta 300 unidades. Experto en HVAC, plomería, sistemas eléctricos y relaciones con inquilinos con enfoque en mantenimiento preventivo y operaciones rentables.',
+      skills: ['Mantenimiento de Edificios', 'Sistemas HVAC', 'Plomería', 'Sistemas Eléctricos', 'Relaciones con Inquilinos', 'Gestión de Proveedores', 'Supervisión de Presupuesto', 'Respuesta a Emergencias', 'Cumplimiento de Códigos', 'Supervisión de Personal'],
+      experience: [
+        {
+          title: 'Superintendente de Edificios',
+          company: 'Related Companies',
+          startDate: '2019-04',
+          isCurrent: true,
+          achievements: [
+            'Gestionó operaciones de mantenimiento para un edificio residencial de lujo de 280 unidades, resolviendo el 95% de las órdenes de trabajo en 24 horas',
+            'Redujo los costos anuales de mantenimiento en $85K mediante programación de mantenimiento preventivo y mejoras de eficiencia energética',
+            'Supervisó un equipo de 6 empleados de mantenimiento y coordinó con más de 15 proveedores para reparaciones especializadas y proyectos de capital',
+          ],
+        },
+        {
+          title: 'Superintendente Asistente',
+          company: 'Brookfield Properties',
+          startDate: '2014-07',
+          endDate: '2019-03',
+          achievements: [
+            'Mantuvo un complejo residencial de 200 unidades con una calificación de satisfacción de inquilinos del 92%',
+            'Completó un proyecto de renovación de lobby de $500K a tiempo y un 8% por debajo del presupuesto',
+            'Logró un cumplimiento del 100% en todas las inspecciones de edificios de la ciudad durante 5 años',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'SUNY Canton', degree: 'Técnico Superior', field: 'Gestión de Instalaciones', startDate: '2011-08', endDate: '2013-05' },
+      ],
+      certifications: [
+        { name: 'Certificación Universal EPA 608', issuer: 'EPA', date: '2016-03' },
+        { name: 'Director de Seguridad contra Incendios NYC (F-89)', issuer: 'FDNY', date: '2019-07' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe destacar un superintendente de edificios en su currículum?', answer: 'Enfóquese en tamaño del edificio, número de unidades, tasas de resolución de órdenes de trabajo, ahorros de costos y tamaño del equipo gestionado. Incluya sistemas específicos que mantiene (HVAC, plomería, eléctrico) y récord de cumplimiento.' },
+      { question: '¿Qué certificaciones son importantes para un superintendente de edificios?', answer: 'EPA 608 para manejo de refrigerantes, certificaciones locales de director de seguridad contra incendios, licencias de operador de calderas y capacitación de seguridad OSHA son todas altamente valoradas.' },
+      { question: '¿Cómo demuestro ahorros de costos en un currículum de superintendente de edificios?', answer: 'Incluya montos específicos ahorrados mediante mantenimiento preventivo, mejoras de eficiencia energética, renegociaciones con proveedores y reducción de llamadas de reparación de emergencia.' },
+    ],
+  },
+  'pest-control-technician': {
+    slug: 'tecnico-de-control-de-plagas',
+    title: 'Técnico de Control de Plagas',
+    keywords: ['currículum de técnico de control de plagas', 'plantilla de currículum de exterminador', 'currículum de manejo de plagas', 'currículum de operador de control de plagas'],
+    searchIntents: ['cómo escribir un currículum de técnico de control de plagas', 'ejemplos de currículum de control de plagas', 'plantilla de currículum de exterminador'],
+    topSkills: ['Identificación de Plagas', 'Aplicación de Químicos', 'Estrategias MIP', 'Servicio al Cliente', 'Operación de Equipos', 'Cumplimiento de Seguridad', 'Documentación', 'Gestión de Rutas', 'Inspección de Edificios', 'Resolución de Problemas'],
+    atsKeywords: ['identificación de plagas', 'aplicación de químicos', 'manejo integrado de plagas', 'MIP', 'cumplimiento de seguridad', 'aplicación de pesticidas', 'inspección de edificios', 'servicio al cliente', 'gestión de rutas', 'documentación', 'tratamiento de termitas'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Kevin',
+      lastName: 'Drummond',
+      profession: 'Técnico de Control de Plagas',
+      summary: 'Técnico de control de plagas con licencia con más de 4 años de experiencia proporcionando servicios de manejo de plagas residencial y comercial. Competente en manejo integrado de plagas, aplicación de químicos y educación al cliente con una ruta de más de 150 cuentas.',
+      skills: ['Identificación de Plagas', 'Aplicación de Químicos', 'Estrategias MIP', 'Servicio al Cliente', 'Operación de Equipos', 'Cumplimiento de Seguridad', 'Documentación', 'Gestión de Rutas', 'Inspección de Edificios', 'Resolución de Problemas'],
+      experience: [
+        {
+          title: 'Técnico de Control de Plagas',
+          company: 'Terminix',
+          startDate: '2022-01',
+          isCurrent: true,
+          achievements: [
+            'Gestionó una ruta de 160 cuentas residenciales y comerciales con una tasa de retención de clientes del 96%',
+            'Completó un promedio de 8 llamadas de servicio por día manteniendo una calificación de satisfacción del cliente de 4.8/5.0',
+            'Redujo las tasas de llamadas de retorno en un 25% al implementar inspecciones iniciales exhaustivas y planes de tratamiento de seguimiento',
+          ],
+        },
+        {
+          title: 'Aprendiz de Control de Plagas',
+          company: 'Orkin',
+          startDate: '2020-04',
+          endDate: '2021-12',
+          achievements: [
+            'Realizó más de 1,200 inspecciones de plagas en propiedades residenciales, comerciales y de servicio de alimentos',
+            'Se capacitó en más de 15 métodos de aplicación de químicos y obtuvo la licencia estatal de aplicador de pesticidas en 6 meses',
+            'Asistió en proyectos de tratamiento de termitas generando $200K en ingresos para la sucursal',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Gwinnett Technical College', degree: 'Certificado', field: 'Manejo de Plagas', startDate: '2019-08', endDate: '2020-03' },
+      ],
+      certifications: [
+        { name: 'Licencia Estatal de Aplicador de Pesticidas', issuer: 'Departamento Estatal de Agricultura', date: '2020-10' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un técnico de control de plagas en su currículum?', answer: 'Liste el tamaño de su ruta, tasa de retención de clientes, volumen de llamadas de servicio y calificaciones de satisfacción. Incluya su licencia estatal de pesticidas y cualquier certificación de especialidad.' },
+      { question: '¿Es importante la licencia para un currículum de control de plagas?', answer: 'Esencial. Una licencia estatal válida de aplicador de pesticidas es requerida en la mayoría de los estados. Inclúyala prominentemente junto con cualquier certificación de especialidad como termitas o fumigación.' },
+      { question: '¿Cómo demuestro crecimiento en un currículum de técnico de control de plagas?', answer: 'Demuestre crecimiento de ruta, reducción de tasas de retorno, mejoras en retención de clientes y progresión de aprendiz a técnico con licencia. Incluya cualquier capacitación que haya proporcionado a otros.' },
+    ],
+  },
+  'laundry-attendant': {
+    slug: 'asistente-de-lavanderia',
+    title: 'Asistente de Lavandería',
+    keywords: ['currículum de asistente de lavandería', 'CV de trabajador de lavandería', 'currículum de lavandería de hotel', 'plantilla de currículum de operador de lavandería'],
+    searchIntents: ['cómo escribir un currículum de asistente de lavandería', 'ejemplos de currículum de asistente de lavandería', 'plantilla de currículum de trabajador de lavandería de hotel'],
+    topSkills: ['Operaciones de Lavandería', 'Cuidado de Telas', 'Operación de Máquinas', 'Control de Calidad', 'Clasificación y Doblado', 'Manejo de Químicos', 'Gestión del Tiempo', 'Resistencia Física', 'Seguimiento de Inventario', 'Trabajo en Equipo'],
+    atsKeywords: ['operaciones de lavandería', 'cuidado de telas', 'operación de máquinas', 'control de calidad', 'clasificación', 'manejo de químicos', 'procesamiento de blancos', 'equipos industriales de lavandería', 'tratamiento de manchas', 'gestión de inventario'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Tanya',
+      lastName: 'Simmons',
+      profession: 'Asistente de Lavandería',
+      summary: 'Asistente de lavandería con más de 3 años de experiencia procesando más de 2,000 libras de blancos diarios en entornos hoteleros y de salud. Experta en operación de máquinas industriales, cuidado de telas y control de calidad con un fuerte enfoque en eficiencia y seguridad.',
+      skills: ['Operaciones de Lavandería', 'Cuidado de Telas', 'Operación de Máquinas', 'Control de Calidad', 'Clasificación y Doblado', 'Manejo de Químicos', 'Gestión del Tiempo', 'Resistencia Física', 'Seguimiento de Inventario', 'Trabajo en Equipo'],
+      experience: [
+        {
+          title: 'Asistente Principal de Lavandería',
+          company: 'Hyatt Regency',
+          startDate: '2022-10',
+          isCurrent: true,
+          achievements: [
+            'Procesó un promedio de 2,500 libras de blancos diarios para un hotel de 450 habitaciones, cumpliendo todos los plazos de rotación',
+            'Redujo el daño a blancos en un 30% al implementar procedimientos adecuados de clasificación y control de temperatura',
+            'Supervisó a 3 asistentes de lavandería, mejorando la producción del equipo en un 15% mediante optimización del flujo de trabajo',
+          ],
+        },
+        {
+          title: 'Asistente de Lavandería',
+          company: 'CLEAN Laundry Services',
+          startDate: '2021-02',
+          endDate: '2022-09',
+          achievements: [
+            'Operó 8 lavadoras y secadoras industriales procesando más de 1,800 libras por turno',
+            'Mantuvo una tasa de aprobación de calidad del 99% en inspecciones de blancos con requisitos mínimos de relavado',
+            'Rastreó el inventario de químicos de limpieza y suministros, reduciendo el desabastecimiento en un 40% mediante pedidos oportunos',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Lamar Institute of Technology', degree: 'Certificado', field: 'Operaciones de Hospitalidad', startDate: '2020-01', endDate: '2020-12' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un asistente de lavandería en su currículum?', answer: 'Incluya el volumen diario de blancos procesados, tasas de aprobación de calidad, equipos operados y cualquier mejora de eficiencia. Mencione el tipo de instalación (hotel, hospital, comercial).' },
+      { question: '¿Cómo hago que un currículum de asistente de lavandería destaque?', answer: 'Cuantifique su producción con libras procesadas diariamente, métricas de calidad y ahorros de costos. Destaque cualquier experiencia de liderazgo y habilidades de mantenimiento de equipos.' },
+      { question: '¿Debo listar tipos de máquinas en mi currículum de asistente de lavandería?', answer: 'Sí. Listar equipos industriales en los que está capacitado (lavadoras comerciales, extractores, planchadoras de blancos) muestra experiencia práctica y reduce el tiempo de capacitación para los empleadores.' },
+    ],
+  },
+  'dry-cleaner': {
+    slug: 'limpiador-en-seco',
+    title: 'Limpiador en Seco',
+    keywords: ['currículum de limpiador en seco', 'CV de técnico de tintorería', 'currículum de cuidado de prendas', 'currículum de operador de tintorería'],
+    searchIntents: ['cómo escribir un currículum de limpiador en seco', 'ejemplos de currículum de limpiador en seco', 'plantilla de currículum de técnico de tintorería'],
+    topSkills: ['Operaciones de Tintorería', 'Eliminación de Manchas', 'Identificación de Telas', 'Planchado y Acabado', 'Manejo de Químicos', 'Mantenimiento de Equipos', 'Servicio al Cliente', 'Control de Calidad', 'Inspección de Prendas', 'Gestión de Inventario'],
+    atsKeywords: ['operaciones de tintorería', 'eliminación de manchas', 'identificación de telas', 'planchado', 'acabado', 'manejo de químicos', 'cuidado de prendas', 'mantenimiento de equipos', 'servicio al cliente', 'control de calidad'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Victor',
+      lastName: 'Papadopoulos',
+      profession: 'Limpiador en Seco',
+      summary: 'Profesional de tintorería experimentado con más de 6 años de expertise en cuidado de prendas, eliminación de manchas y planchado para un negocio de alto volumen que procesa más de 500 artículos diarios. Experto en identificación de telas, manejo de químicos y servicio al cliente.',
+      skills: ['Operaciones de Tintorería', 'Eliminación de Manchas', 'Identificación de Telas', 'Planchado y Acabado', 'Manejo de Químicos', 'Mantenimiento de Equipos', 'Servicio al Cliente', 'Control de Calidad', 'Inspección de Prendas', 'Gestión de Inventario'],
+      experience: [
+        {
+          title: 'Técnico Principal de Tintorería',
+          company: 'Martinizing Dry Cleaning',
+          startDate: '2021-04',
+          isCurrent: true,
+          achievements: [
+            'Procesó más de 550 prendas diarias con una tasa del 99.5% libre de daños y un récord de entrega puntual del 97%',
+            'Mejoró la tasa de éxito en eliminación de manchas del 85% al 95% al investigar y adoptar técnicas avanzadas de desmanchado',
+            'Capacitó a 4 nuevos técnicos en identificación de telas, uso de químicos y estándares de planchado',
+          ],
+        },
+        {
+          title: 'Asociado de Tintorería',
+          company: 'ZIPS Dry Cleaners',
+          startDate: '2018-06',
+          endDate: '2021-03',
+          achievements: [
+            'Operó y mantuvo 3 máquinas de tintorería, 2 unidades de planchado y una estación de acabado a vapor',
+            'Atendió más de 100 interacciones con clientes diariamente, resolviendo quejas con una tasa de satisfacción del 98%',
+            'Redujo el desperdicio de químicos en un 15% al optimizar el uso de solventes e implementar protocolos de reciclaje',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'International Fabricare Institute', degree: 'Certificado', field: 'Tintorería Profesional', startDate: '2017-09', endDate: '2018-04' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un limpiador en seco en su currículum?', answer: 'Liste el volumen diario de prendas, métricas de calidad, tasas de éxito en eliminación de manchas y equipos operados. Incluya especializaciones en cuidado de telas y experiencia en servicio al cliente.' },
+      { question: '¿Es importante la formación formal para un currículum de limpiador en seco?', answer: 'La formación del Drycleaning & Laundry Institute u organizaciones similares agrega credibilidad. Incluya cualquier certificación en cuidado de telas o cumplimiento ambiental.' },
+      { question: '¿Cómo demuestro habilidades técnicas en un currículum de limpiador en seco?', answer: 'Liste equipos específicos operados, técnicas de eliminación de manchas dominadas, tipos de telas manejadas y cualquier capacitación en seguridad con químicos completada.' },
+    ],
+  },
+  'spa-manager': {
+    slug: 'gerente-de-spa',
+    title: 'Gerente de Spa',
+    keywords: ['currículum de gerente de spa', 'CV de director de spa', 'currículum de gerente de bienestar', 'currículum de gerente de operaciones de spa'],
+    searchIntents: ['cómo escribir un currículum de gerente de spa', 'ejemplos de currículum de gerente de spa', 'plantilla de currículum de director de spa'],
+    topSkills: ['Operaciones de Spa', 'Gestión de Ingresos', 'Supervisión de Personal', 'Desarrollo de Menú de Tratamientos', 'Experiencia del Huésped', 'Ventas de Retail', 'Programación', 'Relaciones con Proveedores', 'Marketing', 'Gestión de Presupuestos'],
+    atsKeywords: ['operaciones de spa', 'gestión de ingresos', 'supervisión de personal', 'desarrollo de menú de tratamientos', 'experiencia del huésped', 'ventas de retail', 'optimización de programación', 'adquisición de proveedores', 'marketing de spa', 'gestión de presupuestos', 'programas de bienestar'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Vanessa',
+      lastName: 'Sterling',
+      profession: 'Gerente de Spa',
+      summary: 'Gerente de spa con más de 7 años de experiencia dirigiendo operaciones para spas de resort y hotel de lujo que generan más de $2M en ingresos anuales. Experta en desarrollo de menú de tratamientos, gestión de personal y creación de experiencias excepcionales de bienestar para los huéspedes.',
+      skills: ['Operaciones de Spa', 'Gestión de Ingresos', 'Supervisión de Personal', 'Desarrollo de Menú de Tratamientos', 'Experiencia del Huésped', 'Ventas de Retail', 'Programación', 'Relaciones con Proveedores', 'Marketing', 'Gestión de Presupuestos'],
+      experience: [
+        {
+          title: 'Directora de Spa',
+          company: 'The Spa at Four Seasons',
+          startDate: '2020-11',
+          isCurrent: true,
+          achievements: [
+            'Dirigió operaciones de spa generando $2.4M anuales con un margen de ganancia del 28%, superando los objetivos en un 15%',
+            'Lanzó una serie de tratamientos exclusivos que aumentó el gasto promedio por tratamiento en un 20% y generó $180K en nuevos ingresos',
+            'Gestionó un equipo de 18 terapeutas y esteticistas, logrando una tasa de retención de personal del 93% mediante programas de desarrollo profesional',
+          ],
+        },
+        {
+          title: 'Subgerente de Spa',
+          company: 'Canyon Ranch',
+          startDate: '2017-05',
+          endDate: '2020-10',
+          achievements: [
+            'Aumentó las ventas de productos de retail del spa en un 40% mediante capacitación de personal y colocación estratégica de productos',
+            'Optimizó la programación de terapeutas para mejorar la tasa de utilización del 65% al 82%, agregando $350K en ingresos anuales',
+            'Mantuvo un puntaje de satisfacción del huésped de 4.9/5.0 en más de 10,000 visitas anuales al spa',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'University of California, Irvine', degree: 'Licenciatura', field: 'Administración de Empresas', startDate: '2011-08', endDate: '2015-05' },
+      ],
+      certifications: [
+        { name: 'Supervisor de Spa Certificado', issuer: 'International SPA Association (ISPA)', date: '2019-09' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un gerente de spa en su currículum?', answer: 'Destaque los ingresos gestionados, márgenes de ganancia, tamaño del equipo, puntajes de satisfacción del huésped e innovaciones en el menú de tratamientos. Incluya el desempeño de ventas de retail y mejoras en tasas de utilización.' },
+      { question: '¿Cómo demuestro visión de negocios en un currículum de gerente de spa?', answer: 'Incluya resultados de P&L, porcentajes de crecimiento de ingresos, ahorros de costos, aumentos en ventas de retail y tasas de utilización de terapeutas. Demuestre que entiende el spa como un centro de ganancias.' },
+      { question: '¿Debo mencionar tendencias de bienestar en mi currículum de gerente de spa?', answer: 'Sí. Demuestre conocimiento de tendencias de la industria mencionando programas de bienestar, iniciativas de sostenibilidad o tratamientos innovadores que haya introducido.' },
+    ],
+  },
+  'massage-therapist': {
+    slug: 'terapeuta-de-masaje',
+    title: 'Terapeuta de Masaje',
+    keywords: ['currículum de terapeuta de masaje', 'CV de terapeuta de masaje con licencia', 'plantilla de currículum de LMT', 'ejemplo de currículum de terapia de masaje'],
+    searchIntents: ['cómo escribir un currículum de terapeuta de masaje', 'ejemplos de currículum de terapeuta de masaje', 'plantilla de currículum de LMT'],
+    topSkills: ['Masaje Sueco', 'Masaje de Tejido Profundo', 'Masaje Deportivo', 'Terapia de Puntos Gatillo', 'Liberación Miofascial', 'Evaluación del Cliente', 'Planificación de Tratamiento', 'Conocimiento de Anatomía', 'Servicio al Cliente', 'Notas SOAP'],
+    atsKeywords: ['terapia de masaje', 'masaje sueco', 'tejido profundo', 'masaje deportivo', 'terapia de puntos gatillo', 'liberación miofascial', 'evaluación del cliente', 'planificación de tratamiento', 'documentación SOAP', 'terapeuta de masaje con licencia'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Ashley',
+      lastName: 'Nakamura',
+      profession: 'Terapeuta de Masaje',
+      summary: 'Terapeuta de masaje con licencia con más de 5 años de experiencia proporcionando masaje terapéutico y de relajación en entornos de spa y clínicos. Experta en tejido profundo, masaje deportivo y liberación miofascial con una base de clientes leales de más de 120 clientes regulares.',
+      skills: ['Masaje Sueco', 'Masaje de Tejido Profundo', 'Masaje Deportivo', 'Terapia de Puntos Gatillo', 'Liberación Miofascial', 'Evaluación del Cliente', 'Planificación de Tratamiento', 'Conocimiento de Anatomía', 'Servicio al Cliente', 'Notas SOAP'],
+      experience: [
+        {
+          title: 'Terapeuta Principal de Masaje',
+          company: 'Massage Envy',
+          startDate: '2021-09',
+          isCurrent: true,
+          achievements: [
+            'Mantuvo una tasa de retención de clientes del 85% con una cartera personal de más de 130 clientes recurrentes',
+            'Generó $180K en ingresos anuales por servicios, posicionándose en el 5% superior de terapeutas a nivel empresa',
+            'Mentorizó a 6 terapeutas recién licenciados en técnicas de evaluación y planificación de tratamiento',
+          ],
+        },
+        {
+          title: 'Terapeuta de Masaje',
+          company: 'Hand & Stone Massage and Facial Spa',
+          startDate: '2019-03',
+          endDate: '2021-08',
+          achievements: [
+            'Realizó un promedio de 25 sesiones de masaje por semana en 5 modalidades',
+            'Logró una calificación de satisfacción del cliente de 4.9/5.0 en más de 800 sesiones',
+            'Aumentó las ventas de productos de retail en un 30% mediante recomendaciones y educación post-tratamiento',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'National Holistic Institute', degree: 'Certificado', field: 'Terapia de Masaje (750 horas)', startDate: '2018-01', endDate: '2018-12' },
+      ],
+      certifications: [
+        { name: 'Terapeuta de Masaje con Licencia (LMT)', issuer: 'Junta Estatal de Terapia de Masaje', date: '2019-01' },
+        { name: 'Certificación en Masaje Terapéutico y Trabajo Corporal', issuer: 'NCBTMB', date: '2019-03' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un terapeuta de masaje en su currículum?', answer: 'Liste sus modalidades, tasa de retención de clientes, volumen de sesiones y calificaciones de satisfacción. Incluya su licencia estatal, certificación NCBTMB y horas de educación continua.' },
+      { question: '¿Cómo cuantifico mi experiencia en terapia de masaje?', answer: 'Incluya conteos semanales de sesiones, tasas de retención de clientes, ingresos generados y puntajes de satisfacción. Rastree el tamaño de su cartera de clientes personales y porcentajes de re-reserva.' },
+      { question: '¿Debo listar todas las modalidades de masaje en mi currículum?', answer: 'Liste sus 5-8 modalidades principales y destaque cualquier especialización. Adapte la lista al rol al que está aplicando, enfatizando las técnicas más relevantes.' },
+    ],
+  },
+  'esthetician': {
+    slug: 'esteticista',
+    title: 'Esteticista',
+    keywords: ['currículum de esteticista', 'CV de especialista en cuidado de la piel', 'plantilla de currículum de esteticista con licencia', 'currículum de terapeuta de belleza'],
+    searchIntents: ['cómo escribir un currículum de esteticista', 'ejemplos de currículum de esteticista', 'plantilla de currículum de especialista en cuidado de la piel'],
+    topSkills: ['Tratamientos Faciales', 'Análisis de Piel', 'Peelings Químicos', 'Microdermoabrasión', 'Depilación con Cera', 'Conocimiento de Productos', 'Consulta con Clientes', 'Saneamiento', 'Ventas de Retail', 'Servicio al Cliente'],
+    atsKeywords: ['tratamientos faciales', 'análisis de piel', 'peelings químicos', 'microdermoabrasión', 'servicios de depilación con cera', 'conocimiento de productos', 'consulta con clientes', 'protocolos de saneamiento', 'ventas de retail', 'régimen de cuidado de la piel', 'esteticista con licencia'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Jasmine',
+      lastName: 'Patel',
+      profession: 'Esteticista',
+      summary: 'Esteticista con licencia con más de 4 años de experiencia proporcionando tratamientos personalizados de cuidado de la piel en entornos de spa médico y spa de lujo. Especializada en tratamientos faciales avanzados, peelings químicos y análisis de piel con una base creciente de más de 100 clientes regulares.',
+      skills: ['Tratamientos Faciales', 'Análisis de Piel', 'Peelings Químicos', 'Microdermoabrasión', 'Depilación con Cera', 'Conocimiento de Productos', 'Consulta con Clientes', 'Saneamiento', 'Ventas de Retail', 'Servicio al Cliente'],
+      experience: [
+        {
+          title: 'Esteticista Senior',
+          company: 'SkinSpirit Skincare Clinic & Spa',
+          startDate: '2022-06',
+          isCurrent: true,
+          achievements: [
+            'Realizó más de 20 tratamientos faciales avanzados semanales, generando $150K en ingresos anuales por servicios',
+            'Construyó una base personal de clientes de más de 110 con una tasa de re-reserva del 82%',
+            'Aumentó las ventas de productos de cuidado de la piel de retail en un 45% mediante consultas personalizadas de régimen',
+          ],
+        },
+        {
+          title: 'Esteticista',
+          company: 'European Wax Center',
+          startDate: '2020-08',
+          endDate: '2022-05',
+          achievements: [
+            'Completó más de 30 servicios de depilación y faciales diarios en un entorno de ritmo acelerado',
+            'Mantuvo una calificación de satisfacción del cliente de 4.8/5.0 en más de 2,000 servicios',
+            'Capacitó a 3 nuevas esteticistas en protocolos de tratamiento y estándares de servicio al cliente',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Aveda Institute', degree: 'Licencia', field: 'Estética (600 horas)', startDate: '2019-06', endDate: '2020-06' },
+      ],
+      certifications: [
+        { name: 'Esteticista con Licencia', issuer: 'Junta Estatal de Cosmetología', date: '2020-07' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir una esteticista en su currículum?', answer: 'Destaque sus especializaciones de tratamiento, volumen de servicios, tasa de retención de clientes, desempeño en ventas de retail y puntajes de satisfacción. Incluya su licencia estatal y cualquier formación avanzada.' },
+      { question: '¿Cómo demuestro impacto comercial en un currículum de esteticista?', answer: 'Incluya los ingresos generados, aumentos en ventas de productos, tasas de re-reserva y crecimiento de base de clientes. Los empleadores quieren ver que puede construir y mantener una cartera rentable de clientes.' },
+      { question: '¿Debo listar marcas específicas de cuidado de la piel en las que estoy capacitada?', answer: 'Sí. La capacitación específica en marcas (Dermalogica, SkinCeuticals, Obagi) demuestra conocimiento avanzado de productos y puede ser una ventaja al contratar en spas afiliados a marcas.' },
+    ],
+  },
+  'nail-technician': {
+    slug: 'tecnico-de-unas',
+    title: 'Técnico de Uñas',
+    keywords: ['currículum de técnico de uñas', 'plantilla de CV de técnico de uñas', 'currículum de manicurista', 'ejemplo de currículum de artista de uñas'],
+    searchIntents: ['cómo escribir un currículum de técnico de uñas', 'ejemplos de currículum de técnico de uñas', 'plantilla de currículum de manicurista'],
+    topSkills: ['Manicuras', 'Pedicuras', 'Uñas de Gel', 'Aplicaciones de Acrílico', 'Arte de Uñas', 'Saneamiento', 'Servicio al Cliente', 'Teoría del Color', 'Consulta con Clientes', 'Ventas de Retail'],
+    atsKeywords: ['servicios de manicura', 'servicios de pedicura', 'uñas de gel', 'aplicación de acrílico', 'arte de uñas', 'protocolos de saneamiento', 'servicio al cliente', 'consulta con clientes', 'evaluación de salud de uñas', 'ventas de retail'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Hannah',
+      lastName: 'Tran',
+      profession: 'Técnico de Uñas',
+      summary: 'Técnica de uñas con licencia con más de 4 años de experiencia proporcionando servicios de manicura, pedicura y arte de uñas en entornos de salón y spa. Conocida por diseños creativos de arte de uñas, entrega eficiente de servicios y construcción de una clientela leal de más de 90 clientes regulares.',
+      skills: ['Manicuras', 'Pedicuras', 'Uñas de Gel', 'Aplicaciones de Acrílico', 'Arte de Uñas', 'Saneamiento', 'Servicio al Cliente', 'Teoría del Color', 'Consulta con Clientes', 'Ventas de Retail'],
+      experience: [
+        {
+          title: 'Técnica Senior de Uñas',
+          company: 'Paintbox Nails',
+          startDate: '2022-03',
+          isCurrent: true,
+          achievements: [
+            'Atendió a más de 35 clientes semanales con un ticket promedio de $85, generando $155K en ingresos anuales',
+            'Hizo crecer la base personal de clientes de 40 a 95 mediante marketing en redes sociales e incentivos de referencia',
+            'Creó más de 10 diseños exclusivos de arte de uñas presentados en la cuenta de Instagram del salón, ganando más de 5K seguidores',
+          ],
+        },
+        {
+          title: 'Técnica de Uñas',
+          company: 'Dashing Diva',
+          startDate: '2020-05',
+          endDate: '2022-02',
+          achievements: [
+            'Realizó más de 25 servicios de manicura y pedicura diarios con una calificación de clientes de 4.9/5.0',
+            'Aumentó las reservas de servicio de uñas de gel en un 30% mediante educación del cliente sobre los beneficios y durabilidad del gel',
+            'Mantuvo un 100% de cumplimiento de saneamiento en todas las inspecciones del departamento de salud',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Paul Mitchell The School', degree: 'Licencia', field: 'Tecnología de Uñas (400 horas)', startDate: '2019-06', endDate: '2020-03' },
+      ],
+      certifications: [
+        { name: 'Técnica de Uñas con Licencia', issuer: 'Junta Estatal de Cosmetología', date: '2020-04' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir una técnica de uñas en su currículum?', answer: 'Liste sus especialidades de servicio, volumen de clientes, ingresos generados, tasas de retención y cumplimiento de saneamiento. Incluya su licencia estatal y cualquier formación avanzada en arte de uñas.' },
+      { question: '¿Cómo demuestro creatividad en un currículum de técnica de uñas?', answer: 'Mencione diseños exclusivos, seguidores en redes sociales, premios de competencias y cualquier aparición en medios. Haga referencia a su portafolio o Instagram para ejemplos visuales.' },
+      { question: '¿Es importante mencionar la construcción de clientela en un currículum de técnica de uñas?', answer: 'Sí. El tamaño de la base de clientes, las tasas de re-reserva y el crecimiento impulsado por referencias demuestran su capacidad para generar ingresos y retener clientes para el salón.' },
+    ],
+  },
+  'fitness-trainer': {
+    slug: 'entrenador-de-fitness',
+    title: 'Entrenador de Fitness',
+    keywords: ['currículum de entrenador de fitness', 'CV de entrenador personal', 'plantilla de currículum de entrenador de gimnasio', 'currículum de entrenador personal certificado'],
+    searchIntents: ['cómo escribir un currículum de entrenador de fitness', 'ejemplos de currículum de entrenador personal', 'plantilla de currículum de entrenador de fitness certificado'],
+    topSkills: ['Entrenamiento Personal', 'Diseño de Programas', 'Guía Nutricional', 'Evaluación de Clientes', 'Fitness Grupal', 'Coaching Motivacional', 'Prevención de Lesiones', 'Establecimiento de Metas', 'Ventas y Retención', 'RCP/DEA'],
+    atsKeywords: ['entrenamiento personal', 'diseño de programas', 'coaching nutricional', 'evaluación de clientes', 'instrucción de fitness grupal', 'prevención de lesiones', 'establecimiento de metas', 'retención de clientes', 'evaluaciones de fitness', 'fisiología del ejercicio', 'entrenador personal certificado'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Derek',
+      lastName: 'Morrison',
+      profession: 'Entrenador de Fitness',
+      summary: 'Entrenador personal certificado con más de 5 años de experiencia ayudando a clientes a alcanzar sus metas de fitness mediante programas de entrenamiento personalizados y guía nutricional. Gestionó una cartera de más de 40 clientes con una tasa de retención del 85% y éxito comprobado en pérdida de peso, desarrollo de fuerza y rendimiento atlético.',
+      skills: ['Entrenamiento Personal', 'Diseño de Programas', 'Guía Nutricional', 'Evaluación de Clientes', 'Fitness Grupal', 'Coaching Motivacional', 'Prevención de Lesiones', 'Establecimiento de Metas', 'Ventas y Retención', 'RCP/DEA'],
+      experience: [
+        {
+          title: 'Entrenador Personal Senior',
+          company: 'Equinox',
+          startDate: '2021-10',
+          isCurrent: true,
+          achievements: [
+            'Mantuvo una cartera de 45 clientes de entrenamiento personal con ingresos mensuales de $18K y una tasa de retención del 88%',
+            'Ayudó a más de 30 clientes a alcanzar metas de pérdida de peso con un promedio de 25 libras en programas de 12 semanas',
+            'Dirigió 6 clases de fitness grupal por semana con una asistencia promedio de 25 participantes y una calificación de 4.9/5.0',
+          ],
+        },
+        {
+          title: 'Entrenador Personal',
+          company: 'LA Fitness',
+          startDate: '2019-04',
+          endDate: '2021-09',
+          achievements: [
+            'Hizo crecer los ingresos de entrenamiento personal de $5K a $12K por mes en 18 meses mediante adquisición de clientes y ventas adicionales',
+            'Realizó más de 200 evaluaciones de fitness por año, convirtiendo el 60% en paquetes de entrenamiento pagados',
+            'Desarrolló un programa de boot camp de 6 semanas que atrajo a más de 80 participantes en 4 sesiones',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'University of South Florida', degree: 'Licenciatura', field: 'Ciencias del Ejercicio', startDate: '2015-08', endDate: '2019-05' },
+      ],
+      certifications: [
+        { name: 'Entrenador Personal Certificado (CPT)', issuer: 'National Academy of Sports Medicine (NASM)', date: '2019-06' },
+        { name: 'Coach de Nutrición Certificado', issuer: 'NASM', date: '2020-11' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un entrenador de fitness en su currículum?', answer: 'Destaque sus certificaciones, tamaño de cartera de clientes, tasa de retención, ingresos generados e historias de éxito de clientes. Incluya especializaciones como pérdida de peso, rendimiento deportivo o fitness grupal.' },
+      { question: '¿Qué certificaciones son más valoradas para un currículum de entrenador de fitness?', answer: 'NASM-CPT, ACE-CPT, NSCA-CSCS y certificaciones ACSM son estándares de la industria. Agregue especializaciones como coaching nutricional, ejercicio correctivo o mejora del rendimiento.' },
+      { question: '¿Cómo demuestro resultados de clientes en un currículum de entrenador de fitness?', answer: 'Incluya métricas agregadas como pérdida de peso promedio, ganancias de fuerza o tasas de logro de metas en su base de clientes. Evite compartir detalles individuales de clientes sin permiso.' },
+    ],
+  },
+  'shipping-coordinator': {
+    slug: 'coordinador-de-envios',
+    title: 'Coordinador de Envíos',
+    keywords: ['currículum de coordinador de envíos', 'CV de especialista en envíos', 'currículum de logística de envíos', 'plantilla de currículum de coordinador de envíos'],
+    searchIntents: ['cómo escribir un currículum de coordinador de envíos', 'ejemplos de currículum de coordinador de envíos', 'plantilla de currículum de logística de envíos'],
+    topSkills: ['Operaciones de Envío', 'Procesamiento de Pedidos', 'Coordinación de Transportistas', 'Documentación', 'Seguimiento de Inventario', 'Software WMS', 'Negociación de Tarifas', 'Resolución de Problemas', 'Cumplimiento', 'Comunicación'],
+    atsKeywords: ['operaciones de envío', 'procesamiento de pedidos', 'coordinación de transportistas', 'documentación de envíos', 'seguimiento de inventario', 'WMS', 'negociación de tarifas', 'gestión de flete', 'cumplimiento', 'conocimiento de embarque', 'programas de envío'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Brandon',
+      lastName: 'Ortiz',
+      profession: 'Coordinador de Envíos',
+      summary: 'Coordinador de envíos con más de 4 años de experiencia gestionando operaciones de envío saliente para centros de distribución que procesan más de 5,000 pedidos semanales. Experto en coordinación de transportistas, documentación y plataformas WMS con enfoque en entrega puntual y eficiencia de costos.',
+      skills: ['Operaciones de Envío', 'Procesamiento de Pedidos', 'Coordinación de Transportistas', 'Documentación', 'Seguimiento de Inventario', 'Software WMS', 'Negociación de Tarifas', 'Resolución de Problemas', 'Cumplimiento', 'Comunicación'],
+      experience: [
+        {
+          title: 'Coordinador de Envíos',
+          company: 'Amazon',
+          startDate: '2022-01',
+          isCurrent: true,
+          achievements: [
+            'Coordinó el envío diario saliente de más de 6,000 paquetes con 15 transportistas con una tasa de entrega puntual del 99.2%',
+            'Negoció tarifas con transportistas ahorrando $140K anuales mientras mantuvo los acuerdos de nivel de servicio',
+            'Resolvió más de 200 discrepancias de envío por mes, reduciendo las escalaciones de clientes en un 35%',
+          ],
+        },
+        {
+          title: 'Asociado de Envíos',
+          company: 'FedEx Supply Chain',
+          startDate: '2020-03',
+          endDate: '2021-12',
+          achievements: [
+            'Procesó más de 800 órdenes de envío diarias usando Manhattan WMS con un 99.5% de precisión',
+            'Mejoró la eficiencia de empaque en un 18% mediante procedimientos estandarizados y reorganización de estaciones de trabajo',
+            'Capacitó a 10 nuevos asociados en procedimientos de envío, selección de transportistas y requisitos de documentación',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Tarrant County College', degree: 'Técnico Superior', field: 'Logística y Gestión de Cadena de Suministro', startDate: '2018-08', endDate: '2020-05' },
+      ],
+      certifications: [
+        { name: 'Asociado Certificado en Logística (CLA)', issuer: 'Manufacturing Skill Standards Council', date: '2020-08' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un coordinador de envíos en su currículum?', answer: 'Destaque volúmenes de pedidos, tasas de entrega puntual, cantidad de transportistas gestionados, ahorros de costos y plataformas WMS utilizadas. Incluya métricas de precisión y cualquier mejora de proceso implementada.' },
+      { question: '¿Qué habilidades de software importan para un currículum de coordinador de envíos?', answer: 'El dominio de plataformas WMS (Manhattan, SAP, Oracle), herramientas de gestión de transportistas y software de envío (ShipStation, EasyPost) son valiosos. Incluya sistemas ERP que haya utilizado.' },
+      { question: '¿Cómo demuestro resolución de problemas en un currículum de coordinador de envíos?', answer: 'Cuantifique discrepancias resueltas, reducciones de escalaciones de clientes y mejoras de procesos. Incluya ejemplos de manejo de desafíos de temporada alta o problemas con transportistas.' },
+    ],
+  },
+  'freight-broker': {
+    slug: 'agente-de-carga',
+    title: 'Agente de Carga',
+    keywords: ['currículum de agente de carga', 'CV de agente de flete', 'currículum de corredor de transporte', 'plantilla de currículum de corretaje de carga'],
+    searchIntents: ['cómo escribir un currículum de agente de carga', 'ejemplos de currículum de agente de carga', 'plantilla de currículum de agente de flete'],
+    topSkills: ['Negociación de Flete', 'Relaciones con Transportistas', 'Asignación de Cargas', 'Software TMS', 'Análisis de Tarifas', 'Adquisición de Clientes', 'Análisis de Mercado', 'Cumplimiento Regulatorio', 'Comunicación', 'Resolución de Problemas'],
+    atsKeywords: ['corretaje de flete', 'negociaciones con transportistas', 'asignación de cargas', 'software TMS', 'análisis de tarifas', 'adquisición de clientes', 'análisis de mercado de flete', 'cumplimiento DOT', 'envío FTL/LTL', 'gestión de márgenes', 'gestión de relaciones'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Mitchell',
+      lastName: 'Crawford',
+      profession: 'Agente de Carga',
+      summary: 'Agente de carga con más de 6 años de experiencia intermediando envíos FTL y LTL por un total de más de $8M en ingresos anuales de flete. Experto en negociaciones con transportistas, optimización de cargas y construcción de relaciones embarcador-transportista en rutas nacionales y transfronterizas.',
+      skills: ['Negociación de Flete', 'Relaciones con Transportistas', 'Asignación de Cargas', 'Software TMS', 'Análisis de Tarifas', 'Adquisición de Clientes', 'Análisis de Mercado', 'Cumplimiento Regulatorio', 'Comunicación', 'Resolución de Problemas'],
+      experience: [
+        {
+          title: 'Agente Senior de Carga',
+          company: 'C.H. Robinson',
+          startDate: '2021-02',
+          isCurrent: true,
+          achievements: [
+            'Gestionó una cartera de negocios que genera $4.5M en ingresos anuales de flete con un margen promedio del 14%',
+            'Construyó una red de más de 200 transportistas verificados, reduciendo el tiempo de asignación de cargas en un 30%',
+            'Adquirió 25 nuevas cuentas de embarcadores en 2 años, aumentando los ingresos del portafolio en un 35%',
+          ],
+        },
+        {
+          title: 'Agente de Carga',
+          company: 'XPO Logistics',
+          startDate: '2018-06',
+          endDate: '2021-01',
+          achievements: [
+            'Intermedió más de 1,500 cargas anuales en tipos de equipo de caja seca, refrigerado y plataforma',
+            'Negoció tarifas con transportistas logrando un margen promedio del 16% manteniendo una tasa de recogida puntual del 98%',
+            'Resolvió más de 50 reclamos y fallas de servicio por trimestre, reteniendo al 95% de los clientes afectados',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'University of Tennessee, Knoxville', degree: 'Licenciatura', field: 'Gestión de Cadena de Suministro', startDate: '2014-08', endDate: '2018-05' },
+      ],
+      certifications: [
+        { name: 'Corredor de Transporte Certificado (CTB)', issuer: 'Transportation Intermediaries Association', date: '2020-04' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe destacar un agente de carga en su currículum?', answer: 'Enfóquese en ingresos gestionados, porcentajes de margen, tamaño de red de transportistas, adquisición de nuevos clientes y volúmenes de cargas. Incluya tipos de equipo y especializaciones de rutas.' },
+      { question: '¿Se necesita una licencia de agente de carga en mi currículum?', answer: 'Si posee la credencial de Corredor de Transporte Certificado (CTB), inclúyala. También mencione familiaridad con requisitos de autoridad de corredor, fianzas y regulaciones DOT/FMCSA.' },
+      { question: '¿Cómo demuestro capacidad de ventas en un currículum de agente de carga?', answer: 'Incluya nuevas cuentas adquiridas, porcentajes de crecimiento de ingresos, tasas de retención de clientes y tamaño de portafolio. El corretaje de flete es fundamentalmente un rol impulsado por ventas.' },
+    ],
+  },
+  'customs-specialist': {
+    slug: 'especialista-en-aduanas',
+    title: 'Especialista en Aduanas',
+    keywords: ['currículum de especialista en aduanas', 'CV de agente aduanal', 'currículum de cumplimiento comercial', 'plantilla de currículum de despacho aduanero'],
+    searchIntents: ['cómo escribir un currículum de especialista en aduanas', 'ejemplos de currículum de especialista en aduanas', 'plantilla de currículum de agente aduanal'],
+    topSkills: ['Despacho Aduanero', 'Cumplimiento Comercial', 'Clasificación HTS', 'Documentación', 'Análisis Arancelario', 'Regulaciones de Importación/Exportación', 'Reembolso de Derechos', 'Portal ACE', 'Relaciones con Agentes', 'Resolución de Problemas'],
+    atsKeywords: ['despacho aduanero', 'cumplimiento comercial', 'clasificación HTS', 'análisis arancelario', 'regulaciones de importación', 'controles de exportación', 'reembolso de derechos', 'portal ACE', 'C-TPAT', 'corretaje aduanal', 'tratados de libre comercio'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Elena',
+      lastName: 'Volkov',
+      profession: 'Especialista en Aduanas',
+      summary: 'Especialista en aduanas con más de 5 años de experiencia gestionando cumplimiento de importación/exportación y despacho aduanero para mercancías valoradas en más de $50M anuales. Experta en clasificación HTS, regulaciones comerciales y optimización de derechos con un récord de cumplimiento del 100% en auditorías.',
+      skills: ['Despacho Aduanero', 'Cumplimiento Comercial', 'Clasificación HTS', 'Documentación', 'Análisis Arancelario', 'Regulaciones de Importación/Exportación', 'Reembolso de Derechos', 'Portal ACE', 'Relaciones con Agentes', 'Resolución de Problemas'],
+      experience: [
+        {
+          title: 'Especialista Senior en Aduanas',
+          company: 'UPS Supply Chain Solutions',
+          startDate: '2021-05',
+          isCurrent: true,
+          achievements: [
+            'Gestionó el despacho aduanero de más de 3,000 envíos mensuales valorados en $60M con una tasa de cumplimiento del 99.8%',
+            'Identificó $450K en ahorros de derechos mediante reclasificación HTS y utilización de tratados de libre comercio',
+            'Mantuvo cero penalidades en 4 auditorías de CBP mediante documentación rigurosa y protocolos de cumplimiento',
+          ],
+        },
+        {
+          title: 'Analista de Entradas Aduaneras',
+          company: 'Expeditors International',
+          startDate: '2019-01',
+          endDate: '2021-04',
+          achievements: [
+            'Procesó más de 2,000 entradas aduaneras mensuales de 40 países con una tasa de precisión del 99.5%',
+            'Redujo las retenciones aduaneras en un 40% mediante revisión proactiva de documentación y coordinación de pre-despacho',
+            'Capacitó a 5 analistas junior en clasificación HTS, uso del portal ACE y procedimientos de cumplimiento',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Baruch College, CUNY', degree: 'Licenciatura', field: 'Negocios Internacionales', startDate: '2015-08', endDate: '2019-05' },
+      ],
+      certifications: [
+        { name: 'Agente Aduanal con Licencia', issuer: 'U.S. Customs and Border Protection', date: '2021-10' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe destacar un especialista en aduanas en su currículum?', answer: 'Enfóquese en volumen de envíos, valor comercial gestionado, tasas de cumplimiento, ahorros de derechos logrados y resultados de auditorías. Incluya países y tratados comerciales en los que se especializa.' },
+      { question: '¿Es importante la licencia de agente aduanal para un currículum de especialista en aduanas?', answer: 'Altamente valiosa. La credencial de agente aduanal con licencia demuestra conocimiento avanzado y es requerida para presentar entradas en nombre de importadores. Inclúyala prominentemente.' },
+      { question: '¿Cómo demuestro ahorros de costos en un currículum de especialista en aduanas?', answer: 'Cuantifique los ahorros de derechos mediante reclasificación, utilización de tratados de libre comercio, reclamos de reembolso de derechos y evitación de penalidades. Incluya montos específicos en dólares.' },
+    ],
+  },
+  'import-export-specialist': {
+    slug: 'especialista-en-importacion-y-exportacion',
+    title: 'Especialista en Importación/Exportación',
+    keywords: ['currículum de especialista en importación y exportación', 'currículum de comercio internacional', 'CV de coordinador de importaciones', 'plantilla de currículum de cumplimiento de exportaciones'],
+    searchIntents: ['cómo escribir un currículum de especialista en importación y exportación', 'ejemplos de currículum de importación y exportación', 'plantilla de currículum de especialista en comercio internacional'],
+    topSkills: ['Operaciones de Importación/Exportación', 'Cumplimiento Comercial', 'Gestión Documental', 'Incoterms', 'Carta de Crédito', 'Transporte de Carga', 'Regulaciones Aduaneras', 'Coordinación de Proveedores', 'Sistemas ERP', 'Resolución de Problemas'],
+    atsKeywords: ['operaciones de importación', 'cumplimiento de exportaciones', 'documentación comercial', 'Incoterms', 'carta de crédito', 'transporte de carga', 'regulaciones aduaneras', 'cumplimiento EAR/ITAR', 'coordinación de proveedores', 'logística internacional', 'tratados comerciales'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Adrian',
+      lastName: 'Novak',
+      profession: 'Especialista en Importación/Exportación',
+      summary: 'Especialista en importación/exportación con más de 6 años de experiencia gestionando operaciones de comercio internacional en más de 30 países. Experto en cumplimiento comercial, gestión documental y coordinación de flete para empresas con más de $40M en volumen anual de comercio.',
+      skills: ['Operaciones de Importación/Exportación', 'Cumplimiento Comercial', 'Gestión Documental', 'Incoterms', 'Carta de Crédito', 'Transporte de Carga', 'Regulaciones Aduaneras', 'Coordinación de Proveedores', 'SAP ERP', 'Resolución de Problemas'],
+      experience: [
+        {
+          title: 'Gerente de Importación/Exportación',
+          company: 'Caterpillar Inc.',
+          startDate: '2021-03',
+          isCurrent: true,
+          achievements: [
+            'Gestionó operaciones de importación/exportación valoradas en $45M anuales en 35 países con cero violaciones de cumplimiento',
+            'Redujo los costos de envío internacional en un 20% mediante consolidación de transportistas y optimización de rutas',
+            'Implementó un sistema automatizado de documentación comercial reduciendo el tiempo de procesamiento de 4 horas a 45 minutos por envío',
+          ],
+        },
+        {
+          title: 'Coordinador de Importaciones',
+          company: 'DHL Global Forwarding',
+          startDate: '2018-07',
+          endDate: '2021-02',
+          achievements: [
+            'Coordinó más de 500 envíos mensuales de importación desde Asia y Europa con una tasa de despacho puntual del 98%',
+            'Gestionó documentación de cartas de crédito para $15M en comercio anual, logrando cero rechazos por discrepancias',
+            'Capacitó a 8 miembros del equipo en Incoterms 2020, documentación aduanera y procedimientos de cumplimiento',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Rutgers University', degree: 'Licenciatura', field: 'Gestión de Cadena de Suministro', startDate: '2014-08', endDate: '2018-05' },
+      ],
+      certifications: [
+        { name: 'Especialista Certificado en Exportaciones (CES)', issuer: 'National Customs Brokers & Forwarders Association', date: '2020-09' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un especialista en importación/exportación en su currículum?', answer: 'Destaque el volumen comercial gestionado, países cubiertos, récord de cumplimiento, ahorros de costos y competencia en documentación. Incluya conocimiento de Incoterms y tratados comerciales específicos.' },
+      { question: '¿Cómo demuestro experiencia en cumplimiento en un currículum de importación/exportación?', answer: 'Mencione resultados de auditorías, tasas de cumplimiento, conocimiento de regulaciones comerciales (EAR, ITAR, BIS) y penalidades evitadas. Un récord limpio de cumplimiento es un diferenciador importante.' },
+      { question: '¿Qué certificaciones son valiosas para profesionales de importación/exportación?', answer: 'Especialista Certificado en Exportaciones (CES), Licencia de Agente Aduanal y certificaciones CUSECO son altamente valoradas. Incluya cualquier capacitación en cumplimiento ITAR o EAR.' },
+    ],
+  },
+  'supply-chain-analyst': {
+    slug: 'analista-de-cadena-de-suministro',
+    title: 'Analista de Cadena de Suministro',
+    keywords: ['currículum de analista de cadena de suministro', 'CV de analítica de cadena de suministro', 'currículum de analista de logística', 'currículum de analista de datos de cadena de suministro'],
+    searchIntents: ['cómo escribir un currículum de analista de cadena de suministro', 'ejemplos de currículum de analista de cadena de suministro', 'plantilla de currículum de analista de logística'],
+    topSkills: ['Análisis de Datos', 'Pronóstico de Demanda', 'Optimización de Inventario', 'SQL', 'Excel/Power BI', 'Modelado de Cadena de Suministro', 'Mejora de Procesos', 'SAP/Oracle', 'Análisis Estadístico', 'Comunicación'],
+    atsKeywords: ['analítica de cadena de suministro', 'pronóstico de demanda', 'optimización de inventario', 'análisis de datos', 'SQL', 'Power BI', 'modelado de cadena de suministro', 'mejora de procesos', 'SAP', 'análisis de costos', 'reportes de KPI', 'análisis estadístico'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Christine',
+      lastName: 'Huang',
+      profession: 'Analista de Cadena de Suministro',
+      summary: 'Analista de cadena de suministro con más de 5 años de experiencia aprovechando la analítica de datos para optimizar niveles de inventario, mejorar el pronóstico de demanda y reducir costos de cadena de suministro. Competente en SQL, Power BI y SAP con un historial de entrega de más de $2M en ahorros anuales.',
+      skills: ['Análisis de Datos', 'Pronóstico de Demanda', 'Optimización de Inventario', 'SQL', 'Power BI', 'Modelado de Cadena de Suministro', 'Mejora de Procesos', 'SAP', 'Análisis Estadístico', 'Comunicación'],
+      experience: [
+        {
+          title: 'Analista Senior de Cadena de Suministro',
+          company: 'Procter & Gamble',
+          startDate: '2021-06',
+          isCurrent: true,
+          achievements: [
+            'Desarrolló modelos de pronóstico de demanda que mejoraron la precisión del 72% al 91%, reduciendo el exceso de inventario en $3.2M',
+            'Construyó tableros de Power BI rastreando más de 25 KPIs de cadena de suministro utilizados por la dirección en 4 unidades de negocio',
+            'Lideró un proyecto de optimización de stock de seguridad que redujo los costos de mantenimiento en $1.5M manteniendo un nivel de servicio del 98.5%',
+          ],
+        },
+        {
+          title: 'Analista de Cadena de Suministro',
+          company: 'Johnson & Johnson',
+          startDate: '2019-01',
+          endDate: '2021-05',
+          achievements: [
+            'Analizó más de $500M en gasto anual de adquisiciones para identificar $800K en oportunidades de reducción de costos',
+            'Automatizó reportes semanales usando SQL y Python, ahorrando 15 horas por semana en procesamiento manual de datos',
+            'Mejoró el rendimiento de entrega puntual del 89% al 96% mediante análisis de desempeño de transportistas y acciones correctivas',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Penn State University', degree: 'Licenciatura', field: 'Cadena de Suministro y Sistemas de Información', startDate: '2015-08', endDate: '2019-05' },
+      ],
+      certifications: [
+        { name: 'APICS Certificado en Planificación y Gestión de Inventarios (CPIM)', issuer: 'ASCM', date: '2021-11' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un analista de cadena de suministro en su currículum?', answer: 'Destaque herramientas analíticas utilizadas, ahorros de costos logrados, mejoras en precisión de pronósticos y tableros de KPIs construidos. Incluya impactos específicos en dólares y mejoras de procesos.' },
+      { question: '¿Qué habilidades técnicas importan más para un analista de cadena de suministro?', answer: 'SQL, Excel, Power BI/Tableau, Python/R y sistemas ERP (SAP, Oracle) son esenciales. Incluya experiencia en modelado estadístico y herramientas de pronóstico de demanda.' },
+      { question: '¿Es importante la certificación APICS para un currículum de analista de cadena de suministro?', answer: 'Sí. Las certificaciones CPIM y CSCP de ASCM son altamente valoradas y demuestran conocimiento de cadena de suministro más allá de las habilidades básicas de analítica.' },
+    ],
+  },
+  'materials-manager': {
+    slug: 'gerente-de-materiales',
+    title: 'Gerente de Materiales',
+    keywords: ['currículum de gerente de materiales', 'CV de gestión de materiales', 'currículum de gerente de planificación de materiales', 'currículum de director de materiales'],
+    searchIntents: ['cómo escribir un currículum de gerente de materiales', 'ejemplos de currículum de gerente de materiales', 'plantilla de currículum de gestión de materiales'],
+    topSkills: ['Planificación de Materiales', 'Gestión de Inventario', 'Sistemas MRP', 'Gestión de Proveedores', 'Planificación de Demanda', 'Reducción de Costos', 'Liderazgo de Equipo', 'Sistemas ERP', 'Manufactura Lean', 'Presupuestos'],
+    atsKeywords: ['planificación de materiales', 'gestión de inventario', 'sistemas MRP', 'gestión de proveedores', 'planificación de demanda', 'reducción de costos', 'sistemas ERP', 'manufactura lean', 'adquisiciones', 'operaciones de almacén', 'optimización de flujo de materiales'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Gerald',
+      lastName: 'Hutchinson',
+      profession: 'Gerente de Materiales',
+      summary: 'Gerente de materiales con más de 8 años de experiencia supervisando la planificación de materiales, adquisiciones y control de inventario para instalaciones de manufactura con más de $30M en gasto anual de materiales. Experto en sistemas MRP/ERP, prácticas lean y gestión de relaciones con proveedores.',
+      skills: ['Planificación de Materiales', 'Gestión de Inventario', 'Sistemas MRP', 'Gestión de Proveedores', 'Planificación de Demanda', 'Reducción de Costos', 'Liderazgo de Equipo', 'SAP ERP', 'Manufactura Lean', 'Presupuestos'],
+      experience: [
+        {
+          title: 'Gerente de Materiales',
+          company: '3M Company',
+          startDate: '2020-04',
+          isCurrent: true,
+          achievements: [
+            'Gestionó $35M en adquisiciones anuales de materiales para 3 líneas de manufactura, reduciendo costos de materiales en un 12% mediante consolidación de proveedores',
+            'Mejoró la rotación de inventario de 6.2 a 9.1 mediante optimización de planificación de demanda y ajuste de stock de seguridad',
+            'Lideró un equipo de 8 planificadores y compradores, logrando una tasa de disponibilidad oportuna de materiales del 99.2%',
+          ],
+        },
+        {
+          title: 'Planificador de Materiales',
+          company: 'Honeywell',
+          startDate: '2016-08',
+          endDate: '2020-03',
+          achievements: [
+            'Planificó los requisitos de materiales para más de 500 SKUs en 2 instalaciones de producción usando SAP MRP',
+            'Redujo el inventario de materia prima en $2.8M mediante análisis ABC y optimización de mín/máx',
+            'Identificó y calificó 15 proveedores alternativos, creando redundancia en la cadena de suministro y evitando $600K en costos de desabastecimiento',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'University of Michigan', degree: 'Licenciatura', field: 'Ingeniería Industrial y de Operaciones', startDate: '2012-08', endDate: '2016-05' },
+      ],
+      certifications: [
+        { name: 'APICS CPIM', issuer: 'ASCM', date: '2019-05' },
+        { name: 'Lean Six Sigma Green Belt', issuer: 'ASQ', date: '2021-02' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe destacar un gerente de materiales en su currículum?', answer: 'Enfóquese en gasto de materiales gestionado, ahorros de costos, rotación de inventario, tasas de disponibilidad oportuna y tamaño del equipo. Incluya sistemas ERP/MRP utilizados y experiencia en metodología lean.' },
+      { question: '¿Cómo demuestro ahorros de costos en un currículum de gerente de materiales?', answer: 'Cuantifique ahorros de consolidación de proveedores, reducción de inventario, mejoras en planificación de demanda y eliminación de desperdicios. Incluya montos en dólares y porcentajes de mejora.' },
+      { question: '¿Qué certificaciones son valiosas para un gerente de materiales?', answer: 'APICS CPIM y CSCP, Lean Six Sigma (Green/Black Belt) e ISM CPSM son altamente valoradas. Estas demuestran experiencia en planificación y capacidades de mejora continua.' },
+    ],
+  },
+  'production-planner': {
+    slug: 'planificador-de-produccion',
+    title: 'Planificador de Producción',
+    keywords: ['currículum de planificador de producción', 'CV de planificación de producción', 'currículum de planificador de manufactura', 'plantilla de currículum de programador de producción'],
+    searchIntents: ['cómo escribir un currículum de planificador de producción', 'ejemplos de currículum de planificador de producción', 'plantilla de currículum de programación de producción'],
+    topSkills: ['Programación de Producción', 'Planificación de Capacidad', 'Sistemas MRP/ERP', 'Pronóstico de Demanda', 'Gestión de Inventario', 'Coordinación Multifuncional', 'Análisis de Datos', 'Manufactura Lean', 'Resolución de Problemas', 'Comunicación'],
+    atsKeywords: ['programación de producción', 'planificación de capacidad', 'MRP', 'pronóstico de demanda', 'gestión de inventario', 'programa maestro de producción', 'manufactura lean', 'optimización de producción', 'sistemas ERP', 'proceso S&OP', 'programación de lotes'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Stephanie',
+      lastName: 'Warner',
+      profession: 'Planificador de Producción',
+      summary: 'Planificadora de producción con más de 5 años de experiencia gestionando programas maestros de producción para instalaciones de manufactura que producen más de $50M en producción anual. Experta en planificación de capacidad, pronóstico de demanda y coordinación multifuncional para maximizar el rendimiento y minimizar el tiempo de inactividad.',
+      skills: ['Programación de Producción', 'Planificación de Capacidad', 'SAP MRP', 'Pronóstico de Demanda', 'Gestión de Inventario', 'Coordinación Multifuncional', 'Análisis de Datos', 'Manufactura Lean', 'Resolución de Problemas', 'Comunicación'],
+      experience: [
+        {
+          title: 'Planificadora Senior de Producción',
+          company: 'General Electric',
+          startDate: '2021-08',
+          isCurrent: true,
+          achievements: [
+            'Gestionó programas maestros de producción para 3 líneas de manufactura que producen $55M anuales con un cumplimiento de programación del 96%',
+            'Redujo el tiempo de cambio de producción en un 25% mediante secuenciación optimizada de lotes y algoritmos de programación',
+            'Mejoró la entrega puntual del 88% al 97% mediante planificación proactiva de capacidad y análisis de cuellos de botella',
+          ],
+        },
+        {
+          title: 'Planificadora de Producción',
+          company: 'Kimberly-Clark',
+          startDate: '2019-02',
+          endDate: '2021-07',
+          achievements: [
+            'Programó la producción de más de 200 SKUs en 2 plantas usando SAP APO, manteniendo un cumplimiento de programación del 94%',
+            'Participó en el proceso S&OP, mejorando la precisión del pronóstico de demanda del 75% al 88%',
+            'Redujo el desperdicio de materia prima en un 15% mediante optimización de corridas de producción y ajustes de recetas',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Ohio State University', degree: 'Licenciatura', field: 'Ingeniería Industrial', startDate: '2015-08', endDate: '2019-05' },
+      ],
+      certifications: [
+        { name: 'APICS CPIM', issuer: 'ASCM', date: '2020-09' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un planificador de producción en su currículum?', answer: 'Destaque volumen de producción, tasas de cumplimiento de programación, mejoras en entrega puntual y complejidad de SKUs gestionados. Incluya sistemas ERP utilizados y cualquier experiencia lean o S&OP.' },
+      { question: '¿Qué tan importante es la experiencia en ERP para un currículum de planificador de producción?', answer: 'Crítica. Se espera experiencia en SAP, Oracle o ERP/MRP similares. Especifique los módulos que ha utilizado (APO, PP, MRP) y cualquier herramienta de planificación avanzada.' },
+      { question: '¿Debo mencionar la experiencia en S&OP en mi currículum de planificador de producción?', answer: 'Sí. La participación en Planificación de Ventas y Operaciones demuestra pensamiento estratégico más allá de la programación diaria. Mencione su rol y cualquier mejora en la precisión del pronóstico.' },
+    ],
+  },
+  'manufacturing-engineer': {
+    slug: 'ingeniero-de-manufactura',
+    title: 'Ingeniero de Manufactura',
+    keywords: ['currículum de ingeniero de manufactura', 'CV de ingeniería de manufactura', 'currículum de manufactura de procesos', 'plantilla de currículum de ingeniero de manufactura'],
+    searchIntents: ['cómo escribir un currículum de ingeniero de manufactura', 'ejemplos de currículum de ingeniero de manufactura', 'plantilla de CV de ingeniería de manufactura'],
+    topSkills: ['Optimización de Procesos', 'Manufactura Lean', 'CAD/CAM', 'Six Sigma', 'Análisis de Causa Raíz', 'Diseño de Herramental', 'SPC', 'Automatización', 'Sistemas de Calidad', 'Gestión de Proyectos'],
+    atsKeywords: ['optimización de procesos', 'manufactura lean', 'Six Sigma', 'CAD/CAM', 'análisis de causa raíz', 'diseño de herramental', 'SPC', 'automatización', 'sistemas de calidad', 'mejora continua', 'DFM', 'eficiencia de producción'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Ryan',
+      lastName: 'Fitzgerald',
+      profession: 'Ingeniero de Manufactura',
+      summary: 'Ingeniero de manufactura con más de 6 años de experiencia optimizando procesos de producción, implementando metodologías lean e impulsando la mejora continua en entornos de manufactura de alto volumen. Entregó más de $3M en ahorros de costos acumulados mediante rediseño de procesos y automatización.',
+      skills: ['Optimización de Procesos', 'Manufactura Lean', 'SolidWorks', 'Six Sigma', 'Análisis de Causa Raíz', 'Diseño de Herramental', 'SPC', 'Automatización', 'Sistemas de Calidad', 'Gestión de Proyectos'],
+      experience: [
+        {
+          title: 'Ingeniero Senior de Manufactura',
+          company: 'Tesla',
+          startDate: '2021-03',
+          isCurrent: true,
+          achievements: [
+            'Rediseñó procesos de ensamblaje para producción de módulos de baterías, aumentando el rendimiento en un 30% y reduciendo defectos en un 45%',
+            'Lideró proyectos de automatización por un total de $2M en inversión de capital, logrando ROI en 14 meses mediante ahorros laborales de $1.4M anuales',
+            'Implementó monitoreo SPC en 8 procesos críticos, reduciendo la producción fuera de especificación en un 60%',
+          ],
+        },
+        {
+          title: 'Ingeniero de Manufactura',
+          company: 'Medtronic',
+          startDate: '2018-06',
+          endDate: '2021-02',
+          achievements: [
+            'Optimizó procesos de ensamblaje de dispositivos médicos usando metodología DMAIC, reduciendo el tiempo de ciclo en un 20% y el scrap en un 35%',
+            'Diseñó y validó más de 15 fixtures y herramentales personalizados, reduciendo el tiempo de preparación en un 40%',
+            'Realizó más de 50 análisis de causa raíz, resolviendo problemas crónicos de producción y ahorrando $400K anuales en costos de retrabajo',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Purdue University', degree: 'Licenciatura', field: 'Ingeniería de Manufactura', startDate: '2014-08', endDate: '2018-05' },
+      ],
+      certifications: [
+        { name: 'Lean Six Sigma Black Belt', issuer: 'ASQ', date: '2022-01' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un ingeniero de manufactura en su currículum?', answer: 'Destaque mejoras de procesos con métricas (ganancias de rendimiento, reducciones de defectos, ahorros de costos), proyectos de automatización y herramientas lean/Six Sigma utilizadas. Incluya procesos de manufactura e industrias específicas.' },
+      { question: '¿Qué tan importante es la certificación Six Sigma para un ingeniero de manufactura?', answer: 'Muy importante. La certificación Green Belt o Black Belt demuestra capacidad de resolución de problemas estructurada. Incluya proyectos específicos DMAIC o Kaizen con resultados cuantificados.' },
+      { question: '¿Debo incluir software CAD en mi currículum de ingeniero de manufactura?', answer: 'Sí. Liste herramientas específicas de CAD/CAM (SolidWorks, AutoCAD, CATIA) y software de simulación. Incluya diseños de herramental o fixtures que haya creado.' },
+    ],
+  },
+  'quality-control-inspector': {
+    slug: 'inspector-de-control-de-calidad',
+    title: 'Inspector de Control de Calidad',
+    keywords: ['currículum de inspector de control de calidad', 'CV de inspector de QC', 'plantilla de currículum de inspector de calidad', 'currículum de técnico de inspección'],
+    searchIntents: ['cómo escribir un currículum de inspector de control de calidad', 'ejemplos de currículum de inspector de QC', 'plantilla de currículum de inspector de calidad'],
+    topSkills: ['Técnicas de Inspección', 'Lectura de Planos', 'Instrumentos de Medición', 'GD&T', 'SPC', 'Documentación', 'Normas ISO', 'Análisis de Causa Raíz', 'Atención al Detalle', 'Reportes'],
+    atsKeywords: ['inspección de calidad', 'lectura de planos', 'instrumentos de medición', 'GD&T', 'SPC', 'ISO 9001', 'análisis de causa raíz', 'reportes de no conformidad', 'inspección de primer artículo', 'operación de CMM', 'documentación de calidad'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Tony',
+      lastName: 'Marchetti',
+      profession: 'Inspector de Control de Calidad',
+      summary: 'Inspector de control de calidad con más de 5 años de experiencia realizando inspecciones de entrada, en proceso y finales en manufactura aeroespacial y automotriz. Competente en operación de CMM, interpretación de GD&T y sistemas de calidad ISO 9001 con una tasa de precisión de inspección del 99.7%.',
+      skills: ['Técnicas de Inspección', 'Lectura de Planos', 'Operación de CMM', 'GD&T', 'SPC', 'Documentación', 'ISO 9001', 'Análisis de Causa Raíz', 'Atención al Detalle', 'Calibradores y Micrómetros'],
+      experience: [
+        {
+          title: 'Inspector Senior de Calidad',
+          company: 'Boeing',
+          startDate: '2021-07',
+          isCurrent: true,
+          achievements: [
+            'Realizó más de 200 inspecciones semanales en componentes aeroespaciales con una tasa de precisión del 99.8% y cero escapes al cliente',
+            'Identificó un patrón recurrente de defectos que llevó a una corrección de herramental, eliminando $250K en costos anuales de scrap',
+            'Capacitó a 6 inspectores junior en programación de CMM, interpretación de GD&T y documentación de no conformidades',
+          ],
+        },
+        {
+          title: 'Inspector de Control de Calidad',
+          company: 'BorgWarner',
+          startDate: '2019-03',
+          endDate: '2021-06',
+          achievements: [
+            'Inspeccionó más de 500 piezas automotrices diarias usando calibradores, micrómetros y equipo CMM según normas IATF 16949',
+            'Redujo las quejas de calidad de clientes en un 30% mediante protocolos mejorados de inspección de entrada',
+            'Participó en más de 10 investigaciones de causa raíz usando metodología 8D, resolviendo problemas dentro de los objetivos de 48 horas',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Wichita State University', degree: 'Técnico Superior', field: 'Tecnología de Aseguramiento de Calidad', startDate: '2016-08', endDate: '2018-05' },
+      ],
+      certifications: [
+        { name: 'Inspector de Calidad Certificado ASQ (CQI)', issuer: 'American Society for Quality', date: '2019-11' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un inspector de control de calidad en su currículum?', answer: 'Liste volúmenes de inspección, tasas de precisión, instrumentos de medición operados, normas seguidas (ISO, AS9100, IATF) y logros en detección de defectos. Incluya industrias específicas atendidas.' },
+      { question: '¿Qué tan importante es la experiencia en CMM para un currículum de inspector de QC?', answer: 'Muy importante para roles de manufactura de precisión. Incluya marcas específicas de CMM operadas (Zeiss, Hexagon), lenguajes de programación (PCDMIS, Calypso) y capacidades de medición.' },
+      { question: '¿Debo listar normas de calidad en mi currículum de inspector?', answer: 'Sí. Liste todas las normas de calidad con las que tiene experiencia (ISO 9001, AS9100, IATF 16949, ISO 13485) ya que indican conocimiento específico de la industria.' },
+    ],
+  },
+  'quality-assurance-manager': {
+    slug: 'gerente-de-aseguramiento-de-calidad',
+    title: 'Gerente de Aseguramiento de Calidad',
+    keywords: ['currículum de gerente de aseguramiento de calidad', 'CV de gerente de QA', 'plantilla de currículum de gerente de calidad', 'currículum de director de calidad'],
+    searchIntents: ['cómo escribir un currículum de gerente de aseguramiento de calidad', 'ejemplos de currículum de gerente de QA', 'plantilla de CV de gerente de calidad'],
+    topSkills: ['Sistemas de Gestión de Calidad', 'ISO 9001', 'Gestión de Auditorías', 'CAPA', 'Liderazgo de Equipo', 'Análisis Estadístico', 'Cumplimiento Regulatorio', 'Mejora de Procesos', 'Calidad de Proveedores', 'Evaluación de Riesgos'],
+    atsKeywords: ['sistemas de gestión de calidad', 'ISO 9001', 'gestión de auditorías', 'CAPA', 'liderazgo de equipo', 'análisis estadístico', 'cumplimiento regulatorio', 'mejora de procesos', 'gestión de calidad de proveedores', 'evaluación de riesgos', 'resolución de quejas de clientes', 'mejora continua'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Sandra',
+      lastName: 'Blackwell',
+      profession: 'Gerente de Aseguramiento de Calidad',
+      summary: 'Gerente de aseguramiento de calidad con más de 9 años de experiencia construyendo y manteniendo sistemas de gestión de calidad para organizaciones de manufactura. Lideró certificaciones ISO 9001, gestionó programas de auditoría e impulsó iniciativas de mejora continua reduciendo defectos en más del 50%.',
+      skills: ['Sistemas de Gestión de Calidad', 'ISO 9001', 'Gestión de Auditorías', 'CAPA', 'Liderazgo de Equipo', 'Análisis Estadístico', 'Cumplimiento Regulatorio', 'Mejora de Procesos', 'Calidad de Proveedores', 'Evaluación de Riesgos'],
+      experience: [
+        {
+          title: 'Gerente de Aseguramiento de Calidad',
+          company: 'Emerson Electric',
+          startDate: '2020-01',
+          isCurrent: true,
+          achievements: [
+            'Lideró la certificación ISO 9001:2015 y mantuvo el cumplimiento en 3 instalaciones de manufactura con cero no conformidades mayores',
+            'Redujo las quejas de clientes en un 55% mediante un proceso renovado de CAPA y un programa de mejora de calidad de proveedores',
+            'Gestionó un equipo de calidad de 12 personas, incluyendo inspectores e ingenieros de calidad, logrando una reducción del 40% en tasas de defectos internos',
+          ],
+        },
+        {
+          title: 'Ingeniera de Calidad',
+          company: 'Parker Hannifin',
+          startDate: '2015-09',
+          endDate: '2019-12',
+          achievements: [
+            'Realizó más de 30 auditorías internas y de proveedores anualmente, identificando oportunidades de mejora que ahorraron más de $500K',
+            'Implementó SPC en 15 procesos críticos, reduciendo la variación del proceso en un 35%',
+            'Lideró más de 20 investigaciones CAPA logrando verificación de efectividad del 100% dentro de los objetivos de 90 días',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Rochester Institute of Technology', degree: 'Licenciatura', field: 'Ingeniería Industrial', startDate: '2011-08', endDate: '2015-05' },
+      ],
+      certifications: [
+        { name: 'Gerente de Calidad Certificado ASQ (CQM)', issuer: 'American Society for Quality', date: '2020-06' },
+        { name: 'Auditor Líder ISO 9001:2015', issuer: 'Exemplar Global', date: '2019-03' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un gerente de aseguramiento de calidad en su currículum?', answer: 'Destaque implementaciones de SGC, resultados de auditorías, métricas de reducción de defectos, tamaño del equipo y certificaciones mantenidas. Incluya normas de calidad e industrias específicas atendidas.' },
+      { question: '¿Cómo demuestro liderazgo en un currículum de gerente de QA?', answer: 'Cuantifique el tamaño del equipo, programas de auditoría gestionados, iniciativas multifuncionales lideradas y cambio cultural impulsado. Incluya gestión de CAPA, programas de capacitación desarrollados y presentaciones de revisión por la dirección.' },
+      { question: '¿Qué certificaciones importan más para un gerente de QA?', answer: 'ASQ CQM/OE, certificaciones de Auditor Líder y Six Sigma Black Belt son altamente valoradas. Certificaciones específicas de la industria (AS9100, IATF) agregan mayor diferenciación.' },
+    ],
+  },
+  'lean-manufacturing-specialist': {
+    slug: 'especialista-en-manufactura-lean',
+    title: 'Especialista en Manufactura Lean',
+    keywords: ['currículum de especialista en manufactura lean', 'CV de consultor lean', 'currículum de mejora continua', 'plantilla de currículum de especialista lean'],
+    searchIntents: ['cómo escribir un currículum de especialista en manufactura lean', 'ejemplos de currículum de especialista lean', 'plantilla de currículum de mejora continua'],
+    topSkills: ['Metodología Lean', 'Eventos Kaizen', 'Mapeo de Flujo de Valor', '5S', 'Kanban', 'Eliminación de Desperdicios', 'Trabajo Estándar', 'TPM', 'Gestión del Cambio', 'Capacitación y Facilitación'],
+    atsKeywords: ['manufactura lean', 'Kaizen', 'mapeo de flujo de valor', '5S', 'Kanban', 'eliminación de desperdicios', 'trabajo estándar', 'TPM', 'mejora continua', 'gestión del cambio', 'PDCA', 'análisis de causa raíz'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Keith',
+      lastName: 'Nakamura',
+      profession: 'Especialista en Manufactura Lean',
+      summary: 'Especialista en manufactura lean con más de 7 años de experiencia impulsando la mejora continua en manufactura automotriz y de bienes de consumo. Facilitó más de 50 eventos Kaizen entregando más de $5M en ahorros acumulados mediante eliminación de desperdicios, optimización de procesos y transformación cultural.',
+      skills: ['Metodología Lean', 'Eventos Kaizen', 'Mapeo de Flujo de Valor', '5S', 'Kanban', 'Eliminación de Desperdicios', 'Trabajo Estándar', 'TPM', 'Gestión del Cambio', 'Capacitación y Facilitación'],
+      experience: [
+        {
+          title: 'Especialista Senior Lean',
+          company: 'Toyota Motor North America',
+          startDate: '2020-06',
+          isCurrent: true,
+          achievements: [
+            'Facilitó más de 20 eventos Kaizen anualmente entregando más de $2M en ahorros anuales mediante reducción de desperdicios y optimización de procesos',
+            'Implementó sistemas Kanban en 4 líneas de producción, reduciendo el inventario en proceso en un 40% y el tiempo de entrega en un 25%',
+            'Capacitó a más de 200 empleados en principios lean, 5S y trabajo estándar, construyendo una cultura de mejora continua',
+          ],
+        },
+        {
+          title: 'Ingeniero de Mejora Continua',
+          company: 'Whirlpool Corporation',
+          startDate: '2017-04',
+          endDate: '2020-05',
+          achievements: [
+            'Lideró ejercicios de mapeo de flujo de valor que identificaron $1.8M en oportunidades de mejora en 3 familias de productos',
+            'Redujo las tasas de defectos en línea de ensamblaje en un 45% mediante implementación de trabajo estándar y dispositivos Poka-Yoke',
+            'Logró puntajes de auditoría 5S del 95% en 6 celdas de manufactura mediante coaching y sistemas de rendición de cuentas',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'University of Kentucky', degree: 'Licenciatura', field: 'Ingeniería Mecánica', startDate: '2013-08', endDate: '2017-05' },
+      ],
+      certifications: [
+        { name: 'Lean Six Sigma Black Belt', issuer: 'ASQ', date: '2020-11' },
+        { name: 'Practicante Lean Certificado', issuer: 'Society of Manufacturing Engineers', date: '2018-09' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un especialista en manufactura lean en su currículum?', answer: 'Destaque conteos de eventos Kaizen, ahorros entregados, herramientas utilizadas (VSM, 5S, Kanban) e iniciativas de cambio cultural. Incluya personas capacitadas y mejoras específicas de procesos logradas.' },
+      { question: '¿Cómo cuantifico resultados de manufactura lean?', answer: 'Use métricas como ahorros de costos, reducciones de tiempo de entrega, reducciones de inventario, mejoras en tasas de defectos y ganancias de rendimiento. Siempre vincule las actividades lean a resultados financieros u operativos.' },
+      { question: '¿Es importante la experiencia en la industria para un currículum de especialista lean?', answer: 'Sí. Aunque los principios lean son universales, el conocimiento específico de la industria (automotriz, aeroespacial, médica) agrega valor. Mencione procesos de manufactura y entornos regulatorios específicos.' },
+    ],
+  },
+  'process-engineer': {
+    slug: 'ingeniero-de-procesos',
+    title: 'Ingeniero de Procesos',
+    keywords: ['currículum de ingeniero de procesos', 'CV de ingeniería de procesos', 'currículum de ingeniero de procesos químicos', 'currículum de ingeniero de mejora de procesos'],
+    searchIntents: ['cómo escribir un currículum de ingeniero de procesos', 'ejemplos de currículum de ingeniero de procesos', 'plantilla de CV de ingeniería de procesos'],
+    topSkills: ['Diseño de Procesos', 'Optimización de Procesos', 'Análisis Estadístico', 'DOE', 'Six Sigma', 'Desarrollo de P&ID', 'Software de Simulación', 'Escalamiento', 'Resolución de Problemas', 'Documentación Técnica'],
+    atsKeywords: ['diseño de procesos', 'optimización de procesos', 'DOE', 'Six Sigma', 'P&ID', 'simulación de procesos', 'escalamiento', 'resolución de problemas', 'SPC', 'validación de procesos', 'ingeniería química', 'mejora continua'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Nathan',
+      lastName: 'Eriksson',
+      profession: 'Ingeniero de Procesos',
+      summary: 'Ingeniero de procesos con más de 6 años de experiencia diseñando, optimizando y escalando procesos de manufactura en industrias química y farmacéutica. Experto en DOE, simulación de procesos y Six Sigma con un historial de mejora de rendimientos en más del 15% y reducción de tiempos de ciclo.',
+      skills: ['Diseño de Procesos', 'Optimización de Procesos', 'Minitab', 'DOE', 'Six Sigma', 'Desarrollo de P&ID', 'Aspen HYSYS', 'Escalamiento', 'Resolución de Problemas', 'Documentación Técnica'],
+      experience: [
+        {
+          title: 'Ingeniero Senior de Procesos',
+          company: 'Dow Chemical',
+          startDate: '2021-01',
+          isCurrent: true,
+          achievements: [
+            'Optimizó un proceso de polimerización aumentando el rendimiento en un 18% y reduciendo el consumo de energía en un 12%, ahorrando $2.1M anuales',
+            'Diseñó y ejecutó más de 25 estudios DOE para identificar parámetros óptimos de proceso para 3 lanzamientos de nuevos productos',
+            'Desarrolló modelos de simulación de procesos en Aspen HYSYS que redujeron el tiempo de pruebas de escalamiento en un 40%',
+          ],
+        },
+        {
+          title: 'Ingeniero de Procesos',
+          company: 'Pfizer',
+          startDate: '2018-07',
+          endDate: '2020-12',
+          achievements: [
+            'Lideró la validación de procesos para 4 productos farmacéuticos, logrando aprobación de la FDA en primera presentación para todos',
+            'Redujo el tiempo de ciclo de lote en un 22% mediante optimización de parámetros de proceso y mejoras de equipos',
+            'Redactó más de 50 documentos técnicos incluyendo descripciones de procesos, SOPs e investigaciones de desviaciones',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'University of Delaware', degree: 'Licenciatura', field: 'Ingeniería Química', startDate: '2014-08', endDate: '2018-05' },
+      ],
+      certifications: [
+        { name: 'Lean Six Sigma Green Belt', issuer: 'ASQ', date: '2020-03' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un ingeniero de procesos en su currículum?', answer: 'Destaque mejoras de rendimiento, ahorros de costos, validaciones de procesos y experiencia de escalamiento. Incluya herramientas específicas (Aspen, Minitab), metodologías (DOE, Six Sigma) e industrias atendidas.' },
+      { question: '¿Qué tan importante es el software de simulación para un currículum de ingeniero de procesos?', answer: 'Muy importante. Liste herramientas de simulación de procesos (Aspen HYSYS, COMSOL, ChemCAD) y software estadístico (Minitab, JMP). Incluya ejemplos de cómo las simulaciones mejoraron los resultados.' },
+      { question: '¿Debo incluir experiencia regulatoria en un currículum de ingeniero de procesos?', answer: 'Sí. La experiencia regulatoria con FDA, EPA u OSHA es un diferenciador significativo, especialmente en manufactura farmacéutica y química.' },
+    ],
+  },
+  'production-supervisor': {
+    slug: 'supervisor-de-produccion',
+    title: 'Supervisor de Producción',
+    keywords: ['currículum de supervisor de producción', 'CV de supervisor de manufactura', 'currículum de supervisor de piso de producción', 'plantilla de currículum de supervisor de turno'],
+    searchIntents: ['cómo escribir un currículum de supervisor de producción', 'ejemplos de currículum de supervisor de producción', 'plantilla de CV de supervisor de manufactura'],
+    topSkills: ['Gestión de Producción', 'Liderazgo de Equipo', 'Manufactura Lean', 'Gestión de Seguridad', 'Control de Calidad', 'Programación', 'Gestión del Desempeño', 'Resolución de Problemas', 'Mejora Continua', 'Sistemas ERP'],
+    atsKeywords: ['gestión de producción', 'liderazgo de equipo', 'manufactura lean', 'gestión de seguridad', 'control de calidad', 'programación', 'gestión del desempeño', 'gestión de turno', 'mejora continua', 'gestión de KPIs', 'desarrollo de empleados'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Michael',
+      lastName: 'Castillo',
+      profession: 'Supervisor de Producción',
+      summary: 'Supervisor de producción con más de 7 años de experiencia liderando equipos de manufactura de 25-50 empleados en entornos de producción de alto volumen. Experto en manufactura lean, cumplimiento de seguridad y optimización de productividad con un récord de superar objetivos de producción en más del 10%.',
+      skills: ['Gestión de Producción', 'Liderazgo de Equipo', 'Manufactura Lean', 'Gestión de Seguridad', 'Control de Calidad', 'Programación', 'Gestión del Desempeño', 'Resolución de Problemas', 'Mejora Continua', 'SAP'],
+      experience: [
+        {
+          title: 'Supervisor de Producción',
+          company: 'Procter & Gamble',
+          startDate: '2020-09',
+          isCurrent: true,
+          achievements: [
+            'Supervisó un equipo de 40 trabajadores de producción en 2 turnos, superando consistentemente los objetivos de producción en un 12%',
+            'Redujo los incidentes con tiempo perdido en un 60% mediante un programa de observación de seguridad conductual y reuniones diarias de seguridad',
+            'Mejoró el OEE del 72% al 86% mediante reducción de cambios, mantenimiento preventivo e iniciativas de capacitación de operadores',
+          ],
+        },
+        {
+          title: 'Líder de Línea',
+          company: 'Anheuser-Busch InBev',
+          startDate: '2017-03',
+          endDate: '2020-08',
+          achievements: [
+            'Lideró un equipo de línea de empaque de 15 personas, logrando la mayor eficiencia en la planta con una tasa de operación del 94%',
+            'Capacitó a más de 20 operadores en procedimientos de trabajo estándar y controles de calidad, reduciendo defectos en un 35%',
+            'Implementó un programa 5S en 3 celdas de trabajo, mejorando los puntajes de organización del 65% al 95%',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'University of Wisconsin-Milwaukee', degree: 'Licenciatura', field: 'Tecnología de Ingeniería de Manufactura', startDate: '2013-08', endDate: '2017-05' },
+      ],
+      certifications: [
+        { name: 'OSHA 30 Horas Industria General', issuer: 'OSHA', date: '2020-11' },
+        { name: 'Lean Six Sigma Green Belt', issuer: 'ASQ', date: '2021-06' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un supervisor de producción en su currículum?', answer: 'Destaque tamaño del equipo, objetivos de producción superados, récord de seguridad, mejoras de OEE e iniciativas lean lideradas. Incluya industrias y procesos de producción específicos gestionados.' },
+      { question: '¿Cómo demuestro liderazgo en seguridad en un currículum de supervisor de producción?', answer: 'Incluya mejoras en TRIR/LTIR, implementaciones de programas de seguridad, puntajes de auditoría y capacitación impartida. Un sólido récord de seguridad es una prioridad principal para empleadores de manufactura.' },
+      { question: '¿Es importante la experiencia en manufactura lean para un supervisor de producción?', answer: 'Sí. Demuestre aplicación práctica de lean mediante 5S, Kaizen, trabajo estándar y mejoras de OEE. Incluya certificaciones y herramientas lean específicas que haya aplicado en el piso de producción.' },
+    ],
+  },
+  'plant-manager': {
+    slug: 'gerente-de-planta',
+    title: 'Gerente de Planta',
+    keywords: ['currículum de gerente de planta', 'CV de gerente de fábrica', 'currículum de gerente de planta de manufactura', 'plantilla de currículum de director de planta'],
+    searchIntents: ['cómo escribir un currículum de gerente de planta', 'ejemplos de currículum de gerente de planta', 'plantilla de CV de gerente de planta de manufactura'],
+    topSkills: ['Operaciones de Planta', 'Gestión de P&L', 'Planificación Estratégica', 'Liderazgo de Equipo', 'Manufactura Lean', 'Gestión de Seguridad', 'Proyectos de Capital', 'Presupuestos', 'Cumplimiento Regulatorio', 'Mejora Continua'],
+    atsKeywords: ['operaciones de planta', 'gestión de P&L', 'planificación estratégica', 'liderazgo de equipo', 'manufactura lean', 'gestión de seguridad', 'proyectos de capital', 'presupuestos', 'cumplimiento regulatorio', 'mejora continua', 'OEE', 'eficiencia de producción'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Robert',
+      lastName: 'Andersen',
+      profession: 'Gerente de Planta',
+      summary: 'Gerente de planta con más de 12 años de experiencia liderando operaciones de manufactura para instalaciones con más de 200 empleados y más de $80M en producción anual. Historial comprobado de mejora de rentabilidad, desempeño de seguridad y eficiencia operacional mediante metodologías lean y liderazgo estratégico.',
+      skills: ['Operaciones de Planta', 'Gestión de P&L', 'Planificación Estratégica', 'Liderazgo de Equipo', 'Manufactura Lean', 'Gestión de Seguridad', 'Proyectos de Capital', 'Presupuestos', 'Cumplimiento Regulatorio', 'Mejora Continua'],
+      experience: [
+        {
+          title: 'Gerente de Planta',
+          company: 'Georgia-Pacific',
+          startDate: '2019-05',
+          isCurrent: true,
+          achievements: [
+            'Dirigió operaciones para una instalación de 250 empleados generando $95M en ingresos anuales con responsabilidad total de P&L',
+            'Mejoró la rentabilidad de la planta en un 18% mediante implementación lean, reducción de desperdicios y proyectos de eficiencia energética ahorrando $4.5M anuales',
+            'Logró 3 años consecutivos de cero incidentes con tiempo perdido al implementar un programa integral de cultura de seguridad',
+          ],
+        },
+        {
+          title: 'Gerente de Operaciones',
+          company: 'International Paper',
+          startDate: '2014-08',
+          endDate: '2019-04',
+          achievements: [
+            'Gestionó operaciones de producción para una instalación de 180 personas, aumentando el OEE del 68% al 84% en 4 años',
+            'Lideró un proyecto de expansión de capital de $12M completado a tiempo y bajo presupuesto, agregando un 30% de capacidad de producción',
+            'Redujo la rotación de empleados del 25% al 12% mediante programas de capacitación, planes de carrera e iniciativas de compromiso del empleado',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Georgia Institute of Technology', degree: 'Licenciatura', field: 'Ingeniería Industrial', startDate: '2006-08', endDate: '2010-05' },
+        { institution: 'University of Georgia', degree: 'MBA', field: 'Gestión de Operaciones', startDate: '2012-08', endDate: '2014-05' },
+      ],
+      certifications: [
+        { name: 'Lean Six Sigma Black Belt', issuer: 'ASQ', date: '2017-09' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe destacar un gerente de planta en su currículum?', answer: 'Enfóquese en desempeño de P&L, ingresos, número de empleados, récord de seguridad, proyectos de capital y mejoras operacionales. Demuestre tanto visión estratégica como excelencia operacional práctica.' },
+      { question: '¿Qué tan importante es la capacidad financiera para un currículum de gerente de planta?', answer: 'Crítica. Incluya resultados de P&L, ahorros de costos, gestión de presupuesto y ROI de proyectos de capital. Se espera que los gerentes de planta impulsen la rentabilidad junto con el desempeño operacional.' },
+      { question: '¿Debo incluir MBA o educación avanzada en un currículum de gerente de planta?', answer: 'Sí. Un MBA o título avanzado en ingeniería señala preparación para el liderazgo. Inclúyalo junto con su título de licenciatura y cualquier programa de educación ejecutiva.' },
+    ],
+  },
+  'safety-manager': {
+    slug: 'gerente-de-seguridad',
+    title: 'Gerente de Seguridad',
+    keywords: ['currículum de gerente de seguridad', 'CV de gerente de EHS', 'currículum de gerente de salud y seguridad', 'plantilla de currículum de director de seguridad'],
+    searchIntents: ['cómo escribir un currículum de gerente de seguridad', 'ejemplos de currículum de gerente de seguridad', 'plantilla de CV de gerente de EHS'],
+    topSkills: ['Desarrollo de Programas de Seguridad', 'Cumplimiento OSHA', 'Investigación de Incidentes', 'Evaluación de Riesgos', 'Capacitación y Desarrollo', 'Gestión de Auditorías', 'Respuesta a Emergencias', 'Seguridad Basada en Comportamiento', 'Compensación Laboral', 'Reportes Regulatorios'],
+    atsKeywords: ['desarrollo de programas de seguridad', 'cumplimiento OSHA', 'investigación de incidentes', 'evaluación de riesgos', 'capacitación en seguridad', 'gestión de auditorías', 'planificación de respuesta a emergencias', 'seguridad basada en comportamiento', 'gestión de compensación laboral', 'reportes regulatorios', 'TRIR', 'identificación de peligros'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Jennifer',
+      lastName: 'Dawson',
+      profession: 'Gerente de Seguridad',
+      summary: 'Gerente de seguridad con más de 8 años de experiencia desarrollando y gestionando programas integrales de EHS para entornos de manufactura y construcción con más de 500 empleados. Redujo el TRIR en un 65% y mantuvo cero fatalidades en todas las instalaciones gestionadas.',
+      skills: ['Desarrollo de Programas de Seguridad', 'Cumplimiento OSHA', 'Investigación de Incidentes', 'Evaluación de Riesgos', 'Capacitación y Desarrollo', 'Gestión de Auditorías', 'Respuesta a Emergencias', 'Seguridad Basada en Comportamiento', 'Compensación Laboral', 'Reportes Regulatorios'],
+      experience: [
+        {
+          title: 'Gerente de Seguridad',
+          company: 'Turner Construction',
+          startDate: '2020-02',
+          isCurrent: true,
+          achievements: [
+            'Gestionó programas de EHS en 5 sitios activos de construcción con más de 600 trabajadores, reduciendo el TRIR de 4.2 a 1.5',
+            'Desarrolló e impartió capacitación en seguridad para más de 800 empleados anualmente con una tasa de cumplimiento del 100%',
+            'Lideró más de 40 investigaciones de incidentes usando análisis de causa raíz, implementando acciones correctivas que previnieron la recurrencia',
+          ],
+        },
+        {
+          title: 'Coordinadora de Seguridad',
+          company: 'Nucor Steel',
+          startDate: '2016-08',
+          endDate: '2020-01',
+          achievements: [
+            'Coordinó programas de seguridad para una instalación de manufactura de acero de 350 empleados logrando más de 1M de horas de trabajo seguras',
+            'Redujo los costos de compensación laboral en un 45% mediante un programa de regreso al trabajo y gestión proactiva de lesiones',
+            'Realizó más de 200 auditorías de seguridad anualmente con una tasa de cierre de acciones correctivas del 95% dentro de 30 días',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'West Virginia University', degree: 'Licenciatura', field: 'Gestión de Seguridad', startDate: '2012-08', endDate: '2016-05' },
+      ],
+      certifications: [
+        { name: 'Profesional de Seguridad Certificado (CSP)', issuer: 'Board of Certified Safety Professionals', date: '2019-07' },
+        { name: 'OSHA 30 Horas Construcción', issuer: 'OSHA', date: '2020-03' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un gerente de seguridad en su currículum?', answer: 'Destaque mejoras en TRIR/DART, desarrollo de programas, volúmenes de capacitación, resultados de auditorías y ahorros en compensación laboral. Incluya industrias específicas y tamaños de fuerza laboral gestionados.' },
+      { question: '¿Qué certificaciones son más importantes para un gerente de seguridad?', answer: 'El CSP es el estándar de oro. También son valiosos ASP, OHST, CHST y certificaciones específicas de la industria. La capacitación OSHA de 30 horas es frecuentemente un requisito base.' },
+      { question: '¿Cómo cuantifico mejoras de seguridad en mi currículum?', answer: 'Use métricas de TRIR, DART, EMR e incidentes con tiempo perdido. Incluya horas de trabajo seguras logradas, puntajes de auditoría, tasas de cumplimiento de capacitación y reducciones de costos de compensación laboral.' },
+    ],
+  },
+  'occupational-health-specialist': {
+    slug: 'especialista-en-salud-ocupacional',
+    title: 'Especialista en Salud Ocupacional',
+    keywords: ['currículum de especialista en salud ocupacional', 'CV de especialista en SST', 'currículum de salud laboral', 'plantilla de currículum de salud ocupacional'],
+    searchIntents: ['cómo escribir un currículum de especialista en salud ocupacional', 'ejemplos de currículum de salud ocupacional', 'plantilla de CV de especialista en salud laboral'],
+    topSkills: ['Programas de Salud Ocupacional', 'Higiene Industrial', 'Evaluación Ergonómica', 'Monitoreo de Exposición', 'Cumplimiento Regulatorio', 'Vigilancia de Salud', 'Programas de Bienestar', 'Análisis de Datos', 'Capacitación', 'Gestión de Casos'],
+    atsKeywords: ['salud ocupacional', 'higiene industrial', 'evaluación ergonómica', 'monitoreo de exposición', 'cumplimiento OSHA', 'vigilancia de salud', 'programas de bienestar', 'salud laboral', 'evaluación de peligros', 'protección respiratoria', 'gestión de casos'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Megan',
+      lastName: 'Callahan',
+      profession: 'Especialista en Salud Ocupacional',
+      summary: 'Especialista en salud ocupacional con más de 6 años de experiencia desarrollando programas de salud laboral, realizando evaluaciones de higiene industrial y asegurando el cumplimiento regulatorio para instalaciones de manufactura con más de 1,000 empleados.',
+      skills: ['Programas de Salud Ocupacional', 'Higiene Industrial', 'Evaluación Ergonómica', 'Monitoreo de Exposición', 'Cumplimiento Regulatorio', 'Vigilancia de Salud', 'Programas de Bienestar', 'Análisis de Datos', 'Capacitación', 'Gestión de Casos'],
+      experience: [
+        {
+          title: 'Especialista en Salud Ocupacional',
+          company: 'BASF Corporation',
+          startDate: '2021-03',
+          isCurrent: true,
+          achievements: [
+            'Gestionó programas de salud ocupacional para 1,200 empleados en 2 instalaciones de manufactura química con cero citaciones de OSHA',
+            'Realizó más de 100 evaluaciones de higiene industrial anualmente, identificando y mitigando 15 escenarios de exposición de alto riesgo',
+            'Desarrolló un programa de intervención ergonómica que redujo las reclamaciones por lesiones musculoesqueléticas en un 40%',
+          ],
+        },
+        {
+          title: 'Coordinadora de Seguridad y Salud',
+          company: 'ExxonMobil',
+          startDate: '2018-06',
+          endDate: '2021-02',
+          achievements: [
+            'Administró programas de vigilancia médica para 800 empleados incluyendo pruebas audiométricas, pruebas de función pulmonar y pruebas de ajuste',
+            'Lanzó un programa de bienestar que logró un 75% de participación de empleados y redujo las reclamaciones de seguro de salud en un 12%',
+            'Gestionó más de 50 expedientes de casos de lesiones anualmente con un tiempo promedio de regreso al trabajo de 5 días, un 40% por debajo del promedio de la industria',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'University of South Carolina', degree: 'Licenciatura', field: 'Salud Pública', startDate: '2014-08', endDate: '2018-05' },
+      ],
+      certifications: [
+        { name: 'Higienista Industrial Certificado (CIH)', issuer: 'ABIH', date: '2022-04' },
+        { name: 'Enfermera de Salud Ocupacional Certificada (COHN)', issuer: 'ABOHN', date: '2020-09' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un especialista en salud ocupacional en su currículum?', answer: 'Destaque programas gestionados, poblaciones de empleados atendidas, récord de cumplimiento, métricas de reducción de lesiones y resultados de programas de bienestar. Incluya monitoreo de exposición y experiencia en higiene industrial.' },
+      { question: '¿Qué certificaciones importan para salud ocupacional?', answer: 'CIH, COHN, CSP y ASP son altamente valoradas. Incluya capacitación OSHA y cualquier credencial de salud específica de la industria relevante para su industria objetivo.' },
+      { question: '¿Cómo demuestro ROI en un currículum de salud ocupacional?', answer: 'Cuantifique reducciones en reclamaciones por lesiones, ahorros en compensación laboral, mejoras en regreso al trabajo y evitación de costos de programas de bienestar. Vincule los programas de salud a resultados financieros empresariales.' },
+    ],
+  },
+  'environmental-compliance-specialist': {
+    slug: 'especialista-en-cumplimiento-ambiental',
+    title: 'Especialista en Cumplimiento Ambiental',
+    keywords: ['currículum de especialista en cumplimiento ambiental', 'CV de cumplimiento ambiental', 'currículum de cumplimiento EHS', 'plantilla de currículum de especialista ambiental'],
+    searchIntents: ['cómo escribir un currículum de especialista en cumplimiento ambiental', 'ejemplos de currículum de cumplimiento ambiental', 'plantilla de CV de especialista ambiental'],
+    topSkills: ['Regulaciones Ambientales', 'Gestión de Permisos', 'Cumplimiento EPA', 'Gestión de Residuos', 'Monitoreo de Calidad del Aire', 'Gestión de Aguas Pluviales', 'Auditoría Ambiental', 'Reportes', 'Remediación', 'Sostenibilidad'],
+    atsKeywords: ['cumplimiento ambiental', 'regulaciones EPA', 'gestión de permisos', 'gestión de residuos', 'monitoreo de calidad del aire', 'cumplimiento de aguas pluviales', 'auditoría ambiental', 'RCRA', 'Ley de Aire Limpio', 'Ley de Agua Limpia', 'remediación', 'sostenibilidad'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Heather',
+      lastName: 'Lindström',
+      profession: 'Especialista en Cumplimiento Ambiental',
+      summary: 'Especialista en cumplimiento ambiental con más de 6 años de experiencia asegurando el cumplimiento regulatorio para instalaciones industriales bajo regulaciones ambientales de EPA, estatales y locales. Gestionó programas de permisos, realizó auditorías y logró cero violaciones ambientales en múltiples sitios.',
+      skills: ['Regulaciones Ambientales', 'Gestión de Permisos', 'Cumplimiento EPA', 'Gestión de Residuos', 'Monitoreo de Calidad del Aire', 'Gestión de Aguas Pluviales', 'Auditoría Ambiental', 'Reportes', 'Remediación', 'Sostenibilidad'],
+      experience: [
+        {
+          title: 'Gerente de Cumplimiento Ambiental',
+          company: 'Waste Management, Inc.',
+          startDate: '2021-06',
+          isCurrent: true,
+          achievements: [
+            'Gestionó el cumplimiento ambiental en 4 instalaciones de relleno sanitario y estaciones de transferencia con cero NOVs durante 3 años',
+            'Supervisó más de 25 permisos ambientales incluyendo aire Título V, aguas pluviales NPDES y residuos peligrosos RCRA',
+            'Lideró un proyecto de optimización de captura de metano que redujo las emisiones de gases de efecto invernadero en un 30% y generó $200K en créditos de energía renovable',
+          ],
+        },
+        {
+          title: 'Especialista Ambiental',
+          company: 'Arcadis',
+          startDate: '2018-09',
+          endDate: '2021-05',
+          achievements: [
+            'Realizó más de 40 auditorías de cumplimiento ambiental anualmente para clientes industriales en sectores de manufactura, petróleo y gas y químico',
+            'Preparó y presentó más de 100 reportes regulatorios incluyendo TRI, Tier II e inventarios de emisiones al aire',
+            'Gestionó un proyecto de remediación de suelo y agua subterránea de $1.5M, logrando el cierre 3 meses antes de lo programado',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'University of North Carolina at Chapel Hill', degree: 'Licenciatura', field: 'Ciencias Ambientales', startDate: '2014-08', endDate: '2018-05' },
+      ],
+      certifications: [
+        { name: 'Profesional Ambiental Certificado (CEP)', issuer: 'Academy of Board Certified Environmental Professionals', date: '2021-08' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un especialista en cumplimiento ambiental en su currículum?', answer: 'Destaque permisos gestionados, conteos de auditorías, récord de cumplimiento (cero NOVs), reportes regulatorios presentados y proyectos de remediación. Incluya regulaciones específicas (RCRA, CAA, CWA) en las que se especializa.' },
+      { question: '¿Qué tan importante es la certificación CEP para roles de cumplimiento ambiental?', answer: 'Muy valiosa. El CEP demuestra amplia experiencia ambiental. También incluya licencias específicas del estado y cualquier capacitación especializada en residuos peligrosos o calidad del aire.' },
+      { question: '¿Cómo demuestro impacto en sostenibilidad en mi currículum de cumplimiento ambiental?', answer: 'Cuantifique reducciones de emisiones, contribuciones de energía renovable, tasas de desvío de residuos y ahorros de energía. Las iniciativas de sostenibilidad demuestran liderazgo visionario en cumplimiento.' },
+    ],
+  },
+  'waste-management-specialist': {
+    slug: 'especialista-en-gestion-de-residuos',
+    title: 'Especialista en Gestión de Residuos',
+    keywords: ['currículum de especialista en gestión de residuos', 'CV de gestión de residuos', 'currículum de especialista en residuos peligrosos', 'plantilla de currículum de operaciones de residuos'],
+    searchIntents: ['cómo escribir un currículum de especialista en gestión de residuos', 'ejemplos de currículum de gestión de residuos', 'plantilla de CV de especialista en residuos'],
+    topSkills: ['Operaciones de Gestión de Residuos', 'Manejo de Residuos Peligrosos', 'Cumplimiento RCRA', 'Minimización de Residuos', 'Gestión de Manifiestos', 'Transporte DOT', 'Protocolos de Seguridad', 'Documentación', 'Coordinación de Proveedores', 'Capacitación'],
+    atsKeywords: ['gestión de residuos', 'residuos peligrosos', 'cumplimiento RCRA', 'minimización de residuos', 'gestión de manifiestos', 'regulaciones de transporte DOT', 'caracterización de residuos', 'disposición de residuos', 'cumplimiento ambiental', 'residuos universales'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Thomas',
+      lastName: 'Brennan',
+      profession: 'Especialista en Gestión de Residuos',
+      summary: 'Especialista en gestión de residuos con más de 5 años de experiencia gestionando programas de residuos peligrosos y no peligrosos para instalaciones industriales. Experto en cumplimiento RCRA, minimización de residuos y regulaciones de transporte DOT con un récord de cumplimiento de cero violaciones.',
+      skills: ['Operaciones de Gestión de Residuos', 'Manejo de Residuos Peligrosos', 'Cumplimiento RCRA', 'Minimización de Residuos', 'Gestión de Manifiestos', 'Transporte DOT', 'Protocolos de Seguridad', 'Documentación', 'Coordinación de Proveedores', 'Capacitación'],
+      experience: [
+        {
+          title: 'Especialista en Gestión de Residuos',
+          company: 'Clean Harbors',
+          startDate: '2022-01',
+          isCurrent: true,
+          achievements: [
+            'Gestionó programas de residuos peligrosos para 8 instalaciones industriales de clientes con cero violaciones RCRA durante 3 años',
+            'Procesó más de 500 manifiestos de residuos peligrosos anualmente con una tasa de precisión del 100%',
+            'Implementó estrategias de minimización de residuos que redujeron los costos de disposición de residuos de los clientes en un 22%, ahorrando $180K anuales',
+          ],
+        },
+        {
+          title: 'Técnico Ambiental',
+          company: 'Stericycle',
+          startDate: '2019-06',
+          endDate: '2021-12',
+          achievements: [
+            'Recolectó y transportó residuos peligrosos y médicos de más de 40 instalaciones mensualmente en cumplimiento con las regulaciones DOT',
+            'Realizó más de 200 evaluaciones de caracterización de residuos, asegurando la clasificación y disposición adecuada',
+            'Capacitó a 30 empleados de instalaciones en segregación de residuos, etiquetado y requisitos de áreas de acumulación satélite',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Eastern Kentucky University', degree: 'Licenciatura', field: 'Estudios Ambientales', startDate: '2015-08', endDate: '2019-05' },
+      ],
+      certifications: [
+        { name: 'Capacitación en Residuos Peligrosos RCRA/DOT', issuer: 'Lion Technology', date: '2019-09' },
+        { name: 'OSHA 40 Horas HAZWOPER', issuer: 'OSHA', date: '2019-07' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un especialista en gestión de residuos en su currículum?', answer: 'Destaque volúmenes de residuos gestionados, récord de cumplimiento, precisión de manifiestos, ahorros por minimización de residuos y marcos regulatorios seguidos. Incluya experiencia en RCRA y DOT.' },
+      { question: '¿Qué certificaciones son esenciales para gestión de residuos?', answer: 'HAZWOPER de 40 horas, capacitación RCRA/DOT y credenciales estatales específicas de manejo de residuos son esenciales. Incluya cualquier certificación de gestión de residuos peligrosos de proveedores reconocidos.' },
+      { question: '¿Cómo demuestro impacto ambiental en un currículum de gestión de residuos?', answer: 'Cuantifique porcentajes de reducción de residuos, tasas de desvío, volúmenes de reciclaje y ahorros en costos de disposición. Demuestre cómo su trabajo redujo la huella ambiental mientras mantuvo el cumplimiento.' },
+    ],
+  },
+  'recycling-coordinator': {
+    slug: 'coordinador-de-reciclaje',
+    title: 'Coordinador de Reciclaje',
+    keywords: ['currículum de coordinador de reciclaje', 'CV de gerente de programa de reciclaje', 'currículum de desvío de residuos', 'plantilla de currículum de especialista en reciclaje'],
+    searchIntents: ['cómo escribir un currículum de coordinador de reciclaje', 'ejemplos de currículum de coordinador de reciclaje', 'plantilla de currículum de programa de reciclaje'],
+    topSkills: ['Gestión de Programas de Reciclaje', 'Desvío de Residuos', 'Alcance Comunitario', 'Seguimiento de Datos', 'Gestión de Proveedores', 'Educación y Capacitación', 'Cumplimiento Regulatorio', 'Planificación de Sostenibilidad', 'Gestión de Presupuestos', 'Reportes'],
+    atsKeywords: ['gestión de programas de reciclaje', 'desvío de residuos', 'alcance comunitario', 'métricas de reciclaje', 'gestión de proveedores', 'planificación de sostenibilidad', 'reducción de contaminación', 'educación en reciclaje', 'cumplimiento', 'recuperación de materiales'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Laura',
+      lastName: 'Nguyen',
+      profession: 'Coordinador de Reciclaje',
+      summary: 'Coordinadora de reciclaje con más de 4 años de experiencia gestionando programas de reciclaje municipales y corporativos que desvían más de 5,000 toneladas de residuos anualmente. Experta en alcance comunitario, reducción de contaminación y gestión de proveedores con pasión por la sostenibilidad.',
+      skills: ['Gestión de Programas de Reciclaje', 'Desvío de Residuos', 'Alcance Comunitario', 'Seguimiento de Datos', 'Gestión de Proveedores', 'Educación y Capacitación', 'Cumplimiento Regulatorio', 'Planificación de Sostenibilidad', 'Gestión de Presupuestos', 'Reportes'],
+      experience: [
+        {
+          title: 'Coordinadora de Reciclaje',
+          company: 'Republic Services',
+          startDate: '2022-03',
+          isCurrent: true,
+          achievements: [
+            'Gestionó programas de reciclaje que atienden a más de 50,000 hogares con una tasa de desvío que aumentó del 28% al 42%',
+            'Redujo las tasas de contaminación en un 35% mediante campañas de educación dirigidas y programas de inspección de contenedores',
+            'Coordinó con 10 proveedores de instalaciones de recuperación de materiales, negociando contratos que ahorraron $120K anuales',
+          ],
+        },
+        {
+          title: 'Asociada de Sostenibilidad',
+          company: 'University of Oregon',
+          startDate: '2020-06',
+          endDate: '2022-02',
+          achievements: [
+            'Implementó un programa de reciclaje en campus que desvió 800 toneladas de residuos anualmente del relleno sanitario',
+            'Organizó 15 eventos de educación en reciclaje alcanzando a más de 3,000 estudiantes y personal por semestre',
+            'Rastreó y reportó métricas de reciclaje mensualmente, contribuyendo datos para la calificación de sostenibilidad AASHE STARS',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'University of Oregon', degree: 'Licenciatura', field: 'Estudios Ambientales', startDate: '2016-08', endDate: '2020-05' },
+      ],
+      certifications: [
+        { name: 'Certificación de Sistemas de Reciclaje SWANA', issuer: 'Solid Waste Association of North America', date: '2022-08' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un coordinador de reciclaje en su currículum?', answer: 'Destaque tasas de desvío, tonelaje gestionado, reducciones de contaminación, métricas de participación comunitaria y ahorros de costos. Incluya la escala de programas gestionados (hogares, empresas o instituciones).' },
+      { question: '¿Cómo demuestro impacto comunitario en un currículum de coordinador de reciclaje?', answer: 'Incluya números de asistencia a eventos, alcance de campañas de educación, resultados de encuestas y métricas de cambio de comportamiento. Cuantifique cómo su alcance mejoró la participación en el reciclaje.' },
+      { question: '¿Son importantes las certificaciones SWANA para roles de reciclaje?', answer: 'Sí. Las certificaciones SWANA demuestran conocimiento específico de la industria y son respetadas por empleadores de gestión de residuos municipales y privados.' },
+    ],
+  },
+  'sustainability-consultant': {
+    slug: 'consultor-de-sostenibilidad',
+    title: 'Consultor de Sostenibilidad',
+    keywords: ['currículum de consultor de sostenibilidad', 'CV de consultor ESG', 'currículum de asesor de sostenibilidad', 'plantilla de currículum de sostenibilidad corporativa'],
+    searchIntents: ['cómo escribir un currículum de consultor de sostenibilidad', 'ejemplos de currículum de consultor de sostenibilidad', 'plantilla de CV de consultor ESG'],
+    topSkills: ['Estrategia de Sostenibilidad', 'Reportes ESG', 'Análisis de Huella de Carbono', 'Participación de Interesados', 'Estándares GRI', 'Evaluación de Ciclo de Vida', 'Evaluación de Riesgo Climático', 'Gestión de Proyectos', 'Análisis de Datos', 'Comunicación'],
+    atsKeywords: ['estrategia de sostenibilidad', 'reportes ESG', 'huella de carbono', 'estándares GRI', 'evaluación de ciclo de vida', 'riesgo climático', 'participación de interesados', 'métricas de sostenibilidad', 'responsabilidad social corporativa', 'planificación net-zero', 'metas basadas en ciencia'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Oliver',
+      lastName: 'Grant',
+      profession: 'Consultor de Sostenibilidad',
+      summary: 'Consultor de sostenibilidad con más de 6 años de experiencia asesorando a empresas Fortune 500 en estrategia ESG, reducción de carbono y reportes de sostenibilidad. Desarrolló planes de acción climática que lograron reducciones medibles de emisiones y mejoraron las calificaciones ESG para más de 20 clientes.',
+      skills: ['Estrategia de Sostenibilidad', 'Reportes ESG', 'Análisis de Huella de Carbono', 'Participación de Interesados', 'Estándares GRI', 'Evaluación de Ciclo de Vida', 'Evaluación de Riesgo Climático', 'Gestión de Proyectos', 'Análisis de Datos', 'Comunicación'],
+      experience: [
+        {
+          title: 'Consultor Senior de Sostenibilidad',
+          company: 'ERM (Environmental Resources Management)',
+          startDate: '2021-04',
+          isCurrent: true,
+          achievements: [
+            'Asesoró a 12 clientes Fortune 500 en estrategia y reportes ESG, mejorando las calificaciones ESG promedio en 15 puntos',
+            'Desarrolló planes de reducción de carbono basados en ciencia que identificaron vías para reducir las emisiones de Alcance 1 y 2 en un 40% para 5 clientes',
+            'Lideró la preparación de reportes de sostenibilidad GRI y SASB para 8 clientes, asegurando el cumplimiento con marcos internacionales de divulgación',
+          ],
+        },
+        {
+          title: 'Analista de Sostenibilidad',
+          company: 'Deloitte',
+          startDate: '2018-09',
+          endDate: '2021-03',
+          achievements: [
+            'Realizó evaluaciones de huella de carbono para más de 15 clientes corporativos en sectores de manufactura, retail y tecnología',
+            'Realizó 10 evaluaciones de ciclo de vida que identificaron oportunidades de reducción de emisiones del 20-30% en cadenas de suministro de productos',
+            'Creó tableros de sostenibilidad en Power BI utilizados por la alta dirección en 6 organizaciones de clientes',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Yale University', degree: 'Maestría', field: 'Gestión Ambiental', startDate: '2016-08', endDate: '2018-05' },
+        { institution: 'University of Virginia', degree: 'Licenciatura', field: 'Ciencias Ambientales', startDate: '2012-08', endDate: '2016-05' },
+      ],
+      certifications: [
+        { name: 'LEED Green Associate', issuer: 'U.S. Green Building Council', date: '2019-05' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un consultor de sostenibilidad en su currículum?', answer: 'Destaque conteo de clientes, reducciones de emisiones logradas, mejoras en calificaciones ESG y marcos de reportes utilizados (GRI, SASB, TCFD). Incluya industrias específicas atendidas y resultados de proyectos.' },
+      { question: '¿Qué certificaciones son valiosas para consultoría de sostenibilidad?', answer: 'Las credenciales LEED, capacitación en Protocolo GHG, certificaciones ISSP y SASB FSA son valoradas. Los títulos avanzados en gestión ambiental o sostenibilidad también tienen peso.' },
+      { question: '¿Cómo demuestro impacto comercial en un currículum de consultor de sostenibilidad?', answer: 'Cuantifique mejoras en calificaciones ESG de clientes, ahorros de costos por medidas de eficiencia, reducciones de emisiones e ingresos de iniciativas de productos sostenibles. Demuestre que la sostenibilidad impulsa el valor empresarial.' },
+    ],
+  },
+  'energy-auditor': {
+    slug: 'auditor-de-energia',
+    title: 'Auditor de Energía',
+    keywords: ['currículum de auditor de energía', 'CV de consultor energético', 'currículum de auditor de energía de edificios', 'plantilla de currículum de eficiencia energética'],
+    searchIntents: ['cómo escribir un currículum de auditor de energía', 'ejemplos de currículum de auditor de energía', 'plantilla de currículum de eficiencia energética'],
+    topSkills: ['Auditoría Energética', 'Ciencia de Edificios', 'Análisis de HVAC', 'Eficiencia de Iluminación', 'Pruebas de Infiltración', 'Termografía', 'Modelado Energético', 'Redacción de Reportes', 'Cumplimiento de Códigos', 'Educación al Cliente'],
+    atsKeywords: ['auditoría energética', 'ciencia de edificios', 'eficiencia de HVAC', 'análisis de iluminación', 'pruebas de infiltración', 'termografía infrarroja', 'modelado energético', 'reembolsos de servicios públicos', 'estándares ASHRAE', 'medidas de conservación de energía', 'envolvente de edificios'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Daniel',
+      lastName: 'Shaw',
+      profession: 'Auditor de Energía',
+      summary: 'Auditor de energía certificado con más de 5 años de experiencia realizando evaluaciones energéticas residenciales y comerciales. Identificó más de $3M en ahorros energéticos acumulados para más de 500 clientes mediante análisis de envolvente de edificios, optimización de HVAC y recomendaciones de eficiencia de iluminación.',
+      skills: ['Auditoría Energética', 'Ciencia de Edificios', 'Análisis de HVAC', 'Eficiencia de Iluminación', 'Pruebas de Infiltración', 'Termografía', 'Modelado Energético', 'Redacción de Reportes', 'Cumplimiento de Códigos', 'Educación al Cliente'],
+      experience: [
+        {
+          title: 'Auditor Senior de Energía',
+          company: 'CLEAResult',
+          startDate: '2021-08',
+          isCurrent: true,
+          achievements: [
+            'Realizó más de 300 auditorías energéticas comerciales y residenciales anualmente, identificando ahorros promedio del 25% por cliente',
+            'Generó $1.8M en solicitudes de reembolsos de servicios públicos para clientes mediante recomendaciones de medidas de conservación de energía',
+            'Logró una tasa de implementación del 92% en las recomendaciones de auditoría mediante reportes claros y análisis de ROI',
+          ],
+        },
+        {
+          title: 'Auditor de Energía',
+          company: 'ICF International',
+          startDate: '2019-04',
+          endDate: '2021-07',
+          achievements: [
+            'Realizó más de 200 auditorías ASHRAE Nivel I y II para propiedades comerciales que suman más de 5M de pies cuadrados',
+            'Identificó $1.2M en oportunidades de ahorro energético anual mediante mejoras en HVAC, iluminación y envolvente de edificios',
+            'Capacitó a 4 auditores junior en pruebas de infiltración, imagen termográfica y preparación de reportes de auditoría',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'University of Colorado Boulder', degree: 'Licenciatura', field: 'Ingeniería Mecánica', startDate: '2015-08', endDate: '2019-05' },
+      ],
+      certifications: [
+        { name: 'Auditor Energético Certificado (CEA)', issuer: 'Association of Energy Engineers', date: '2019-11' },
+        { name: 'Analista de Edificios BPI', issuer: 'Building Performance Institute', date: '2020-03' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un auditor de energía en su currículum?', answer: 'Destaque volúmenes de auditoría, ahorros identificados, tasas de implementación de clientes y pies cuadrados evaluados. Incluya niveles de auditoría realizados (ASHRAE I, II, III) y herramientas de diagnóstico utilizadas.' },
+      { question: '¿Qué certificaciones son esenciales para un auditor de energía?', answer: 'CEA de AEE, Analista de Edificios BPI y Calificador HERS son credenciales clave. Incluya certificaciones ASHRAE y cualquier licencia estatal específica de auditor energético.' },
+      { question: '¿Cómo cuantifico el impacto en un currículum de auditor de energía?', answer: 'Use ahorros totales identificados, kWh o therms reducidos, reembolsos de servicios públicos asegurados, tasas de implementación de clientes y pies cuadrados auditados. Demuestre tanto el impacto energético como financiero.' },
+    ],
+  },
+  'facilities-engineer': {
+    slug: 'ingeniero-de-instalaciones',
+    title: 'Ingeniero de Instalaciones',
+    keywords: ['currículum de ingeniero de instalaciones', 'CV de ingeniero de edificios', 'currículum de ingeniero de mantenimiento de instalaciones', 'plantilla de currículum de ingeniería de instalaciones'],
+    searchIntents: ['cómo escribir un currículum de ingeniero de instalaciones', 'ejemplos de currículum de ingeniero de instalaciones', 'plantilla de CV de ingeniero de edificios'],
+    topSkills: ['Mantenimiento de Instalaciones', 'Sistemas HVAC', 'Sistemas Eléctricos', 'Plomería', 'CMMS', 'Mantenimiento Preventivo', 'Proyectos de Capital', 'Gestión Energética', 'Cumplimiento de Códigos', 'Gestión de Proveedores'],
+    atsKeywords: ['mantenimiento de instalaciones', 'sistemas HVAC', 'sistemas eléctricos', 'plomería', 'CMMS', 'mantenimiento preventivo', 'proyectos de capital', 'gestión energética', 'cumplimiento de códigos de edificios', 'gestión de proveedores', 'sistemas de automatización de edificios'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Craig',
+      lastName: 'Hamilton',
+      profession: 'Ingeniero de Instalaciones',
+      summary: 'Ingeniero de instalaciones con más de 7 años de experiencia gestionando sistemas de edificios y programas de mantenimiento para instalaciones comerciales e institucionales que suman más de 1M de pies cuadrados. Experto en sistemas HVAC, eléctricos y de plomería con enfoque en eficiencia energética y mantenimiento preventivo.',
+      skills: ['Mantenimiento de Instalaciones', 'Sistemas HVAC', 'Sistemas Eléctricos', 'Plomería', 'CMMS', 'Mantenimiento Preventivo', 'Proyectos de Capital', 'Gestión Energética', 'Cumplimiento de Códigos', 'Gestión de Proveedores'],
+      experience: [
+        {
+          title: 'Ingeniero Senior de Instalaciones',
+          company: 'CBRE Group',
+          startDate: '2020-10',
+          isCurrent: true,
+          achievements: [
+            'Gestionó sistemas de edificios para un campus corporativo de 1.2M de pies cuadrados incluyendo HVAC, eléctrico, plomería y protección contra incendios',
+            'Redujo el consumo de energía en un 18% mediante optimización de BAS y proyectos de retrofit LED, ahorrando $280K anuales',
+            'Implementó un programa de mantenimiento preventivo impulsado por CMMS que redujo las órdenes de trabajo de emergencia en un 45%',
+          ],
+        },
+        {
+          title: 'Ingeniero de Instalaciones',
+          company: 'JLL (Jones Lang LaSalle)',
+          startDate: '2017-05',
+          endDate: '2020-09',
+          achievements: [
+            'Mantuvo sistemas críticos de edificios para 800K pies cuadrados de espacio de oficinas Clase A con un tiempo de actividad del 99.9%',
+            'Gestionó $2M en proyectos anuales de mejora de capital incluyendo reemplazos de chillers y modernizaciones de elevadores',
+            'Coordinó con más de 20 proveedores de servicios, reduciendo costos de contratos en un 15% mediante licitación competitiva y gestión del desempeño',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Milwaukee School of Engineering', degree: 'Licenciatura', field: 'Ingeniería Mecánica', startDate: '2013-08', endDate: '2017-05' },
+      ],
+      certifications: [
+        { name: 'Gerente de Instalaciones Certificado (CFM)', issuer: 'IFMA', date: '2021-06' },
+        { name: 'EPA 608 Universal', issuer: 'EPA', date: '2018-02' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un ingeniero de instalaciones en su currículum?', answer: 'Destaque pies cuadrados gestionados, sistemas mantenidos, ahorros energéticos, métricas de tiempo de actividad y experiencia en proyectos de capital. Incluya plataformas CMMS utilizadas y tipos de edificios gestionados.' },
+      { question: '¿Qué tan importante es la certificación CFM para un ingeniero de instalaciones?', answer: 'El CFM de IFMA es la credencial más reconocida en gestión de instalaciones. Demuestra conocimiento integral y es cada vez más requerido para roles senior.' },
+      { question: '¿Debo listar sistemas de edificios en mi currículum de ingeniero de instalaciones?', answer: 'Sí. Especifique sistemas HVAC, eléctricos, de plomería, protección contra incendios, elevadores y BAS que gestiona. Incluya marcas de equipos específicos y plataformas de automatización de edificios.' },
+    ],
+  },
+  'maintenance-manager': {
+    slug: 'gerente-de-mantenimiento',
+    title: 'Gerente de Mantenimiento',
+    keywords: ['currículum de gerente de mantenimiento', 'CV de director de mantenimiento', 'currículum de gerente de mantenimiento de instalaciones', 'plantilla de currículum de supervisor de mantenimiento'],
+    searchIntents: ['cómo escribir un currículum de gerente de mantenimiento', 'ejemplos de currículum de gerente de mantenimiento', 'plantilla de CV de supervisor de mantenimiento'],
+    topSkills: ['Gestión de Mantenimiento', 'Mantenimiento Preventivo', 'CMMS', 'Liderazgo de Equipo', 'Gestión de Presupuestos', 'Confiabilidad de Equipos', 'Cumplimiento de Seguridad', 'Gestión de Proveedores', 'Resolución de Problemas', 'Planificación de Capital'],
+    atsKeywords: ['gestión de mantenimiento', 'mantenimiento preventivo', 'CMMS', 'liderazgo de equipo', 'gestión de presupuestos', 'confiabilidad de equipos', 'cumplimiento de seguridad', 'mantenimiento predictivo', 'gestión de órdenes de trabajo', 'planificación de capital', 'reducción de tiempo de inactividad'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Wayne',
+      lastName: 'Prescott',
+      profession: 'Gerente de Mantenimiento',
+      summary: 'Gerente de mantenimiento con más de 10 años de experiencia liderando equipos y programas de mantenimiento para instalaciones de manufactura con más de $50M en activos de equipos. Redujo el tiempo de inactividad no planificado en más del 50% mediante estrategias de mantenimiento preventivo y predictivo.',
+      skills: ['Gestión de Mantenimiento', 'Mantenimiento Preventivo', 'CMMS', 'Liderazgo de Equipo', 'Gestión de Presupuestos', 'Confiabilidad de Equipos', 'Cumplimiento de Seguridad', 'Gestión de Proveedores', 'Resolución de Problemas', 'Planificación de Capital'],
+      experience: [
+        {
+          title: 'Gerente de Mantenimiento',
+          company: 'Tyson Foods',
+          startDate: '2019-07',
+          isCurrent: true,
+          achievements: [
+            'Gestionó un equipo de mantenimiento de 22 técnicos responsables de $60M en equipos de producción en una instalación de 400K pies cuadrados',
+            'Redujo el tiempo de inactividad no planificado en un 55% mediante la implementación de un programa de mantenimiento predictivo usando análisis de vibraciones y termografía',
+            'Gestionó un presupuesto anual de mantenimiento de $2.5M, completando todos los proyectos dentro del presupuesto mientras redujo los costos de inventario de repuestos en un 20%',
+          ],
+        },
+        {
+          title: 'Supervisor de Mantenimiento',
+          company: 'Nestlé USA',
+          startDate: '2014-11',
+          endDate: '2019-06',
+          achievements: [
+            'Supervisó 12 técnicos de mantenimiento en 3 turnos, manteniendo un cumplimiento de MP del 95% y una disponibilidad de equipos del 92%',
+            'Lideró una implementación de CMMS (Maximo) que mejoró la eficiencia de seguimiento de órdenes de trabajo en un 60%',
+            'Ejecutó $1.5M en proyectos de equipos de capital incluyendo reemplazos de transportadores y mejoras de líneas de empaque',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'University of Arkansas', degree: 'Licenciatura', field: 'Tecnología de Ingeniería Mecánica', startDate: '2008-08', endDate: '2012-05' },
+      ],
+      certifications: [
+        { name: 'Profesional Certificado en Mantenimiento y Confiabilidad (CMRP)', issuer: 'SMRP', date: '2020-04' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe destacar un gerente de mantenimiento en su currículum?', answer: 'Enfóquese en tamaño del equipo, valor de activos de equipos, reducciones de tiempo de inactividad, tasas de cumplimiento de MP y gestión de presupuesto. Incluya plataformas CMMS y estrategias de mantenimiento implementadas.' },
+      { question: '¿Cómo demuestro mejora de confiabilidad en un currículum de gerente de mantenimiento?', answer: 'Cuantifique reducciones de tiempo de inactividad, mejoras en disponibilidad de equipos, aumentos de MTBF y tasas de cumplimiento de MP. Incluya herramientas y tecnologías de mantenimiento predictivo adoptadas.' },
+      { question: '¿Es importante la certificación CMRP para un gerente de mantenimiento?', answer: 'Sí. El CMRP de SMRP es la certificación premier para profesionales de mantenimiento y confiabilidad. Demuestra experiencia en mejores prácticas de mantenimiento e ingeniería de confiabilidad.' },
+    ],
+  },
+  'reliability-engineer': {
+    slug: 'ingeniero-de-confiabilidad',
+    title: 'Ingeniero de Confiabilidad',
+    keywords: ['currículum de ingeniero de confiabilidad', 'CV de ingeniería de confiabilidad', 'currículum de ingeniero de confiabilidad de mantenimiento', 'plantilla de currículum de especialista en confiabilidad'],
+    searchIntents: ['cómo escribir un currículum de ingeniero de confiabilidad', 'ejemplos de currículum de ingeniero de confiabilidad', 'plantilla de CV de ingeniería de confiabilidad'],
+    topSkills: ['Análisis de Confiabilidad', 'FMEA', 'Análisis de Causa Raíz', 'Análisis de Vibraciones', 'Mantenimiento Predictivo', 'RCM', 'Análisis de Datos', 'CMMS', 'Diseño de Equipos', 'Gestión de Proyectos'],
+    atsKeywords: ['análisis de confiabilidad', 'FMEA', 'análisis de causa raíz', 'análisis de vibraciones', 'mantenimiento predictivo', 'mantenimiento centrado en confiabilidad', 'análisis de fallas', 'MTBF', 'MTTR', 'gestión de activos', 'monitoreo de condición', 'análisis Weibull'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Andrew',
+      lastName: 'Sorensen',
+      profession: 'Ingeniero de Confiabilidad',
+      summary: 'Ingeniero de confiabilidad con más de 7 años de experiencia mejorando la confiabilidad de equipos y reduciendo el tiempo de inactividad no planificado en industrias de manufactura y procesos. Experto en FMEA, RCM, tecnologías de mantenimiento predictivo y análisis de fallas con más de $4M en ahorros documentados.',
+      skills: ['Análisis de Confiabilidad', 'FMEA', 'Análisis de Causa Raíz', 'Análisis de Vibraciones', 'Mantenimiento Predictivo', 'RCM', 'Análisis de Datos', 'CMMS', 'Diseño de Equipos', 'Gestión de Proyectos'],
+      experience: [
+        {
+          title: 'Ingeniero Senior de Confiabilidad',
+          company: 'Chevron',
+          startDate: '2020-08',
+          isCurrent: true,
+          achievements: [
+            'Implementó estrategias RCM en 3 unidades de refinería, aumentando la disponibilidad de equipos del 88% al 96% y ahorrando $2.8M anuales',
+            'Realizó más de 30 estudios FMEA identificando modos de falla críticos y optimizando intervalos de MP, reduciendo costos de mantenimiento en un 20%',
+            'Desplegó programas de análisis de vibraciones y análisis de aceite cubriendo más de 500 activos rotativos, detectando el 85% de las fallas antes de la avería',
+          ],
+        },
+        {
+          title: 'Ingeniero de Confiabilidad',
+          company: 'Dow Chemical',
+          startDate: '2017-05',
+          endDate: '2020-07',
+          achievements: [
+            'Realizó análisis de causa raíz de fallas en más de 50 fallas de equipos, implementando acciones correctivas que redujeron las fallas repetitivas en un 70%',
+            'Lideró un programa de análisis Weibull para poblaciones críticas de bombas y compresores, optimizando intervalos de reemplazo y ahorrando $600K anuales',
+            'Desarrolló tableros de confiabilidad rastreando MTBF, MTTR y listas de equipos problemáticos para revisión de la dirección',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Texas A&M University', degree: 'Licenciatura', field: 'Ingeniería Mecánica', startDate: '2013-08', endDate: '2017-05' },
+      ],
+      certifications: [
+        { name: 'Ingeniero de Confiabilidad Certificado (CRE)', issuer: 'ASQ', date: '2020-02' },
+        { name: 'Analista de Vibraciones Categoría II', issuer: 'Mobius Institute', date: '2019-06' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un ingeniero de confiabilidad en su currículum?', answer: 'Destaque mejoras en disponibilidad de equipos, métricas MTBF/MTTR, ahorros de costos, conteos de FMEA y RCA, y tecnologías de mantenimiento predictivo desplegadas. Incluya industrias y tipos de activos específicos.' },
+      { question: '¿Qué certificaciones son valoradas para ingenieros de confiabilidad?', answer: 'ASQ CRE, CMRP de SMRP y certificaciones de análisis de vibraciones de Mobius Institute o Vibration Institute son altamente valoradas. Incluya certificaciones de análisis de aceite y termografía.' },
+      { question: '¿Cómo demuestro ROI en un currículum de ingeniero de confiabilidad?', answer: 'Cuantifique ahorros por reducción de tiempo de inactividad, reducciones de costos de mantenimiento, extensión de vida útil de equipos y fallas catastróficas evitadas. La ingeniería de confiabilidad es fundamentalmente sobre impacto financiero.' },
+    ],
+  },
+  'industrial-engineer': {
+    slug: 'ingeniero-industrial',
+    title: 'Ingeniero Industrial',
+    keywords: ['currículum de ingeniero industrial', 'plantilla de currículum de IE', 'CV de ingeniería industrial', 'currículum de ingeniero de mejora de procesos'],
+    searchIntents: ['cómo escribir un currículum de ingeniero industrial', 'ejemplos de currículum de ingeniero industrial', 'plantilla de CV de ingeniería industrial'],
+    topSkills: ['Mejora de Procesos', 'Estudios de Tiempos y Movimientos', 'Lean/Six Sigma', 'Diseño de Instalaciones', 'Planificación de Capacidad', 'Modelado de Simulación', 'Análisis de Datos', 'Ergonomía', 'Gestión de Proyectos', 'AutoCAD'],
+    atsKeywords: ['mejora de procesos', 'estudios de tiempos', 'manufactura lean', 'Six Sigma', 'diseño de instalaciones', 'planificación de capacidad', 'modelado de simulación', 'medición de trabajo', 'ergonomía', 'mejora de productividad', 'trabajo estándar', 'investigación de operaciones'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Angela',
+      lastName: 'Patterson',
+      profession: 'Ingeniero Industrial',
+      summary: 'Ingeniera industrial con más de 6 años de experiencia optimizando operaciones de manufactura y distribución mediante mejora de procesos, diseño de instalaciones y metodologías lean. Entregó más de $3.5M en ganancias acumuladas de productividad y ahorros de costos en múltiples instalaciones.',
+      skills: ['Mejora de Procesos', 'Estudios de Tiempos y Movimientos', 'Lean/Six Sigma', 'Diseño de Instalaciones', 'Planificación de Capacidad', 'Simulación Arena', 'Análisis de Datos', 'Ergonomía', 'Gestión de Proyectos', 'AutoCAD'],
+      experience: [
+        {
+          title: 'Ingeniera Industrial Senior',
+          company: 'Amazon',
+          startDate: '2021-04',
+          isCurrent: true,
+          achievements: [
+            'Rediseñó rutas de picking y layouts de almacenamiento en almacén, mejorando el rendimiento de cumplimiento de pedidos en un 22% en 3 centros de distribución',
+            'Realizó estudios de tiempos y modelado de simulación que identificaron $1.5M en ahorros laborales mediante modelos de dotación optimizados',
+            'Lideró evaluaciones ergonómicas para más de 200 estaciones de trabajo, reduciendo lesiones musculoesqueléticas en un 35% y reclamos de compensación laboral en $400K anuales',
+          ],
+        },
+        {
+          title: 'Ingeniera Industrial',
+          company: 'FedEx Ground',
+          startDate: '2018-07',
+          endDate: '2021-03',
+          achievements: [
+            'Optimizó operaciones de clasificación de paquetes para un hub que procesa más de 200K paquetes diarios, reduciendo el tiempo de clasificación en un 15%',
+            'Diseñó un nuevo layout de instalaciones usando AutoCAD que aumentó la capacidad en un 30% sin expandir la huella del edificio',
+            'Implementó prácticas de trabajo estándar en 5 áreas de trabajo, mejorando la productividad laboral en un 18%',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'University of Pittsburgh', degree: 'Licenciatura', field: 'Ingeniería Industrial', startDate: '2014-08', endDate: '2018-05' },
+      ],
+      certifications: [
+        { name: 'Lean Six Sigma Green Belt', issuer: 'ASQ', date: '2019-11' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un ingeniero industrial en su currículum?', answer: 'Destaque mejoras de productividad, ahorros de costos, proyectos de diseño de instalaciones y herramientas lean/Six Sigma aplicadas. Incluya ganancias de rendimiento, ahorros laborales y mejoras ergonómicas.' },
+      { question: '¿Qué tan importante es el software de simulación para un currículum de ingeniero industrial?', answer: 'Cada vez más importante. Incluya herramientas como Arena, FlexSim o AnyLogic. La experiencia en simulación demuestra la capacidad de modelar y validar mejoras antes de la implementación.' },
+      { question: '¿Debo incluir experiencia en ergonomía en mi currículum de ingeniero industrial?', answer: 'Sí. La experiencia ergonómica es valorada para reducir riesgos de lesiones y costos de compensación laboral. Incluya métodos de evaluación, reducciones de lesiones y cualquier proyecto de diseño ergonómico.' },
+    ],
+  },
+  'packaging-engineer': {
+    slug: 'ingeniero-de-empaque',
+    title: 'Ingeniero de Empaque',
+    keywords: ['currículum de ingeniero de empaque', 'CV de diseño de empaques', 'currículum de ingeniero de desarrollo de empaques', 'plantilla de currículum de ingeniería de empaque'],
+    searchIntents: ['cómo escribir un currículum de ingeniero de empaque', 'ejemplos de currículum de ingeniero de empaque', 'plantilla de CV de ingeniero de diseño de empaques'],
+    topSkills: ['Diseño de Empaques', 'Selección de Materiales', 'Pruebas ISTA', 'SolidWorks', 'Sostenibilidad', 'Optimización de Costos', 'Cumplimiento Regulatorio', 'Gestión de Proveedores', 'Prototipado', 'Gestión de Proyectos'],
+    atsKeywords: ['diseño de empaques', 'selección de materiales', 'protocolos de pruebas ISTA', 'sostenibilidad de empaques', 'optimización de costos', 'cumplimiento regulatorio', 'validación de empaques', 'diseño CAD', 'prototipado', 'especificaciones de empaques', 'diseño de corrugado'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Emily',
+      lastName: 'Richter',
+      profession: 'Ingeniero de Empaque',
+      summary: 'Ingeniera de empaque con más de 5 años de experiencia diseñando, probando y optimizando soluciones de empaque para bienes de consumo y productos de e-commerce. Entregó más de $2M en ahorros de costos de empaque mientras mejoró métricas de sostenibilidad y rendimiento de protección de productos.',
+      skills: ['Diseño de Empaques', 'Selección de Materiales', 'Pruebas ISTA', 'SolidWorks', 'Sostenibilidad', 'Optimización de Costos', 'Cumplimiento Regulatorio', 'Gestión de Proveedores', 'Prototipado', 'Gestión de Proyectos'],
+      experience: [
+        {
+          title: 'Ingeniera Senior de Empaque',
+          company: 'Procter & Gamble',
+          startDate: '2021-06',
+          isCurrent: true,
+          achievements: [
+            'Rediseñó empaques para 8 líneas de productos reduciendo el uso de materiales en un 25% y ahorrando $1.2M anuales',
+            'Desarrolló una hoja de ruta de empaques sostenibles que aumentó el contenido reciclado del 15% al 50% en 12 SKUs',
+            'Realizó más de 100 protocolos de pruebas ISTA 3A y 6A, logrando una tasa de aprobación del 98% en primer intento',
+          ],
+        },
+        {
+          title: 'Ingeniera de Empaque',
+          company: 'Amazon',
+          startDate: '2019-01',
+          endDate: '2021-05',
+          achievements: [
+            'Optimizó empaques de e-commerce para más de 500 ASINs, reduciendo los cargos por peso dimensional en un 18% y ahorrando $800K anuales',
+            'Validó más de 50 diseños de empaques mediante pruebas ISTA, reduciendo las tasas de daño en tránsito del 3.2% al 0.8%',
+            'Gestionó 10 relaciones con proveedores de empaques, consolidando proveedores y reduciendo tiempos de entrega en un 30%',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Michigan State University', degree: 'Licenciatura', field: 'Ingeniería de Empaque', startDate: '2015-08', endDate: '2019-05' },
+      ],
+      certifications: [
+        { name: 'Profesional Certificado en Empaque (CPP)', issuer: 'Institute of Packaging Professionals', date: '2022-03' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un ingeniero de empaque en su currículum?', answer: 'Destaque ahorros de costos, mejoras de sostenibilidad, protocolos de pruebas y reducciones de tasas de daño. Incluya herramientas CAD, estándares de pruebas (ISTA, ASTM) y experiencia en materiales.' },
+      { question: '¿Qué tan importante es la experiencia en sostenibilidad para un ingeniero de empaque?', answer: 'Crítica. El empaque sostenible es una prioridad principal de la industria. Incluya mejoras en contenido reciclado, porcentajes de reducción de materiales y cualquier proyecto con materiales de base biológica o compostables.' },
+      { question: '¿Debo listar experiencia en pruebas ISTA en mi currículum de ingeniero de empaque?', answer: 'Sí. La competencia en pruebas ISTA es una habilidad fundamental. Especifique protocolos de prueba utilizados (3A, 6A, 2A), tasas de aprobación logradas y cómo los resultados de pruebas informaron mejoras de diseño.' },
+    ],
+  },
+  'food-safety-inspector': {
+    slug: 'inspector-de-seguridad-alimentaria',
+    title: 'Inspector de Seguridad Alimentaria',
+    keywords: ['currículum de inspector de seguridad alimentaria', 'CV de inspector de alimentos', 'currículum de auditor de seguridad alimentaria', 'plantilla de currículum de inspector de salud'],
+    searchIntents: ['cómo escribir un currículum de inspector de seguridad alimentaria', 'ejemplos de currículum de inspector de seguridad alimentaria', 'plantilla de currículum de inspección de alimentos'],
+    topSkills: ['Inspección de Seguridad Alimentaria', 'HACCP', 'Cumplimiento Regulatorio', 'Auditoría', 'Regulaciones FDA', 'Muestreo Microbiológico', 'Redacción de Reportes', 'Habilidades de Investigación', 'Comunicación', 'Atención al Detalle'],
+    atsKeywords: ['inspección de seguridad alimentaria', 'HACCP', 'cumplimiento regulatorio', 'auditoría de alimentos', 'regulaciones FDA', 'estándares USDA', 'muestreo microbiológico', 'inspección de saneamiento', 'cumplimiento GMP', 'ley de modernización de seguridad alimentaria', 'acciones correctivas'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Rebecca',
+      lastName: 'Lawson',
+      profession: 'Inspector de Seguridad Alimentaria',
+      summary: 'Inspectora de seguridad alimentaria con más de 5 años de experiencia realizando inspecciones y auditorías de instalaciones de manufactura, procesamiento y venta de alimentos. Experta en HACCP, regulaciones FDA y cumplimiento FSMA con más de 2,000 inspecciones completadas y un sólido historial de acciones de cumplimiento.',
+      skills: ['Inspección de Seguridad Alimentaria', 'HACCP', 'Cumplimiento Regulatorio', 'Auditoría', 'Regulaciones FDA', 'Muestreo Microbiológico', 'Redacción de Reportes', 'Habilidades de Investigación', 'Comunicación', 'Atención al Detalle'],
+      experience: [
+        {
+          title: 'Inspectora Senior de Seguridad Alimentaria',
+          company: 'U.S. Food and Drug Administration',
+          startDate: '2021-04',
+          isCurrent: true,
+          achievements: [
+            'Realizó más de 250 inspecciones anuales de instalaciones de manufactura y procesamiento de alimentos bajo regulaciones FSMA y cGMP',
+            'Identificó y documentó más de 80 violaciones críticas que llevaron a acciones exitosas de cumplimiento y medidas correctivas',
+            'Capacitó a 6 inspectores recién contratados en procedimientos de inspección, evaluación HACCP y documentación regulatoria',
+          ],
+        },
+        {
+          title: 'Auditora de Seguridad Alimentaria',
+          company: 'NSF International',
+          startDate: '2019-01',
+          endDate: '2021-03',
+          achievements: [
+            'Realizó más de 200 auditorías de terceros contra estándares SQF, BRC y FSSC 22000 para clientes de la industria alimentaria',
+            'Logró una tasa de precisión del 100% en reportes de auditoría con cero apelaciones de clientes durante 2 años',
+            'Recolectó y analizó más de 500 muestras ambientales y de producto con documentación apropiada de cadena de custodia',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'University of Georgia', degree: 'Licenciatura', field: 'Ciencia y Tecnología de Alimentos', startDate: '2015-08', endDate: '2019-05' },
+      ],
+      certifications: [
+        { name: 'Auditor HACCP Certificado', issuer: 'ASQ', date: '2019-09' },
+        { name: 'Individuo Calificado en Controles Preventivos (PCQI)', issuer: 'FSPCA', date: '2020-02' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un inspector de seguridad alimentaria en su currículum?', answer: 'Destaque volúmenes de inspección, estándares de auditoría aplicados, tasas de identificación de violaciones y resultados de cumplimiento. Incluya regulaciones específicas (FSMA, cGMP) y esquemas de certificación auditados.' },
+      { question: '¿Qué certificaciones son esenciales para inspectores de seguridad alimentaria?', answer: 'La certificación HACCP, PCQI y credenciales de Auditor Líder para SQF, BRC o FSSC 22000 son altamente valoradas. Incluya cualquier licencia estatal específica de inspección de alimentos.' },
+      { question: '¿Cómo demuestro minuciosidad en un currículum de inspector de seguridad alimentaria?', answer: 'Incluya volúmenes de inspección, tasas de detección de violaciones críticas, precisión de reportes de auditoría y resultados de acciones de cumplimiento. La minuciosidad impacta directamente la salud pública y la efectividad regulatoria.' },
+    ],
+  },
+  'warehouse-associate': {
+    slug: 'asociado-de-almacen',
+    title: 'Asociado de Almacén',
+    keywords: ['currículum de asociado de almacén', 'CV de trabajador de almacén', 'currículum de miembro de equipo de almacén', 'plantilla de currículum de asociado de almacén'],
+    searchIntents: ['cómo escribir un currículum de asociado de almacén', 'ejemplos de currículum de asociado de almacén', 'plantilla de currículum de trabajador de almacén'],
+    topSkills: ['Picking de Pedidos', 'Empaque', 'Recepción', 'Gestión de Inventario', 'Escáner RF', 'Resistencia Física', 'Cumplimiento de Seguridad', 'Trabajo en Equipo', 'Gestión del Tiempo', 'Atención al Detalle'],
+    atsKeywords: ['picking de pedidos', 'empaque', 'recepción', 'gestión de inventario', 'escáner RF', 'seguridad de almacén', 'operaciones de envío', 'control de calidad', 'WMS', 'manejo de materiales', 'precisión de pedidos'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Jerome',
+      lastName: 'Washington',
+      profession: 'Asociado de Almacén',
+      summary: 'Asociado de almacén con más de 3 años de experiencia en centros de distribución de alto volumen que procesan más de 10,000 pedidos diarios. Experto en picking de pedidos, empaque, recepción y gestión de inventario con una tasa de precisión de pedidos del 99.5% y un sólido récord de seguridad.',
+      skills: ['Picking de Pedidos', 'Empaque', 'Recepción', 'Gestión de Inventario', 'Escáner RF', 'Resistencia Física', 'Cumplimiento de Seguridad', 'Trabajo en Equipo', 'Gestión del Tiempo', 'Atención al Detalle'],
+      experience: [
+        {
+          title: 'Asociado de Almacén II',
+          company: 'Amazon',
+          startDate: '2022-09',
+          isCurrent: true,
+          achievements: [
+            'Realizó picking y empaque de más de 250 pedidos por turno con una tasa de precisión del 99.7%, superando consistentemente el objetivo de 200 pedidos',
+            'Recibió y procesó más de 15 envíos entrantes diarios, verificando cantidades y calidad contra órdenes de compra',
+            'Mantuvo cero incidentes de seguridad durante 18 meses siguiendo todos los protocolos de EPP y manejo de materiales',
+          ],
+        },
+        {
+          title: 'Asociado de Almacén',
+          company: 'Walmart Distribution Center',
+          startDate: '2021-02',
+          endDate: '2022-08',
+          achievements: [
+            'Procesó más de 180 pedidos por turno en un entorno de pick-to-light de ritmo acelerado con un 99.3% de precisión',
+            'Asistió con conteos mensuales de inventario, logrando una precisión de conteo del 99.8% en más de 5,000 SKUs',
+            'Capacitó a 8 nuevos asociados en operación de escáner RF, procedimientos de picking y estándares de seguridad',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Columbus State Community College', degree: 'Certificado', field: 'Almacén y Distribución', startDate: '2020-06', endDate: '2020-12' },
+      ],
+      certifications: [
+        { name: 'OSHA 10 Horas Industria General', issuer: 'OSHA', date: '2021-03' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un asociado de almacén en su currículum?', answer: 'Destaque pedidos procesados por turno, tasas de precisión, equipos operados y récord de seguridad. Incluya plataformas WMS utilizadas y cualquier capacitación cruzada en recepción, envío o inventario.' },
+      { question: '¿Cómo hago que un currículum de asociado de almacén destaque?', answer: 'Cuantifique su productividad: pedidos por hora, tasas de precisión y cómo se compara con los objetivos. Incluya cualquier capacitación que haya proporcionado y logros de seguridad.' },
+      { question: '¿Debo incluir la certificación de montacargas en mi currículum de asociado de almacén?', answer: 'Absolutamente. La certificación de montacargas (sentado, reach, order picker) es una habilidad valiosa. Incluya todos los equipos de manejo de materiales en los que está certificado para operar.' },
+    ],
+  },
+  'inventory-clerk': {
+    slug: 'empleado-de-inventario',
+    title: 'Empleado de Inventario',
+    keywords: ['currículum de empleado de inventario', 'CV de empleado de control de inventario', 'plantilla de currículum de almacenista', 'currículum de especialista en inventario'],
+    searchIntents: ['cómo escribir un currículum de empleado de inventario', 'ejemplos de currículum de empleado de inventario', 'plantilla de currículum de empleado de control de inventario'],
+    topSkills: ['Control de Inventario', 'Conteos Cíclicos', 'Entrada de Datos', 'Sistemas WMS/ERP', 'Recepción', 'Conciliación', 'Reportes', 'Organización', 'Atención al Detalle', 'Comunicación'],
+    atsKeywords: ['control de inventario', 'conteos cíclicos', 'entrada de datos', 'WMS', 'sistemas ERP', 'operaciones de recepción', 'conciliación de inventario', 'gestión de stock', 'gestión de SKUs', 'precisión de inventario', 'reducción de merma'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Kimberly',
+      lastName: 'Frost',
+      profession: 'Empleado de Inventario',
+      summary: 'Empleada de inventario con más de 4 años de experiencia manteniendo la precisión de inventario para centros de distribución que gestionan más de 15,000 SKUs. Competente en conteos cíclicos, operaciones WMS y conciliación de inventario con una tasa de precisión consistente superior al 99%.',
+      skills: ['Control de Inventario', 'Conteos Cíclicos', 'Entrada de Datos', 'Sistemas WMS', 'Recepción', 'Conciliación', 'Reportes', 'Organización', 'Atención al Detalle', 'Comunicación'],
+      experience: [
+        {
+          title: 'Empleada Senior de Inventario',
+          company: 'Sysco Corporation',
+          startDate: '2022-06',
+          isCurrent: true,
+          achievements: [
+            'Mantuvo una precisión de inventario del 99.4% en 18,000 SKUs en un centro de distribución de alimentos de $50M',
+            'Realizó más de 200 conteos cíclicos semanales, identificando y resolviendo discrepancias dentro de 24 horas',
+            'Redujo la merma de inventario en un 30% mediante verificación mejorada de recepción y procedimientos de prevención de pérdidas',
+          ],
+        },
+        {
+          title: 'Empleada de Inventario',
+          company: 'Grainger',
+          startDate: '2020-03',
+          endDate: '2022-05',
+          achievements: [
+            'Procesó más de 100 transacciones diarias de inventario en SAP WMS con una tasa de precisión de entrada de datos del 99.6%',
+            'Concilió discrepancias de inventario valoradas en más de $200K mensuales, manteniendo la merma por debajo del 0.5%',
+            'Preparó reportes semanales de inventario para la gerencia, rastreando niveles de stock, puntos de reorden y artículos de movimiento lento',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Ivy Tech Community College', degree: 'Técnico Superior', field: 'Administración de Empresas', startDate: '2018-08', endDate: '2020-05' },
+      ],
+      certifications: [
+        { name: 'Asociado Certificado en Logística (CLA)', issuer: 'Manufacturing Skill Standards Council', date: '2020-07' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un empleado de inventario en su currículum?', answer: 'Destaque conteos de SKUs gestionados, tasas de precisión de inventario, volúmenes de conteos cíclicos y reducciones de merma. Incluya sistemas WMS/ERP utilizados y cualquier mejora de proceso implementada.' },
+      { question: '¿Cómo demuestro precisión en un currículum de empleado de inventario?', answer: 'Incluya porcentajes específicos de precisión para entrada de datos, conteos cíclicos e inventario general. Cuantifique logros en resolución de discrepancias y reducción de merma.' },
+      { question: '¿Qué habilidades de software son importantes para un empleado de inventario?', answer: 'Las plataformas WMS (SAP WM, Manhattan, Oracle), sistemas ERP y habilidades avanzadas de Excel son esenciales. Incluya competencia con escáner de códigos de barras y cualquier herramienta de reportes utilizada.' },
+    ],
+  },
+  'order-fulfillment-specialist': {
+    slug: 'especialista-en-cumplimiento-de-pedidos',
+    title: 'Especialista en Cumplimiento de Pedidos',
+    keywords: ['currículum de especialista en cumplimiento de pedidos', 'CV de asociado de fulfillment', 'currículum de procesamiento de pedidos', 'plantilla de currículum de especialista en fulfillment'],
+    searchIntents: ['cómo escribir un currículum de especialista en cumplimiento de pedidos', 'ejemplos de currículum de cumplimiento de pedidos', 'plantilla de CV de especialista en fulfillment'],
+    topSkills: ['Procesamiento de Pedidos', 'Picking y Empaque', 'Control de Calidad', 'Software WMS', 'Coordinación de Envíos', 'Comunicación con Clientes', 'Gestión de Inventario', 'Resolución de Problemas', 'Gestión del Tiempo', 'Atención al Detalle'],
+    atsKeywords: ['procesamiento de pedidos', 'picking y empaque', 'control de calidad', 'WMS', 'coordinación de envíos', 'comunicación con clientes', 'gestión de inventario', 'precisión de pedidos', 'operaciones de fulfillment', 'procesamiento de devoluciones', 'cumplimiento de SLA'],
+    sampleResumeData: buildResumeData({
+      firstName: 'Darren',
+      lastName: 'McKay',
+      profession: 'Especialista en Cumplimiento de Pedidos',
+      summary: 'Especialista en cumplimiento de pedidos con más de 4 años de experiencia gestionando el procesamiento de pedidos de extremo a extremo en centros de fulfillment de e-commerce. Experto en picking, empaque, control de calidad y coordinación de envíos con una tasa de precisión de pedidos del 99.5% y cumplimiento de SLA del 100%.',
+      skills: ['Procesamiento de Pedidos', 'Picking y Empaque', 'Control de Calidad', 'Software WMS', 'Coordinación de Envíos', 'Comunicación con Clientes', 'Gestión de Inventario', 'Resolución de Problemas', 'Gestión del Tiempo', 'Atención al Detalle'],
+      experience: [
+        {
+          title: 'Especialista Senior de Fulfillment',
+          company: 'Shopify Fulfillment Network',
+          startDate: '2022-04',
+          isCurrent: true,
+          achievements: [
+            'Procesó más de 300 pedidos diarios en múltiples canales de venta con una tasa de precisión del 99.6% y cumplimiento de envío el mismo día',
+            'Identificó y resolvió más de 50 discrepancias de pedidos semanalmente, reduciendo las quejas de clientes en un 40%',
+            'Capacitó a 12 nuevos asociados de fulfillment en operaciones WMS, controles de calidad y estándares de empaque',
+          ],
+        },
+        {
+          title: 'Asociado de Fulfillment',
+          company: 'Target Distribution Center',
+          startDate: '2020-07',
+          endDate: '2022-03',
+          achievements: [
+            'Realizó picking, empaque y envío de más de 220 pedidos por turno en un entorno de fulfillment de e-commerce de ritmo acelerado',
+            'Mantuvo una tasa de aprobación de control de calidad del 99.3% en todos los envíos salientes',
+            'Asistió con el procesamiento de devoluciones, inspeccionando y reabasteciendo más de 100 artículos diarios con categorización adecuada',
+          ],
+        },
+      ],
+      education: [
+        { institution: 'Hennepin Technical College', degree: 'Técnico Superior', field: 'Gestión de Cadena de Suministro', startDate: '2018-08', endDate: '2020-05' },
+      ],
+      certifications: [
+        { name: 'Técnico de Logística Certificado (CLT)', issuer: 'Manufacturing Skill Standards Council', date: '2020-09' },
+      ],
+    }),
+    faqs: [
+      { question: '¿Qué debe incluir un especialista en cumplimiento de pedidos en su currículum?', answer: 'Destaque volumen diario de pedidos, tasas de precisión, cumplimiento de SLA y métricas de control de calidad. Incluya plataformas WMS, transportistas utilizados y cualquier mejora de proceso.' },
+      { question: '¿Cómo demuestro eficiencia en un currículum de cumplimiento de pedidos?', answer: 'Cuantifique pedidos procesados por hora/turno, compare con los objetivos e incluya cualquier mejora de velocidad lograda. Mencione experiencia en fulfillment multicanal y rendimiento en temporada alta.' },
+      { question: '¿Es importante la experiencia en procesamiento de devoluciones para roles de fulfillment?', answer: 'Sí. El procesamiento de devoluciones demuestra atención al detalle y resolución de problemas. Incluya volúmenes procesados, precisión de inspección y métricas de eficiencia de reabastecimiento.' },
+    ],
+  },
+};

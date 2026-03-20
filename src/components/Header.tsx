@@ -1,10 +1,13 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Menu, X, User, LogOut, Globe, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { Avatar } from './Avatar';
 import { formatName } from '@/utils/textFormatting';
+import { getSpanishProfessionSlug, getEnglishProfessionSlug } from '@/data/professions';
+import { getSpanishSkillSlug, getEnglishSkillSlug } from '@/data/skills';
+import { getLanguageFromSlug } from '@/data/slugMappings';
 
 export function Header() {
   const { t, i18n } = useTranslation();
@@ -12,9 +15,61 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'es' ? 'en' : 'es';
+    const currentPath = location.pathname;
+
+    // Check if we're on a profession or skill page and need to redirect
+    const professionMatch = currentPath.match(/^\/resume\/(.+)$/);
+    const skillMatch = currentPath.match(/^\/resume-skills\/(.+)$/);
+
+    if (professionMatch) {
+      const currentSlug = professionMatch[1];
+      const currentLang = getLanguageFromSlug(currentSlug, 'profession');
+
+      if (currentLang === 'en' && newLang === 'es') {
+        // Switching from English to Spanish profession page
+        const spanishSlug = getSpanishProfessionSlug(currentSlug);
+        if (spanishSlug) {
+          i18n.changeLanguage(newLang);
+          navigate(`/resume/${spanishSlug}`, { replace: true });
+          return;
+        }
+      } else if (currentLang === 'es' && newLang === 'en') {
+        // Switching from Spanish to English profession page
+        const englishSlug = getEnglishProfessionSlug(currentSlug);
+        if (englishSlug) {
+          i18n.changeLanguage(newLang);
+          navigate(`/resume/${englishSlug}`, { replace: true });
+          return;
+        }
+      }
+    } else if (skillMatch) {
+      const currentSlug = skillMatch[1];
+      const currentLang = getLanguageFromSlug(currentSlug, 'skill');
+
+      if (currentLang === 'en' && newLang === 'es') {
+        // Switching from English to Spanish skill page
+        const spanishSlug = getSpanishSkillSlug(currentSlug);
+        if (spanishSlug) {
+          i18n.changeLanguage(newLang);
+          navigate(`/resume-skills/${spanishSlug}`, { replace: true });
+          return;
+        }
+      } else if (currentLang === 'es' && newLang === 'en') {
+        // Switching from Spanish to English skill page
+        const englishSlug = getEnglishSkillSlug(currentSlug);
+        if (englishSlug) {
+          i18n.changeLanguage(newLang);
+          navigate(`/resume-skills/${englishSlug}`, { replace: true });
+          return;
+        }
+      }
+    }
+
+    // Default: just change language without redirecting
     i18n.changeLanguage(newLang);
   };
 
