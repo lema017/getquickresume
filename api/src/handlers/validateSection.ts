@@ -11,6 +11,7 @@ import { getUserById } from '../services/dynamodb';
 import { SECURITY_PREAMBLE, sanitizeForPrompt } from '../utils/inputSanitizer';
 import { trackAIUsage } from '../services/aiUsageService';
 import { getAIConfigForUser } from '../utils/aiProviderSelector';
+import type { OpenAiCompatibleChatCompletion } from '../types/aiHttpResponses';
 
 // ============================================================================
 // Types
@@ -222,10 +223,10 @@ async function callGroqAPI(prompt: string, model: string): Promise<{ content: st
     throw new Error(`Groq API error: ${response.status}`);
   }
 
-  const data = await response.json();
+  const data = (await response.json()) as OpenAiCompatibleChatCompletion;
   // Extract usage data including Groq prompt caching info
   return {
-    content: data.choices[0]?.message?.content || '',
+    content: data.choices?.[0]?.message?.content || '',
     usage: {
       promptTokens: data.usage?.prompt_tokens || 0,
       completionTokens: data.usage?.completion_tokens || 0,

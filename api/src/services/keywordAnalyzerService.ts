@@ -10,6 +10,7 @@ import { getAIConfigForUser } from '../utils/aiProviderSelector';
 import { trackAIUsage, AIResponse, TokenUsage } from './aiUsageService';
 import { jsonrepair } from 'jsonrepair';
 import { SECURITY_PREAMBLE, sanitizeUserInput, sanitizeForPrompt } from '../utils/inputSanitizer';
+import type { AnthropicMessagesResponse, OpenAiCompatibleChatCompletion } from '../types/aiHttpResponses';
 
 // ============================================================================
 // Types
@@ -361,10 +362,10 @@ Respond with ONLY valid JSON in this exact format:
       throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
     }
     
-    const data = await response.json();
-    
+    const data = (await response.json()) as OpenAiCompatibleChatCompletion;
+
     return {
-      content: data.choices[0]?.message?.content || '{}',
+      content: data.choices?.[0]?.message?.content || '{}',
       usage: {
         promptTokens: data.usage?.prompt_tokens || 0,
         completionTokens: data.usage?.completion_tokens || 0,
@@ -399,11 +400,11 @@ Respond with ONLY valid JSON in this exact format:
       throw new Error(`Groq API error: ${response.status} - ${errorText}`);
     }
     
-    const data = await response.json();
-    
+    const data = (await response.json()) as OpenAiCompatibleChatCompletion;
+
     // Extract usage data including Groq prompt caching info
     return {
-      content: data.choices[0]?.message?.content || '{}',
+      content: data.choices?.[0]?.message?.content || '{}',
       usage: {
         promptTokens: data.usage?.prompt_tokens || 0,
         completionTokens: data.usage?.completion_tokens || 0,
@@ -437,8 +438,8 @@ Respond with ONLY valid JSON in this exact format:
       throw new Error(`Anthropic API error: ${response.status} - ${errorText}`);
     }
     
-    const data = await response.json();
-    
+    const data = (await response.json()) as AnthropicMessagesResponse;
+
     return {
       content: data.content?.[0]?.text || '{}',
       usage: {

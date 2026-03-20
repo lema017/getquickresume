@@ -13,6 +13,7 @@ import { TokenUsage, AIResponse, trackAIUsage } from './aiUsageService';
 import { SECURITY_PREAMBLE, sanitizeForPrompt } from '../utils/inputSanitizer';
 import { GeneratedResume } from '../types';
 import { getAIConfigForUser } from '../utils/aiProviderSelector';
+import type { OpenAiCompatibleChatCompletion } from '../types/aiHttpResponses';
 
 // ============================================================================
 // TYPES
@@ -303,7 +304,7 @@ FINAL REMINDER:
         throw new Error(`Groq API error: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as OpenAiCompatibleChatCompletion;
       // Extract usage data including Groq prompt caching info
       const usage = {
         promptTokens: data.usage?.prompt_tokens || 0,
@@ -319,7 +320,7 @@ FINAL REMINDER:
       });
       
       return {
-        content: data.choices[0]?.message?.content || '',
+        content: data.choices?.[0]?.message?.content || '',
         usage
       };
     } catch (error) {
