@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
@@ -187,6 +187,61 @@ function App() {
             } />
 
             {/* Programmatic SEO: Profession Resume Pages */}
+            <Route
+              path="/resume/douglas-g-hurley"
+              element={<Navigate to="/resume/experienced-aerospace-engineer" replace />}
+            />
+            <Route
+              path="/resume/fresher"
+              element={<Navigate to="/resume/junior-software-engineer" replace />}
+            />
+            <Route path="/resume/basic" element={<Navigate to="/resume/software-engineer" replace />} />
+            <Route path="/resume/headline" element={<Navigate to="/resume/software-engineer" replace />} />
+            <Route path="/resume/summary" element={<Navigate to="/resume/software-engineer" replace />} />
+            <Route path="/resume/kegg-software-engineer" element={<Navigate to="/resume/software-engineer" replace />} />
+            <Route path="/resume/nau21-software-engineer" element={<Navigate to="/resume/software-engineer" replace />} />
+            <Route path="/resume/sabien-itaca-software-engineer" element={<Navigate to="/resume/software-engineer" replace />} />
+            <Route path="/resume/software-engineer-doetaylor" element={<Navigate to="/resume/software-engineer" replace />} />
+            <Route path="/resume/software-engineer-resume" element={<Navigate to="/resume/software-engineer" replace />} />
+            <Route path="/resume/software-engineering" element={<Navigate to="/resume/software-engineer" replace />} />
+            <Route path="/resume/software-engineering-ubc-eml" element={<Navigate to="/resume/software-engineer" replace />} />
+            <Route
+              path="/resume/curriculum-de-ingeniero-de-software"
+              element={<Navigate to="/resume/ingeniero-de-software" replace />}
+            />
+            <Route path="/resume/obgyn" element={<Navigate to="/resume/obstetrician-gynecologist" replace />} />
+            <Route path="/resume/pdf" element={<Navigate to="/resume/title-abstractor" replace />} />
+            <Route
+              path="/resume/robert-l-behnken"
+              element={<Navigate to="/resume/experienced-aerospace-engineer" replace />}
+            />
+            <Route path="/resume/teenage" element={<Navigate to="/resume/high-school-student" replace />} />
+            <Route path="/resume/file-clerk" element={<Navigate to="/resume/data-entry-clerk" replace />} />
+            <Route path="/resume/archivo-clerk" element={<Navigate to="/resume/operador-de-captura" replace />} />
+            <Route path="/resume/bellhop" element={<Navigate to="/resume/concierge" replace />} />
+            <Route path="/resume/bellhop-curriculum" element={<Navigate to="/resume/conserje" replace />} />
+            <Route path="/resume/english" element={<Navigate to="/resume/english-teacher" replace />} />
+            <Route path="/resume/curriculum-en-espanol" element={<Navigate to="/resume/profesor-de-ingles" replace />} />
+            <Route path="/resume/waitress" element={<Navigate to="/resume/server" replace />} />
+            <Route path="/resume/curriculum-esperanza-waitress" element={<Navigate to="/resume/mesero" replace />} />
+            <Route path="/resume/modern-call-center" element={<Navigate to="/resume/call-center-agent" replace />} />
+            <Route path="/resume/curriculum-llamada-moderna" element={<Navigate to="/resume/agente-de-call-center" replace />} />
+            <Route path="/resume/pipe-fitter" element={<Navigate to="/resume/plumber" replace />} />
+            <Route path="/resume/curriculum-para-tuberias" element={<Navigate to="/resume/plomero" replace />} />
+            <Route path="/resume/ic-designer" element={<Navigate to="/resume/ic-design-engineer" replace />} />
+            <Route path="/resume/diseñador-de-ci" element={<Navigate to="/resume/ingeniero-de-diseno-de-ci" replace />} />
+            <Route path="/resume/curriculum-designer" element={<Navigate to="/resume/curriculum-development-specialist" replace />} />
+            <Route path="/resume/diseñador-de-curriculum" element={<Navigate to="/resume/especialista-desarrollo-curriculo" replace />} />
+            <Route path="/resume/education-on-a" element={<Navigate to="/resume/high-school-teacher" replace />} />
+            <Route path="/resume/educacion-en-a" element={<Navigate to="/resume/profesor-de-secundaria" replace />} />
+            <Route path="/resume/medical-interpreter" element={<Navigate to="/resume/interpreter" replace />} />
+            <Route path="/resume/intérprete-médico" element={<Navigate to="/resume/interprete" replace />} />
+            <Route path="/resume/over-the-phone-interpreter" element={<Navigate to="/resume/interpreter" replace />} />
+            <Route path="/resume/intérprete-por-teléfono" element={<Navigate to="/resume/interprete" replace />} />
+            <Route path="/resume/nanny" element={<Navigate to="/resume/babysitter" replace />} />
+            <Route path="/resume/niñera-curriculum" element={<Navigate to="/resume/cuidadora-de-ninos" replace />} />
+            <Route path="/resume/farmacéutico" element={<Navigate to="/resume/farmaceutico" replace />} />
+            <Route path="/resume/titulo-proper-title" element={<Navigate to="/resume/extractor-de-titulos" replace />} />
             <Route path="/resume/:slug" element={
               <MainLayout>
                 <ProfessionResumePage />

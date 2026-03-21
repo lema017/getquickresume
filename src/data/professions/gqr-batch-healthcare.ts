@@ -2812,58 +2812,6 @@ export const professions: ProfessionPageData[] = [
     ],
   },
   {
-    slug: "medical-interpreter",
-    title: "Medical Interpreter",
-    templateStyle: "professional",
-    keywords: ["Medical Interpreter resume", "Medical Interpreter CV template", "Medical Interpreter resume example", "Medical Interpreter curriculum vitae"],
-    searchIntents: ["how to write a Medical Interpreter resume", "Medical Interpreter resume examples", "best Medical Interpreter resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Bilingual Communication", "Cultural Competence", "Medical Terminology", "Patient Advocacy", "Confidentiality", "Active Listening", "Note-taking Skills", "Time Management", "Interpersonal Skills", "Problem Solving"],
-    atsKeywords: ["Medical Interpretation", "Bilingual", "Spanish Interpreter", "Healthcare Communication", "Patient Interaction", "Language Proficiency", "Cultural Sensitivity", "Healthcare Terminology", "Interpretation Techniques", "Healthcare Systems", "Patient Confidentiality"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Medical Interpreter",
-      summary: "Dedicated Medical Interpreter with over 5 years of experience facilitating communication between healthcare providers and patients. Successfully interpreted over 1,000 medical encounters, improving patient satisfaction by 30%.",
-      skills: ["Language Proficiency in Spanish", "Healthcare Knowledge", "Simultaneous Interpretation", "Consecutive Interpretation", "Documentation Skills", "Client Relations", "Crisis Management", "Team Collaboration", "Adaptability", "Attention to Detail"],
-      experience: [
-        {
-          title: "Senior Medical Interpreter",
-          company: "HealthBridge Medical Center",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Increased patient understanding of medical procedures by 40% through effective interpretation.",
-            "Reduced appointment no-show rates by 25% by ensuring clear communication.",
-            "Facilitated over 500 telehealth sessions, enhancing access to care for non-English speaking patients.",
-          ],
-        },
-        {
-          title: "Medical Interpreter",
-          company: "CareFirst Health Services",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Provided interpretation for over 300 patient consultations, ensuring accurate information exchange.",
-            "Collaborated with medical staff to develop interpretive resources, improving service delivery.",
-            "Trained 5 new interpreters on best practices in medical interpretation.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Health Communication", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Certified Medical Interpreter (CMI)", issuer: "National Board of Certification for Medical Interpreters", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Medical Interpreter include on their resume?", answer: "A Medical Interpreter should include language proficiency, certification details, relevant experience in healthcare settings, and specific interpreting skills." },
-      { question: "How do I make my Medical Interpreter resume stand out?", answer: "Highlight measurable achievements, emphasize bilingual skills, and tailor your resume for each job application by using relevant keywords." },
-      { question: "What skills are most important for a Medical Interpreter?", answer: "Key skills include bilingual communication, cultural competence, medical terminology knowledge, and the ability to maintain confidentiality." },
-    ],
-  },
-  {
     slug: "medical-officer",
     title: "Medical Officer",
     templateStyle: "professional",
@@ -3486,58 +3434,6 @@ export const professions: ProfessionPageData[] = [
       { question: "What should a Mental Health Therapist include on their resume?", answer: "A Mental Health Therapist should include relevant education, certifications, key skills, and specific achievements that demonstrate their impact on client outcomes." },
       { question: "How do I make my Mental Health Therapist resume stand out?", answer: "Highlight quantifiable achievements, tailor your resume to the job description, and emphasize your unique therapeutic approaches." },
       { question: "What skills are most important for a Mental Health Therapist?", answer: "Key skills include empathy, active listening, crisis intervention techniques, and the ability to develop personalized treatment plans." },
-    ],
-  },
-  {
-    slug: "modern-call-center",
-    title: "Modern Call Center Resume",
-    templateStyle: "professional",
-    keywords: ["call center resume", "call center CV template", "call center resume example", "call center curriculum vitae"],
-    searchIntents: ["how to write a call center resume", "call center resume examples", "best call center resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Customer Service", "Communication", "Problem Solving", "Time Management", "Multi-tasking", "Technical Proficiency", "Sales Skills", "Adaptability", "Conflict Resolution", "Team Collaboration"],
-    atsKeywords: ["call center", "customer support", "call handling", "sales support", "CRM software", "communication skills", "problem-solving", "teamwork", "data entry", "customer satisfaction", "performance metrics"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Modern Call Center Resume",
-      summary: "Dedicated call center professional with over 5 years of experience in customer service and support, achieving a 95% customer satisfaction rate through effective communication and problem-solving skills.",
-      skills: ["Active Listening", "Empathy", "Voice Modulation", "Call Center Software", "Data Analysis", "Customer Relationship Management", "Conflict Management", "Training and Development", "Sales Techniques", "Report Generation"],
-      experience: [
-        {
-          title: "Senior Customer Service Representative",
-          company: "TeleTech",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Increased customer satisfaction scores by 20% over six months",
-            "Successfully managed an average of 80 calls per day with a 90% resolution rate",
-            "Led a team project that improved call response times by 15%",
-          ],
-        },
-        {
-          title: "Customer Service Representative",
-          company: "Concentrix",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Achieved employee of the month three times for outstanding performance",
-            "Maintained a 95% customer satisfaction rating throughout employment",
-            "Trained 5 new hires on company policies and procedures",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Business Administration", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Customer Service Excellence", issuer: "International Customer Service Association", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Modern Call Center include on their resume?", answer: "A Modern Call Center resume should include relevant work experience, specific achievements with metrics, skills pertinent to customer service and call handling, and any certifications related to customer support." },
-      { question: "How do I make my Modern Call Center resume stand out?", answer: "Highlight your achievements with quantifiable results, tailor your resume for the specific job description, and use action verbs to describe your responsibilities." },
-      { question: "What skills are most important for a Modern Call Center?", answer: "Key skills include excellent communication, problem-solving abilities, customer relationship management, adaptability, and technical proficiency in call center software." },
     ],
   },
   {

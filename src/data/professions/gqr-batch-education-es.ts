@@ -1652,56 +1652,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué habilidades necesita un Profesor de Música Coral?", answer: "Necesita habilidades en instrucción vocal, dirección coral, planificación curricular y manejo de aula." },
     ],
   },
-  "curriculum-designer": {
-    slug: "diseñador-de-curriculum",
-    title: "Diseñador de Currículum",
-    keywords: ["currículum de Diseñador de Currículum", "CV de Diseñador de Currículum", "ejemplo currículum Diseñador de Currículum", "plantilla CV Diseñador de Currículum"],
-    searchIntents: ["cómo escribir currículum de Diseñador de Currículum", "ejemplos currículum Diseñador de Currículum", "mejor formato CV Diseñador de Currículum"],
-    topSkills: ["Diseño Instruccional", "Sistemas de Gestión del Aprendizaje", "Desarrollo Curricular", "Diseño de Evaluaciones", "Gestión de Proyectos", "Análisis de Datos", "Desarrollo de E-Learning", "Estrategias de Enseñanza", "Colaboración", "Comunicación"],
-    atsKeywords: ["Desarrollo Curricular", "Estrategias Instruccionales", "Objetivos de Aprendizaje", "Teoría del Aprendizaje de Adultos", "Aprendizaje Híbrido", "Desarrollo de Contenido", "Tecnología Educativa", "Evaluación", "Evaluación de Programas", "Análisis de Necesidades", "Compromiso de Interesados"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Diseñador de Currículum",
-      summary: "Diseñador de Currículum dedicado con más de 5 años de experiencia en la creación de contenido educativo atractivo, lo que resultó en una mejora del 30% en las puntuaciones de satisfacción de los estudiantes.",
-      skills: ["Diseño Instruccional", "Sistemas de Gestión del Aprendizaje", "Desarrollo Curricular", "Diseño de Evaluaciones", "Gestión de Proyectos", "Análisis de Datos", "Desarrollo de E-Learning", "Estrategias de Enseñanza", "Colaboración", "Comunicación"],
-      experience: [
-        {
-          title: "Diseñador de Currículum Senior",
-          company: "Pearson Education",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Lideré el desarrollo de un nuevo currículo digital que aumentó el compromiso estudiantil en un 40%.",
-            "Implementé métodos de análisis de datos que mejoraron la precisión de las evaluaciones en un 25%.",
-            "Colaboré con equipos multifuncionales para mejorar los materiales del curso, resultando en un aumento del 15% en la retención de estudiantes.",
-          ],
-        },
-        {
-          title: "Desarrollador de Currículum",
-          company: "McGraw-Hill Education",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Diseñé y lancé una serie de cursos en línea que alcanzaron a más de 10,000 estudiantes.",
-            "Creé herramientas de evaluación que mejoraron el tiempo de respuesta del feedback en un 20%.",
-            "Facilité talleres para educadores para mejorar las técnicas de enseñanza, resultando en un aumento del 30% en el feedback positivo.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "University of California, Berkeley", degree: "B.S.", field: "Educación", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Certified Instructional Designer", issuer: "Association for Educational Communications and Technology", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un Diseñador de Currículum en su currículum?", answer: "Incluir experiencias relevantes, habilidades técnicas y ejemplos de trabajos previos." },
-      { question: "¿Cómo destacar mi currículum de Diseñador de Currículum?", answer: "Utiliza palabras clave relevantes y destaca logros medibles." },
-      { question: "¿Qué habilidades necesita un Diseñador de Currículum?", answer: "Diseño Instruccional, análisis de datos, y habilidades de comunicación son esenciales." },
-    ],
-  },
   "curriculum-development-specialist": {
     slug: "especialista-desarrollo-curriculo",
     title: "Especialista en Desarrollo Curricular",

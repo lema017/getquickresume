@@ -10975,58 +10975,6 @@ export const professions: ProfessionPageData[] = [
     ],
   },
   {
-    slug: "file-clerk",
-    title: "File Clerk",
-    templateStyle: "professional",
-    keywords: ["File Clerk resume", "File Clerk CV template", "File Clerk resume example", "File Clerk curriculum vitae"],
-    searchIntents: ["how to write a File Clerk resume", "File Clerk resume examples", "best File Clerk resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Organizational Skills", "Attention to Detail", "Data Entry", "Filing Systems", "Record Management", "Time Management", "Communication Skills", "Customer Service", "Problem Solving", "Team Collaboration"],
-    atsKeywords: ["file management", "data organization", "document retrieval", "confidentiality", "inventory control", "records keeping", "office administration", "customer interaction", "software proficiency", "time tracking", "accuracy"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "File Clerk",
-      summary: "Detail-oriented File Clerk with over 5 years of experience in managing and organizing files efficiently. Achieved a 30% reduction in retrieval time through improved filing systems.",
-      skills: ["Document Filing", "Data Entry Accuracy", "Record Keeping", "Microsoft Office Suite", "Database Management", "Scanning and Indexing", "Customer Support", "Report Generation", "Multi-tasking", "Problem Resolution"],
-      experience: [
-        {
-          title: "Senior File Clerk",
-          company: "Global Tech Solutions",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Reduced document retrieval time by 30% through the implementation of a new digital filing system.",
-            "Managed over 10,000 records with 99% accuracy in data entry.",
-            "Trained 5 new staff members on filing procedures, contributing to improved office efficiency.",
-          ],
-        },
-        {
-          title: "File Clerk",
-          company: "City Health Department",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Maintained accurate filing of sensitive health records for over 5,000 patients.",
-            "Streamlined the document request process, improving response time by 25%.",
-            "Assisted in the transition to electronic filing, reducing paper usage by 40%.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "College of Administration", degree: "B.S.", field: "Business Administration", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Certified File Management Professional", issuer: "National Association of File Management", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a File Clerk include on their resume?", answer: "A File Clerk should include relevant experience in file management, data entry skills, and familiarity with filing systems and software." },
-      { question: "How do I make my File Clerk resume stand out?", answer: "Highlight quantifiable achievements, such as improvements in efficiency and accuracy, and showcase relevant skills like organizational abilities and attention to detail." },
-      { question: "What skills are most important for a File Clerk?", answer: "Key skills include organizational skills, attention to detail, proficiency in data entry, and effective communication abilities." },
-    ],
-  },
-  {
     slug: "finance-account-manager",
     title: "Finance Account Manager",
     templateStyle: "professional",

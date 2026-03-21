@@ -260,7 +260,7 @@ export const translations: Record<string, ProfessionEsData> = {
     ],
   },
   'pharmacist': {
-    slug: 'farmacéutico',
+    slug: 'farmaceutico',
     title: 'Farmacéutico',
     keywords: ['currículum de farmacéutico', 'CV de farmacia', 'currículum de PharmD', 'plantilla de currículum de farmacéutico'],
     searchIntents: ['ejemplo de currículum de farmacéutico', 'cómo escribir un currículum de farmacéutico', 'plantilla de CV de farmacia'],
@@ -1177,7 +1177,7 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: '¿Debo incluir métricas de residencia en mi CV de medicina de emergencia?', answer: 'Sí, especialmente para médicos en las primeras etapas de su carrera. Incluya consultas totales de pacientes, activaciones de trauma gestionadas y registros de procedimientos. Estos demuestran volumen clínico y preparación para la práctica independiente.' },
     ],
   },
-  'obgyn': {
+  'obstetrician-gynecologist': {
     slug: 'ginecologo-obstetra',
     title: 'Ginecólogo-Obstetra',
     keywords: ['currículum de ginecólogo obstetra', 'CV de ginecobstetra', 'currículum de obstetricia y ginecología', 'plantilla de CV de ginecólogo obstetra'],

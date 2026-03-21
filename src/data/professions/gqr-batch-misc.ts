@@ -1459,58 +1459,6 @@ export const professions: ProfessionPageData[] = [
     ],
   },
   {
-    slug: "basic",
-    title: "Software Engineer",
-    templateStyle: "professional",
-    keywords: ["Software Engineer resume", "Software Engineer CV template", "Software Engineer resume example", "Software Engineer curriculum vitae"],
-    searchIntents: ["how to write a Software Engineer resume", "Software Engineer resume examples", "best Software Engineer resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Java", "Python", "JavaScript", "SQL", "C#", "HTML", "CSS", "React", "Node.js", "Git"],
-    atsKeywords: ["software development", "agile methodologies", "problem solving", "collaboration", "version control", "API development", "unit testing", "full-stack development", "data structures", "algorithms", "cloud computing"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Software Engineer",
-      summary: "Dedicated Software Engineer with over 5 years of experience in developing scalable web applications. Successfully improved application performance by 30%, resulting in increased user satisfaction.",
-      skills: ["Java", "React", "Node.js", "SQL", "Python", "REST APIs", "Agile", "DevOps", "Git", "Cloud Services"],
-      experience: [
-        {
-          title: "Senior Software Engineer",
-          company: "Tech Innovations Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Led a team to enhance application performance by 30%, boosting user engagement by 15%.",
-            "Developed and deployed 5 major features that increased client retention by 20%.",
-            "Implemented CI/CD pipelines reducing deployment time by 50%.",
-          ],
-        },
-        {
-          title: "Software Engineer",
-          company: "NextGen Solutions",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Collaborated on a project that resulted in a 25% increase in operational efficiency.",
-            "Optimized database queries, reducing load times by 40%.",
-            "Contributed to open-source projects improving code quality and team collaboration.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Computer Science", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "AWS Certified Solutions Architect", issuer: "Amazon Web Services", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Software Engineer include on their resume?", answer: "Focus on technical skills, relevant projects, and quantifiable achievements to demonstrate impact." },
-      { question: "How do I make my Software Engineer resume stand out?", answer: "Highlight unique projects, contributions to open-source, and relevant certifications to differentiate yourself." },
-      { question: "What skills are most important for a Software Engineer?", answer: "Key skills include programming languages, problem-solving abilities, knowledge of algorithms, and familiarity with development methodologies." },
-    ],
-  },
-  {
     slug: "basketball-coach",
     title: "Basketball Coach",
     templateStyle: "professional",
@@ -1820,58 +1768,6 @@ export const professions: ProfessionPageData[] = [
       { question: "What should a Behavior Interventionist include on their resume?", answer: "A Behavior Interventionist should include specific skills in behavior assessment, intervention strategies, and relevant certifications, along with quantifiable achievements in previous roles." },
       { question: "How do I make my Behavior Interventionist resume stand out?", answer: "Highlight unique experiences, such as specialized training or successful intervention case studies, and use metrics to demonstrate the impact of your work." },
       { question: "What skills are most important for a Behavior Interventionist?", answer: "Key skills include knowledge of behavior modification techniques, strong communication abilities, empathy, patience, and the ability to collaborate with families and other professionals." },
-    ],
-  },
-  {
-    slug: "bellhop",
-    title: "Bellhop",
-    templateStyle: "professional",
-    keywords: ["Bellhop resume", "Bellhop CV template", "Bellhop resume example", "Bellhop curriculum vitae"],
-    searchIntents: ["how to write a Bellhop resume", "Bellhop resume examples", "best Bellhop resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Customer Service", "Communication", "Time Management", "Attention to Detail", "Problem Solving", "Teamwork", "Adaptability", "Multitasking", "Physical Stamina", "Conflict Resolution"],
-    atsKeywords: ["hospitality", "guest services", "luggage handling", "check-in", "checkout", "room service", "concierge", "customer satisfaction", "team collaboration", "safety protocols", "property management"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Bellhop",
-      summary: "Dedicated Bellhop with over 5 years of experience in providing exceptional guest services and efficiently managing luggage. Proven record of increasing guest satisfaction by 20% through attentive service and attention to detail.",
-      skills: ["Exceptional Customer Service", "Strong Communication Skills", "Effective Time Management", "Detail-Oriented", "Strong Physical Stamina", "Team Collaboration", "Conflict Resolution", "Adaptability", "Multitasking Ability", "Problem Solving"],
-      experience: [
-        {
-          title: "Senior Bellhop",
-          company: "Grand Hotel & Resort",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Increased guest satisfaction ratings by 25% through personalized service.",
-            "Managed over 100 guest interactions daily, ensuring smooth check-in and check-out processes.",
-            "Streamlined luggage handling procedures, reducing average wait time by 15%.",
-          ],
-        },
-        {
-          title: "Bellhop",
-          company: "City Center Hotel",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Assisted guests with luggage and inquiries, achieving a 95% positive feedback score.",
-            "Collaborated with housekeeping and front desk teams to ensure timely service.",
-            "Trained new staff on best practices for guest services and safety protocols.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Hospitality Management", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Certified Hospitality Professional", issuer: "Hospitality Institute", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Bellhop include on their resume?", answer: "A Bellhop resume should include relevant experience in guest services, skills such as communication and problem-solving, and any certifications related to hospitality." },
-      { question: "How do I make my Bellhop resume stand out?", answer: "Highlight quantifiable achievements, showcase customer service skills, and include specific examples of how you've enhanced guest experiences." },
-      { question: "What skills are most important for a Bellhop?", answer: "Key skills for a Bellhop include strong customer service abilities, effective communication, physical stamina, and the capacity to manage multiple tasks efficiently." },
     ],
   },
   {
@@ -3537,58 +3433,6 @@ export const professions: ProfessionPageData[] = [
       { question: "What should a Co-Founder of The Agrocal Company include on their resume?", answer: "Highlight leadership experience, achievements in business growth, and specific agricultural skills relevant to your contributions." },
       { question: "How do I make my Co-Founder resume stand out?", answer: "Focus on quantifiable achievements, showcase your unique contributions to the company, and emphasize your leadership skills in the agricultural sector." },
       { question: "What skills are most important for a Co-Founder of The Agrocal Company?", answer: "Key skills include leadership, strategic planning, financial management, and a deep understanding of agricultural technology and market trends." },
-    ],
-  },
-  {
-    slug: "college-graduate",
-    title: "Entry-Level Software Engineer",
-    templateStyle: "professional",
-    keywords: ["software engineer resume", "entry-level CV template", "recent graduate resume example", "curriculum vitae for freshers"],
-    searchIntents: ["how to write a software engineer resume", "entry-level resume examples", "best recent graduate resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Java", "Python", "JavaScript", "SQL", "HTML/CSS", "Git", "Problem Solving", "Team Collaboration", "Agile Methodologies", "Data Structures"],
-    atsKeywords: ["software development", "programming", "web development", "algorithm", "data analysis", "project management", "software testing", "debugging", "API development", "technical documentation", "collaboration"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Entry-Level Software Engineer",
-      summary: "Recent computer science graduate with strong programming skills and a proven ability to deliver projects on time and under budget. Successfully completed multiple internships with a focus on software development and team collaboration.",
-      skills: ["Java", "Python", "JavaScript", "SQL", "C++", "HTML", "CSS", "React", "Node.js", "Git"],
-      experience: [
-        {
-          title: "Software Intern",
-          company: "Tech Innovations Inc.",
-          startDate: "2022-06",
-          isCurrent: true,
-          achievements: [
-            "Developed a web application that improved user engagement by 30%.",
-            "Collaborated with a team of 5 to redesign the company’s internal tools, reducing processing time by 15 hours per month.",
-            "Implemented automated testing that decreased bug reports by 20%.",
-          ],
-        },
-        {
-          title: "Junior Developer Intern",
-          company: "CodeCraft Solutions",
-          startDate: "2021-05",
-          endDate: "2022-05",
-          achievements: [
-            "Assisted in developing a mobile app that achieved a 4.5-star rating on app stores.",
-            "Contributed to database optimization efforts that improved query performance by 25%.",
-            "Participated in weekly code reviews to enhance coding skills and team communication.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Computer Science", startDate: "2018-08", endDate: "2022-05" },
-      ],
-      certifications: [
-        { name: "Certified Java Developer", issuer: "Oracle", date: "2022-10" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a College Graduate include on their resume?", answer: "A College Graduate should include their education, relevant internships or work experience, skills, and any certifications." },
-      { question: "How do I make my College Graduate resume stand out?", answer: "Highlight relevant projects, internships, and quantify achievements to showcase your impact." },
-      { question: "What skills are most important for a College Graduate?", answer: "Technical skills like programming languages, problem-solving abilities, and teamwork are crucial for a College Graduate." },
     ],
   },
   {
@@ -5517,7 +5361,7 @@ export const professions: ProfessionPageData[] = [
     ],
   },
   {
-    slug: "douglas-g-hurley",
+    slug: "experienced-aerospace-engineer",
     title: "Experienced Aerospace Engineer",
     templateStyle: "professional",
     keywords: ["Aerospace engineer resume", "Aerospace CV template", "Aerospace engineer resume example", "Aerospace curriculum vitae"],
@@ -5526,8 +5370,8 @@ export const professions: ProfessionPageData[] = [
     topSkills: ["Aerodynamics", "Fluid Dynamics", "Structural Analysis", "Project Management", "CAD Software", "Systems Engineering", "Thermal Analysis", "Propulsion Systems", "Manufacturing Processes", "Technical Documentation"],
     atsKeywords: ["aerospace", "engineering", "design", "analysis", "project management", "compliance", "testing", "simulation", "manufacturing", "research", "development"],
     sampleResumeData: buildResumeData({
-      firstName: "Douglas",
-      lastName: "Hurley",
+      firstName: "Alex",
+      lastName: "Johnson",
       profession: "Experienced Aerospace Engineer",
       summary: "A highly skilled Aerospace Engineer with over 10 years of experience in designing and analyzing complex systems for leading aerospace companies. Proven track record of improving project efficiency by 30% and reducing costs by $500,000 annually.",
       skills: ["Aerodynamics", "Computer-Aided Design (CAD)", "Finite Element Analysis (FEA)", "Programming (Python, MATLAB)", "System Modeling", "Risk Assessment", "Technical Writing", "Team Collaboration", "Regulatory Compliance", "Testing and Validation"],
@@ -5563,9 +5407,9 @@ export const professions: ProfessionPageData[] = [
       ],
     }),
     faqs: [
-      { question: "What should a Douglas G Hurley include on their resume?", answer: "A Douglas G Hurley should include relevant aerospace engineering experience, technical skills, and specific achievements that demonstrate their impact in previous roles." },
-      { question: "How do I make my Douglas G Hurley resume stand out?", answer: "Highlight unique projects, quantify achievements with metrics, and tailor the resume to the job description for each application." },
-      { question: "What skills are most important for a Douglas G Hurley?", answer: "Key skills include aerodynamics, structural analysis, project management, and proficiency in CAD software." },
+      { question: "What should an experienced aerospace engineer include on their resume?", answer: "Include relevant aerospace engineering experience, technical skills, and specific achievements that demonstrate impact in previous roles." },
+      { question: "How do I make my experienced aerospace engineer resume stand out?", answer: "Highlight unique projects, quantify achievements with metrics, and tailor the resume to the job description for each application." },
+      { question: "What skills are most important for an experienced aerospace engineer?", answer: "Key skills include aerodynamics, structural analysis, project management, and proficiency in CAD software." },
     ],
   },
   {
@@ -5774,58 +5618,6 @@ export const professions: ProfessionPageData[] = [
       { question: "What should an Education resume include?", answer: "An Education resume should include relevant teaching experience, educational background, certifications, and key skills that demonstrate your ability to engage students and develop effective curriculum." },
       { question: "How do I make my Education resume stand out?", answer: "Highlight specific achievements and metrics related to student success, use action verbs to describe your responsibilities, and tailor your resume to the job description." },
       { question: "What skills are most important for an Education professional?", answer: "Key skills include effective communication, classroom management, instructional design, and the ability to adapt teaching methods to meet diverse student needs." },
-    ],
-  },
-  {
-    slug: "education-on-a",
-    title: "Education On A",
-    templateStyle: "professional",
-    keywords: ["Education On A resume", "Education On A CV template", "Education On A resume example", "Education On A curriculum vitae"],
-    searchIntents: ["how to write a Education On A resume", "Education On A resume examples", "best Education On A resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Curriculum Development", "Classroom Management", "Educational Technology", "Instructional Design", "Assessment Strategies", "Differentiated Instruction", "Communication Skills", "Collaboration", "Adaptability", "Critical Thinking"],
-    atsKeywords: ["education", "teaching", "learning", "curriculum", "assessment", "student engagement", "technology integration", "professional development", "coaching", "mentoring", "classroom management"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Education On A",
-      summary: "Dedicated education professional with over 5 years of experience in developing innovative curricula and enhancing student engagement. Proven track record of increasing student performance by 20% through effective teaching strategies.",
-      skills: ["Lesson Planning", "Student Assessment", "Project-Based Learning", "Behavior Management", "Parent Communication", "Data-Driven Instruction", "Culturally Responsive Teaching", "Team Leadership", "Public Speaking", "Conflict Resolution"],
-      experience: [
-        {
-          title: "Senior Educator",
-          company: "Bright Futures Academy",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Increased student test scores by 30% through tailored lesson plans.",
-            "Implemented a new digital learning platform that improved student engagement by 25%.",
-            "Led a team of educators in developing a multi-disciplinary curriculum resulting in a 15% reduction in dropout rates.",
-          ],
-        },
-        {
-          title: "Educator",
-          company: "River Valley High School",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Developed and executed lesson plans that improved student satisfaction ratings by 40%.",
-            "Coordinated after-school tutoring programs that resulted in a 50% improvement in grades.",
-            "Facilitated professional development workshops for fellow teachers on classroom management techniques.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Education", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Certified Teacher", issuer: "State Board of Education", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Education On A include on their resume?", answer: "A resume for Education On A should include relevant teaching experience, educational background, certifications, and specific achievements that highlight teaching effectiveness." },
-      { question: "How do I make my Education On A resume stand out?", answer: "Incorporate metrics that demonstrate your impact on student success, use action verbs, and tailor your resume to the specific job you are applying for." },
-      { question: "What skills are most important for a Education On A?", answer: "Key skills include classroom management, curriculum development, effective communication, adaptability to different learning styles, and proficiency in educational technology." },
     ],
   },
   {
@@ -6346,58 +6138,6 @@ export const professions: ProfessionPageData[] = [
       { question: "What should an Energy Advisor include on their resume?", answer: "An Energy Advisor should include their relevant experience in energy efficiency projects, quantifiable achievements, certifications, and specific skills related to energy management and consulting." },
       { question: "How do I make my Energy Advisor resume stand out?", answer: "Highlight specific projects you've worked on, use metrics to demonstrate your impact, and include relevant certifications. Tailor your resume to the job description." },
       { question: "What skills are most important for an Energy Advisor?", answer: "Key skills for an Energy Advisor include energy auditing, data analysis, project management, knowledge of renewable energy technologies, and strong communication skills." },
-    ],
-  },
-  {
-    slug: "english",
-    title: "English Resume",
-    templateStyle: "professional",
-    keywords: ["English resume", "English CV template", "English resume example", "English curriculum vitae"],
-    searchIntents: ["how to write a English resume", "English resume examples", "best English resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Creative Writing", "Editing", "Literary Analysis", "Research", "Communication", "Teaching", "Public Speaking", "Content Development", "Proofreading", "Critical Thinking"],
-    atsKeywords: ["English Language", "Grammar", "Literature", "Instructional Design", "Curriculum Development", "Assessment", "Classroom Management", "Academic Writing", "Digital Literacy", "Content Strategy", "Project Management"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "English Resume",
-      summary: "An experienced English professional with over 5 years in education and content creation, recognized for improving student engagement by 30% through innovative teaching methods.",
-      skills: ["Creative Writing", "Editing", "Research", "Literary Analysis", "Public Speaking", "Curriculum Development", "Digital Communication", "Teaching", "Proofreading", "Instructional Design"],
-      experience: [
-        {
-          title: "Senior English Teacher",
-          company: "Greenwood Academy",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Increased student literacy rates by 25% over two years through tailored lesson plans.",
-            "Developed a new curriculum that improved overall student engagement by 30%.",
-            "Led workshops for fellow teachers that resulted in a 15% increase in teaching effectiveness.",
-          ],
-        },
-        {
-          title: "English Literature Instructor",
-          company: "Heritage High School",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Implemented a peer review system that enhanced student writing skills by 40%.",
-            "Organized literary events that increased attendance by 50%.",
-            "Collaborated on a school-wide initiative to integrate technology into the classroom, resulting in a 20% improvement in student performance.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.A.", field: "English Literature", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Certified English Teacher", issuer: "National Board for Professional Teaching Standards", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should an English resume include?", answer: "An English resume should include relevant educational background, teaching experience, specific skills related to literacy and communication, and measurable achievements in student performance." },
-      { question: "How do I make my English resume stand out?", answer: "Highlight unique teaching methodologies you have developed, include quantifiable achievements, and showcase any published works or contributions to educational platforms." },
-      { question: "What skills are most important for an English professional?", answer: "Key skills include strong writing and editing abilities, effective communication, creativity in lesson planning, and a deep understanding of literary analysis and pedagogy." },
     ],
   },
   {
@@ -8117,58 +7857,6 @@ export const professions: ProfessionPageData[] = [
     ],
   },
   {
-    slug: "fresher",
-    title: "Entry-Level Software Engineer",
-    templateStyle: "professional",
-    keywords: ["Entry-Level Software Engineer resume", "Entry-Level Software Engineer CV template", "Entry-Level Software Engineer resume example", "Entry-Level Software Engineer curriculum vitae"],
-    searchIntents: ["how to write an Entry-Level Software Engineer resume", "Entry-Level Software Engineer resume examples", "best Entry-Level Software Engineer resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Java", "Python", "JavaScript", "SQL", "HTML", "CSS", "Git", "Problem-Solving", "Team Collaboration", "Communication"],
-    atsKeywords: ["software development", "programming", "web development", "data structures", "algorithms", "Agile", "Scrum", "debugging", "testing", "version control", "object-oriented programming"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Entry-Level Software Engineer",
-      summary: "Recent computer science graduate with internship experience in software development. Successfully contributed to projects that improved application performance by 30%.",
-      skills: ["Java", "Python", "JavaScript", "SQL", "HTML", "CSS", "Git", "Problem-Solving", "Teamwork", "Adaptability"],
-      experience: [
-        {
-          title: "Software Development Intern",
-          company: "Tech Innovations Inc.",
-          startDate: "2022-06",
-          isCurrent: true,
-          achievements: [
-            "Contributed to a web application that increased user engagement by 25%",
-            "Assisted in debugging and optimizing code, reducing load times by 15%",
-            "Collaborated with the development team to implement new features",
-          ],
-        },
-        {
-          title: "IT Support Intern",
-          company: "Global Tech Solutions",
-          startDate: "2021-06",
-          endDate: "2022-05",
-          achievements: [
-            "Resolved over 200 technical support tickets, improving customer satisfaction rates by 20%",
-            "Streamlined IT documentation processes, enhancing team efficiency",
-            "Participated in daily stand-ups and team meetings, gaining Agile experience",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Computer Science", startDate: "2018-08", endDate: "2022-05" },
-      ],
-      certifications: [
-        { name: "Certified Java Programmer", issuer: "Oracle", date: "2023-01" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Fresher include on their resume?", answer: "Fresher resumes should include education, relevant skills, internship experiences, and any projects or certifications." },
-      { question: "How do I make my Fresher resume stand out?", answer: "Highlight specific projects, internships, and relevant skills. Use action verbs and quantify achievements where possible." },
-      { question: "What skills are most important for a Fresher?", answer: "Technical skills related to the job, problem-solving abilities, teamwork, and effective communication are vital for Freshers." },
-    ],
-  },
-  {
     slug: "front-line-employee",
     title: "Front Line Employee",
     templateStyle: "professional",
@@ -9414,58 +9102,6 @@ export const professions: ProfessionPageData[] = [
       { question: "What should a Headhunter include on their resume?", answer: "A Headhunter should include experience in talent acquisition, metrics demonstrating success, and specific skills related to recruiting and client management." },
       { question: "How do I make my Headhunter resume stand out?", answer: "Highlight successful placements, use clear metrics to demonstrate your impact, and tailor your resume to each job application by including relevant keywords." },
       { question: "What skills are most important for a Headhunter?", answer: "Key skills include strong interpersonal communication, negotiation, candidate sourcing techniques, and an understanding of industry trends." },
-    ],
-  },
-  {
-    slug: "headline",
-    title: "Software Engineer",
-    templateStyle: "professional",
-    keywords: ["Software Engineer resume", "Software Engineer CV template", "Software Engineer resume example", "Software Engineer curriculum vitae"],
-    searchIntents: ["how to write a Software Engineer resume", "Software Engineer resume examples", "best Software Engineer resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Java", "Python", "C++", "JavaScript", "SQL", "Agile", "Machine Learning", "DevOps", "React", "Node.js"],
-    atsKeywords: ["software development", "full stack", "backend", "frontend", "API development", "cloud computing", "database management", "version control", "problem solving", "team collaboration", "technical documentation"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Software Engineer",
-      summary: "Dedicated Software Engineer with over 5 years of experience in developing scalable web applications and a proven track record of optimizing performance, achieving a 30% reduction in load times across projects.",
-      skills: ["Java", "Python", "SQL", "Agile", "DevOps", "React", "Node.js", "C++", "Machine Learning", "Cloud Services"],
-      experience: [
-        {
-          title: "Senior Software Engineer",
-          company: "Tech Innovations Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Led a team to develop a microservices architecture, resulting in a 40% increase in system scalability.",
-            "Implemented a CI/CD pipeline that decreased deployment times by 50%.",
-            "Enhanced application performance, reducing load times by 30%.",
-          ],
-        },
-        {
-          title: "Software Engineer",
-          company: "Web Solutions LLC",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Developed a customer feedback system that improved user satisfaction ratings by 25%.",
-            "Coordinated with cross-functional teams to deliver projects on time and within budget.",
-            "Automated testing processes, resulting in a 20% reduction in bugs.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Computer Science", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "AWS Certified Solutions Architect", issuer: "Amazon", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Software Engineer include on their resume?", answer: "A Software Engineer should include relevant programming languages, frameworks, and tools, along with specific project achievements and metrics." },
-      { question: "How do I make my Software Engineer resume stand out?", answer: "Highlight your most impactful projects with quantifiable results, use industry-specific keywords, and tailor your resume to the job description." },
-      { question: "What skills are most important for a Software Engineer?", answer: "Key skills include proficiency in programming languages, understanding of algorithms and data structures, experience with version control systems, and familiarity with Agile methodologies." },
     ],
   },
   {
@@ -12902,58 +12538,6 @@ export const professions: ProfessionPageData[] = [
     ],
   },
   {
-    slug: "nanny",
-    title: "Nanny",
-    templateStyle: "professional",
-    keywords: ["Nanny resume", "Nanny CV template", "Nanny resume example", "Nanny curriculum vitae"],
-    searchIntents: ["how to write a Nanny resume", "Nanny resume examples", "best Nanny resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Childcare", "First Aid", "CPR Certification", "Communication", "Time Management", "Conflict Resolution", "Meal Preparation", "Organizational Skills", "Educational Activities", "Household Management"],
-    atsKeywords: ["child supervision", "developmental activities", "safety protocols", "nurturing", "behavior management", "transportation", "playtime activities", "family engagement", "household chores", "emergency response", "multi-tasking"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Nanny",
-      summary: "Dedicated Nanny with over 5 years of experience in providing exceptional childcare and creating a safe, nurturing environment for children. Successfully managed the daily needs of children aged 1-10, leading to a 30% improvement in their social and emotional development.",
-      skills: ["Child Development", "Creative Play", "Behavioral Management", "Cooking Healthy Meals", "Educational Support", "Arts and Crafts", "Transportation Safety", "Patience", "Flexibility", "Housekeeping"],
-      experience: [
-        {
-          title: "Senior Nanny",
-          company: "Bright Futures Childcare",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Implemented a structured daily routine that improved children's behavioral issues by 40%",
-            "Successfully organized educational activities that enhanced children's learning skills, resulting in a 25% increase in school readiness",
-            "Developed strong relationships with families, leading to a 100% satisfaction rate in client feedback",
-          ],
-        },
-        {
-          title: "Nanny",
-          company: "Happy Kids Nanny Services",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Provided care for three children, ages 2 to 8, ensuring their safety and well-being during daily activities",
-            "Coordinated and executed educational and recreational activities that promoted physical and mental development",
-            "Managed household tasks, including meal preparation and laundry, improving household efficiency by 20%",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Child Development", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "CPR and First Aid Certification", issuer: "American Red Cross", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Nanny include on their resume?", answer: "A Nanny should include relevant experience with children, certifications, specific skills related to childcare, and any achievements that demonstrate their impact on child development." },
-      { question: "How do I make my Nanny resume stand out?", answer: "Highlight specific accomplishments, use metrics to quantify your impact, and tailor your resume to the job description by including keywords relevant to the nanny position." },
-      { question: "What skills are most important for a Nanny?", answer: "Key skills for a Nanny include childcare experience, communication skills, patience, creativity in engaging children, and the ability to manage multiple tasks effectively." },
-    ],
-  },
-  {
     slug: "natural-sciences-student",
     title: "Natural Sciences Student",
     templateStyle: "professional",
@@ -13566,58 +13150,6 @@ export const professions: ProfessionPageData[] = [
     ],
   },
   {
-    slug: "over-the-phone-interpreter",
-    title: "Over The Phone Interpreter",
-    templateStyle: "professional",
-    keywords: ["Over The Phone Interpreter resume", "Over The Phone Interpreter CV template", "Over The Phone Interpreter resume example", "Over The Phone Interpreter curriculum vitae"],
-    searchIntents: ["how to write a Over The Phone Interpreter resume", "Over The Phone Interpreter resume examples", "best Over The Phone Interpreter resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Fluent in multiple languages", "Cultural sensitivity", "Active listening", "Communication skills", "Problem solving", "Attention to detail", "Time management", "Technical proficiency", "Confidentiality adherence", "Client relationship management"],
-    atsKeywords: ["bilingual", "interpretation", "translation", "customer service", "language proficiency", "remote interpretation", "conflict resolution", "interpersonal skills", "accuracy", "multitasking", "professionalism"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Over The Phone Interpreter",
-      summary: "Dedicated Over The Phone Interpreter with 5 years of experience in delivering high-quality language services and improving client satisfaction by 30%. Proven track record of handling sensitive information with confidentiality and accuracy.",
-      skills: ["Language proficiency", "Interpretation techniques", "Voice modulation", "Client engagement", "Crisis management", "Cultural knowledge", "Documentation skills", "Training and development", "Feedback incorporation", "Time zone management"],
-      experience: [
-        {
-          title: "Senior Interpreter",
-          company: "Linguistic Solutions Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Increased client satisfaction ratings by 30% through improved service delivery.",
-            "Successfully interpreted over 1,000 calls in various languages, maintaining a 98% accuracy rate.",
-            "Developed a training manual for new interpreters, reducing onboarding time by 20%.",
-          ],
-        },
-        {
-          title: "Telephone Interpreter",
-          company: "Global Language Services",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Handled an average of 50 calls per day, ensuring timely and effective communication.",
-            "Achieved a 95% client retention rate by providing exceptional language services.",
-            "Participated in quality assurance initiatives that improved service consistency.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Linguistics", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Certified Medical Interpreter", issuer: "National Board of Certification for Medical Interpreters", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Over The Phone Interpreter include on their resume?", answer: "An Over The Phone Interpreter should include language proficiency, interpretation experience, and relevant certifications." },
-      { question: "How do I make my Over The Phone Interpreter resume stand out?", answer: "Highlight specific achievements, incorporate metrics, and emphasize your unique skills in interpretation." },
-      { question: "What skills are most important for a Over The Phone Interpreter?", answer: "Key skills include fluent language proficiency, active listening, cultural sensitivity, and effective communication." },
-    ],
-  },
-  {
     slug: "part-time-job",
     title: "Part Time Job",
     templateStyle: "professional",
@@ -13769,58 +13301,6 @@ export const professions: ProfessionPageData[] = [
       { question: "What should a Payment Processing resume include?", answer: "A Payment Processing resume should include specific skills such as transaction management, fraud detection, and customer service experience, along with quantifiable achievements and relevant certifications." },
       { question: "How do I make my Payment Processing resume stand out?", answer: "Highlight your achievements with metrics, use industry-specific keywords, and tailor your resume to match the job description." },
       { question: "What skills are most important for a Payment Processing Specialist?", answer: "Key skills include transaction management, regulatory compliance, data analysis, and strong communication abilities to handle customer inquiries effectively." },
-    ],
-  },
-  {
-    slug: "pdf",
-    title: "Proper Title",
-    templateStyle: "professional",
-    keywords: ["Pdf resume", "Pdf CV template", "Pdf resume example", "Pdf curriculum vitae"],
-    searchIntents: ["how to write a Pdf resume", "Pdf resume examples", "best Pdf resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Adobe Acrobat", "PDF Editing", "Document Formatting", "Digital Publishing", "File Compression", "Optical Character Recognition", "Document Management", "Graphic Design", "Version Control", "Collaboration Tools"],
-    atsKeywords: ["pdf", "document design", "visual communication", "layout", "user experience", "software proficiency", "file conversion", "metadata management", "print production", "content creation", "project management"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Proper Title",
-      summary: "Detail-oriented PDF specialist with over 5 years of experience in document design and editing, recognized for increasing document accessibility by 30% and streamlining workflows for cross-functional teams.",
-      skills: ["Adobe Acrobat Pro", "InDesign", "Photoshop", "Illustrator", "Microsoft Office Suite", "Google Workspace", "HTML/CSS", "Project Management", "Attention to Detail", "Problem Solving"],
-      experience: [
-        {
-          title: "Senior PDF Specialist",
-          company: "TechDocs Solutions",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Improved document conversion processes, reducing turnaround time by 40%",
-            "Led a team to redesign user manuals, increasing customer satisfaction scores by 25%",
-            "Developed a PDF training program that decreased onboarding time for new hires by 15%",
-          ],
-        },
-        {
-          title: "PDF Designer",
-          company: "Creative Documents Inc.",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Created and maintained a library of over 100 PDF templates for internal use",
-            "Collaborated with marketing to produce visually appealing PDF brochures, leading to a 20% increase in lead generation",
-            "Implemented quality control measures that reduced errors in published documents by 35%",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Graphic Design", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Adobe Certified Expert (ACE)", issuer: "Adobe", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Pdf include on their resume?", answer: "A Pdf should include relevant experience in document design, editing skills, proficiency with PDF software, and an understanding of best practices for accessibility and usability." },
-      { question: "How do I make my Pdf resume stand out?", answer: "Utilize clean layouts, incorporate visuals where appropriate, highlight measurable achievements, and ensure your contact information is easily accessible." },
-      { question: "What skills are most important for a Pdf?", answer: "Key skills include proficiency in Adobe Acrobat, attention to detail in document formatting, understanding of digital publishing principles, and the ability to collaborate effectively with teams." },
     ],
   },
   {
@@ -13977,58 +13457,6 @@ export const professions: ProfessionPageData[] = [
       { question: "What should a Physics Lecturer include on their resume?", answer: "A Physics Lecturer should include relevant teaching experience, research accomplishments, education background, and specific skills related to physics and education." },
       { question: "How do I make my Physics Lecturer resume stand out?", answer: "Highlight your teaching innovations, student success metrics, and any published research. Tailor your resume to emphasize the skills and experiences most relevant to the position." },
       { question: "What skills are most important for a Physics Lecturer?", answer: "Key skills include a strong grasp of physics concepts, effective communication, classroom management, curriculum development, and the ability to engage students in the learning process." },
-    ],
-  },
-  {
-    slug: "pipe-fitter",
-    title: "Pipe Fitter Resume",
-    templateStyle: "professional",
-    keywords: ["Pipe Fitter resume", "Pipe Fitter CV template", "Pipe Fitter resume example", "Pipe Fitter curriculum vitae"],
-    searchIntents: ["how to write a Pipe Fitter resume", "Pipe Fitter resume examples", "best Pipe Fitter resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Pipe welding", "Blueprint reading", "Pipe installation", "Safety protocols", "Hydraulic systems", "Troubleshooting", "Metal fabrication", "Job site management", "Piping layout", "Quality control"],
-    atsKeywords: ["pipe fitting", "welding", "installation", "maintenance", "blueprint interpretation", "safety compliance", "mechanical skills", "team collaboration", "problem-solving", "piping systems", "hydraulics"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Pipe Fitter Resume",
-      summary: "Experienced Pipe Fitter with over 8 years in the industry, specializing in high-pressure systems and optimizing installation efficiency, resulting in a 20% reduction in project timelines.",
-      skills: ["Pipe welding", "Installation techniques", "Blueprint analysis", "Leak detection", "Metal joining", "Pressure testing", "Piping system design", "Safety regulations", "Team leadership", "Equipment operation"],
-      experience: [
-        {
-          title: "Senior Pipe Fitter",
-          company: "Industrial Solutions Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Led a team of 5 in the successful installation of a complex piping system, reducing labor costs by $15,000.",
-            "Implemented new safety protocols that decreased workplace accidents by 30%.",
-            "Streamlined the installation process, resulting in a 25% increase in project completion rate.",
-          ],
-        },
-        {
-          title: "Pipe Fitter",
-          company: "Precision Pipeworks",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Completed over 50 successful installations of commercial piping systems.",
-            "Trained 10 new employees in pipe fitting techniques and safety measures.",
-            "Contributed to a project that won the regional safety award for excellence in safety practices.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "Technical College", degree: "A.S.", field: "Pipe Fitting Technology", startDate: "2012-08", endDate: "2014-05" },
-      ],
-      certifications: [
-        { name: "Certified Pipe Fitter", issuer: "National Center for Construction Education and Research", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Pipe Fitter include on their resume?", answer: "A Pipe Fitter should include relevant work experience, certifications, specific skills related to pipe fitting, and measurable achievements." },
-      { question: "How do I make my Pipe Fitter resume stand out?", answer: "Highlight specific projects with quantifiable results, use industry-specific keywords, and emphasize certifications and safety training." },
-      { question: "What skills are most important for a Pipe Fitter?", answer: "Important skills include pipe welding, blueprint reading, safety compliance, and effective communication for teamwork." },
     ],
   },
   {
@@ -16162,58 +15590,6 @@ export const professions: ProfessionPageData[] = [
       { question: "What should a Retail Worker include on their resume?", answer: "A Retail Worker should include relevant experience, skills related to customer service and sales, and any achievements that demonstrate their ability to drive sales and enhance customer satisfaction." },
       { question: "How do I make my Retail Worker resume stand out?", answer: "Highlight specific achievements with quantifiable metrics, incorporate relevant keywords from the job description, and showcase strong customer service skills." },
       { question: "What skills are most important for a Retail Worker?", answer: "Key skills include customer service excellence, effective communication, sales techniques, time management, and teamwork." },
-    ],
-  },
-  {
-    slug: "robert-l-behnken",
-    title: "Aerospace Engineer",
-    templateStyle: "professional",
-    keywords: ["Aerospace engineer resume", "Aerospace CV template", "Aerospace engineer resume example", "Aerospace curriculum vitae"],
-    searchIntents: ["how to write an aerospace engineer resume", "aerospace engineer resume examples", "best aerospace engineer resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Structural analysis", "Fluid dynamics", "Project management", "CAD software proficiency", "Systems engineering", "Simulation modeling", "Data analysis", "Technical documentation", "Team collaboration", "Problem-solving"],
-    atsKeywords: ["aerospace engineering", "NASA", "design engineering", "research and development", "aerodynamics", "mechanical systems", "electrical systems", "robotics", "test engineering", "project lifecycle", "compliance standards"],
-    sampleResumeData: buildResumeData({
-      firstName: "Robert",
-      lastName: "Behnken",
-      profession: "Aerospace Engineer",
-      summary: "A seasoned Aerospace Engineer with over 15 years of experience in spacecraft design and development, recognized for leading projects that achieved a 30% reduction in costs while improving safety metrics.",
-      skills: ["Rocket propulsion", "Avionics systems", "Thermal protection systems", "Manufacturing processes", "Technical leadership", "Risk assessment", "Regulatory compliance", "Prototype testing", "Cross-functional teamwork", "Innovative design solutions"],
-      experience: [
-        {
-          title: "Senior Aerospace Engineer",
-          company: "NASA",
-          startDate: "2016-01",
-          isCurrent: true,
-          achievements: [
-            "Led a team that developed spacecraft systems, reducing launch costs by $5 million.",
-            "Implemented design improvements that enhanced mission success rates by 15%.",
-            "Collaborated on a project that resulted in a 20% increase in payload capacity.",
-          ],
-        },
-        {
-          title: "Aerospace Engineer",
-          company: "SpaceX",
-          startDate: "2010-05",
-          endDate: "2015-12",
-          achievements: [
-            "Contributed to the Falcon 9 rocket design, achieving a 10% weight reduction.",
-            "Developed testing protocols that improved safety metrics by 25%.",
-            "Assisted in the successful launch of 20 missions, each surpassing performance targets.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "University of California, Los Angeles", degree: "B.S.", field: "Aerospace Engineering", startDate: "2005-09", endDate: "2009-06" },
-      ],
-      certifications: [
-        { name: "Certified Aerospace Technician", issuer: "National Institute for Certification in Engineering Technologies", date: "2018-04" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Robert L Behnken include on their resume?", answer: "An aerospace engineer should include detailed project experiences, technical skills specific to aerospace, and metrics demonstrating their impact on past projects." },
-      { question: "How do I make my Robert L Behnken resume stand out?", answer: "Highlight unique projects, quantify achievements with metrics, and showcase relevant certifications and advanced skills that align with aerospace engineering." },
-      { question: "What skills are most important for a Robert L Behnken?", answer: "Key skills include aerospace design principles, proficiency in CAD software, project management abilities, and a strong understanding of fluid dynamics and structural analysis." },
     ],
   },
   {
@@ -18713,58 +18089,6 @@ export const professions: ProfessionPageData[] = [
     ],
   },
   {
-    slug: "summary",
-    title: "Software Engineer Resume",
-    templateStyle: "professional",
-    keywords: ["software engineer resume", "software engineer CV template", "software engineer resume example", "software engineer curriculum vitae"],
-    searchIntents: ["how to write a software engineer resume", "software engineer resume examples", "best software engineer resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Java", "Python", "JavaScript", "SQL", "React", "Node.js", "C++", "Agile", "DevOps", "Cloud Computing"],
-    atsKeywords: ["software development", "full-stack development", "API integration", "software testing", "version control", "problem-solving", "team collaboration", "technical documentation", "software architecture", "database management", "project management"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Software Engineer Resume",
-      summary: "Results-driven Software Engineer with over 5 years of experience in developing scalable web applications. Achieved a 30% reduction in system downtime through effective troubleshooting and optimization.",
-      skills: ["s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10"],
-      experience: [
-        {
-          title: "Senior Software Engineer",
-          company: "Tech Innovations Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Led a team in migrating legacy systems to cloud-based solutions, resulting in a 40% increase in deployment speed.",
-            "Developed a machine learning model that improved user engagement metrics by 25%.",
-            "Implemented CI/CD pipelines that reduced release times by 50%.",
-          ],
-        },
-        {
-          title: "Software Engineer",
-          company: "Creative Solutions LLC",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Designed and developed a web application that handled over 1 million users.",
-            "Optimized existing codebase, leading to a 20% improvement in application performance.",
-            "Collaborated with cross-functional teams to deliver projects on time and within budget.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Computer Science", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "AWS Certified Solutions Architect", issuer: "Amazon Web Services", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Summary include on their resume?", answer: "A summary should highlight your key skills, years of experience, and notable achievements relevant to the software engineering field." },
-      { question: "How do I make my Summary resume stand out?", answer: "Incorporate quantifiable achievements, use powerful action verbs, and customize your summary to match the job description." },
-      { question: "What skills are most important for a Summary?", answer: "Key skills include programming languages, frameworks, problem-solving abilities, and experience with software development life cycle." },
-    ],
-  },
-  {
     slug: "superintendent",
     title: "Superintendent",
     templateStyle: "professional",
@@ -19230,58 +18554,6 @@ export const professions: ProfessionPageData[] = [
       { question: "What should a Technology Assistant include on their resume?", answer: "A Technology Assistant should include technical skills, relevant work experience, certifications, and a summary of achievements in IT support." },
       { question: "How do I make my Technology Assistant resume stand out?", answer: "Highlight specific achievements with metrics, use action verbs, and tailor your resume to the job description." },
       { question: "What skills are most important for a Technology Assistant?", answer: "Key skills include technical troubleshooting, customer service, knowledge of operating systems, and effective communication." },
-    ],
-  },
-  {
-    slug: "teenage",
-    title: "Teen Resume",
-    templateStyle: "professional",
-    keywords: ["teen resume", "teen CV template", "teen resume example", "teen curriculum vitae"],
-    searchIntents: ["how to write a teen resume", "teen resume examples", "best teen resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["communication", "teamwork", "time management", "problem-solving", "customer service", "adaptability", "leadership", "creativity", "digital literacy", "attention to detail"],
-    atsKeywords: ["youth employment", "entry-level", "internship", "part-time job", "high school", "volunteer experience", "skills-based", "reliable", "motivated", "punctual", "effective communication"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Teen Resume",
-      summary: "Dedicated high school student with 2 years of volunteer experience and demonstrated leadership in school projects, contributing to a 30% increase in event participation.",
-      skills: ["customer service", "basic computer skills", "social media management", "public speaking", "event coordination", "research skills", "cash handling", "conflict resolution", "team collaboration", "time management"],
-      experience: [
-        {
-          title: "Volunteer Coordinator",
-          company: "Local Community Center",
-          startDate: "2022-01",
-          isCurrent: true,
-          achievements: [
-            "Increased volunteer sign-ups by 40% through targeted outreach efforts",
-            "Organized community events that attracted over 200 attendees",
-            "Developed a new scheduling system that improved volunteer availability by 25%",
-          ],
-        },
-        {
-          title: "Cashier",
-          company: "Grocery Mart",
-          startDate: "2021-06",
-          endDate: "2022-12",
-          achievements: [
-            "Handled cash transactions efficiently, achieving a 99% accuracy rate",
-            "Provided excellent customer service, resulting in a 15% increase in customer satisfaction scores",
-            "Trained 5 new cashiers on operating procedures and customer interaction",
-          ],
-        },
-      ],
-      education: [
-        { institution: "Springfield High School", degree: "High School Diploma", field: "General Studies", startDate: "2019-08", endDate: "2023-05" },
-      ],
-      certifications: [
-        { name: "First Aid Certification", issuer: "Red Cross", date: "2023-01" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Teenage include on their resume?", answer: "A teenage resume should include education details, relevant experience (including volunteer work), skills, and extracurricular activities." },
-      { question: "How do I make my Teenage resume stand out?", answer: "Highlight leadership roles, specific achievements, and any unique skills or experiences that relate to the job you're applying for." },
-      { question: "What skills are most important for a Teenage?", answer: "Key skills include communication, teamwork, adaptability, and any job-specific skills related to the position." },
     ],
   },
   {

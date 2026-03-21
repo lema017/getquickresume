@@ -9467,58 +9467,6 @@ export const professions: ProfessionPageData[] = [
     ],
   },
   {
-    slug: "kegg-software-engineer",
-    title: "Software Engineer",
-    templateStyle: "professional",
-    keywords: ["Kegg Software Engineer resume", "Kegg CV template", "Kegg Software Engineer example", "Kegg curriculum vitae"],
-    searchIntents: ["how to write a Kegg Software Engineer resume", "Kegg Software Engineer resume examples", "best Kegg Software Engineer resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Java", "Python", "C++", "SQL", "JavaScript", "React", "Node.js", "Docker", "Kubernetes", "Agile"],
-    atsKeywords: ["software development", "full stack", "API integration", "cloud computing", "DevOps", "version control", "problem-solving", "software testing", "database management", "team collaboration", "project management"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Software Engineer",
-      summary: "Dedicated Software Engineer with over 5 years of experience in developing scalable applications. Achieved a 30% increase in application efficiency through code optimization and refactoring.",
-      skills: ["Agile methodologies", "RESTful APIs", "Microservices architecture", "Version control (Git)", "Cloud platforms (AWS, Azure)", "UI/UX design principles", "Unit testing and debugging", "Continuous integration/continuous deployment (CI/CD)", "Data structures and algorithms", "Technical documentation"],
-      experience: [
-        {
-          title: "Senior Software Engineer",
-          company: "Tech Innovations Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Led a team to develop a microservices-based application that improved system performance by 40%.",
-            "Implemented CI/CD pipelines that reduced deployment time by 50%.",
-            "Mentored junior developers, resulting in a 20% decrease in onboarding time.",
-          ],
-        },
-        {
-          title: "Software Engineer",
-          company: "NextGen Solutions",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Developed and maintained web applications used by over 10,000 users.",
-            "Optimized database queries, resulting in a 25% reduction in load times.",
-            "Collaborated with cross-functional teams to gather requirements and deliver effective software solutions.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "Stanford University", degree: "B.S.", field: "Computer Science", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "AWS Certified Developer", issuer: "Amazon", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Kegg Software Engineer include on their resume?", answer: "A Kegg Software Engineer should include technical skills, project experiences, relevant certifications, and quantified achievements to demonstrate their expertise." },
-      { question: "How do I make my Kegg Software Engineer resume stand out?", answer: "Highlight specific achievements with metrics, showcase relevant projects, and tailor your skills to match the job description." },
-      { question: "What skills are most important for a Kegg Software Engineer?", answer: "Key skills include programming languages (Java, Python), cloud services, database management, and familiarity with Agile methodologies." },
-    ],
-  },
-  {
     slug: "lead-data-analyst",
     title: "Lead Data Analyst",
     templateStyle: "professional",
@@ -10868,58 +10816,6 @@ export const professions: ProfessionPageData[] = [
       { question: "What should a Music Recording Engineer include on their resume?", answer: "Highlight your technical skills, relevant experience, and any notable projects or collaborations." },
       { question: "How do I make my Music Recording Engineer resume stand out?", answer: "Use quantifiable achievements, tailor your skills to the job description, and showcase a diverse portfolio." },
       { question: "What skills are most important for a Music Recording Engineer?", answer: "Key skills include proficiency in audio editing software, strong attention to detail, and excellent communication for collaboration." },
-    ],
-  },
-  {
-    slug: "nau21-software-engineer",
-    title: "Software Engineer",
-    templateStyle: "professional",
-    keywords: ["Software Engineer resume", "Software Engineer CV template", "Software Engineer resume example", "Software Engineer curriculum vitae"],
-    searchIntents: ["how to write a Software Engineer resume", "Software Engineer resume examples", "best Software Engineer resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Java", "Python", "JavaScript", "SQL", "React", "Node.js", "C++", "Agile", "DevOps", "Cloud Computing"],
-    atsKeywords: ["software development", "full-stack development", "agile methodologies", "debugging", "API development", "version control", "system architecture", "test-driven development", "software design patterns", "continuous integration", "microservices"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Software Engineer",
-      summary: "Software Engineer with over 5 years of experience in building scalable web applications and optimizing system performance, achieving a 30% reduction in load time for major projects.",
-      skills: ["Java", "Python", "JavaScript", "HTML/CSS", "SQL", "React", "Node.js", "Git", "Docker", "Cloud Services"],
-      experience: [
-        {
-          title: "Senior Software Engineer",
-          company: "Tech Innovations Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Led a team to develop a microservices architecture that improved deployment speed by 40%",
-            "Implemented a new feature that increased user engagement by 25%",
-            "Optimized database queries resulting in a 50% reduction in server load",
-          ],
-        },
-        {
-          title: "Software Engineer",
-          company: "Creative Solutions LLC",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Developed a web application that handled over 1 million users per month",
-            "Collaborated with cross-functional teams to deliver projects on time and within budget",
-            "Automated testing processes, reducing bugs by 30% before production release",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Computer Science", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "AWS Certified Solutions Architect", issuer: "Amazon", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Nau21 Software Engineer include on their resume?", answer: "A Nau21 Software Engineer resume should highlight technical skills, relevant experience, and specific projects that demonstrate coding ability and problem-solving skills." },
-      { question: "How do I make my Nau21 Software Engineer resume stand out?", answer: "Focus on quantifiable achievements, tailor your resume for the job you're applying for, and include key projects that showcase your skills and contributions." },
-      { question: "What skills are most important for a Nau21 Software Engineer?", answer: "Key skills include programming languages, understanding of software development life cycles, problem-solving abilities, and experience with cloud technologies." },
     ],
   },
   {
@@ -13991,58 +13887,6 @@ export const professions: ProfessionPageData[] = [
     ],
   },
   {
-    slug: "sabien-itaca-software-engineer",
-    title: "Software Engineer",
-    templateStyle: "professional",
-    keywords: ["Software Engineer resume", "Software Engineer CV template", "Software Engineer resume example", "Software Engineer curriculum vitae"],
-    searchIntents: ["how to write a Software Engineer resume", "Software Engineer resume examples", "best Software Engineer resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Java", "Python", "JavaScript", "C++", "SQL", "React", "Node.js", "Django", "Git", "Agile"],
-    atsKeywords: ["software development", "full-stack development", "API design", "cloud computing", "database management", "DevOps", "unit testing", "version control", "technical documentation", "scrum", "problem solving"],
-    sampleResumeData: buildResumeData({
-      firstName: "Sabien",
-      lastName: "Itaca",
-      profession: "Software Engineer",
-      summary: "Software Engineer with over 5 years of experience in full-stack development, specializing in building scalable web applications. Proven track record of improving application performance by 30% and reducing deployment times by 40%.",
-      skills: ["Java", "Python", "JavaScript", "C++", "SQL", "React", "Node.js", "Django", "Git", "Agile"],
-      experience: [
-        {
-          title: "Senior Software Engineer",
-          company: "Tech Innovators Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Led a team to develop a microservices architecture, reducing system downtime by 25%.",
-            "Implemented automated testing resulting in a 50% decrease in bug reports post-release.",
-            "Optimized database queries that improved application load time by 40%.",
-          ],
-        },
-        {
-          title: "Software Engineer",
-          company: "Creative Solutions LLC",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Developed a customer relationship management tool that increased user engagement by 35%.",
-            "Collaborated with cross-functional teams to deliver project milestones 15% ahead of schedule.",
-            "Enhanced user interface for a key product, leading to a 20% boost in customer satisfaction scores.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Computer Science", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Certified ScrumMaster", issuer: "Scrum Alliance", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Sabien Itaca Software Engineer include on their resume?", answer: "A Sabien Itaca Software Engineer should include technical skills, relevant work experience, education, and certifications that highlight their proficiency in software development and problem-solving." },
-      { question: "How do I make my Sabien Itaca Software Engineer resume stand out?", answer: "To stand out, focus on quantifiable achievements, tailor your resume to the job description, and emphasize your technical skills and project experiences." },
-      { question: "What skills are most important for a Sabien Itaca Software Engineer?", answer: "Key skills include proficiency in programming languages, understanding of software development methodologies, experience with version control systems, and strong problem-solving abilities." },
-    ],
-  },
-  {
     slug: "safety-engineer",
     title: "Safety Engineer",
     templateStyle: "professional",
@@ -15811,58 +15655,6 @@ export const professions: ProfessionPageData[] = [
     ],
   },
   {
-    slug: "software-engineer-doetaylor",
-    title: "Software Engineer",
-    templateStyle: "professional",
-    keywords: ["software engineer resume", "software engineer CV template", "software engineer resume example", "software engineer curriculum vitae"],
-    searchIntents: ["how to write a software engineer resume", "software engineer resume examples", "best software engineer resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Java", "Python", "JavaScript", "C++", "SQL", "React", "Node.js", "Agile", "DevOps", "Cloud Computing"],
-    atsKeywords: ["software development", "algorithm design", "problem solving", "full-stack development", "version control", "API development", "unit testing", "debugging", "technical documentation", "collaboration", "CI/CD"],
-    sampleResumeData: buildResumeData({
-      firstName: "Doetaylor",
-      lastName: "Smith",
-      profession: "Software Engineer",
-      summary: "Software Engineer with over 5 years of experience in developing scalable web applications. Successfully improved application performance by 30% through optimized code and architecture.",
-      skills: ["software design", "object-oriented programming", "microservices", "database management", "UI/UX design", "team leadership", "code review", "application security", "performance tuning", "technical support"],
-      experience: [
-        {
-          title: "Senior Software Engineer",
-          company: "Tech Innovations Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Led a team to develop a microservices architecture that reduced downtime by 25%",
-            "Implemented a new feature that increased user engagement by 40%",
-            "Optimized database queries, resulting in a 50% reduction in load times",
-          ],
-        },
-        {
-          title: "Software Engineer",
-          company: "NextGen Solutions",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Developed an internal tool that improved workflow efficiency by 15%",
-            "Collaborated with cross-functional teams to launch a product that generated $1M in revenue within the first year",
-            "Participated in the transition to Agile methodology, enhancing team productivity",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Computer Science", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "AWS Certified Solutions Architect", issuer: "Amazon", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Software Engineer Doetaylor include on their resume?", answer: "A Software Engineer should include relevant experience, technical skills, education, and certifications that demonstrate their expertise in software development." },
-      { question: "How do I make my Software Engineer Doetaylor resume stand out?", answer: "Use quantifiable achievements, tailor your resume to specific job descriptions, and highlight your unique skills and projects." },
-      { question: "What skills are most important for a Software Engineer Doetaylor?", answer: "Key skills include programming languages, software development methodologies, problem-solving abilities, and experience with cloud technologies." },
-    ],
-  },
-  {
     slug: "software-engineer-enel-x",
     title: "Software Engineer Enel X",
     templateStyle: "professional",
@@ -15912,58 +15704,6 @@ export const professions: ProfessionPageData[] = [
       { question: "What should a Software Engineer Enel X include on their resume?", answer: "Include relevant programming languages, projects, and metrics that demonstrate your impact." },
       { question: "How do I make my Software Engineer Enel X resume stand out?", answer: "Highlight your unique projects, quantify your achievements, and tailor your skills to match the job description." },
       { question: "What skills are most important for a Software Engineer Enel X?", answer: "Key skills include proficiency in programming languages, cloud services, and strong problem-solving abilities." },
-    ],
-  },
-  {
-    slug: "software-engineer-resume",
-    title: "Software Engineer Resume",
-    templateStyle: "professional",
-    keywords: ["software engineer resume", "software engineer CV template", "software engineer resume example", "software engineer curriculum vitae"],
-    searchIntents: ["how to write a software engineer resume", "software engineer resume examples", "best software engineer resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Java", "Python", "JavaScript", "C++", "SQL", "React", "Node.js", "Agile", "Git", "Problem Solving"],
-    atsKeywords: ["software development", "full-stack development", "API integration", "cloud computing", "microservices", "DevOps", "database management", "software testing", "version control", "technical documentation", "team collaboration"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Software Engineer Resume",
-      summary: "Detail-oriented Software Engineer with over 5 years of experience in developing scalable web applications. Successfully improved application performance by 30%, resulting in enhanced user satisfaction.",
-      skills: ["Software Development", "Web Development", "Database Design", "Application Security", "Debugging", "Data Structures", "Algorithms", "Cloud Services", "Continuous Integration", "User Experience Design"],
-      experience: [
-        {
-          title: "Senior Software Engineer",
-          company: "Tech Innovations Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Led a team to develop a microservices architecture that reduced deployment time by 40%",
-            "Implemented a new feature that increased customer engagement by 25%",
-            "Optimized database queries which improved application response time by 15%",
-          ],
-        },
-        {
-          title: "Software Engineer",
-          company: "Creative Solutions LLC",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Developed a web application that processed over 1 million transactions monthly",
-            "Collaborated with cross-functional teams to deliver product features on time and within budget",
-            "Increased application reliability by implementing comprehensive testing strategies",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Computer Science", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Certified Java Developer", issuer: "Oracle", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Software Engineer Resume include on their resume?", answer: "A Software Engineer resume should include a summary of skills, relevant experience, education, and certifications. Highlight key projects and technologies used." },
-      { question: "How do I make my Software Engineer Resume resume stand out?", answer: "Focus on quantifiable achievements, tailor your resume for each job application, and showcase relevant projects to demonstrate your skills." },
-      { question: "What skills are most important for a Software Engineer Resume?", answer: "Important skills include programming languages, software development methodologies, problem-solving abilities, and familiarity with tools and technologies used in the industry." },
     ],
   },
   {
@@ -16071,58 +15811,6 @@ export const professions: ProfessionPageData[] = [
     ],
   },
   {
-    slug: "software-engineering",
-    title: "Software Engineer",
-    templateStyle: "professional",
-    keywords: ["Software Engineer resume", "Software Engineer CV template", "Software Engineer resume example", "Software Engineer curriculum vitae"],
-    searchIntents: ["how to write a Software Engineer resume", "Software Engineer resume examples", "best Software Engineer resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Java", "Python", "JavaScript", "C++", "SQL", "HTML/CSS", "React", "Node.js", "Django", "Git"],
-    atsKeywords: ["Software Development", "Agile Methodologies", "Problem Solving", "Version Control", "API Development", "Database Management", "Unit Testing", "Continuous Integration", "Cloud Computing", "Data Structures", "Algorithms"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Software Engineer",
-      summary: "Experienced Software Engineer with over 5 years of experience in full-stack development, specializing in building scalable web applications. Achieved a 30% reduction in loading times and a 25% increase in user engagement through optimized coding practices.",
-      skills: ["Java", "Python", "JavaScript", "C++", "SQL", "HTML/CSS", "React", "Node.js", "Django", "Git"],
-      experience: [
-        {
-          title: "Senior Software Engineer",
-          company: "Tech Innovations Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Led a team of 5 to develop a customer feedback system, increasing customer satisfaction scores by 40%.",
-            "Implemented a new caching strategy, reducing server load by 50%.",
-            "Designed and deployed a microservices architecture that improved deployment speed by 60%.",
-          ],
-        },
-        {
-          title: "Software Engineer",
-          company: "Creative Solutions Ltd.",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Developed a web application that served over 100,000 users monthly, improving user retention by 20%.",
-            "Automated testing processes which reduced bug reports by 30%.",
-            "Collaborated with cross-functional teams to enhance application features, leading to a 15% increase in user engagement.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Computer Science", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "AWS Certified Solutions Architect", issuer: "Amazon", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Software Engineer include on their resume?", answer: "A Software Engineer should include relevant technical skills, project experience, educational background, and quantifiable achievements that demonstrate their impact in previous roles." },
-      { question: "How do I make my Software Engineer resume stand out?", answer: "Highlight your most relevant projects, use metrics to quantify your achievements, and tailor your resume to match the job description." },
-      { question: "What skills are most important for a Software Engineer?", answer: "Key skills include programming languages (such as Java, Python, and JavaScript), understanding of algorithms and data structures, problem-solving abilities, and familiarity with software development methodologies." },
-    ],
-  },
-  {
     slug: "software-engineering-manager",
     title: "Software Engineering Manager",
     templateStyle: "professional",
@@ -16172,58 +15860,6 @@ export const professions: ProfessionPageData[] = [
       { question: "What should a Software Engineering Manager include on their resume?", answer: "A Software Engineering Manager should include leadership experience, technical expertise, project management skills, and specific achievements that demonstrate their ability to deliver successful projects." },
       { question: "How do I make my Software Engineering Manager resume stand out?", answer: "Highlight quantifiable achievements, showcase leadership roles in projects, and include relevant certifications and skills tailored to the job description." },
       { question: "What skills are most important for a Software Engineering Manager?", answer: "Key skills include team leadership, project management, proficiency in software development languages, and experience with Agile methodologies." },
-    ],
-  },
-  {
-    slug: "software-engineering-ubc-eml",
-    title: "Software Engineer Resume",
-    templateStyle: "professional",
-    keywords: ["Software Engineer resume", "Software Engineer CV template", "Software Engineer resume example", "Software Engineer curriculum vitae"],
-    searchIntents: ["how to write a Software Engineer resume", "Software Engineer resume examples", "best Software Engineer resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Java", "Python", "JavaScript", "C++", "SQL", "Git", "Agile Methodologies", "RESTful APIs", "Cloud Computing", "Software Development Life Cycle"],
-    atsKeywords: ["software development", "application design", "debugging", "full-stack development", "object-oriented programming", "data structures", "algorithm design", "version control", "performance optimization", "team collaboration", "technical documentation"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Software Engineer Resume",
-      summary: "Software Engineer with over 5 years of experience in developing scalable web applications and a proven track record of increasing system efficiency by 30%. Passionate about building innovative solutions and collaborating with cross-functional teams.",
-      skills: ["Frontend Development", "Backend Development", "Database Management", "Unit Testing", "DevOps Practices", "Problem Solving", "System Architecture", "Software Testing", "User Experience Design", "Technical Leadership"],
-      experience: [
-        {
-          title: "Senior Software Engineer",
-          company: "Tech Innovations Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Led a team of 5 engineers to develop a web application that increased user engagement by 40%",
-            "Implemented a new CI/CD pipeline that reduced deployment time by 50%",
-            "Designed and optimized database queries resulting in a 25% reduction in load times",
-          ],
-        },
-        {
-          title: "Software Engineer",
-          company: "Creative Solutions LLC",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Developed and maintained multiple client-facing applications, achieving a 98% customer satisfaction score",
-            "Collaborated with stakeholders to gather requirements and deliver projects ahead of schedule",
-            "Enhanced application performance by refactoring legacy code, which improved efficiency by 20%",
-          ],
-        },
-      ],
-      education: [
-        { institution: "University of British Columbia", degree: "B.S.", field: "Computer Science", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "AWS Certified Solutions Architect", issuer: "Amazon Web Services", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Software Engineering Ubc Eml include on their resume?", answer: "A Software Engineering resume should include relevant education, technical skills, work experience with quantified achievements, and certifications." },
-      { question: "How do I make my Software Engineering Ubc Eml resume stand out?", answer: "Highlight unique projects, use metrics to showcase accomplishments, and tailor the resume to the job description." },
-      { question: "What skills are most important for a Software Engineering Ubc Eml?", answer: "Key skills include programming languages, problem-solving abilities, experience with software development methodologies, and familiarity with system architecture." },
     ],
   },
   {

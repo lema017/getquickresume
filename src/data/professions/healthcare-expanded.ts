@@ -2467,7 +2467,7 @@ export const professions: ProfessionPageData[] = [
     ],
   },
   {
-    slug: 'obgyn',
+    slug: 'obstetrician-gynecologist',
     title: 'OB-GYN',
     templateStyle: 'professional',
     keywords: ['obgyn resume', 'OB-GYN resume', 'obstetrics gynecology resume', 'obgyn CV'],

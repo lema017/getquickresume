@@ -2185,57 +2185,5 @@ export const professions: ProfessionPageData[] = [
       { question: "How do I make my Waiter Host resume stand out?", answer: "Highlight specific achievements, such as improved guest satisfaction ratings or successful event management, and tailor your resume to the job description." },
       { question: "What skills are most important for a Waiter Host?", answer: "Key skills include customer service, effective communication, time management, and the ability to work well under pressure in a fast-paced environment." },
     ],
-  },
-  {
-    slug: "waitress",
-    title: "Waitress",
-    templateStyle: "professional",
-    keywords: ["waitress resume", "waitress CV template", "waitress resume example", "waitress curriculum vitae"],
-    searchIntents: ["how to write a waitress resume", "waitress resume examples", "best waitress resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["customer service", "communication", "multitasking", "time management", "teamwork", "problem-solving", "cash handling", "menu knowledge", "attention to detail", "punctuality"],
-    atsKeywords: ["waitressing", "restaurant service", "food safety", "customer satisfaction", "order taking", "point of sale systems", "team collaboration", "conflict resolution", "sales skills", "menu recommendations", "cleanliness"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Waitress",
-      summary: "Dedicated waitress with over 5 years of experience in high-volume restaurants, consistently achieving customer satisfaction ratings above 90%. Proven ability to handle up to 20 tables at once during peak hours.",
-      skills: ["excellent interpersonal skills", "strong organizational skills", "ability to work under pressure", "familiarity with POS systems", "knowledge of food and beverage pairing", "cash register operation", "active listening", "adaptability", "sales techniques", "conflict management"],
-      experience: [
-        {
-          title: "Senior Waitress",
-          company: "The Gourmet Bistro",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Increased customer satisfaction scores by 15% over one year through attentive service and personalized dining experiences.",
-            "Managed a team of 5 junior waitstaff, improving efficiency during busy shifts by 25%.",
-            "Consistently achieved sales targets, upselling specials and increasing average ticket size by $8.",
-          ],
-        },
-        {
-          title: "Waitress",
-          company: "Family Diner",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Received 'Employee of the Month' award for three consecutive months due to exemplary service.",
-            "Trained 10 new waitstaff, ensuring they understood restaurant policies and service standards.",
-            "Maintained a 95% positive customer feedback rating on online platforms.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "Culinary Academy", degree: "Certificate", field: "Hospitality Management", startDate: "2014-08", endDate: "2016-05" },
-      ],
-      certifications: [
-        { name: "Food Safety Certification", issuer: "Food Safety Institute", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Waitress include on their resume?", answer: "A waitress should include relevant work experience, skills related to customer service, and achievements that highlight their ability to enhance customer satisfaction." },
-      { question: "How do I make my Waitress resume stand out?", answer: "Incorporate quantifiable achievements, tailor your resume to highlight key skills, and use a clean, professional format that is easy to read." },
-      { question: "What skills are most important for a Waitress?", answer: "Key skills include excellent communication, multitasking, customer service orientation, and the ability to work effectively in a team environment." },
-    ],
   }
 ];

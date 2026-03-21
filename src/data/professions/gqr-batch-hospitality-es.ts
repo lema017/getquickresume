@@ -2101,55 +2101,5 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Cómo destacar mi currículum de Anfitrión de Mesero?", answer: "Destacar logros específicos y habilidades clave puede ayudar a que su currículum se destaque." },
       { question: "¿Qué habilidades necesita un Anfitrión de Mesero?", answer: "Las habilidades clave incluyen servicio al cliente, trabajo en equipo y manejo de efectivo." },
     ],
-  },
-  "waitress": {
-    slug: "curriculum-esperanza-waitress",
-    title: "Mesera",
-    keywords: ["currículum de mesera", "CV de mesera", "ejemplo currículum mesera", "plantilla CV mesera"],
-    searchIntents: ["cómo escribir currículum de mesera", "ejemplos currículum mesera", "mejor formato CV mesera"],
-    topSkills: ["servicio al cliente", "comunicación", "multitarea", "gestión del tiempo", "trabajo en equipo", "resolución de problemas", "manejo de efectivo", "conocimiento del menú", "atención al detalle", "puntualidad"],
-    atsKeywords: ["waitressing", "restaurant service", "food safety", "customer satisfaction", "order taking", "point of sale systems", "team collaboration", "conflict resolution", "sales skills", "menu recommendations", "cleanliness"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Mesera",
-      summary: "Mesera dedicada con más de 5 años de experiencia en restaurantes de alto volumen, logrando constantemente calificaciones de satisfacción del cliente superiores al 90%. Capacidad comprobada para manejar hasta 20 mesas a la vez durante las horas pico.",
-      skills: ["servicio al cliente", "comunicación", "multitarea", "gestión del tiempo", "trabajo en equipo", "resolución de problemas", "manejo de efectivo", "conocimiento del menú", "atención al detalle", "puntualidad"],
-      experience: [
-        {
-          title: "Mesera Senior",
-          company: "The Gourmet Bistro",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Aumenté las puntuaciones de satisfacción del cliente en un 15% durante un año a través de un servicio atento y experiencias gastronómicas personalizadas.",
-            "Gestioné un equipo de 5 meseros junior, mejorando la eficiencia durante los turnos ocupados en un 25%.",
-            "Logré consistentemente los objetivos de ventas, promoviendo especialidades y aumentando el tamaño promedio de la cuenta en $8.",
-          ],
-        },
-        {
-          title: "Mesera",
-          company: "Family Diner",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Recibí el premio de 'Empleado del Mes' durante tres meses consecutivos debido a un servicio ejemplar.",
-            "Capacité a 10 nuevos meseros, asegurando que entendieran las políticas del restaurante y los estándares de servicio.",
-            "Mantuve una calificación de retroalimentación positiva del 95% en plataformas en línea.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "Culinary Academy", degree: "Certificate", field: "Gestión de Hospitalidad", startDate: "2014-08", endDate: "2016-05" },
-      ],
-      certifications: [
-        { name: "Food Safety Certification", issuer: "Food Safety Institute", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un mesera en su currículum?", answer: "Debe incluir experiencias laborales, habilidades relevantes, y logros destacables." },
-      { question: "¿Cómo destacar mi currículum de mesera?", answer: "Enfatiza tus logros en servicio al cliente y cualquier reconocimiento recibido." },
-      { question: "¿Qué habilidades necesita una mesera?", answer: "Habilidades clave incluyen servicio al cliente, multitarea y comunicación efectiva." },
-    ],
   }
 };

@@ -2702,56 +2702,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué habilidades necesita un Practicante Médico?", answer: "Cuidado del paciente, investigación clínica, y habilidades de comunicación." },
     ],
   },
-  "medical-interpreter": {
-    slug: "intérprete-médico",
-    title: "Intérprete Médico",
-    keywords: ["currículum de intérprete médico", "CV de intérprete médico", "ejemplo currículum intérprete médico", "plantilla CV intérprete médico"],
-    searchIntents: ["cómo escribir currículum de intérprete médico", "ejemplos currículum intérprete médico", "mejor formato CV intérprete médico"],
-    topSkills: ["Comunicación Bilingüe", "Competencia Cultural", "Terminología Médica", "Defensa del Paciente", "Confidencialidad", "Escucha Activa", "Habilidades de Toma de Notas", "Gestión del Tiempo", "Habilidades Interpersonales", "Resolución de Problemas"],
-    atsKeywords: ["Interpretación Médica", "Bilingüe", "Intérprete Español", "Comunicación en Salud", "Interacción con Pacientes", "Dominio del Idioma", "Sensibilidad Cultural", "Terminología de Salud", "Técnicas de Interpretación", "Sistemas de Salud", "Confidencialidad del Paciente"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Intérprete Médico",
-      summary: "Intérprete Médico dedicado con más de 5 años de experiencia facilitando la comunicación entre proveedores de salud y pacientes. He interpretado con éxito más de 1,000 encuentros médicos, mejorando la satisfacción del paciente en un 30%.",
-      skills: ["Comunicación Bilingüe", "Competencia Cultural", "Terminología Médica", "Defensa del Paciente", "Confidencialidad", "Escucha Activa", "Habilidades de Toma de Notas", "Gestión del Tiempo", "Habilidades Interpersonales", "Resolución de Problemas"],
-      experience: [
-        {
-          title: "Intérprete Médico Senior",
-          company: "HealthBridge Medical Center",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Aumenté la comprensión del paciente sobre los procedimientos médicos en un 40% a través de una interpretación efectiva.",
-            "Reduje las tasas de inasistencia a citas en un 25% al asegurar una comunicación clara.",
-            "Facilité más de 500 sesiones de telemedicina, mejorando el acceso a la atención para pacientes que no hablan inglés.",
-          ],
-        },
-        {
-          title: "Intérprete Médico",
-          company: "CareFirst Health Services",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Proporcioné interpretación para más de 300 consultas de pacientes, asegurando un intercambio preciso de información.",
-            "Colaboré con el personal médico para desarrollar recursos interpretativos, mejorando la entrega del servicio.",
-            "Capacité a 5 nuevos intérpretes sobre las mejores prácticas en interpretación médica.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Comunicación en Salud", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Certified Medical Interpreter (CMI)", issuer: "National Board of Certification for Medical Interpreters", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un Intérprete Médico en su currículum?", answer: "Un Intérprete Médico debe incluir su experiencia laboral, habilidades específicas, certificaciones y educación relevante." },
-      { question: "¿Cómo destacar mi currículum de Intérprete Médico?", answer: "Enfóquese en sus logros cuantificables y habilidades específicas que sean relevantes para el puesto." },
-      { question: "¿Qué habilidades necesita un Intérprete Médico?", answer: "Las habilidades clave incluyen comunicación bilingüe, competencia cultural y conocimiento de terminología médica." },
-    ],
-  },
   "medical-officer": {
     slug: "oficial-medico",
     title: "Oficial Médico",
@@ -3350,56 +3300,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué debe incluir un Mental Health Therapist en su currículum?", answer: "Un Mental Health Therapist debe incluir su experiencia laboral, habilidades relevantes, educación y certificaciones pertinentes." },
       { question: "¿Cómo destacar mi currículum de Mental Health Therapist?", answer: "Para destacar, enfócate en logros cuantificables, utiliza palabras clave de la industria y personaliza tu currículum para cada aplicación." },
       { question: "¿Qué habilidades necesita un Mental Health Therapist?", answer: "Un Mental Health Therapist necesita habilidades en terapia, comunicación efectiva, empatía, evaluación psicológica y gestión de crisis." },
-    ],
-  },
-  "modern-call-center": {
-    slug: "curriculum-llamada-moderna",
-    title: "Currículum Moderno de Call Center",
-    keywords: ["currículum de call center", "CV de call center", "ejemplo currículum call center", "plantilla CV call center"],
-    searchIntents: ["cómo escribir currículum de call center", "ejemplos currículum call center", "mejor formato CV call center"],
-    topSkills: ["Servicio al Cliente", "Comunicación", "Resolución de Problemas", "Gestión del Tiempo", "Multitarea", "Competencia Técnica", "Habilidades de Ventas", "Adaptabilidad", "Resolución de Conflictos", "Colaboración en Equipo"],
-    atsKeywords: ["call center", "soporte al cliente", "manejo de llamadas", "soporte de ventas", "software CRM", "habilidades de comunicación", "resolución de problemas", "trabajo en equipo", "entrada de datos", "satisfacción del cliente", "métricas de rendimiento"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Currículum Moderno de Call Center",
-      summary: "Profesional de call center dedicado con más de 5 años de experiencia en servicio y soporte al cliente, logrando una tasa de satisfacción del cliente del 95% a través de habilidades efectivas de comunicación y resolución de problemas.",
-      skills: ["Servicio al Cliente", "Comunicación", "Resolución de Problemas", "Gestión del Tiempo", "Multitarea", "Competencia Técnica", "Habilidades de Ventas", "Adaptabilidad", "Resolución de Conflictos", "Colaboración en Equipo"],
-      experience: [
-        {
-          title: "Representante Senior de Servicio al Cliente",
-          company: "TeleTech",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Aumenté las puntuaciones de satisfacción del cliente en un 20% en seis meses",
-            "Gestioné con éxito un promedio de 80 llamadas por día con una tasa de resolución del 90%",
-            "Lideré un proyecto de equipo que mejoró los tiempos de respuesta de llamadas en un 15%",
-          ],
-        },
-        {
-          title: "Representante de Servicio al Cliente",
-          company: "Concentrix",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Logré empleado del mes tres veces por rendimiento excepcional",
-            "Mantuve una calificación de satisfacción del cliente del 95% durante mi empleo",
-            "Entrené a 5 nuevos empleados sobre políticas y procedimientos de la empresa",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "Licenciatura", field: "Administración de Empresas", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Customer Service Excellence", issuer: "International Customer Service Association", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un Modern Call Center Resume en su currículum?", answer: "Un currículum moderno de call center debe incluir experiencia relevante, habilidades clave de servicio al cliente y métricas de rendimiento." },
-      { question: "¿Cómo destacar mi currículum de Modern Call Center Resume?", answer: "Destacar logros cuantificables y habilidades específicas puede hacer que tu currículum resalte entre los demás." },
-      { question: "¿Qué habilidades necesita un Modern Call Center Resume?", answer: "Habilidades de comunicación, resolución de problemas y servicio al cliente son esenciales para un currículum de call center." },
     ],
   },
   "modern-cashier": {

@@ -9102,56 +9102,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué habilidades necesita un Karate Instructor?", answer: "Las habilidades clave incluyen técnicas de artes marciales, entrenamiento de autodefensa y diseño de currículo." },
     ],
   },
-  "kegg-software-engineer": {
-    slug: "ingeniero-de-software",
-    title: "Ingeniero de Software",
-    keywords: ["currículum de ingeniero de software", "CV de ingeniero de software", "ejemplo currículum ingeniero de software", "plantilla CV ingeniero de software"],
-    searchIntents: ["cómo escribir currículum de ingeniero de software", "ejemplos currículum ingeniero de software", "mejor formato CV ingeniero de software"],
-    topSkills: ["Java", "Python", "C++", "SQL", "JavaScript", "React", "Node.js", "Docker", "Kubernetes", "Ágil"],
-    atsKeywords: ["desarrollo de software", "full stack", "integración de API", "computación en la nube", "DevOps", "control de versiones", "resolución de problemas", "pruebas de software", "gestión de bases de datos", "colaboración en equipo", "gestión de proyectos"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Ingeniero de Software",
-      summary: "Ingeniero de Software dedicado con más de 5 años de experiencia en el desarrollo de aplicaciones escalables. Logré un aumento del 30% en la eficiencia de la aplicación a través de la optimización y refactorización del código.",
-      skills: ["Java", "Python", "C++", "SQL", "JavaScript", "React", "Node.js", "Docker", "Kubernetes", "Ágil"],
-      experience: [
-        {
-          title: "Ingeniero de Software Senior",
-          company: "Tech Innovations Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Lideré un equipo para desarrollar una aplicación basada en microservicios que mejoró el rendimiento del sistema en un 40%.",
-            "Implementé pipelines de CI/CD que redujeron el tiempo de despliegue en un 50%.",
-            "Mentoré a desarrolladores junior, resultando en una disminución del 20% en el tiempo de incorporación.",
-          ],
-        },
-        {
-          title: "Ingeniero de Software",
-          company: "NextGen Solutions",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Desarrollé y mantuve aplicaciones web utilizadas por más de 10,000 usuarios.",
-            "Optimizé consultas de bases de datos, resultando en una reducción del 25% en los tiempos de carga.",
-            "Colaboré con equipos multifuncionales para recopilar requisitos y entregar soluciones de software efectivas.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "Stanford University", degree: "B.S.", field: "Ciencias de la Computación", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "AWS Certified Developer", issuer: "Amazon", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un Ingeniero de Software en su currículum?", answer: "Incluir habilidades técnicas, experiencia laboral relevante, y proyectos destacados." },
-      { question: "¿Cómo destacar mi currículum de Ingeniero de Software?", answer: "Utilizar palabras clave de la industria, resaltar logros cuantificables y personalizar el CV para cada solicitud." },
-      { question: "¿Qué habilidades necesita un Ingeniero de Software?", answer: "Desarrollo de software, resolución de problemas, trabajo en equipo, y gestión de proyectos." },
-    ],
-  },
   "lead-data-analyst": {
     slug: "analista-de-datos-lider",
     title: "Analista de Datos Líder",
@@ -10450,56 +10400,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué debe incluir un ingeniero de grabación de música en su currículum?", answer: "Un ingeniero de grabación de música debe incluir su experiencia, habilidades técnicas, proyectos destacados y cualquier certificación relevante." },
       { question: "¿Cómo destacar mi currículum de ingeniero de grabación de música?", answer: "Para destacar su currículum, enfatice sus logros en proyectos anteriores y su experiencia con software de audio y equipos de grabación." },
       { question: "¿Qué habilidades necesita un ingeniero de grabación de música?", answer: "Las habilidades clave incluyen ingeniería de audio, mezcla, masterización, diseño de sonido y manejo de software de producción musical." },
-    ],
-  },
-  "nau21-software-engineer": {
-    slug: "ingeniero-de-software",
-    title: "Ingeniero de Software",
-    keywords: ["currículum de ingeniero de software", "CV de ingeniero de software", "ejemplo currículum ingeniero de software", "plantilla CV ingeniero de software"],
-    searchIntents: ["cómo escribir currículum de ingeniero de software", "ejemplos currículum ingeniero de software", "mejor formato CV ingeniero de software"],
-    topSkills: ["Java", "Python", "JavaScript", "SQL", "React", "Node.js", "C++", "Ágil", "DevOps", "Computación en la Nube"],
-    atsKeywords: ["desarrollo de software", "desarrollo full-stack", "metodologías ágiles", "depuración", "desarrollo de API", "control de versiones", "arquitectura de sistemas", "desarrollo guiado por pruebas", "patrones de diseño de software", "integración continua", "microservicios"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Ingeniero de Software",
-      summary: "Ingeniero de Software con más de 5 años de experiencia en la construcción de aplicaciones web escalables y optimización del rendimiento del sistema, logrando una reducción del 30% en el tiempo de carga para proyectos importantes.",
-      skills: ["Java", "Python", "JavaScript", "SQL", "React", "Node.js", "C++", "Ágil", "DevOps", "Computación en la Nube"],
-      experience: [
-        {
-          title: "Ingeniero de Software Senior",
-          company: "Tech Innovations Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Lideré un equipo para desarrollar una arquitectura de microservicios que mejoró la velocidad de despliegue en un 40%",
-            "Implementé una nueva característica que aumentó el compromiso de los usuarios en un 25%",
-            "Optimizé las consultas a la base de datos, resultando en una reducción del 50% en la carga del servidor",
-          ],
-        },
-        {
-          title: "Ingeniero de Software",
-          company: "Creative Solutions LLC",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Desarrollé una aplicación web que manejaba más de 1 millón de usuarios por mes",
-            "Colaboré con equipos multifuncionales para entregar proyectos a tiempo y dentro del presupuesto",
-            "Automatizé los procesos de prueba, reduciendo errores en un 30% antes del lanzamiento a producción",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Ciencias de la Computación", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "AWS Certified Solutions Architect", issuer: "Amazon", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un Ingeniero de Software en su currículum?", answer: "Debe incluir habilidades técnicas, experiencia laboral, proyectos relevantes y certificaciones." },
-      { question: "¿Cómo destacar mi currículum de Ingeniero de Software?", answer: "Enfócate en tus logros, utiliza palabras clave de la industria y presenta tus habilidades de manera clara." },
-      { question: "¿Qué habilidades necesita un Ingeniero de Software?", answer: "Habilidades en programación, diseño de sistemas, trabajo en equipo y metodologías ágiles son clave." },
     ],
   },
   "net-c-programmer": {
@@ -13452,56 +13352,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué habilidades necesita un RF Test Engineer?", answer: "Habilidades clave incluyen diseño de circuitos RF, procesamiento de señales y análisis de datos." },
     ],
   },
-  "sabien-itaca-software-engineer": {
-    slug: "ingeniero-de-software",
-    title: "Ingeniero de Software",
-    keywords: ["currículum de ingeniero de software", "CV de ingeniero de software", "ejemplo currículum ingeniero de software", "plantilla CV ingeniero de software"],
-    searchIntents: ["cómo escribir currículum de ingeniero de software", "ejemplos currículum ingeniero de software", "mejor formato CV ingeniero de software"],
-    topSkills: ["Java", "Python", "JavaScript", "C++", "SQL", "React", "Node.js", "Django", "Git", "Agile"],
-    atsKeywords: ["desarrollo de software", "desarrollo full-stack", "diseño de API", "computación en la nube", "gestión de bases de datos", "DevOps", "pruebas unitarias", "control de versiones", "documentación técnica", "scrum", "resolución de problemas"],
-    sampleResumeData: buildResumeData({
-      firstName: "Sabien",
-      lastName: "Itaca",
-      profession: "Ingeniero de Software",
-      summary: "Ingeniero de Software con más de 5 años de experiencia en desarrollo full-stack, especializado en la construcción de aplicaciones web escalables. Historial comprobado de mejora del rendimiento de aplicaciones en un 30% y reducción de los tiempos de implementación en un 40%.",
-      skills: ["Java", "Python", "JavaScript", "C++", "SQL", "React", "Node.js", "Django", "Git", "Agile"],
-      experience: [
-        {
-          title: "Ingeniero de Software Senior",
-          company: "Tech Innovators Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Lideré un equipo para desarrollar una arquitectura de microservicios, reduciendo el tiempo de inactividad del sistema en un 25%.",
-            "Implementé pruebas automatizadas que resultaron en una disminución del 50% en los informes de errores después del lanzamiento.",
-            "Optimizé las consultas de la base de datos, lo que mejoró el tiempo de carga de la aplicación en un 40%.",
-          ],
-        },
-        {
-          title: "Ingeniero de Software",
-          company: "Creative Solutions LLC",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Desarrollé una herramienta de gestión de relaciones con clientes que aumentó el compromiso del usuario en un 35%.",
-            "Colaboré con equipos multifuncionales para entregar hitos del proyecto un 15% antes de lo previsto.",
-            "Mejoré la interfaz de usuario de un producto clave, lo que llevó a un aumento del 20% en los puntajes de satisfacción del cliente.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Ciencias de la Computación", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Certified ScrumMaster", issuer: "Scrum Alliance", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un Ingeniero de Software en su currículum?", answer: "Debe incluir habilidades técnicas, experiencia relevante, proyectos destacados y certificaciones." },
-      { question: "¿Cómo destacar mi currículum de Ingeniero de Software?", answer: "Enfatiza tus logros cuantificables y adapta tu currículum a cada oferta de trabajo." },
-      { question: "¿Qué habilidades necesita un Ingeniero de Software?", answer: "Necesita habilidades en programación, desarrollo de software, gestión de bases de datos y trabajo en equipo." },
-    ],
-  },
   "safety-engineer": {
     slug: "ingeniero-de-seguridad",
     title: "Ingeniero de Seguridad",
@@ -15202,56 +15052,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué habilidades necesita un Ingeniero de Software en Zehntech Technology?", answer: "Habilidades en programación, desarrollo web, trabajo en equipo, y conocimiento de metodologías ágiles." },
     ],
   },
-  "software-engineer-doetaylor": {
-    slug: "ingeniero-de-software",
-    title: "Ingeniero de Software",
-    keywords: ["currículum de Ingeniero de Software", "CV de Ingeniero de Software", "ejemplo currículum Ingeniero de Software", "plantilla CV Ingeniero de Software"],
-    searchIntents: ["cómo escribir currículum de Ingeniero de Software", "ejemplos currículum Ingeniero de Software", "mejor formato CV Ingeniero de Software"],
-    topSkills: ["Java", "Python", "JavaScript", "C++", "SQL", "React", "Node.js", "Agile", "DevOps", "Cloud Computing"],
-    atsKeywords: ["desarrollo de software", "diseño de algoritmos", "resolución de problemas", "desarrollo full-stack", "control de versiones", "desarrollo de API", "pruebas unitarias", "depuración", "documentación técnica", "colaboración", "CI/CD"],
-    sampleResumeData: buildResumeData({
-      firstName: "Doetaylor",
-      lastName: "Smith",
-      profession: "Ingeniero de Software",
-      summary: "Ingeniero de Software con más de 5 años de experiencia en el desarrollo de aplicaciones web escalables. Mejoró con éxito el rendimiento de la aplicación en un 30% a través de código y arquitectura optimizados.",
-      skills: ["Java", "Python", "JavaScript", "C++", "SQL", "React", "Node.js", "Agile", "DevOps", "Cloud Computing"],
-      experience: [
-        {
-          title: "Ingeniero de Software Senior",
-          company: "Tech Innovations Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Lideré un equipo para desarrollar una arquitectura de microservicios que redujo el tiempo de inactividad en un 25%",
-            "Implementé una nueva característica que aumentó el compromiso del usuario en un 40%",
-            "Optimizé las consultas a la base de datos, resultando en una reducción del 50% en los tiempos de carga",
-          ],
-        },
-        {
-          title: "Ingeniero de Software",
-          company: "NextGen Solutions",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Desarrollé una herramienta interna que mejoró la eficiencia del flujo de trabajo en un 15%",
-            "Colaboré con equipos interfuncionales para lanzar un producto que generó $1M en ingresos dentro del primer año",
-            "Participé en la transición a la metodología Agile, mejorando la productividad del equipo",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "Licenciatura", field: "Ciencias de la Computación", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "AWS Certified Solutions Architect", issuer: "Amazon", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un Ingeniero de Software en su currículum?", answer: "Debe incluir habilidades técnicas, experiencias relevantes y proyectos destacados." },
-      { question: "¿Cómo destacar mi currículum de Ingeniero de Software?", answer: "Utiliza palabras clave específicas y destaca tus logros cuantificables." },
-      { question: "¿Qué habilidades necesita un Ingeniero de Software?", answer: "Habilidades en programación, desarrollo ágil, y manejo de bases de datos son clave." },
-    ],
-  },
   "software-engineer-enel-x": {
     slug: "ingeniero-de-software-enel-x",
     title: "Ingeniero de Software Enel X",
@@ -15300,56 +15100,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué debe incluir un Ingeniero de Software Enel X en su currículum?", answer: "Debe incluir habilidades técnicas, experiencia laboral relevante y certificaciones." },
       { question: "¿Cómo destacar mi currículum de Ingeniero de Software Enel X?", answer: "Utiliza palabras clave, resalta logros cuantificables y personaliza tu CV para cada solicitud." },
       { question: "¿Qué habilidades necesita un Ingeniero de Software Enel X?", answer: "Necesita habilidades en programación, metodologías ágiles, y experiencia en la nube y microservicios." },
-    ],
-  },
-  "software-engineer-resume": {
-    slug: "curriculum-de-ingeniero-de-software",
-    title: "Currículum de Ingeniero de Software",
-    keywords: ["currículum de ingeniero de software", "CV de ingeniero de software", "ejemplo currículum ingeniero de software", "plantilla CV ingeniero de software"],
-    searchIntents: ["cómo escribir currículum de ingeniero de software", "ejemplos currículum ingeniero de software", "mejor formato CV ingeniero de software"],
-    topSkills: ["Java", "Python", "JavaScript", "C++", "SQL", "React", "Node.js", "Agile", "Git", "Resolución de Problemas"],
-    atsKeywords: ["desarrollo de software", "desarrollo full-stack", "integración de API", "computación en la nube", "microservicios", "DevOps", "gestión de bases de datos", "pruebas de software", "control de versiones", "documentación técnica", "colaboración en equipo"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Currículum de Ingeniero de Software",
-      summary: "Ingeniero de Software orientado a los detalles con más de 5 años de experiencia en el desarrollo de aplicaciones web escalables. Mejoró exitosamente el rendimiento de la aplicación en un 30%, lo que resultó en una mayor satisfacción del usuario.",
-      skills: ["Java", "Python", "JavaScript", "C++", "SQL", "React", "Node.js", "Agile", "Git", "Resolución de Problemas"],
-      experience: [
-        {
-          title: "Ingeniero de Software Senior",
-          company: "Tech Innovations Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Dirigí un equipo para desarrollar una arquitectura de microservicios que redujo el tiempo de implementación en un 40%",
-            "Implementé una nueva función que aumentó la participación del cliente en un 25%",
-            "Optimizé las consultas a la base de datos, lo que mejoró el tiempo de respuesta de la aplicación en un 15%",
-          ],
-        },
-        {
-          title: "Ingeniero de Software",
-          company: "Creative Solutions LLC",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Desarrollé una aplicación web que procesó más de 1 millón de transacciones mensuales",
-            "Colaboré con equipos multifuncionales para entregar características del producto a tiempo y dentro del presupuesto",
-            "Aumenté la confiabilidad de la aplicación al implementar estrategias de pruebas integrales",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "Licenciatura", field: "Ciencias de la Computación", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Certified Java Developer", issuer: "Oracle", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un currículum de Ingeniero de Software?", answer: "Un currículum de Ingeniero de Software debe incluir experiencia laboral relevante, habilidades técnicas, educación y certificaciones." },
-      { question: "¿Cómo destacar mi currículum de Ingeniero de Software?", answer: "Para destacar su currículum, utilice palabras clave relevantes, cuantifique sus logros y mantenga un formato limpio y profesional." },
-      { question: "¿Qué habilidades necesita un Ingeniero de Software?", answer: "Un Ingeniero de Software necesita habilidades en programación, resolución de problemas, trabajo en equipo y conocimiento en metodologías de desarrollo ágil." },
     ],
   },
   "software-engineer-specializing-in-the-linux": {
@@ -15452,56 +15202,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué habilidades necesita un Ingeniero de Software en Volkswagen?", answer: "Java, C++, Python, y experiencia en sistemas embebidos y metodologías ágiles." },
     ],
   },
-  "software-engineering": {
-    slug: "ingeniero-de-software",
-    title: "Ingeniero de Software",
-    keywords: ["currículum de ingeniero de software", "CV de ingeniero de software", "ejemplo currículum ingeniero de software", "plantilla CV ingeniero de software"],
-    searchIntents: ["cómo escribir currículum de ingeniero de software", "ejemplos currículum ingeniero de software", "mejor formato CV ingeniero de software"],
-    topSkills: ["Java", "Python", "JavaScript", "C++", "SQL", "HTML/CSS", "React", "Node.js", "Django", "Git"],
-    atsKeywords: ["Desarrollo de Software", "Metodologías Ágiles", "Resolución de Problemas", "Control de Versiones", "Desarrollo de API", "Gestión de Bases de Datos", "Pruebas Unitarias", "Integración Continua", "Computación en la Nube", "Estructuras de Datos", "Algoritmos"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Ingeniero de Software",
-      summary: "Ingeniero de Software experimentado con más de 5 años de experiencia en desarrollo full-stack, especializado en la creación de aplicaciones web escalables. Logré una reducción del 30% en los tiempos de carga y un aumento del 25% en la participación de los usuarios a través de prácticas de codificación optimizadas.",
-      skills: ["Java", "Python", "JavaScript", "C++", "SQL", "HTML/CSS", "React", "Node.js", "Django", "Git"],
-      experience: [
-        {
-          title: "Ingeniero de Software Senior",
-          company: "Tech Innovations Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Lideré un equipo de 5 para desarrollar un sistema de retroalimentación de clientes, aumentando los índices de satisfacción del cliente en un 40%.",
-            "Implementé una nueva estrategia de almacenamiento en caché, reduciendo la carga del servidor en un 50%.",
-            "Diseñé y desplegué una arquitectura de microservicios que mejoró la velocidad de despliegue en un 60%.",
-          ],
-        },
-        {
-          title: "Ingeniero de Software",
-          company: "Creative Solutions Ltd.",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Desarrollé una aplicación web que atendió a más de 100,000 usuarios mensuales, mejorando la retención de usuarios en un 20%.",
-            "Automatizé procesos de prueba que redujeron los informes de errores en un 30%.",
-            "Colaboré con equipos multifuncionales para mejorar las características de la aplicación, lo que llevó a un aumento del 15% en la participación de los usuarios.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Ciencia de la Computación", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "AWS Certified Solutions Architect", issuer: "Amazon", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un Ingeniero de Software en su currículum?", answer: "Un Ingeniero de Software debe incluir sus habilidades técnicas, experiencia laboral relevante, proyectos destacados y certificaciones." },
-      { question: "¿Cómo destacar mi currículum de Ingeniero de Software?", answer: "Asegúrate de personalizar tu currículum para resaltar tus logros y habilidades más relevantes para el puesto al que aplicas." },
-      { question: "¿Qué habilidades necesita un Ingeniero de Software?", answer: "Las habilidades clave incluyen programación, desarrollo de software, trabajo en equipo, y conocimiento de metodologías ágiles." },
-    ],
-  },
   "software-engineering-manager": {
     slug: "gerente-de-ingenieria-de-software",
     title: "Gerente de Ingeniería de Software",
@@ -15550,56 +15250,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué debe incluir un Software Engineering Manager en su currículum?", answer: "Incluir experiencia en liderazgo de equipos, gestión de proyectos y habilidades técnicas relevantes." },
       { question: "¿Cómo destacar mi currículum de Software Engineering Manager?", answer: "Enfatizar logros cuantificables y habilidades clave en el área de ingeniería de software." },
       { question: "¿Qué habilidades necesita un Software Engineering Manager?", answer: "Liderazgo, gestión de proyectos, metodologías ágiles y experiencia en tecnologías de la nube." },
-    ],
-  },
-  "software-engineering-ubc-eml": {
-    slug: "curriculum-de-ingeniero-de-software",
-    title: "Currículum de Ingeniero de Software",
-    keywords: ["currículum de ingeniero de software", "CV de ingeniero de software", "ejemplo currículum ingeniero de software", "plantilla CV ingeniero de software"],
-    searchIntents: ["cómo escribir currículum de ingeniero de software", "ejemplos currículum ingeniero de software", "mejor formato CV ingeniero de software"],
-    topSkills: ["Java", "Python", "JavaScript", "C++", "SQL", "Git", "Metodologías Ágiles", "APIs RESTful", "Computación en la Nube", "Ciclo de Vida del Desarrollo de Software"],
-    atsKeywords: ["desarrollo de software", "diseño de aplicaciones", "depuración", "desarrollo full-stack", "programación orientada a objetos", "estructuras de datos", "diseño de algoritmos", "control de versiones", "optimización del rendimiento", "colaboración en equipo", "documentación técnica"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Currículum de Ingeniero de Software",
-      summary: "Ingeniero de Software con más de 5 años de experiencia en el desarrollo de aplicaciones web escalables y un historial comprobado de aumento de eficiencia del sistema en un 30%. Apasionado por construir soluciones innovadoras y colaborar con equipos multifuncionales.",
-      skills: ["Java", "Python", "JavaScript", "C++", "SQL", "Git", "Metodologías Ágiles", "APIs RESTful", "Computación en la Nube", "Desarrollo de Software"],
-      experience: [
-        {
-          title: "Ingeniero de Software Senior",
-          company: "Tech Innovations Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Lideré un equipo de 5 ingenieros para desarrollar una aplicación web que aumentó la participación de los usuarios en un 40%",
-            "Implementé un nuevo pipeline de CI/CD que redujo el tiempo de implementación en un 50%",
-            "Diseñé y optimicé consultas de base de datos, lo que resultó en una reducción del 25% en los tiempos de carga",
-          ],
-        },
-        {
-          title: "Ingeniero de Software",
-          company: "Creative Solutions LLC",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Desarrollé y mantuve múltiples aplicaciones orientadas al cliente, logrando un 98% de satisfacción del cliente",
-            "Colaboré con las partes interesadas para recopilar requisitos y entregar proyectos antes de lo previsto",
-            "Mejoré el rendimiento de la aplicación refactorizando código heredado, lo que mejoró la eficiencia en un 20%",
-          ],
-        },
-      ],
-      education: [
-        { institution: "University of British Columbia", degree: "B.S.", field: "Ciencias de la Computación", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "AWS Certified Solutions Architect", issuer: "Amazon Web Services", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un currículum de ingeniero de software?", answer: "Un currículum de ingeniero de software debe incluir experiencia laboral relevante, habilidades técnicas, educación y certificaciones." },
-      { question: "¿Cómo destacar mi currículum de ingeniero de software?", answer: "Para destacar tu currículum, enfatiza tus logros cuantificables y utiliza palabras clave relevantes en la industria." },
-      { question: "¿Qué habilidades necesita un ingeniero de software?", answer: "Las habilidades clave incluyen programación en varios lenguajes, gestión de bases de datos, metodologías de desarrollo ágil, y habilidades de colaboración." },
     ],
   },
   "software-intern": {

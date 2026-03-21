@@ -2802,56 +2802,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué habilidades necesita un IC Design Engineer?", answer: "Conocimientos en diseño analógico y digital, simulaciones, y experiencia en herramientas CAD." },
     ],
   },
-  "ic-designer": {
-    slug: "diseñador-de-ci",
-    title: "Diseñador de CI",
-    keywords: ["currículum de diseñador de CI", "CV de diseñador de CI", "ejemplo currículum diseñador de CI", "plantilla CV diseñador de CI"],
-    searchIntents: ["cómo escribir currículum de diseñador de CI", "ejemplos currículum diseñador de CI", "mejor formato CV diseñador de CI"],
-    topSkills: ["Diseño de Circuitos Analógicos", "Diseño de Circuitos Digitales", "Verilog", "VHDL", "Simulación SPICE", "Diseño de PCB", "Diseño de Circuitos RF", "Programación de FPGA", "Diseño de Layout", "Análisis de Integridad de Señal"],
-    atsKeywords: ["Diseño de CI", "Simulación de Circuitos", "Diseño Mixto", "ASIC", "FPGA", "Optimización de Layout", "Verificación de Diseño", "Análisis de Tiempos", "Gestión de Energía", "Sistemas Embebidos", "Pruebas y Validación"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Diseñador de CI",
-      summary: "Diseñador de CI con más de 5 años de experiencia en diseño de circuitos analógicos y digitales, logrando reducir el tiempo de ciclo de diseño en un 20% mientras mejoraba el rendimiento general del producto.",
-      skills: ["Diseño de Circuitos Analógicos", "Diseño de Circuitos Digitales", "Verilog", "VHDL", "Simulación SPICE", "Diseño de PCB", "Diseño de Circuitos RF", "Programación de FPGA", "Diseño de Layout", "Análisis de Integridad de Señal"],
-      experience: [
-        {
-          title: "Diseñador de CI Senior",
-          company: "Analog Devices",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Lideré un proyecto que redujo el consumo de energía en un 30%, ahorrando a la empresa $500,000 anuales.",
-            "Completé con éxito más de 10 diseños de alta complejidad, resultando en una tasa de éxito del 95% en el primer intento.",
-            "Implementé un nuevo proceso de verificación que disminuyó los errores de diseño en un 25%.",
-          ],
-        },
-        {
-          title: "Diseñador de CI",
-          company: "Texas Instruments",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Diseñé y probé múltiples circuitos que mejoraron la claridad de la señal en un 15%.",
-            "Desarrollé un diseño que mejoró la eficiencia de producción, reduciendo costos en $200,000 anuales.",
-            "Colaboré con equipos multifuncionales para entregar proyectos antes de lo previsto.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "Massachusetts Institute of Technology", degree: "B.S.", field: "Ingeniería Eléctrica", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Certified Electronics Technician", issuer: "National Institute for Certification in Engineering Technologies", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un IC Designer en su currículum?", answer: "Un IC Designer debe incluir una sección clara de habilidades técnicas, experiencia laboral relevante, educación y certificaciones." },
-      { question: "¿Cómo destacar mi currículum de IC Designer?", answer: "Puede destacar su currículum utilizando palabras clave relevantes, mostrando logros cuantificables y personalizando su perfil para cada aplicación." },
-      { question: "¿Qué habilidades necesita un IC Designer?", answer: "Un IC Designer necesita habilidades en diseño de circuitos, simulación, programación en Verilog/VHDL y experiencia en optimización de layout." },
-    ],
-  },
   "ic-layout-design-engineer": {
     slug: "ingeniero-de-diseno-de-layout-ic",
     title: "Ingeniero de Diseño de Layout IC",
@@ -5203,7 +5153,7 @@ export const translations: Record<string, ProfessionEsData> = {
     ],
   },
   "title-abstractor": {
-    slug: "titulo-proper-title",
+    slug: "extractor-de-titulos",
     title: "Título Adecuado",
     keywords: ["currículum de Título Adecuado", "CV de Título Adecuado", "ejemplo currículum Título Adecuado", "plantilla CV Título Adecuado"],
     searchIntents: ["cómo escribir currículum de Título Adecuado", "ejemplos currículum Título Adecuado", "mejor formato CV Título Adecuado"],

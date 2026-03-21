@@ -2915,58 +2915,6 @@ export const professions: ProfessionPageData[] = [
     ],
   },
   {
-    slug: "ic-designer",
-    title: "IC Designer",
-    templateStyle: "creative",
-    keywords: ["IC designer resume", "IC designer CV template", "IC designer resume example", "IC designer curriculum vitae"],
-    searchIntents: ["how to write an IC designer resume", "IC designer resume examples", "best IC designer resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Analog Circuit Design", "Digital Circuit Design", "Verilog", "VHDL", "SPICE Simulation", "PCB Design", "RF Circuit Design", "FPGA Programming", "Layout Design", "Signal Integrity Analysis"],
-    atsKeywords: ["IC Design", "Circuit Simulation", "Mixed-Signal Design", "ASIC", "FPGA", "Layout Optimization", "Design Verification", "Timing Analysis", "Power Management", "Embedded Systems", "Testing and Validation"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "IC Designer",
-      summary: "IC Designer with over 5 years of experience in analog and digital circuit design, successfully reducing design cycle time by 20% while improving overall product performance.",
-      skills: ["Analog Design", "Digital Design", "Test Planning", "Debugging", "Design for Testability", "Technical Documentation", "Collaboration", "Project Management", "Problem Solving", "Critical Thinking"],
-      experience: [
-        {
-          title: "Senior IC Designer",
-          company: "Analog Devices",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Led a project that reduced power consumption by 30%, saving the company $500,000 annually.",
-            "Successfully completed over 10 high-complexity designs resulting in a 95% first-pass success rate.",
-            "Implemented a new verification process that decreased design errors by 25%.",
-          ],
-        },
-        {
-          title: "IC Designer",
-          company: "Texas Instruments",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Designed and tested multiple circuits that improved signal clarity by 15%.",
-            "Developed a layout that enhanced production efficiency, reducing costs by $200,000 annually.",
-            "Collaborated with cross-functional teams to deliver projects ahead of schedule.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "Massachusetts Institute of Technology", degree: "B.S.", field: "Electrical Engineering", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Certified Electronics Technician", issuer: "National Institute for Certification in Engineering Technologies", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should an IC Designer include on their resume?", answer: "An IC Designer should include relevant projects, technical skills, certifications, and quantifiable achievements that demonstrate their impact in previous roles." },
-      { question: "How do I make my IC Designer resume stand out?", answer: "Highlight specific projects with metrics, use industry keywords, and customize your resume for each job application to align with the job description." },
-      { question: "What skills are most important for an IC Designer?", answer: "Key skills include circuit design, simulation tools, testing methodologies, and a strong understanding of electronic principles and practices." },
-    ],
-  },
-  {
     slug: "ic-layout-design-engineer",
     title: "IC Layout Design Engineer",
     templateStyle: "creative",

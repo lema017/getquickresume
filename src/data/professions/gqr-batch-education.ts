@@ -1724,58 +1724,6 @@ export const professions: ProfessionPageData[] = [
     ],
   },
   {
-    slug: "curriculum-designer",
-    title: "Curriculum Designer",
-    templateStyle: "professional",
-    keywords: ["Curriculum Designer resume", "Curriculum Designer CV template", "Curriculum Designer resume example", "Curriculum Designer curriculum vitae"],
-    searchIntents: ["how to write a Curriculum Designer resume", "Curriculum Designer resume examples", "best Curriculum Designer resume format"],
-    totalMonthlySearches: 800,
-    topSkills: ["Instructional Design", "Learning Management Systems", "Curriculum Development", "Assessment Design", "Project Management", "Data Analysis", "E-Learning Development", "Teaching Strategies", "Collaboration", "Communication"],
-    atsKeywords: ["Curriculum Development", "Instructional Strategies", "Learning Objectives", "Adult Learning Theory", "Blended Learning", "Content Development", "Educational Technology", "Evaluation", "Program Assessment", "Needs Analysis", "Stakeholder Engagement"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Curriculum Designer",
-      summary: "Dedicated Curriculum Designer with over 5 years of experience in creating engaging educational content, resulting in a 30% improvement in learner satisfaction scores.",
-      skills: ["Curriculum Mapping", "Lesson Planning", "Educational Research", "Content Creation", "Technology Integration", "Professional Development", "Team Leadership", "Feedback and Evaluation", "Strategic Planning", "User Experience Design"],
-      experience: [
-        {
-          title: "Senior Curriculum Designer",
-          company: "Pearson Education",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Led the development of a new digital curriculum that increased student engagement by 40%.",
-            "Implemented data analysis methods that improved assessment accuracy by 25%.",
-            "Collaborated with cross-functional teams to enhance course materials, resulting in a 15% increase in learner retention.",
-          ],
-        },
-        {
-          title: "Curriculum Developer",
-          company: "McGraw-Hill Education",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Designed and launched a series of online courses that reached over 10,000 students.",
-            "Created assessment tools that improved feedback turnaround time by 20%.",
-            "Facilitated workshops for educators to enhance instructional techniques, resulting in a 30% increase in positive feedback.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "University of California, Berkeley", degree: "B.S.", field: "Education", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Certified Instructional Designer", issuer: "Association for Educational Communications and Technology", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "What should a Curriculum Designer include on their resume?", answer: "A Curriculum Designer should include their educational background, relevant work experience, specific skills in instructional design, examples of successful projects, and any certifications related to curriculum development." },
-      { question: "How do I make my Curriculum Designer resume stand out?", answer: "Highlight unique projects you've led, quantify your achievements with metrics, and tailor your resume to include keywords from the job description to pass through ATS." },
-      { question: "What skills are most important for a Curriculum Designer?", answer: "Key skills include instructional design principles, curriculum development expertise, knowledge of learning management systems, strong communication abilities, and the capacity for data analysis to measure educational effectiveness." },
-    ],
-  },
-  {
     slug: "curriculum-development-specialist",
     title: "Curriculum Development Specialist",
     templateStyle: "professional",

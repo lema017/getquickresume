@@ -1402,56 +1402,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué habilidades necesita un entrenador de béisbol?", answer: "Un entrenador de béisbol necesita habilidades en liderazgo, comunicación, estrategia de juego y desarrollo de jugadores." },
     ],
   },
-  "basic": {
-    slug: "ingeniero-de-software",
-    title: "Ingeniero de Software",
-    keywords: ["currículum de ingeniero de software", "CV de ingeniero de software", "ejemplo currículum ingeniero de software", "plantilla CV ingeniero de software"],
-    searchIntents: ["cómo escribir currículum de ingeniero de software", "ejemplos currículum ingeniero de software", "mejor formato CV ingeniero de software"],
-    topSkills: ["Java", "Python", "JavaScript", "SQL", "C#", "HTML", "CSS", "React", "Node.js", "Git"],
-    atsKeywords: ["desarrollo de software", "metodologías ágiles", "resolución de problemas", "colaboración", "control de versiones", "desarrollo de API", "pruebas unitarias", "desarrollo full-stack", "estructuras de datos", "algoritmos", "computación en la nube"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Ingeniero de Software",
-      summary: "Ingeniero de Software dedicado con más de 5 años de experiencia en el desarrollo de aplicaciones web escalables. Mejoró con éxito el rendimiento de la aplicación en un 30%, lo que resultó en un aumento en la satisfacción del usuario.",
-      skills: ["Java", "Python", "JavaScript", "SQL", "C#", "HTML", "CSS", "React", "Node.js", "Git"],
-      experience: [
-        {
-          title: "Ingeniero de Software Senior",
-          company: "Tech Innovations Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Lideré un equipo para mejorar el rendimiento de la aplicación en un 30%, aumentando el compromiso del usuario en un 15%.",
-            "Desarrollé y desplegué 5 funciones principales que aumentaron la retención de clientes en un 20%.",
-            "Implementé pipelines de CI/CD reduciendo el tiempo de despliegue en un 50%.",
-          ],
-        },
-        {
-          title: "Ingeniero de Software",
-          company: "NextGen Solutions",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Colaboré en un proyecto que resultó en un aumento del 25% en la eficiencia operativa.",
-            "Optimicé consultas de bases de datos, reduciendo los tiempos de carga en un 40%.",
-            "Contribuí a proyectos de código abierto mejorando la calidad del código y la colaboración del equipo.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Ciencias de la Computación", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "AWS Certified Solutions Architect", issuer: "Amazon Web Services", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un Ingeniero de Software en su currículum?", answer: "Un Ingeniero de Software debe incluir sus habilidades técnicas, experiencia laboral relevante, proyectos destacados y certificaciones." },
-      { question: "¿Cómo destacar mi currículum de Ingeniero de Software?", answer: "Para destacar su currículum, enfoque en resultados cuantificables y proyectos exitosos, y utilice palabras clave relevantes." },
-      { question: "¿Qué habilidades necesita un Ingeniero de Software?", answer: "Un Ingeniero de Software debe tener habilidades en programación, desarrollo web, manejo de bases de datos y metodologías ágiles." },
-    ],
-  },
   "basketball-coach": {
     slug: "entrenador-de-baloncesto",
     title: "Entrenador de Baloncesto",
@@ -1750,56 +1700,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué debe incluir un Intervencionista de Comportamiento en su currículum?", answer: "Incluya su experiencia en la implementación de planes de comportamiento, habilidades interpersonales y formación específica en análisis de comportamiento." },
       { question: "¿Cómo destacar mi currículum de Intervencionista de Comportamiento?", answer: "Use palabras clave relevantes, resalte logros cuantificables y personalice su currículum para cada solicitud." },
       { question: "¿Qué habilidades necesita un Intervencionista de Comportamiento?", answer: "Las habilidades clave incluyen análisis de comportamiento, comunicación efectiva, empatía y capacidad para trabajar en equipo." },
-    ],
-  },
-  "bellhop": {
-    slug: "bellhop-curriculum",
-    title: "Botones",
-    keywords: ["currículum de botones", "CV de botones", "ejemplo currículum botones", "plantilla CV botones"],
-    searchIntents: ["cómo escribir currículum de botones", "ejemplos currículum botones", "mejor formato CV botones"],
-    topSkills: ["Atención al Cliente", "Comunicación", "Gestión del Tiempo", "Atención al Detalle", "Resolución de Problemas", "Trabajo en Equipo", "Adaptabilidad", "Multitarea", "Resistencia Física", "Resolución de Conflictos"],
-    atsKeywords: ["hospitalidad", "servicios al huésped", "manejo de equipaje", "check-in", "check-out", "servicio a la habitación", "conserjería", "satisfacción del cliente", "colaboración en equipo", "protocolos de seguridad", "gestión de propiedades"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Botones",
-      summary: "Botones dedicado con más de 5 años de experiencia en proporcionar servicios excepcionales a los huéspedes y gestionar equipaje de manera eficiente. Historial comprobado de aumentar la satisfacción del huésped en un 20% a través de un servicio atento y atención al detalle.",
-      skills: ["Atención al Cliente", "Comunicación", "Gestión del Tiempo", "Atención al Detalle", "Resolución de Problemas", "Trabajo en Equipo", "Adaptabilidad", "Multitarea", "Resistencia Física", "Resolución de Conflictos"],
-      experience: [
-        {
-          title: "Botones Senior",
-          company: "Grand Hotel & Resort",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Aumenté las calificaciones de satisfacción del huésped en un 25% a través de un servicio personalizado.",
-            "Manejé más de 100 interacciones diarias con huéspedes, asegurando procesos de check-in y check-out fluidos.",
-            "Optimicé los procedimientos de manejo de equipaje, reduciendo el tiempo de espera promedio en un 15%.",
-          ],
-        },
-        {
-          title: "Botones",
-          company: "City Center Hotel",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Asistí a los huéspedes con el equipaje y consultas, logrando un 95% de puntuación positiva en los comentarios.",
-            "Colaboré con los equipos de limpieza y recepción para garantizar un servicio oportuno.",
-            "Capacité al nuevo personal sobre las mejores prácticas para servicios al huésped y protocolos de seguridad.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Gestión de Hospitalidad", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Certified Hospitality Professional", issuer: "Hospitality Institute", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un Botones en su currículum?", answer: "Un Botones debe incluir experiencias relacionadas con el servicio al huésped, manejo de equipaje, y habilidades de comunicación." },
-      { question: "¿Cómo destacar mi currículum de Botones?", answer: "Resalte sus logros en servicio al cliente y habilidades específicas relacionadas con la hospitalidad." },
-      { question: "¿Qué habilidades necesita un Botones?", answer: "Las habilidades clave incluyen atención al cliente, manejo de equipaje, y habilidades de comunicación efectiva." },
     ],
   },
   "bellman": {
@@ -3400,56 +3300,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué debe incluir un Co-Fundador en su currículum?", answer: "Un Co-Fundador debe incluir su experiencia en liderazgo, desarrollo de negocios y habilidades estratégicas." },
       { question: "¿Cómo destacar mi currículum de Co-Fundador?", answer: "Utiliza palabras clave relevantes y destaca logros específicos que muestren tu impacto en las empresas." },
       { question: "¿Qué habilidades necesita un Co-Fundador?", answer: "Las habilidades clave incluyen liderazgo, planificación estratégica, y habilidades en desarrollo de negocios." },
-    ],
-  },
-  "college-graduate": {
-    slug: "entry-level-software-engineer",
-    title: "Ingeniero de Software de Nivel Inicial",
-    keywords: ["currículum de ingeniero de software de nivel inicial", "CV de ingeniero de software de nivel inicial", "ejemplo currículum ingeniero de software", "plantilla CV ingeniero de software"],
-    searchIntents: ["cómo escribir currículum de ingeniero de software de nivel inicial", "ejemplos currículum ingeniero de software", "mejor formato CV ingeniero de software"],
-    topSkills: ["Java", "Python", "JavaScript", "SQL", "HTML/CSS", "Git", "Resolución de Problemas", "Colaboración en Equipo", "Metodologías Ágiles", "Estructuras de Datos"],
-    atsKeywords: ["desarrollo de software", "programación", "desarrollo web", "algoritmo", "análisis de datos", "gestión de proyectos", "pruebas de software", "depuración", "desarrollo de API", "documentación técnica", "colaboración"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Ingeniero de Software de Nivel Inicial",
-      summary: "Reciente graduado en informática con sólidas habilidades en programación y una capacidad comprobada para entregar proyectos a tiempo y dentro del presupuesto. Completó con éxito múltiples pasantías con un enfoque en el desarrollo de software y la colaboración en equipo.",
-      skills: ["Java", "Python", "JavaScript", "SQL", "HTML/CSS", "Git", "Resolución de Problemas", "Colaboración en Equipo", "Metodologías Ágiles", "Estructuras de Datos"],
-      experience: [
-        {
-          title: "Pasantía de Software",
-          company: "Tech Innovations Inc.",
-          startDate: "2022-06",
-          isCurrent: true,
-          achievements: [
-            "Desarrollé una aplicación web que mejoró la interacción de los usuarios en un 30%.",
-            "Colaboré con un equipo de 5 para rediseñar las herramientas internas de la empresa, reduciendo el tiempo de procesamiento en 15 horas al mes.",
-            "Implementé pruebas automatizadas que disminuyeron los informes de errores en un 20%.",
-          ],
-        },
-        {
-          title: "Pasantía de Desarrollador Junior",
-          company: "CodeCraft Solutions",
-          startDate: "2021-05",
-          endDate: "2022-05",
-          achievements: [
-            "Asistí en el desarrollo de una aplicación móvil que logró una calificación de 4.5 estrellas en las tiendas de aplicaciones.",
-            "Contribuí a los esfuerzos de optimización de bases de datos que mejoraron el rendimiento de las consultas en un 25%.",
-            "Participé en revisiones de código semanales para mejorar habilidades de codificación y comunicación en equipo.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Informática", startDate: "2018-08", endDate: "2022-05" },
-      ],
-      certifications: [
-        { name: "Certified Java Developer", issuer: "Oracle", date: "2022-10" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un Ingeniero de Software de Nivel Inicial en su currículum?", answer: "Un Ingeniero de Software de Nivel Inicial debe incluir sus habilidades técnicas, experiencia previa, proyectos destacados y educación." },
-      { question: "¿Cómo destacar mi currículum de Ingeniero de Software de Nivel Inicial?", answer: "Resalta tus habilidades clave, proyectos relevantes y utiliza un formato limpio y profesional." },
-      { question: "¿Qué habilidades necesita un Ingeniero de Software de Nivel Inicial?", answer: "Necesita habilidades en programación, resolución de problemas, colaboración en equipo y conocimientos de metodologías ágiles." },
     ],
   },
   "college-simple": {
@@ -5302,7 +5152,7 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué habilidades necesita un Caminador de Perros?", answer: "Habilidades clave incluyen cuidado de animales, gestión del tiempo y comunicación efectiva." },
     ],
   },
-  "douglas-g-hurley": {
+  "experienced-aerospace-engineer": {
     slug: "ingeniero-aeroespacial-experto",
     title: "Ingeniero Aeroespacial Experimentado",
     keywords: ["currículum de ingeniero aeroespacial", "CV de ingeniero aeroespacial", "ejemplo currículum ingeniero aeroespacial", "plantilla CV ingeniero aeroespacial"],
@@ -5310,8 +5160,8 @@ export const translations: Record<string, ProfessionEsData> = {
     topSkills: ["Aerodinámica", "Dinámica de Fluidos", "Análisis Estructural", "Gestión de Proyectos", "Software CAD", "Ingeniería de Sistemas", "Análisis Térmico", "Sistemas de Propulsión", "Procesos de Fabricación", "Documentación Técnica"],
     atsKeywords: ["aeroespacial", "ingeniería", "diseño", "análisis", "gestión de proyectos", "cumplimiento", "pruebas", "simulación", "fabricación", "investigación", "desarrollo"],
     sampleResumeData: buildResumeData({
-      firstName: "Douglas",
-      lastName: "Hurley",
+      firstName: "Alex",
+      lastName: "Johnson",
       profession: "Ingeniero Aeroespacial Experimentado",
       summary: "Ingeniero aeroespacial altamente calificado con más de 10 años de experiencia en el diseño y análisis de sistemas complejos para empresas líderes en el sector aeroespacial. Historial comprobado de mejorar la eficiencia de proyectos en un 30% y reducir costos en $500,000 anuales.",
       skills: ["Aerodinámica", "Dinámica de Fluidos", "Análisis Estructural", "Gestión de Proyectos", "Software CAD", "Ingeniería de Sistemas", "Análisis Térmico", "Sistemas de Propulsión", "Procesos de Fabricación", "Documentación Técnica"],
@@ -5550,56 +5400,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué debe incluir un Educador en su currículum?", answer: "Un Educador debe incluir su experiencia en enseñanza, habilidades en gestión del aula y su enfoque en el desarrollo curricular." },
       { question: "¿Cómo destacar mi currículum de Educador?", answer: "Para destacar su currículum, incluya logros cuantificables y resalte su experiencia en tecnología educativa." },
       { question: "¿Qué habilidades necesita un Educador?", answer: "Un Educador necesita habilidades como gestión del aula, comunicación efectiva, y un fuerte enfoque en la instrucción diferenciada." },
-    ],
-  },
-  "education-on-a": {
-    slug: "educacion-en-a",
-    title: "Educación En A",
-    keywords: ["currículum de educación en a", "CV de educación en a", "ejemplo currículum educación en a", "plantilla CV educación en a"],
-    searchIntents: ["cómo escribir currículum de educación en a", "ejemplos currículum educación en a", "mejor formato CV educación en a"],
-    topSkills: ["Desarrollo de Currículo", "Gestión del Aula", "Tecnología Educativa", "Diseño Instruccional", "Estrategias de Evaluación", "Instrucción Diferenciada", "Habilidades de Comunicación", "Colaboración", "Adaptabilidad", "Pensamiento Crítico"],
-    atsKeywords: ["educación", "enseñanza", "aprendizaje", "currículo", "evaluación", "compromiso estudiantil", "integración tecnológica", "desarrollo profesional", "coaching", "mentoría", "gestión del aula"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Educación En A",
-      summary: "Profesional de la educación dedicado con más de 5 años de experiencia en el desarrollo de currículos innovadores y en el aumento de la participación estudiantil. Historial comprobado de aumentar el rendimiento estudiantil en un 20% mediante estrategias de enseñanza efectivas.",
-      skills: ["Desarrollo de Currículo", "Gestión del Aula", "Tecnología Educativa", "Diseño Instruccional", "Estrategias de Evaluación", "Instrucción Diferenciada", "Habilidades de Comunicación", "Colaboración", "Adaptabilidad", "Pensamiento Crítico"],
-      experience: [
-        {
-          title: "Educador Senior",
-          company: "Bright Futures Academy",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Aumenté las puntuaciones de los exámenes de los estudiantes en un 30% mediante planes de lecciones personalizados.",
-            "Implementé una nueva plataforma de aprendizaje digital que mejoró la participación estudiantil en un 25%.",
-            "Lideré un equipo de educadores en el desarrollo de un currículo multidisciplinario que resultó en una reducción del 15% en las tasas de deserción.",
-          ],
-        },
-        {
-          title: "Educador",
-          company: "River Valley High School",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Desarrollé y ejecuté planes de lecciones que mejoraron las calificaciones de satisfacción estudiantil en un 40%.",
-            "Coordiné programas de tutoría después de la escuela que resultaron en una mejora del 50% en las calificaciones.",
-            "Facilité talleres de desarrollo profesional para otros maestros sobre técnicas de gestión del aula.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Educación", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Certified Teacher", issuer: "State Board of Education", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un Education On A en su currículum?", answer: "Un Education On A debe incluir una descripción clara de su experiencia en la enseñanza, habilidades específicas y logros destacados en el aula." },
-      { question: "¿Cómo destacar mi currículum de Education On A?", answer: "Para destacar su currículum, enfoque en sus logros medibles y use verbos de acción que muestren su impacto en el aprendizaje de los estudiantes." },
-      { question: "¿Qué habilidades necesita un Education On A?", answer: "Las habilidades clave incluyen la gestión del aula, la creación de currículos efectivos, la integración de tecnología y la capacidad de adaptarse a diferentes estilos de aprendizaje." },
     ],
   },
   "educational-technologist": {
@@ -6100,56 +5900,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué debe incluir un Energy Advisor en su currículum?", answer: "Un Energy Advisor debe incluir su experiencia en auditorías energéticas, proyectos de eficiencia energética y habilidades en gestión de proyectos." },
       { question: "¿Cómo destacar mi currículum de Energy Advisor?", answer: "Destaca tus logros cuantificables en eficiencia energética y tu experiencia en proyectos exitosos." },
       { question: "¿Qué habilidades necesita un Energy Advisor?", answer: "Un Energy Advisor necesita habilidades en auditoría energética, análisis de datos y gestión de relaciones con clientes." },
-    ],
-  },
-  "english": {
-    slug: "curriculum-en-espanol",
-    title: "Currículum en Inglés",
-    keywords: ["currículum de inglés", "CV de inglés", "ejemplo currículum inglés", "plantilla CV inglés"],
-    searchIntents: ["cómo escribir currículum de inglés", "ejemplos currículum inglés", "mejor formato CV inglés"],
-    topSkills: ["Redacción Creativa", "Edición", "Análisis Literario", "Investigación", "Comunicación", "Enseñanza", "Oratoria", "Desarrollo de Contenido", "Corrección de Estilo", "Pensamiento Crítico"],
-    atsKeywords: ["Idioma Inglés", "Gramática", "Literatura", "Diseño Instruccional", "Desarrollo Curricular", "Evaluación", "Gestión del Aula", "Escritura Académica", "Alfabetización Digital", "Estrategia de Contenidos", "Gestión de Proyectos"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Currículum en Inglés",
-      summary: "Un profesional de inglés experimentado con más de 5 años en educación y creación de contenido, reconocido por mejorar el compromiso estudiantil en un 30% a través de métodos de enseñanza innovadores.",
-      skills: ["Redacción Creativa", "Edición", "Análisis Literario", "Investigación", "Comunicación", "Enseñanza", "Oratoria", "Desarrollo de Contenido", "Corrección de Estilo", "Pensamiento Crítico"],
-      experience: [
-        {
-          title: "Profesor de Inglés Senior",
-          company: "Greenwood Academy",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Aumenté las tasas de alfabetización estudiantil en un 25% en dos años a través de planes de lecciones personalizados.",
-            "Desarrollé un nuevo currículo que mejoró el compromiso general de los estudiantes en un 30%.",
-            "Dirigí talleres para compañeros docentes que resultaron en un aumento del 15% en la efectividad docente.",
-          ],
-        },
-        {
-          title: "Instructor de Literatura Inglesa",
-          company: "Heritage High School",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Implementé un sistema de revisión por pares que mejoró las habilidades de escritura de los estudiantes en un 40%.",
-            "Organicé eventos literarios que aumentaron la asistencia en un 50%.",
-            "Colaboré en una iniciativa de toda la escuela para integrar tecnología en el aula, resultando en una mejora del 20% en el rendimiento estudiantil.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "Licenciatura", field: "Literatura Inglesa", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Certified English Teacher", issuer: "National Board for Professional Teaching Standards", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un currículum en inglés?", answer: "Un currículum en inglés debe incluir información personal, experiencia laboral, educación y habilidades relevantes." },
-      { question: "¿Cómo destacar mi currículum de inglés?", answer: "Destaca tus logros, usa palabras clave relevantes y asegúrate de que el formato sea claro y profesional." },
-      { question: "¿Qué habilidades necesita un currículum de inglés?", answer: "Las habilidades clave incluyen comunicación efectiva, redacción, análisis crítico y gestión del aula." },
     ],
   },
   "enterpreneur": {
@@ -7802,56 +7552,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué habilidades necesita un Técnico de Iluminación Freelance?", answer: "Necesita habilidades en diseño de iluminación, rigging, y conocimientos eléctricos, así como habilidades interpersonales." },
     ],
   },
-  "fresher": {
-    slug: "entry-level-software-engineer",
-    title: "Ingeniero de Software de Nivel de Entrada",
-    keywords: ["currículum de ingeniero de software", "CV de ingeniero de software", "ejemplo currículum ingeniero de software", "plantilla CV ingeniero de software"],
-    searchIntents: ["cómo escribir currículum de ingeniero de software", "ejemplos currículum ingeniero de software", "mejor formato CV ingeniero de software"],
-    topSkills: ["Java", "Python", "JavaScript", "SQL", "HTML", "CSS", "Git", "Resolución de Problemas", "Colaboración en Equipo", "Comunicación"],
-    atsKeywords: ["desarrollo de software", "programación", "desarrollo web", "estructuras de datos", "algoritmos", "Agile", "Scrum", "depuración", "pruebas", "control de versiones", "programación orientada a objetos"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Ingeniero de Software de Nivel de Entrada",
-      summary: "Reciente graduado en ciencias de la computación con experiencia en prácticas en desarrollo de software. Contribuyó exitosamente a proyectos que mejoraron el rendimiento de la aplicación en un 30%.",
-      skills: ["Java", "Python", "JavaScript", "SQL", "HTML", "CSS", "Git", "Resolución de Problemas", "Colaboración en Equipo", "Comunicación"],
-      experience: [
-        {
-          title: "Practicante en Desarrollo de Software",
-          company: "Tech Innovations Inc.",
-          startDate: "2022-06",
-          isCurrent: true,
-          achievements: [
-            "Contribuyó a una aplicación web que aumentó la participación de usuarios en un 25%",
-            "Asistió en la depuración y optimización de código, reduciendo los tiempos de carga en un 15%",
-            "Colaboró con el equipo de desarrollo para implementar nuevas características",
-          ],
-        },
-        {
-          title: "Practicante de Soporte IT",
-          company: "Global Tech Solutions",
-          startDate: "2021-06",
-          endDate: "2022-05",
-          achievements: [
-            "Resolví más de 200 tickets de soporte técnico, mejorando las tasas de satisfacción del cliente en un 20%",
-            "Simplifiqué los procesos de documentación de TI, aumentando la eficiencia del equipo",
-            "Participé en reuniones diarias y stand-ups, ganando experiencia en Agile",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Ciencias de la Computación", startDate: "2018-08", endDate: "2022-05" },
-      ],
-      certifications: [
-        { name: "Certified Java Programmer", issuer: "Oracle", date: "2023-01" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un Ingeniero de Software de Nivel de Entrada en su currículum?", answer: "Debe incluir habilidades técnicas, experiencia relevante y educación." },
-      { question: "¿Cómo destacar mi currículum de Ingeniero de Software de Nivel de Entrada?", answer: "Enfócate en tus logros y proyectos relevantes, y utiliza palabras clave adecuadas." },
-      { question: "¿Qué habilidades necesita un Ingeniero de Software de Nivel de Entrada?", answer: "Necesita habilidades en programación, resolución de problemas y colaboración en equipo." },
-    ],
-  },
   "front-line-employee": {
     slug: "empleado-de-frente",
     title: "Empleado de Frente",
@@ -9050,56 +8750,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué debe incluir un Headhunter en su currículum?", answer: "Un Headhunter debe incluir su experiencia en adquisición de talento, habilidades de negociación y logros en la colocación de candidatos." },
       { question: "¿Cómo destacar mi currículum de Headhunter?", answer: "Es importante resaltar logros cuantificables y habilidades específicas del sector en su currículum." },
       { question: "¿Qué habilidades necesita un Headhunter?", answer: "Las habilidades clave incluyen adquisición de talento, negociación, y gestión de relaciones con los clientes." },
-    ],
-  },
-  "headline": {
-    slug: "ingeniero-de-software",
-    title: "Ingeniero de Software",
-    keywords: ["currículum de ingeniero de software", "CV de ingeniero de software", "ejemplo currículum ingeniero de software", "plantilla CV ingeniero de software"],
-    searchIntents: ["cómo escribir currículum de ingeniero de software", "ejemplos currículum ingeniero de software", "mejor formato CV ingeniero de software"],
-    topSkills: ["Java", "Python", "C++", "JavaScript", "SQL", "Ágil", "Aprendizaje Automático", "DevOps", "React", "Node.js"],
-    atsKeywords: ["desarrollo de software", "full stack", "backend", "frontend", "desarrollo de API", "computación en la nube", "gestión de bases de datos", "control de versiones", "resolución de problemas", "colaboración en equipo", "documentación técnica"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Ingeniero de Software",
-      summary: "Ingeniero de Software dedicado con más de 5 años de experiencia en el desarrollo de aplicaciones web escalables y un historial comprobado de optimización de rendimiento, logrando una reducción del 30% en los tiempos de carga en diversos proyectos.",
-      skills: ["Java", "Python", "C++", "JavaScript", "SQL", "Ágil", "Aprendizaje Automático", "DevOps", "React", "Node.js"],
-      experience: [
-        {
-          title: "Ingeniero de Software Senior",
-          company: "Tech Innovations Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Lideré un equipo para desarrollar una arquitectura de microservicios, lo que resultó en un aumento del 40% en la escalabilidad del sistema.",
-            "Implementé un pipeline de CI/CD que redujo los tiempos de despliegue en un 50%.",
-            "Mejoré el rendimiento de la aplicación, reduciendo los tiempos de carga en un 30%.",
-          ],
-        },
-        {
-          title: "Ingeniero de Software",
-          company: "Web Solutions LLC",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Desarrollé un sistema de retroalimentación de clientes que mejoró las calificaciones de satisfacción del usuario en un 25%.",
-            "Coordiné con equipos multifuncionales para entregar proyectos a tiempo y dentro del presupuesto.",
-            "Automatizé procesos de prueba, resultando en una reducción del 20% en errores.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "Licenciatura en Ciencias de la Computación", field: "Ciencias de la Computación", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "AWS Certified Solutions Architect", issuer: "Amazon", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un Ingeniero de Software en su currículum?", answer: "Incluir experiencia relevante, habilidades técnicas, y proyectos destacados." },
-      { question: "¿Cómo destacar mi currículum de Ingeniero de Software?", answer: "Usar palabras clave y resaltar logros cuantificables." },
-      { question: "¿Qué habilidades necesita un Ingeniero de Software?", answer: "Habilidades clave incluyen programación, trabajo en equipo y resolución de problemas." },
     ],
   },
   "high-school": {
@@ -12402,56 +12052,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué habilidades necesita un Mystery Shopper Resume?", answer: "Las habilidades clave incluyen atención al detalle, comunicación efectiva y capacidad para realizar evaluaciones objetivas." },
     ],
   },
-  "nanny": {
-    slug: "niñera-curriculum",
-    title: "Niñera",
-    keywords: ["currículum de niñera", "CV de niñera", "ejemplo currículum niñera", "plantilla CV niñera"],
-    searchIntents: ["cómo escribir currículum de niñera", "ejemplos currículum niñera", "mejor formato CV niñera"],
-    topSkills: ["Cuidado de niños", "Primeros Auxilios", "Certificación de RCP", "Comunicación", "Manejo del Tiempo", "Resolución de Conflictos", "Preparación de Comidas", "Habilidades Organizativas", "Actividades Educativas", "Manejo del Hogar"],
-    atsKeywords: ["supervisión de niños", "actividades de desarrollo", "protocolos de seguridad", "cuidado", "manejo de comportamiento", "transporte", "actividades de juego", "participación familiar", "tareas del hogar", "respuesta a emergencias", "multitarea"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Niñera",
-      summary: "Niñera dedicada con más de 5 años de experiencia en proporcionar cuidado excepcional y crear un ambiente seguro y cariñoso para los niños. Manejó exitosamente las necesidades diarias de niños de 1 a 10 años, logrando una mejora del 30% en su desarrollo social y emocional.",
-      skills: ["Cuidado de niños", "Primeros Auxilios", "Certificación de RCP", "Comunicación", "Manejo del Tiempo", "Resolución de Conflictos", "Preparación de Comidas", "Habilidades Organizativas", "Actividades Educativas", "Manejo del Hogar"],
-      experience: [
-        {
-          title: "Niñera Senior",
-          company: "Bright Futures Childcare",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Implementé una rutina diaria estructurada que mejoró los problemas de comportamiento de los niños en un 40%",
-            "Organicé con éxito actividades educativas que mejoraron las habilidades de aprendizaje de los niños, resultando en un aumento del 25% en la preparación escolar",
-            "Desarrollé relaciones sólidas con las familias, alcanzando una tasa de satisfacción del 100% en los comentarios de los clientes",
-          ],
-        },
-        {
-          title: "Niñera",
-          company: "Happy Kids Nanny Services",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Proporcioné cuidado a tres niños, de 2 a 8 años, asegurando su seguridad y bienestar durante las actividades diarias",
-            "Coordiné y ejecuté actividades educativas y recreativas que promovieron el desarrollo físico y mental",
-            "Manejé tareas del hogar, incluyendo la preparación de comidas y la lavandería, mejorando la eficiencia del hogar en un 20%",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Desarrollo Infantil", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "CPR and First Aid Certification", issuer: "American Red Cross", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un Nanny en su currículum?", answer: "Un Nanny debe incluir su experiencia en cuidado infantil, habilidades relevantes, certificaciones y logros específicos en su carrera." },
-      { question: "¿Cómo destacar mi currículum de Nanny?", answer: "Para destacar, incluya logros cuantificables, habilidades clave y personalice su currículum para cada puesto." },
-      { question: "¿Qué habilidades necesita un Nanny?", answer: "Las habilidades clave incluyen el cuidado infantil, la comunicación efectiva, la gestión del tiempo y la capacidad de resolver conflictos." },
-    ],
-  },
   "natural-sciences-student": {
     slug: "estudiante-de-ciencias-naturales",
     title: "Estudiante de Ciencias Naturales",
@@ -13048,56 +12648,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué habilidades necesita un Agente de Atención al Cliente?", answer: "Habilidades clave incluyen comunicación efectiva, resolución de problemas y empatía." },
     ],
   },
-  "over-the-phone-interpreter": {
-    slug: "intérprete-por-teléfono",
-    title: "Intérprete por Teléfono",
-    keywords: ["currículum de intérprete por teléfono", "CV de intérprete por teléfono", "ejemplo currículum intérprete por teléfono", "plantilla CV intérprete por teléfono"],
-    searchIntents: ["cómo escribir currículum de intérprete por teléfono", "ejemplos currículum intérprete por teléfono", "mejor formato CV intérprete por teléfono"],
-    topSkills: ["Fluidez en múltiples idiomas", "Sensibilidad cultural", "Escucha activa", "Habilidades de comunicación", "Resolución de problemas", "Atención al detalle", "Gestión del tiempo", "Competencia técnica", "Adherencia a la confidencialidad", "Gestión de relaciones con clientes"],
-    atsKeywords: ["bilingüe", "interpretación", "traducción", "servicio al cliente", "competencia lingüística", "interpretación remota", "resolución de conflictos", "habilidades interpersonales", "precisión", "multitarea", "profesionalismo"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Intérprete por Teléfono",
-      summary: "Intérprete por Teléfono dedicado con 5 años de experiencia en la entrega de servicios lingüísticos de alta calidad y en la mejora de la satisfacción del cliente en un 30%. Historial comprobado en el manejo de información sensible con confidencialidad y precisión.",
-      skills: ["Fluidez en múltiples idiomas", "Sensibilidad cultural", "Escucha activa", "Habilidades de comunicación", "Resolución de problemas", "Atención al detalle", "Gestión del tiempo", "Competencia técnica", "Adherencia a la confidencialidad", "Gestión de relaciones con clientes"],
-      experience: [
-        {
-          title: "Intérprete Senior",
-          company: "Linguistic Solutions Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Aumenté las calificaciones de satisfacción del cliente en un 30% a través de una mejor entrega de servicios.",
-            "Interpreté exitosamente más de 1,000 llamadas en varios idiomas, manteniendo una tasa de precisión del 98%.",
-            "Desarrollé un manual de capacitación para nuevos intérpretes, reduciendo el tiempo de incorporación en un 20%.",
-          ],
-        },
-        {
-          title: "Intérprete Telefónico",
-          company: "Global Language Services",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Maneje un promedio de 50 llamadas por día, asegurando una comunicación oportuna y efectiva.",
-            "Logré una tasa de retención de clientes del 95% al proporcionar servicios lingüísticos excepcionales.",
-            "Participé en iniciativas de aseguramiento de la calidad que mejoraron la consistencia del servicio.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Lingüística", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Certified Medical Interpreter", issuer: "National Board of Certification for Medical Interpreters", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un Intérprete por Teléfono en su currículum?", answer: "Incluya sus habilidades lingüísticas, experiencia relevante y certificaciones." },
-      { question: "¿Cómo destacar mi currículum de Intérprete por Teléfono?", answer: "Enfatice sus logros y habilidades clave en la interpretación y servicio al cliente." },
-      { question: "¿Qué habilidades necesita un Intérprete por Teléfono?", answer: "Fluidez en idiomas, escucha activa, y habilidades de comunicación son esenciales." },
-    ],
-  },
   "part-time-job": {
     slug: "empleo-a-tiempo-parcial",
     title: "Empleo a Tiempo Parcial",
@@ -13244,56 +12794,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué debe incluir un Payment Processing Specialist en su currículum?", answer: "Un especialista en procesamiento de pagos debe incluir su experiencia en gestión de transacciones, habilidades en detección de fraude y cumplimiento regulatorio, así como logros cuantificables." },
       { question: "¿Cómo destacar mi currículum de Payment Processing Specialist?", answer: "Para destacar su currículum, incluya resultados medibles en sus logros y use palabras clave relevantes para el campo." },
       { question: "¿Qué habilidades necesita un Payment Processing Specialist?", answer: "Las habilidades clave incluyen gestión de transacciones, atención al cliente, análisis de datos y cumplimiento regulatorio." },
-    ],
-  },
-  "pdf": {
-    slug: "titulo-proper-title",
-    title: "Título Apropiado",
-    keywords: ["currículum de Título Apropiado", "CV de Título Apropiado", "ejemplo currículum Título Apropiado", "plantilla CV Título Apropiado"],
-    searchIntents: ["cómo escribir currículum de Título Apropiado", "ejemplos currículum Título Apropiado", "mejor formato CV Título Apropiado"],
-    topSkills: ["Adobe Acrobat", "Edición de PDF", "Formato de Documentos", "Publicación Digital", "Compresión de Archivos", "Reconocimiento Óptico de Caracteres", "Gestión de Documentos", "Diseño Gráfico", "Control de Versiones", "Herramientas de Colaboración"],
-    atsKeywords: ["pdf", "diseño de documentos", "comunicación visual", "maquetación", "experiencia del usuario", "competencia en software", "conversión de archivos", "gestión de metadatos", "producción impresa", "creación de contenido", "gestión de proyectos"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Título Apropiado",
-      summary: "Especialista en PDF orientado a los detalles con más de 5 años de experiencia en diseño y edición de documentos, reconocido por aumentar la accesibilidad de los documentos en un 30% y optimizar flujos de trabajo para equipos multifuncionales.",
-      skills: ["Adobe Acrobat", "Edición de PDF", "Formato de Documentos", "Publicación Digital", "Compresión de Archivos", "Reconocimiento Óptico de Caracteres", "Gestión de Documentos", "Diseño Gráfico", "Control de Versiones", "Herramientas de Colaboración"],
-      experience: [
-        {
-          title: "Especialista Senior en PDF",
-          company: "TechDocs Solutions",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Mejoró los procesos de conversión de documentos, reduciendo el tiempo de entrega en un 40%",
-            "Lideró un equipo para rediseñar manuales de usuario, aumentando los puntajes de satisfacción del cliente en un 25%",
-            "Desarrolló un programa de capacitación en PDF que disminuyó el tiempo de integración para nuevos empleados en un 15%",
-          ],
-        },
-        {
-          title: "Diseñador de PDF",
-          company: "Creative Documents Inc.",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Creó y mantuvo una biblioteca de más de 100 plantillas de PDF para uso interno",
-            "Colaboró con marketing para producir folletos en PDF visualmente atractivos, lo que llevó a un aumento del 20% en la generación de leads",
-            "Implementó medidas de control de calidad que redujeron los errores en documentos publicados en un 35%",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Diseño Gráfico", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Adobe Certified Expert (ACE)", issuer: "Adobe", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un Título Apropiado en su currículum?", answer: "Respuesta específica." },
-      { question: "¿Cómo destacar mi currículum de Título Apropiado?", answer: "Consejos específicos." },
-      { question: "¿Qué habilidades necesita un Título Apropiado?", answer: "Habilidades clave." },
     ],
   },
   "personal-assistant": {
@@ -13444,56 +12944,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué debe incluir un profesor de física en su currículum?", answer: "Un profesor de física debe incluir su experiencia docente, logros en investigación, habilidades técnicas y metodológicas, así como su formación académica." },
       { question: "¿Cómo destacar mi currículum de profesor de física?", answer: "Para destacar, enfócate en logros cuantificables, utiliza palabras clave relevantes y resalta tus métodos de enseñanza innovadores." },
       { question: "¿Qué habilidades necesita un profesor de física?", answer: "Un profesor de física necesita habilidades en mecánica cuántica, termodinámica, electromagnetismo, así como habilidades de enseñanza y laboratorio." },
-    ],
-  },
-  "pipe-fitter": {
-    slug: "curriculum-para-tuberias",
-    title: "Currículum de Instalador de Tuberías",
-    keywords: ["currículum de instalador de tuberías", "CV de instalador de tuberías", "ejemplo currículum instalador de tuberías", "plantilla CV instalador de tuberías"],
-    searchIntents: ["cómo escribir currículum de instalador de tuberías", "ejemplos currículum instalador de tuberías", "mejor formato CV instalador de tuberías"],
-    topSkills: ["Soldadura de tuberías", "Lectura de planos", "Instalación de tuberías", "Protocolos de seguridad", "Sistemas hidráulicos", "Resolución de problemas", "Fabricación de metales", "Gestión de sitios de trabajo", "Diseño de tuberías", "Control de calidad"],
-    atsKeywords: ["instalación de tuberías", "soldadura", "instalación", "mantenimiento", "interpretación de planos", "cumplimiento de seguridad", "habilidades mecánicas", "colaboración en equipo", "resolución de problemas", "sistemas de tuberías", "hidráulica"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Currículum de Instalador de Tuberías",
-      summary: "Instalador de tuberías experimentado con más de 8 años en la industria, especializado en sistemas de alta presión y optimización de la eficiencia de instalación, lo que resulta en una reducción del 20% en los plazos de los proyectos.",
-      skills: ["Soldadura de tuberías", "Lectura de planos", "Instalación de tuberías", "Protocolos de seguridad", "Sistemas hidráulicos", "Resolución de problemas", "Fabricación de metales", "Gestión de sitios de trabajo", "Diseño de tuberías", "Control de calidad"],
-      experience: [
-        {
-          title: "Instalador de Tuberías Senior",
-          company: "Industrial Solutions Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Lideré un equipo de 5 en la exitosa instalación de un sistema de tuberías complejo, reduciendo los costos laborales en $15,000.",
-            "Implementé nuevos protocolos de seguridad que disminuyeron los accidentes laborales en un 30%.",
-            "Optimicé el proceso de instalación, resultando en un aumento del 25% en la tasa de finalización de proyectos.",
-          ],
-        },
-        {
-          title: "Instalador de Tuberías",
-          company: "Precision Pipeworks",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Completé más de 50 instalaciones exitosas de sistemas de tuberías comerciales.",
-            "Capacité a 10 nuevos empleados en técnicas de instalación de tuberías y medidas de seguridad.",
-            "Contribuí a un proyecto que ganó el premio regional de seguridad por excelencia en prácticas de seguridad.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "Technical College", degree: "A.S.", field: "Tecnología en Instalación de Tuberías", startDate: "2012-08", endDate: "2014-05" },
-      ],
-      certifications: [
-        { name: "Certified Pipe Fitter", issuer: "National Center for Construction Education and Research", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un currículum de instalador de tuberías?", answer: "Un currículum de instalador de tuberías debe incluir habilidades técnicas, experiencia laboral relevante, y certificaciones." },
-      { question: "¿Cómo destacar mi currículum de instalador de tuberías?", answer: "Destacar logros específicos y resultados cuantificables en proyectos anteriores." },
-      { question: "¿Qué habilidades necesita un instalador de tuberías?", answer: "Habilidades clave incluyen soldadura, lectura de planos, y conocimientos de sistemas hidráulicos." },
     ],
   },
   "pipe-layer": {
@@ -15547,56 +14997,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué debe incluir un Retail Associate en su currículum?", answer: "Incluir experiencias de trabajo relevantes, habilidades específicas y logros cuantificables." },
       { question: "¿Cómo destacar mi currículum de Retail Associate?", answer: "Usar palabras clave de la industria, resaltar logros y personalizar el currículum para cada aplicación." },
       { question: "¿Qué habilidades necesita un Retail Associate?", answer: "Habilidades de atención al cliente, ventas, gestión de inventario y trabajo en equipo son esenciales." },
-    ],
-  },
-  "robert-l-behnken": {
-    slug: "ingeniero-aeroespacial",
-    title: "Ingeniero Aeroespacial",
-    keywords: ["currículum de ingeniero aeroespacial", "CV de ingeniero aeroespacial", "ejemplo currículum ingeniero aeroespacial", "plantilla CV ingeniero aeroespacial"],
-    searchIntents: ["cómo escribir currículum de ingeniero aeroespacial", "ejemplos currículum ingeniero aeroespacial", "mejor formato CV ingeniero aeroespacial"],
-    topSkills: ["Análisis estructural", "Dinámica de fluidos", "Gestión de proyectos", "Dominio de software CAD", "Ingeniería de sistemas", "Modelado de simulaciones", "Análisis de datos", "Documentación técnica", "Colaboración en equipo", "Resolución de problemas"],
-    atsKeywords: ["ingeniería aeroespacial", "NASA", "ingeniería de diseño", "investigación y desarrollo", "aerodinámica", "sistemas mecánicos", "sistemas eléctricos", "robótica", "ingeniería de pruebas", "ciclo de vida del proyecto", "normas de cumplimiento"],
-    sampleResumeData: buildResumeData({
-      firstName: "Robert",
-      lastName: "Behnken",
-      profession: "Ingeniero Aeroespacial",
-      summary: "Ingeniero Aeroespacial experimentado con más de 15 años de experiencia en el diseño y desarrollo de naves espaciales, reconocido por liderar proyectos que lograron una reducción del 30% en costos mientras mejoraban las métricas de seguridad.",
-      skills: ["Análisis estructural", "Dinámica de fluidos", "Gestión de proyectos", "Dominio de software CAD", "Ingeniería de sistemas", "Modelado de simulaciones", "Análisis de datos", "Documentación técnica", "Colaboración en equipo", "Resolución de problemas"],
-      experience: [
-        {
-          title: "Ingeniero Aeroespacial Senior",
-          company: "NASA",
-          startDate: "2016-01",
-          isCurrent: true,
-          achievements: [
-            "Lideré un equipo que desarrolló sistemas de naves espaciales, reduciendo los costos de lanzamiento en $5 millones.",
-            "Implementé mejoras en el diseño que aumentaron las tasas de éxito de las misiones en un 15%.",
-            "Colaboré en un proyecto que resultó en un aumento del 20% en la capacidad de carga.",
-          ],
-        },
-        {
-          title: "Ingeniero Aeroespacial",
-          company: "SpaceX",
-          startDate: "2010-05",
-          endDate: "2015-12",
-          achievements: [
-            "Contribuí al diseño del cohete Falcon 9, logrando una reducción del 10% en peso.",
-            "Desarrollé protocolos de prueba que mejoraron las métricas de seguridad en un 25%.",
-            "Asistí en el lanzamiento exitoso de 20 misiones, cada una superando los objetivos de rendimiento.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "University of California, Los Angeles", degree: "B.S.", field: "Ingeniería Aeroespacial", startDate: "2005-09", endDate: "2009-06" },
-      ],
-      certifications: [
-        { name: "Certified Aerospace Technician", issuer: "National Institute for Certification in Engineering Technologies", date: "2018-04" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un Aerospace Engineer en su currículum?", answer: "Incluya su experiencia laboral, habilidades técnicas y logros relevantes en proyectos." },
-      { question: "¿Cómo destacar mi currículum de Aerospace Engineer?", answer: "Utilice palabras clave relevantes y destaque logros cuantificables." },
-      { question: "¿Qué habilidades necesita un Aerospace Engineer?", answer: "Las habilidades clave incluyen análisis estructural, dinámica de fluidos y gestión de proyectos." },
     ],
   },
   "sale-and-customer-representative": {
@@ -17999,56 +17399,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué habilidades necesita un Voluntario de Línea de Ayuda para el Suicidio?", answer: "Habilidades clave incluyen escucha activa, empatía, intervención en crisis y habilidades de comunicación." },
     ],
   },
-  "summary": {
-    slug: "curriculum-de-ingeniero-de-software",
-    title: "Currículum de Ingeniero de Software",
-    keywords: ["currículum de ingeniero de software", "CV de ingeniero de software", "ejemplo currículum ingeniero de software", "plantilla CV ingeniero de software"],
-    searchIntents: ["cómo escribir currículum de ingeniero de software", "ejemplos currículum ingeniero de software", "mejor formato CV ingeniero de software"],
-    topSkills: ["Java", "Python", "JavaScript", "SQL", "React", "Node.js", "C++", "Agile", "DevOps", "Cloud Computing"],
-    atsKeywords: ["desarrollo de software", "desarrollo full-stack", "integración de API", "pruebas de software", "control de versiones", "resolución de problemas", "colaboración en equipo", "documentación técnica", "arquitectura de software", "gestión de bases de datos", "gestión de proyectos"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Currículum de Ingeniero de Software",
-      summary: "Ingeniero de Software orientado a resultados con más de 5 años de experiencia en el desarrollo de aplicaciones web escalables. Logré una reducción del 30% en el tiempo de inactividad del sistema a través de una solución efectiva de problemas y optimización.",
-      skills: ["Java", "Python", "JavaScript", "SQL", "React", "Node.js", "C++", "Agile", "DevOps", "Cloud Computing"],
-      experience: [
-        {
-          title: "Ingeniero de Software Senior",
-          company: "Tech Innovations Inc.",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Lideré un equipo en la migración de sistemas heredados a soluciones basadas en la nube, lo que resultó en un aumento del 40% en la velocidad de implementación.",
-            "Desarrollé un modelo de aprendizaje automático que mejoró los métricas de compromiso del usuario en un 25%.",
-            "Implementé pipelines de CI/CD que redujeron los tiempos de lanzamiento en un 50%.",
-          ],
-        },
-        {
-          title: "Ingeniero de Software",
-          company: "Creative Solutions LLC",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Diseñé y desarrollé una aplicación web que manejó más de 1 millón de usuarios.",
-            "Optimicé la base de código existente, lo que llevó a una mejora del 20% en el rendimiento de la aplicación.",
-            "Colaboré con equipos interfuncionales para entregar proyectos a tiempo y dentro del presupuesto.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "State University", degree: "B.S.", field: "Ciencias de la Computación", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "AWS Certified Solutions Architect", issuer: "Amazon Web Services", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un currículum de Ingeniero de Software?", answer: "Un currículum de Ingeniero de Software debe incluir habilidades técnicas, experiencia laboral, formación académica y certificaciones relevantes." },
-      { question: "¿Cómo destacar mi currículum de Ingeniero de Software?", answer: "Utilizar palabras clave relevantes y resaltar logros cuantificables puede ayudar a que tu currículum se destaque." },
-      { question: "¿Qué habilidades necesita un Ingeniero de Software?", answer: "Un Ingeniero de Software debe tener habilidades en programación, resolución de problemas, trabajo en equipo y gestión de proyectos." },
-    ],
-  },
   "superintendent": {
     slug: "superintendente",
     title: "Superintendente",
@@ -18507,56 +17857,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué debe incluir un Asistente Tecnológico en su currículum?", answer: "Un Asistente Tecnológico debe incluir experiencia en soporte técnico, habilidades en resolución de problemas, y certificaciones relevantes." },
       { question: "¿Cómo destacar mi currículum de Asistente Tecnológico?", answer: "Destacar logros cuantificables y habilidades técnicas específicas puede hacer que tu currículum se destaque." },
       { question: "¿Qué habilidades necesita un Asistente Tecnológico?", answer: "Las habilidades clave incluyen soporte técnico, atención al cliente, y conocimientos en hardware y software." },
-    ],
-  },
-  "teenage": {
-    slug: "curriculum-juvenil",
-    title: "Currículum Juvenil",
-    keywords: ["currículum de adolescente", "CV de adolescente", "ejemplo currículum adolescente", "plantilla CV adolescente"],
-    searchIntents: ["cómo escribir currículum de adolescente", "ejemplos currículum adolescente", "mejor formato CV adolescente"],
-    topSkills: ["comunicación", "trabajo en equipo", "gestión del tiempo", "solución de problemas", "servicio al cliente", "adaptabilidad", "liderazgo", "creatividad", "alfabetización digital", "atención al detalle"],
-    atsKeywords: ["empleo juvenil", "nivel de entrada", "pasantía", "trabajo a tiempo parcial", "escuela secundaria", "experiencia de voluntariado", "basado en habilidades", "fiable", "motivado", "puntual", "comunicación efectiva"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Currículum Juvenil",
-      summary: "Estudiante de secundaria dedicado con 2 años de experiencia en voluntariado y liderazgo demostrado en proyectos escolares, contribuyendo a un aumento del 30% en la participación de eventos.",
-      skills: ["comunicación", "trabajo en equipo", "gestión del tiempo", "solución de problemas", "servicio al cliente", "adaptabilidad", "liderazgo", "creatividad", "alfabetización digital", "atención al detalle"],
-      experience: [
-        {
-          title: "Coordinador de Voluntarios",
-          company: "Local Community Center",
-          startDate: "2022-01",
-          isCurrent: true,
-          achievements: [
-            "Aumenté las inscripciones de voluntarios en un 40% a través de esfuerzos de divulgación específicos",
-            "Organicé eventos comunitarios que atrajeron a más de 200 asistentes",
-            "Desarrollé un nuevo sistema de programación que mejoró la disponibilidad de los voluntarios en un 25%",
-          ],
-        },
-        {
-          title: "Cajero",
-          company: "Grocery Mart",
-          startDate: "2021-06",
-          endDate: "2022-12",
-          achievements: [
-            "Manejé transacciones en efectivo de manera eficiente, logrando una tasa de precisión del 99%",
-            "Brindé un excelente servicio al cliente, lo que resultó en un aumento del 15% en los puntajes de satisfacción del cliente",
-            "Capacité a 5 nuevos cajeros sobre los procedimientos operativos y la interacción con el cliente",
-          ],
-        },
-      ],
-      education: [
-        { institution: "Springfield High School", degree: "Diploma de Secundaria", field: "Estudios Generales", startDate: "2019-08", endDate: "2023-05" },
-      ],
-      certifications: [
-        { name: "First Aid Certification", issuer: "Red Cross", date: "2023-01" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un Teen Resume en su currículum?", answer: "Un Teen Resume debe incluir información sobre la educación, experiencia laboral, habilidades y logros relevantes." },
-      { question: "¿Cómo destacar mi currículum de Teen Resume?", answer: "Resalta tus experiencias de voluntariado y habilidades únicas para captar la atención de los empleadores." },
-      { question: "¿Qué habilidades necesita un Teen Resume?", answer: "Las habilidades clave incluyen comunicación, trabajo en equipo, y servicio al cliente." },
     ],
   },
   "telemarketer": {

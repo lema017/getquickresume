@@ -10552,56 +10552,6 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué habilidades necesita un Gerente de Granja?", answer: "Habilidades clave incluyen gestión de cultivos, planificación financiera y cumplimiento regulatorio." },
     ],
   },
-  "file-clerk": {
-    slug: "archivo-clerk",
-    title: "Archivista",
-    keywords: ["currículum de archivista", "CV de archivista", "ejemplo currículum archivista", "plantilla CV archivista"],
-    searchIntents: ["cómo escribir currículum de archivista", "ejemplos currículum archivista", "mejor formato CV archivista"],
-    topSkills: ["Habilidades Organizacionales", "Atención al Detalle", "Entrada de Datos", "Sistemas de Archivo", "Gestión de Registros", "Gestión del Tiempo", "Habilidades de Comunicación", "Servicio al Cliente", "Resolución de Problemas", "Colaboración en Equipo"],
-    atsKeywords: ["gestión de archivos", "organización de datos", "recuperación de documentos", "confidencialidad", "control de inventarios", "mantenimiento de registros", "administración de oficina", "interacción con clientes", "competencia en software", "seguimiento del tiempo", "precisión"],
-    sampleResumeData: buildResumeData({
-      firstName: "Alex",
-      lastName: "Johnson",
-      profession: "Archivista",
-      summary: "Archivista orientado a los detalles con más de 5 años de experiencia en la gestión y organización de archivos de manera eficiente. Logré una reducción del 30% en el tiempo de recuperación a través de la mejora de los sistemas de archivo.",
-      skills: ["Habilidades Organizacionales", "Atención al Detalle", "Entrada de Datos", "Sistemas de Archivo", "Gestión de Registros", "Gestión del Tiempo", "Habilidades de Comunicación", "Servicio al Cliente", "Resolución de Problemas", "Colaboración en Equipo"],
-      experience: [
-        {
-          title: "Archivista Senior",
-          company: "Global Tech Solutions",
-          startDate: "2021-03",
-          isCurrent: true,
-          achievements: [
-            "Reduje el tiempo de recuperación de documentos en un 30% mediante la implementación de un nuevo sistema de archivo digital.",
-            "Gestioné más de 10,000 registros con un 99% de precisión en la entrada de datos.",
-            "Entrené a 5 nuevos miembros del personal en los procedimientos de archivo, contribuyendo a mejorar la eficiencia de la oficina.",
-          ],
-        },
-        {
-          title: "Archivista",
-          company: "City Health Department",
-          startDate: "2018-06",
-          endDate: "2021-02",
-          achievements: [
-            "Mantuve un archivo preciso de registros de salud sensibles para más de 5,000 pacientes.",
-            "Agilicé el proceso de solicitud de documentos, mejorando el tiempo de respuesta en un 25%.",
-            "Asistí en la transición a un archivo electrónico, reduciendo el uso de papel en un 40%.",
-          ],
-        },
-      ],
-      education: [
-        { institution: "College of Administration", degree: "B.S.", field: "Administración de Empresas", startDate: "2014-08", endDate: "2018-05" },
-      ],
-      certifications: [
-        { name: "Certified File Management Professional", issuer: "National Association of File Management", date: "2022-06" },
-      ],
-    }),
-    faqs: [
-      { question: "¿Qué debe incluir un archivista en su currículum?", answer: "Un archivista debe incluir su experiencia en gestión de archivos, habilidades organizacionales y logros en eficiencia." },
-      { question: "¿Cómo destacar mi currículum de archivista?", answer: "Resaltar logros cuantificables y habilidades específicas relacionadas con la gestión de archivos." },
-      { question: "¿Qué habilidades necesita un archivista?", answer: "Las habilidades clave incluyen atención al detalle, organización, y capacidad para manejar información confidencial." },
-    ],
-  },
   "finance-account-manager": {
     slug: "finance-account-manager",
     title: "Gerente de Cuentas de Finanzas",

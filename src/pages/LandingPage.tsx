@@ -296,58 +296,6 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* ── Popular resume guides (internal links for crawl + users) ── */}
-        <section className="border-t border-slate-100 py-16 lg:py-20 bg-white" aria-labelledby="popular-resume-guides-heading">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-2xl mx-auto mb-10">
-              <h2 id="popular-resume-guides-heading" className="text-2xl lg:text-3xl font-bold text-slate-900 mb-2">
-                {t('landing.popularGuides.title')}
-              </h2>
-              <p className="text-slate-600">{t('landing.popularGuides.subtitle')}</p>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14">
-              <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 mb-4">
-                  {t('landing.popularGuides.professionsTitle')}
-                </h3>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
-                  {POPULAR_PROFESSION_LINKS.map((p) => (
-                    <li key={p.slug}>
-                      <Link
-                        to={`/resume/${p.slug}`}
-                        className="text-blue-700 hover:text-blue-900 hover:underline text-sm font-medium"
-                      >
-                        {lang === 'es'
-                          ? `${p.titleEs}${t('landing.popularGuides.professionLinkSuffixEs')}`
-                          : `${p.titleEn}${t('landing.popularGuides.professionLinkSuffix')}`}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 mb-4">
-                  {t('landing.popularGuides.skillsTitle')}
-                </h3>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
-                  {POPULAR_SKILL_LINKS.map((s) => (
-                    <li key={s.slug}>
-                      <Link
-                        to={`/resume-skills/${s.slug}`}
-                        className="text-blue-700 hover:text-blue-900 hover:underline text-sm font-medium"
-                      >
-                        {lang === 'es'
-                          ? `${s.titleEs}${t('landing.popularGuides.skillLinkSuffixEs')}`
-                          : `${s.titleEn}${t('landing.popularGuides.skillLinkSuffix')}`}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* ── How It Works — 3 Steps ── */}
         <section className="bg-slate-50 py-20 lg:py-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -448,6 +396,58 @@ export function LandingPage() {
             <p className="mt-6 text-slate-400 text-sm">
               {t('landing.freeTier.upgradeHint')}
             </p>
+          </div>
+        </section>
+
+        {/* ── Popular resume guides (internal links for crawl + users) ── */}
+        <section className="border-t border-slate-100 py-16 lg:py-20 bg-white" aria-labelledby="popular-resume-guides-heading">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-2xl mx-auto mb-10">
+              <h2 id="popular-resume-guides-heading" className="text-2xl lg:text-3xl font-bold text-slate-900 mb-2">
+                {t('landing.popularGuides.title')}
+              </h2>
+              <p className="text-slate-600">{t('landing.popularGuides.subtitle')}</p>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14">
+              <div>
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 mb-4">
+                  {t('landing.popularGuides.professionsTitle')}
+                </h3>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                  {POPULAR_PROFESSION_LINKS.map((p) => (
+                    <li key={p.slug}>
+                      <Link
+                        to={`/resume/${p.slug}`}
+                        className="text-blue-700 hover:text-blue-900 hover:underline text-sm font-medium"
+                      >
+                        {lang === 'es'
+                          ? `${p.titleEs}${t('landing.popularGuides.professionLinkSuffixEs')}`
+                          : `${p.titleEn}${t('landing.popularGuides.professionLinkSuffix')}`}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 mb-4">
+                  {t('landing.popularGuides.skillsTitle')}
+                </h3>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                  {POPULAR_SKILL_LINKS.map((s) => (
+                    <li key={s.slug}>
+                      <Link
+                        to={`/resume-skills/${s.slug}`}
+                        className="text-blue-700 hover:text-blue-900 hover:underline text-sm font-medium"
+                      >
+                        {lang === 'es'
+                          ? `${s.titleEs}${t('landing.popularGuides.skillLinkSuffixEs')}`
+                          : `${s.titleEn}${t('landing.popularGuides.skillLinkSuffix')}`}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         </section>
       </div>
