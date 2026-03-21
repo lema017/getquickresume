@@ -16203,7 +16203,7 @@ export const translations: Record<string, ProfessionEsData> = {
     ],
   },
   "loss-mitigation-specialist": {
-    slug: "especialista-en-mitigacion-de-p%C3%A9rdidas",
+    slug: "especialista-en-mitigacion-de-pérdidas",
     title: "Especialista en Mitigación de Pérdidas",
     keywords: ["currículum de especialista en mitigación de pérdidas", "CV de especialista en mitigación de pérdidas", "ejemplo currículum especialista en mitigación de pérdidas", "plantilla CV especialista en mitigación de pérdidas"],
     searchIntents: ["cómo escribir currículum de especialista en mitigación de pérdidas", "ejemplos currículum especialista en mitigación de pérdidas", "mejor formato CV especialista en mitigación de pérdidas"],
@@ -23900,6 +23900,7 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: "¿Qué debe incluir un Contador Senior en su currículum?", answer: "Un Contador Senior debe incluir su experiencia laboral, habilidades clave, certificaciones, y logros relevantes en su currículum." },
       { question: "¿Cómo destacar mi currículum de Contador Senior?", answer: "Para destacar, asegúrate de resaltar tus logros cuantificables y utiliza palabras clave relevantes en el área de contabilidad." },
       { question: "¿Qué habilidades necesita un Contador Senior?", answer: "Las habilidades clave incluyen informes financieros, preparación de impuestos, y experiencia en software contable como QuickBooks." },
+      { question: "¿Cómo muestro contabilidad técnica y experiencia en consolidaciones?", answer: "Mencione consolidaciones multi-entidad, adopción de nuevas normas, memorandos técnicos y cómo apoyó variaciones, intercompañías o decisiones de política contable." },
     ],
   },
   "senior-associate": {

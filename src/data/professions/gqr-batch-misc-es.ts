@@ -15392,6 +15392,11 @@ export const translations: Record<string, ProfessionEsData> = {
     }),
     faqs: [
       { question: "¿Qué habilidades necesita un asociado comercial?", answer: "Un asociado comercial necesita habilidades en servicio al cliente, técnicas de venta, manejo de inventarios y capacidad para trabajar en equipo." },
+      {
+        question: "¿Qué métricas de retail debo poner en el currículum?",
+        answer:
+          "Incluye ventas por hora o transacción, cumplimiento de inventario, NPS o satisfacción del cliente, y reducción de mermas o tiempos de caja cuando sean verificables.",
+      },
     ],
   },
   "retail-assistant": {
@@ -18399,7 +18404,17 @@ export const translations: Record<string, ProfessionEsData> = {
     title: "Técnico",
     keywords: ["currículum de técnico", "CV de técnico", "ejemplo currículum técnico", "plantilla CV técnico"],
     searchIntents: ["cómo escribir currículum de técnico", "ejemplos currículum técnico", "mejor formato CV técnico"],
-    topSkills: [],
+    topSkills: [
+      "Diagnóstico eléctrico",
+      "Reparación mecánica",
+      "Mantenimiento preventivo",
+      "Soporte técnico",
+      "Pruebas de diagnóstico",
+      "Instalación de equipos",
+      "Control de calidad",
+      "Cumplimiento de seguridad",
+      "Servicio al cliente",
+    ],
     atsKeywords: ["técnico", "reparación", "mantenimiento", "diagnósticos", "solución de problemas", "soporte", "instalación", "calidad", "seguridad", "servicio al cliente", "eléctrico"],
     sampleResumeData: buildResumeData({
       firstName: "Alex",

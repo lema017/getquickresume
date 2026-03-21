@@ -2298,6 +2298,11 @@ export const translations: Record<string, ProfessionEsData> = {
     }),
     faqs: [
       { question: "¿Qué habilidades necesita un profesor de salud?", answer: "Habilidades en educación, comunicación, y promoción de salud." },
+      {
+        question: "¿Cómo mostrar estándares y evaluación en el CV de profesor de salud?",
+        answer:
+          "Cita estándares estatales o del distrito, tipos de evaluación formativa y sumativa, y cómo documentaste resultados de aprendizaje en salud o bienestar estudiantil.",
+      },
     ],
   },
   "high-school-art-teacher": {

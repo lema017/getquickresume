@@ -2,9 +2,10 @@ import { useState, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, Sparkles, Target, ArrowRight, BookOpen, Lightbulb, Briefcase, Link2, Loader2 } from 'lucide-react';
+import { ChevronRight, Sparkles, ArrowRight, BookOpen, Briefcase, Link2, Loader2 } from 'lucide-react';
 import { LiveTemplateCarousel } from '@/components/templates/LiveTemplateCarousel';
-import { getSkillBySlug, getAllSkillSlugs, getSpanishSkillSlug } from '@/data/skills';
+import { SkillSeoSections } from '@/components/skill-seo/SkillSeoSections';
+import { getSkillBySlug, getAllSkillSlugs, getSpanishSkillSlug, resolveSkillPage, buildSkillSeoOverrides } from '@/data/skills';
 import type { SkillPageData } from '@/data/skills';
 import { getProfessionBySlug, getSpanishProfessionSlug } from '@/data/professions';
 import type { ProfessionPageData } from '@/data/professions';
@@ -37,7 +38,7 @@ export function SkillResumePage() {
 
   const detectedLanguage = slug ? getLanguageFromSlug(slug, 'skill') : 'en';
   const isSpanish = detectedLanguage === 'es';
-  const lng = detectedLanguage;
+  const lng: 'en' | 'es' = detectedLanguage === 'es' ? 'es' : 'en';
 
   useEffect(() => {
     if (detectedLanguage && detectedLanguage !== i18n.language) {
@@ -61,8 +62,14 @@ export function SkillResumePage() {
       setAllSkillSlugs(slugs);
 
       if (loadedSkill) {
+        const demo = loadedSkill.demoProfessionSlug;
+        const orderedSlugs = [...loadedSkill.professionSlugs];
+        if (demo) {
+          const without = orderedSlugs.filter((s) => s !== demo);
+          orderedSlugs.splice(0, orderedSlugs.length, demo, ...without);
+        }
         const profResults = await Promise.all(
-          loadedSkill.professionSlugs.map(async (s) => {
+          orderedSlugs.map(async (s) => {
             const prof = await getProfessionBySlug(s);
             const localizedSlug = isSpanish
               ? (getSpanishProfessionSlug(s) || s)
@@ -89,6 +96,16 @@ export function SkillResumePage() {
     return getTemplatesByStyle(firstProfession.templateStyle);
   }, [firstProfession]);
 
+  const resolved = useMemo(() => {
+    if (!skill) return null;
+    return resolveSkillPage(skill, lng);
+  }, [skill, lng]);
+
+  const seoOverrides = useMemo(() => {
+    if (!skill || !resolved) return null;
+    return buildSkillSeoOverrides(skill, resolved, lng);
+  }, [skill, resolved, lng]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 py-20">
@@ -97,7 +114,7 @@ export function SkillResumePage() {
     );
   }
 
-  if (!skill) {
+  if (!skill || !resolved) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 py-20">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">
@@ -113,7 +130,7 @@ export function SkillResumePage() {
     );
   }
 
-  const seo = generateSkillPageSEO(skill, detectedLanguage);
+  const seo = generateSkillPageSEO(skill, detectedLanguage, seoOverrides);
 
   const englishSlug = isSpanish && slug ? getEnglishSlug(slug, 'skill') : slug;
   const spanishSlug = !isSpanish && slug ? getSpanishSkillSlug(slug) : slug;
@@ -165,7 +182,11 @@ export function SkillResumePage() {
           {JSON.stringify(generateFAQSchema(skill.faqs))}
         </script>
         <script type="application/ld+json">
-          {JSON.stringify(generateSkillWebPageSchema(skill, detectedLanguage))}
+          {JSON.stringify(
+            generateSkillWebPageSchema(skill, detectedLanguage, {
+              longDescription: resolved.content.overview,
+            })
+          )}
         </script>
       </Helmet>
 
@@ -186,27 +207,22 @@ export function SkillResumePage() {
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
             {t('skillResumePage.h1', { title: skill.title, lng })}
           </h1>
-          <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            {skill.description.split('\n')[0] || skill.description.substring(0, 200)}
+          <p className="mt-4 text-base sm:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            {resolved.content.heroTagline}
           </p>
+          <div className="mt-6 flex flex-wrap gap-2 justify-center">
+            {resolved.content.entityFocus.map((chip) => (
+              <span
+                key={chip}
+                className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-800 border border-slate-200"
+              >
+                {chip}
+              </span>
+            ))}
+          </div>
         </header>
 
-        {/* Why This Skill Matters */}
-        <section className="py-12 bg-white" aria-label={t('skillResumePage.sectionWhyAria', { lng })}>
-          <div className="max-w-4xl mx-auto px-4 sm:px-6">
-            <div className="flex items-center gap-3 mb-6">
-              <Lightbulb className="w-6 h-6 text-amber-500" />
-              <h2 className="text-2xl font-bold text-gray-900">
-                {t('skillResumePage.whyHeading', { title: skill.title, lng })}
-              </h2>
-            </div>
-            <div className="prose prose-gray max-w-none">
-              {skill.whyImportant.split('\n').map((paragraph, i) => (
-                <p key={i} className="text-gray-600 leading-relaxed mb-4">{paragraph}</p>
-              ))}
-            </div>
-          </div>
-        </section>
+        <SkillSeoSections content={resolved.content} lng={lng} />
 
         {/* Template Carousel */}
         {firstProfession && templates.length > 0 && (
@@ -287,28 +303,6 @@ export function SkillResumePage() {
           </div>
         </section>
 
-        {/* Resume Bullet Examples */}
-        <section className="py-12" aria-label={t('skillResumePage.sectionBulletsAria', { lng })}>
-          <div className="max-w-4xl mx-auto px-4 sm:px-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              {t('skillResumePage.bulletsHeading', { title: skill.title, lng })}
-            </h2>
-            <p className="text-gray-600 mb-6">
-              {t('skillResumePage.bulletsIntro', { title: skill.title, titleLower, lng })}
-            </p>
-            <div className="space-y-3">
-              {skill.exampleBullets.map((bullet, i) => (
-                <div key={i} className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
-                  <span className="shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold mt-0.5">
-                    {i + 1}
-                  </span>
-                  <p className="text-gray-700 leading-relaxed">{bullet}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* Tips for Your Resume */}
         <section className="py-12 bg-white" aria-label={t('skillResumePage.sectionTipsAria', { lng })}>
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
@@ -366,31 +360,6 @@ export function SkillResumePage() {
             </div>
           </section>
         )}
-
-        {/* ATS Keywords */}
-        <section className="py-12 bg-white" aria-label={t('skillResumePage.sectionAtsAria', { lng })}>
-          <div className="max-w-4xl mx-auto px-4 sm:px-6">
-            <div className="flex items-center gap-3 mb-6">
-              <Target className="w-6 h-6 text-green-600" />
-              <h2 className="text-2xl font-bold text-gray-900">
-                {t('skillResumePage.atsHeading', { title: skill.title, lng })}
-              </h2>
-            </div>
-            <p className="text-gray-600 mb-6">
-              {t('skillResumePage.atsIntro', { title: skill.title, titleLower, lng })}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {skill.atsKeywords.map((keyword) => (
-                <span
-                  key={keyword}
-                  className="inline-flex px-3 py-1.5 bg-green-50 text-green-800 border border-green-200 rounded-full text-sm font-medium"
-                >
-                  {keyword}
-                </span>
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* FAQ Section */}
         {skill.faqs.length > 0 && (

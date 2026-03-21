@@ -24856,6 +24856,10 @@ export const professions: ProfessionPageData[] = [
       { question: "What should a Senior Accountant include on their resume?", answer: "A Senior Accountant should include relevant work experience, key skills, certifications, and achievements that quantify their impact in previous roles." },
       { question: "How do I make my Senior Accountant resume stand out?", answer: "Focus on quantifiable achievements, use action verbs, tailor your resume to the job description, and ensure it is free from errors." },
       { question: "What skills are most important for a Senior Accountant?", answer: "Key skills include financial reporting, tax preparation, attention to detail, analytical skills, and proficiency with accounting software." },
+      {
+        question: "How do I show technical accounting and consolidation experience?",
+        answer: "Call out multi-entity consolidations, adoption of new standards, memo work, and how you supported flux, intercompany, or policy decisions.",
+      },
     ],
   },
   {

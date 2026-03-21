@@ -444,6 +444,11 @@ export const professions: ProfessionPageData[] = [
         answer:
           'Use metrics like close cycle reduction, accuracy rates, volume of transactions processed, and cost savings identified.',
       },
+      {
+        question: 'How should I describe month-end close and reconciliations?',
+        answer:
+          'Name the accounts or entities you reconciled, the close timeline you helped achieve, and tools (ERP, BlackLine) you used for tie-outs and flux commentary.',
+      },
     ],
   },
   {
@@ -1435,6 +1440,11 @@ export const professions: ProfessionPageData[] = [
         question: 'How do I show full-charge bookkeeping experience?',
         answer:
           'Detail the complete scope: AP/AR, payroll, bank reconciliations, financial statements, and tax preparation support.',
+      },
+      {
+        question: 'How do I show 1099 and sales tax compliance on a bookkeeper resume?',
+        answer:
+          'Mention filings prepared, vendor counts, jurisdictions, and any clean audit or penalty-avoidance outcomes tied to compliance work.',
       },
     ],
   },
@@ -3655,6 +3665,11 @@ export const professions: ProfessionPageData[] = [
         question: 'How do I show ERP implementation experience?',
         answer:
           'Detail the systems implemented (NetSuite, SAP), scope of the project, and improvements in efficiency or reporting.',
+      },
+      {
+        question: 'How should a Controller resume address SOX and internal controls?',
+        answer:
+          'Describe control design or testing you owned, audit outcomes, remediation of deficiencies, and how you documented policies or segregation of duties.',
       },
     ],
   },
@@ -6088,6 +6103,11 @@ export const professions: ProfessionPageData[] = [
         question: 'Should I pursue CFA or CPA?',
         answer:
           'CFA is preferred for investment-focused roles; CPA for accounting-oriented ones. FMVA is excellent for modeling skills.',
+      },
+      {
+        question: 'How do I show FP&A partnership on a Financial Analyst resume?',
+        answer:
+          'Cite budget owners you supported, forecast accuracy improvements, board or exec decks you built, and business partners who relied on your models.',
       },
     ],
   },

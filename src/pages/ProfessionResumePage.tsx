@@ -2,10 +2,19 @@ import { useState, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, Sparkles, Target, ArrowRight, Loader2 } from 'lucide-react';
+import { ChevronRight, ArrowRight, Loader2 } from 'lucide-react';
 import { LiveTemplateCarousel } from '@/components/templates/LiveTemplateCarousel';
-import { getProfessionBySlug, getSpanishProfessionSlug } from '@/data/professions';
+import { ProfessionSeoSections } from '@/components/profession-seo/ProfessionSeoSections';
+import {
+  getProfessionBySlug,
+  getSpanishProfessionSlug,
+  resolveProfessionPage,
+  buildProfessionSeoOverrides,
+  getRelatedProfessionSummaries,
+  inferProfessionCategory,
+} from '@/data/professions';
 import type { ProfessionPageData } from '@/data/professions';
+import { PROFESSION_CATEGORY_HUB_COPY } from '@/data/professions/categoryHubMeta';
 import { getAllSkillSlugs, getSpanishSkillSlug } from '@/data/skills';
 import { getTemplatesByStyle } from '@/utils/templateCatalog';
 import { getLanguageFromSlug, getEnglishSlug } from '@/data/slugMappings';
@@ -32,10 +41,11 @@ export function ProfessionResumePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [profession, setProfession] = useState<ProfessionPageData | undefined>();
   const [allSkillSlugsSet, setAllSkillSlugsSet] = useState<Set<string>>(new Set());
+  const [relatedProfessions, setRelatedProfessions] = useState<Array<{ slug: string; title: string }>>([]);
 
   const detectedLanguage = slug ? getLanguageFromSlug(slug, 'profession') : 'en';
   const isSpanish = detectedLanguage === 'es';
-  const lng = detectedLanguage;
+  const lng: 'en' | 'es' = detectedLanguage === 'es' ? 'es' : 'en';
 
   useEffect(() => {
     if (detectedLanguage && detectedLanguage !== i18n.language) {
@@ -62,6 +72,26 @@ export function ProfessionResumePage() {
     return () => { cancelled = true; };
   }, [slug]);
 
+  const englishSlug = isSpanish && slug ? getEnglishSlug(slug, 'profession') : slug;
+
+  const resolved = useMemo(() => {
+    if (!profession) return null;
+    return resolveProfessionPage(profession, lng);
+  }, [profession, lng]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!profession || !resolved || !englishSlug) {
+        setRelatedProfessions([]);
+        return;
+      }
+      const rows = await getRelatedProfessionSummaries(englishSlug, resolved.categoryId, lng, 8);
+      if (!cancelled) setRelatedProfessions(rows);
+    })();
+    return () => { cancelled = true; };
+  }, [profession, resolved, englishSlug, lng]);
+
   const templates = useMemo(() => {
     if (!profession) return [];
     return getTemplatesByStyle(profession.templateStyle);
@@ -72,6 +102,20 @@ export function ProfessionResumePage() {
     return getTemplateStyleIntro(profession.templateStyle, isSpanish ? 'es' : 'en');
   }, [profession, isSpanish]);
 
+  const seoOverrides = useMemo(() => {
+    if (!profession || !resolved) return null;
+    return buildProfessionSeoOverrides(profession, resolved, lng);
+  }, [profession, resolved, lng]);
+
+  const experienceExamples = useMemo(() => {
+    if (!profession) return [];
+    return profession.sampleResumeData.experience.slice(0, 2).map((exp) => ({
+      title: exp.title,
+      company: exp.company,
+      bullets: exp.achievements.slice(0, 3),
+    }));
+  }, [profession]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 py-20">
@@ -80,7 +124,7 @@ export function ProfessionResumePage() {
     );
   }
 
-  if (!profession) {
+  if (!profession || !resolved) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 py-20">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">
@@ -96,16 +140,19 @@ export function ProfessionResumePage() {
     );
   }
 
-  const seo = generateProfessionPageSEO(profession, detectedLanguage);
-
-  const englishSlug = isSpanish && slug ? getEnglishSlug(slug, 'profession') : slug;
+  const seo = generateProfessionPageSEO(profession, detectedLanguage, seoOverrides);
   const spanishSlug = !isSpanish && slug ? getSpanishProfessionSlug(slug) : slug;
   const englishUrl = englishSlug ? `${BASE_URL}/resume/${englishSlug}` : seo.canonicalUrl;
   const spanishUrl = spanishSlug ? `${BASE_URL}/resume/${spanishSlug}` : null;
 
+  const categoryId = inferProfessionCategory(profession);
+  const hubMeta = PROFESSION_CATEGORY_HUB_COPY[categoryId];
+  const hubUrl = `${BASE_URL}/resumes/${categoryId}`;
+
   const breadcrumbs = [
     { name: t('professionResumePage.breadcrumbHome', { lng }), url: BASE_URL },
     { name: t('professionResumePage.breadcrumbTemplates', { lng }), url: `${BASE_URL}/create` },
+    { name: hubMeta.label[lng], url: hubUrl },
     {
       name: t('professionResumePage.breadcrumbCurrent', { title: profession.title, lng }),
       url: seo.canonicalUrl,
@@ -121,7 +168,17 @@ export function ProfessionResumePage() {
     return englishSkillSlug;
   };
 
-  const titleLower = profession.title.toLowerCase();
+  const getSkillHref = (skillTitle: string): string | null => {
+    const englishSkillSlug = skillSlugify(skillTitle);
+    if (!allSkillSlugsSet.has(englishSkillSlug)) return null;
+    return `/resume-skills/${getLocalizedSkillSlug(skillTitle)}`;
+  };
+
+  const ldPage = generateProfessionWebPageSchema(profession, detectedLanguage, {
+    longDescription: resolved.content.overview,
+    skills: profession.topSkills,
+    responsibilities: resolved.content.responsibilities,
+  });
 
   return (
     <>
@@ -145,7 +202,6 @@ export function ProfessionResumePage() {
         <meta name="twitter:description" content={seo.description} />
         <meta name="twitter:image" content={seo.ogImage} />
 
-        {/* Hreflang tags for bilingual SEO */}
         <link rel="alternate" hrefLang="en" href={englishUrl} />
         {spanishUrl && <link rel="alternate" hrefLang="es" href={spanishUrl} />}
         <link rel="alternate" hrefLang="x-default" href={englishUrl} />
@@ -157,17 +213,22 @@ export function ProfessionResumePage() {
           {JSON.stringify(generateFAQSchema(profession.faqs))}
         </script>
         <script type="application/ld+json">
-          {JSON.stringify(generateProfessionWebPageSchema(profession, detectedLanguage))}
+          {JSON.stringify(ldPage)}
         </script>
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-        {/* Breadcrumbs */}
         <nav className="max-w-6xl mx-auto px-4 sm:px-6 pt-6 pb-2" aria-label={t('professionResumePage.breadcrumbNavAria', { lng })}>
           <ol className="flex items-center gap-1.5 text-sm text-gray-500 flex-wrap">
             <li><Link to="/" className="hover:text-blue-600 transition-colors">{t('professionResumePage.breadcrumbHome', { lng })}</Link></li>
             <li><ChevronRight className="w-3.5 h-3.5" /></li>
             <li><Link to="/create" className="hover:text-blue-600 transition-colors">{t('professionResumePage.breadcrumbTemplates', { lng })}</Link></li>
+            <li><ChevronRight className="w-3.5 h-3.5" /></li>
+            <li>
+              <Link to={`/resumes/${categoryId}`} className="hover:text-blue-600 transition-colors">
+                {hubMeta.label[lng]}
+              </Link>
+            </li>
             <li><ChevronRight className="w-3.5 h-3.5" /></li>
             <li className="text-gray-900 font-medium">
               {t('professionResumePage.breadcrumbCurrent', { title: profession.title, lng })}
@@ -175,14 +236,23 @@ export function ProfessionResumePage() {
           </ol>
         </nav>
 
-        {/* Hero Section */}
         <header className="max-w-4xl mx-auto px-4 sm:px-6 pt-6 pb-8 text-center">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
             {t('professionResumePage.h1', { title: profession.title, lng })}
           </h1>
           <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            {t('professionResumePage.heroLead', { title: profession.title, titleLower, lng })}
+            {resolved.content.heroTagline}
           </p>
+          <div className="mt-6 flex flex-wrap gap-2 justify-center">
+            {resolved.content.entityFocus.map((chip) => (
+              <span
+                key={chip}
+                className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-800 border border-slate-200"
+              >
+                {chip}
+              </span>
+            ))}
+          </div>
           {templateStyleIntro && (
             <div className="mt-8 max-w-2xl mx-auto text-left border-t border-gray-200 pt-6">
               <h2 className="text-lg font-semibold text-gray-900">{templateStyleIntro.heading}</h2>
@@ -191,7 +261,16 @@ export function ProfessionResumePage() {
           )}
         </header>
 
-        {/* Template Carousel - CENTRAL FEATURE */}
+        <ProfessionSeoSections
+          title={profession.title}
+          content={resolved.content}
+          lng={lng}
+          getSkillHref={getSkillHref}
+          relatedProfessions={relatedProfessions}
+          summaryExample={profession.sampleResumeData.summary}
+          experienceExamples={experienceExamples}
+        />
+
         <section
           className="pb-12"
           aria-label={t('professionResumePage.sectionTemplatesAria', { title: profession.title, lng })}
@@ -209,71 +288,6 @@ export function ProfessionResumePage() {
           </div>
         </section>
 
-        {/* Top Skills Section */}
-        <section className="py-12 bg-white" aria-label={t('professionResumePage.sectionTopSkillsAria', { lng })}>
-          <div className="max-w-4xl mx-auto px-4 sm:px-6">
-            <div className="flex items-center gap-3 mb-6">
-              <Sparkles className="w-6 h-6 text-blue-600" />
-              <h2 className="text-2xl font-bold text-gray-900">
-                {t('professionResumePage.topSkillsHeading', { title: profession.title, lng })}
-              </h2>
-            </div>
-            <p className="text-gray-600 mb-6">
-              {t('professionResumePage.topSkillsIntro', { title: profession.title, titleLower, lng })}
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-              {profession.topSkills.map((skill) => {
-                const localizedSkillSlug = getLocalizedSkillSlug(skill);
-                const hasSkillPage = allSkillSlugsSet.has(skillSlugify(skill));
-                return hasSkillPage ? (
-                  <Link
-                    key={skill}
-                    to={`/resume-skills/${localizedSkillSlug}`}
-                    className="flex items-center gap-2 px-4 py-3 bg-blue-50 text-blue-800 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
-                    {skill}
-                  </Link>
-                ) : (
-                  <div
-                    key={skill}
-                    className="flex items-center gap-2 px-4 py-3 bg-blue-50 text-blue-800 rounded-lg text-sm font-medium"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
-                    {skill}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* ATS Keywords Section */}
-        <section className="py-12" aria-label={t('professionResumePage.sectionAtsAria', { lng })}>
-          <div className="max-w-4xl mx-auto px-4 sm:px-6">
-            <div className="flex items-center gap-3 mb-6">
-              <Target className="w-6 h-6 text-green-600" />
-              <h2 className="text-2xl font-bold text-gray-900">
-                {t('professionResumePage.atsHeading', { title: profession.title, lng })}
-              </h2>
-            </div>
-            <p className="text-gray-600 mb-6">
-              {t('professionResumePage.atsIntro', { title: profession.title, titleLower, lng })}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {profession.atsKeywords.map((keyword) => (
-                <span
-                  key={keyword}
-                  className="inline-flex px-3 py-1.5 bg-green-50 text-green-800 border border-green-200 rounded-full text-sm font-medium"
-                >
-                  {keyword}
-                </span>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* FAQ Section */}
         {profession.faqs.length > 0 && (
           <section className="py-12 bg-white" aria-label={t('professionResumePage.sectionFaqAria', { lng })}>
             <div className="max-w-4xl mx-auto px-4 sm:px-6">
@@ -297,7 +311,6 @@ export function ProfessionResumePage() {
           </section>
         )}
 
-        {/* CTA Banner */}
         <section className="py-16" aria-label={t('professionResumePage.sectionCtaAria', { lng })}>
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
             <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-8 sm:p-12 text-center text-white">

@@ -202,6 +202,7 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: '¿Debo incluir mi CPA en mi currículum de contador?', answer: 'Absolutamente. Coloque su designación CPA de manera prominente, junto a su nombre o en una sección dedicada de certificaciones. Es una de las credenciales más buscadas.' },
       { question: '¿Qué software debe destacar un contador?', answer: 'Mencione QuickBooks, SAP, Oracle, Excel (funciones avanzadas) y cualquier sistema ERP con el que tenga experiencia.' },
       { question: '¿Cómo cuantifico logros como contador?', answer: 'Use métricas como reducción del ciclo de cierre, tasas de precisión, volumen de transacciones procesadas y ahorros de costos identificados.' },
+      { question: '¿Cómo debo describir el cierre de mes y las conciliaciones?', answer: 'Nombre las cuentas o entidades que concilió, el cronograma de cierre que ayudó a lograr y las herramientas (ERP, BlackLine) que usó para cuadres y comentarios de variaciones.' },
     ],
   },
   'accounts-payable-specialist': {
@@ -652,6 +653,7 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: '¿Qué debo incluir en un currículum de tenedor de libros?', answer: 'Incluya dominio de software (QuickBooks, Xero), volumen de transacciones gestionadas, número de entidades manejadas y su precisión en conciliaciones.' },
       { question: '¿Los tenedores de libros necesitan certificación?', answer: 'Aunque no es requerido, certificaciones como CB (AIPB) o QuickBooks ProAdvisor fortalecen considerablemente su currículum.' },
       { question: '¿Cómo demuestro experiencia de teneduría de libros a cargo completo?', answer: 'Detalle el alcance completo: cuentas por pagar/cobrar, nómina, conciliaciones bancarias, estados financieros y soporte en preparación de impuestos.' },
+      { question: '¿Cómo muestro cumplimiento de 1099 e impuestos de ventas?', answer: 'Mencione declaraciones preparadas, número de proveedores, jurisdicciones y resultados de auditoría o ausencia de multas vinculados al cumplimiento.' },
     ],
   },
   'branch-manager': {
@@ -1649,6 +1651,7 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: '¿Qué debe enfatizar un currículum de Controlador?', answer: 'Enfóquese en la escala de ingresos de las organizaciones gestionadas, mejoras en el ciclo de cierre, resultados de auditoría, tamaño del equipo y controles financieros implementados.' },
       { question: '¿Se requiere CPA para un puesto de Controlador?', answer: 'Aunque no siempre es requerido, CPA es fuertemente preferido y esperado para la mayoría de los roles de Controlador. Inclúyalo de manera prominente.' },
       { question: '¿Cómo muestro experiencia en implementación de ERP?', answer: 'Detalle los sistemas implementados (NetSuite, SAP), el alcance del proyecto y las mejoras en eficiencia o reportes.' },
+      { question: '¿Cómo debe abordar un Controlador el SOX y los controles internos en el CV?', answer: 'Describa diseño o pruebas de controles que lideró, resultados de auditoría, remediación de deficiencias y cómo documentó políticas o segregación de funciones.' },
     ],
   },
   'corrections-officer': {
@@ -2751,6 +2754,7 @@ export const translations: Record<string, ProfessionEsData> = {
       { question: '¿Qué habilidades técnicas debe listar un Analista Financiero?', answer: 'Incluya Excel avanzado (VBA, macros, tablas dinámicas), SQL, Power BI/Tableau y técnicas de modelado financiero (DCF, LBO).' },
       { question: '¿Cómo muestro impacto analítico?', answer: 'Cuantifique ahorros de costos identificados, ingresos apoyados por sus modelos y mejoras de eficiencia en sus reportes.' },
       { question: '¿Debo buscar CFA o CPA?', answer: 'CFA es preferido para roles orientados a inversiones; CPA para los orientados a contabilidad. FMVA es excelente para habilidades de modelado.' },
+      { question: '¿Cómo muestro la colaboración con FP&A en un CV de Analista Financiero?', answer: 'Cite a los responsables de presupuesto que apoyó, mejoras en la precisión de pronósticos, presentaciones para dirección o junta y socios de negocio que usaron sus modelos.' },
     ],
   },
   'fleet-manager': {

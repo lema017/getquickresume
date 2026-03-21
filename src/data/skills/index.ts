@@ -3,6 +3,10 @@ import {
   getSpanishSkillSlug as getSpanishSkillSlugFromMappingsImport,
   isSpanishSkillSlug,
 } from '../slugMappings';
+import type { SkillContentBody, SkillFamilyId, SkillSEOOverrides } from './types';
+
+export type { SkillContentBody, SkillFamilyId, SkillSEOOverrides, ResolvedSkillPage } from './types';
+export { resolveSkillPage, buildSkillSeoOverrides } from './resolveSkillPage';
 
 export interface SkillEsData {
   slug: string;
@@ -17,6 +21,11 @@ export interface SkillEsData {
   resumeTips: string[];
   exampleBullets: string[];
   faqs: Array<{ question: string; answer: string }>;
+  familyId?: SkillFamilyId;
+  content?: Partial<SkillContentBody>;
+  seo?: SkillSEOOverrides;
+  /** Prefer this EN profession slug for the template carousel when set (must resolve via getProfessionBySlug). */
+  demoProfessionSlug?: string;
 }
 
 export interface SkillPageData {
@@ -34,7 +43,12 @@ export interface SkillPageData {
   resumeTips: string[];
   exampleBullets: string[];
   faqs: Array<{ question: string; answer: string }>;
+  familyId?: SkillFamilyId;
+  content?: Partial<SkillContentBody>;
+  seo?: SkillSEOOverrides;
   es?: SkillEsData;
+  /** Prefer this EN profession slug for the template carousel when set (must resolve via getProfessionBySlug). */
+  demoProfessionSlug?: string;
 }
 
 const registry = new Map<string, SkillPageData>();
@@ -107,20 +121,24 @@ export async function getSkillBySlug(slug: string): Promise<SkillPageData | unde
   if (!skill) return undefined;
 
   if (isSpanishSkillSlug(slug) && skill.es) {
+    const es = skill.es;
     return {
       ...skill,
-      slug: skill.es.slug,
-      title: skill.es.title,
-      description: skill.es.description,
-      whyImportant: skill.es.whyImportant,
-      keywords: skill.es.keywords,
-      searchIntents: skill.es.searchIntents,
-      relatedSkills: skill.es.relatedSkills,
-      professionSlugs: skill.es.professionSlugs,
-      atsKeywords: skill.es.atsKeywords,
-      resumeTips: skill.es.resumeTips,
-      exampleBullets: skill.es.exampleBullets,
-      faqs: skill.es.faqs,
+      slug: es.slug,
+      title: es.title,
+      description: es.description,
+      whyImportant: es.whyImportant,
+      keywords: es.keywords,
+      searchIntents: es.searchIntents,
+      relatedSkills: es.relatedSkills,
+      professionSlugs: es.professionSlugs,
+      atsKeywords: es.atsKeywords,
+      resumeTips: es.resumeTips,
+      exampleBullets: es.exampleBullets,
+      faqs: es.faqs,
+      familyId: es.familyId ?? skill.familyId,
+      content: es.content ?? skill.content,
+      seo: es.seo ?? skill.seo,
     };
   }
 
@@ -202,4 +220,23 @@ export function getEnglishSkillSlug(spanishSlug: string): string {
 
 function getSpanishSkillSlugFromMappings(englishSlug: string): string | undefined {
   return getSpanishSkillSlugFromMappingsImport(englishSlug);
+}
+
+/** Resolve related skill slugs (English) to localized link rows. */
+export async function getRelatedSkillLinkRows(
+  relatedEnglishSlugs: string[],
+  lang: 'en' | 'es',
+  limit = 8
+): Promise<Array<{ slug: string; title: string }>> {
+  await loadAllModules();
+  const out: Array<{ slug: string; title: string }> = [];
+  for (const slug of relatedEnglishSlugs) {
+    if (out.length >= limit) break;
+    const s = registry.get(slug);
+    if (!s) continue;
+    const locSlug = lang === 'es' ? getSpanishSkillSlug(slug) || slug : slug;
+    const title = lang === 'es' && s.es ? s.es.title : s.title;
+    out.push({ slug: locSlug, title });
+  }
+  return out;
 }

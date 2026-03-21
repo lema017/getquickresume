@@ -53,6 +53,9 @@ const SupportPage = lazy(() => import('@/pages/SupportPage').then(m => ({ defaul
 const AtsResumeCheckerPage = lazy(() => import('@/pages/AtsResumeCheckerPage').then(m => ({ default: m.AtsResumeCheckerPage })));
 const ResumeTranslatorPage = lazy(() => import('@/pages/ResumeTranslatorPage').then(m => ({ default: m.ResumeTranslatorPage })));
 const ProfessionResumePage = lazy(() => import('@/pages/ProfessionResumePage').then(m => ({ default: m.ProfessionResumePage })));
+const ProfessionCategoryHubPage = lazy(() =>
+  import('@/pages/ProfessionCategoryHubPage').then(m => ({ default: m.ProfessionCategoryHubPage }))
+);
 const SkillResumePage = lazy(() => import('@/pages/SkillResumePage').then(m => ({ default: m.SkillResumePage })));
 // Legal pages
 const PrivacyPage = lazy(() => import('@/pages/PrivacyPage').then(m => ({ default: m.PrivacyPage })));
@@ -174,6 +177,12 @@ function App() {
             <Route path="/resume-translator" element={
               <MainLayout>
                 <ResumeTranslatorPage />
+              </MainLayout>
+            } />
+
+            <Route path="/resumes/:categoryId" element={
+              <MainLayout>
+                <ProfessionCategoryHubPage />
               </MainLayout>
             } />
 

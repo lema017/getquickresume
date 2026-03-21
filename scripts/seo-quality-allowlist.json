@@ -1,0 +1,4 @@
+{
+  "_comment": "EN profession slugs exempt from MIN_PROFESSION_FAQS in verify-seo-content.mjs. Shrink this list as you backfill FAQs. Regenerate with: node scripts/report-seo-inventory.mjs --write-faq-allowlist",
+  "professionFaqAllowlist": []
+}

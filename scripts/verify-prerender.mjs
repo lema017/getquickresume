@@ -7,6 +7,14 @@
  * - URL Inspection on samples of /resume/* and /resume-skills/* (EN + ES)
  * - Monitor Coverage, Page indexing, hreflang
  * - Compare "View crawled page" vs live for contradictions
+ *
+ * "Crawled – currently not indexed" (GSC): export a sample of those URLs from the
+ * Page indexing report, then for each URL confirm canonical matches the intended
+ * loc, titles/descriptions are not near-duplicates across templates, and the site
+ * links in (profession pages link to /resume-skills/* and /create; see ProfessionResumePage).
+ *
+ * Offline sampling vs prod: extract locs from sitemap XML (e.g. ripgrep loc tags),
+ * then curl that URL and check rel="canonical" matches the URL.
  */
 
 import fs from 'fs';

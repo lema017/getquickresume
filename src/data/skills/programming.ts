@@ -106,6 +106,7 @@ export const skills: SkillPageData[] = [
     totalMonthlySearches: 9800,
     relatedSkills: ['JavaScript', 'React', 'Angular', 'Node.js', 'Next.js', 'NestJS', 'Generics', 'Type Safety', 'Zod', 'tRPC'],
     professionSlugs: ['frontend-developer', 'full-stack-developer', 'software-engineer', 'web-developer', 'backend-developer', 'angular-developer'],
+    demoProfessionSlug: 'software-engineer',
     atsKeywords: ['TypeScript', 'TS', 'type safety', 'generics', 'interfaces', 'React TypeScript', 'Angular', 'Node.js', 'static typing', 'ES6+', 'Next.js', 'NestJS'],
     resumeTips: [
       'List TypeScript separately from JavaScript since ATS systems treat them as different skills.',

@@ -21,14 +21,20 @@ custom:
   certificateArn: arn:aws:acm:us-east-1:408034543529:certificate/91e492ba-21e0-4dd6-a972-f1e553774107
   
   # S3 sync: extensionless prerender files live at dist/resume/{slug} and
-  # dist/resume-skills/{slug}. serverless-s3-sync uses mime by extension; when
-  # unknown, defaultContentType applies — so those keys upload as text/html.
+  # dist/resume-skills/{slug}. @auth0/s3 ignores defaultContentType for paths
+  # with no extension (mime.getType returns null), so params below set
+  # ContentType on upload and drive syncMetadata copyObject for those keys.
   # Hashed assets (.js, .css, …) still get correct types from their extensions.
   s3Sync:
     - bucketName: ${self:custom.stages.${self:provider.stage}.bucketName}
       localDir: dist
       deleteRemoved: true
       defaultContentType: text/html
+      params:
+        - "resume/**":
+            ContentType: "text/html; charset=utf-8"
+        - "resume-skills/**":
+            ContentType: "text/html; charset=utf-8"
 
 plugins:
   - serverless-s3-sync

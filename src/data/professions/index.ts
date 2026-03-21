@@ -7,6 +7,17 @@ import {
   getAllSpanishProfessionSlugs,
   getAllEnglishProfessionSlugs,
 } from '../slugMappings';
+import type {
+  ProfessionCategoryId,
+  ProfessionContentBody,
+  ProfessionSEOOverrides,
+} from './types';
+import { inferProfessionCategory } from './professionCategoryInference';
+import aiFaqOverlaysJson from './generated/aiFaqOverlays.json';
+
+export type { ProfessionCategoryId, ProfessionContentBody, ProfessionSEOOverrides, ResolvedProfessionPage } from './types';
+export { inferProfessionCategory } from './professionCategoryInference';
+export { resolveProfessionPage, buildProfessionSeoOverrides } from './resolveProfessionPage';
 
 export interface ProfessionEsData {
   slug: string;
@@ -17,6 +28,9 @@ export interface ProfessionEsData {
   atsKeywords: string[];
   sampleResumeData: ResumeData;
   faqs: Array<{ question: string; answer: string }>;
+  categoryId?: ProfessionCategoryId;
+  content?: Partial<ProfessionContentBody>;
+  seo?: ProfessionSEOOverrides;
 }
 
 export interface ProfessionPageData {
@@ -30,6 +44,9 @@ export interface ProfessionPageData {
   atsKeywords: string[];
   sampleResumeData: ResumeData;
   faqs: Array<{ question: string; answer: string }>;
+  categoryId?: ProfessionCategoryId;
+  content?: Partial<ProfessionContentBody>;
+  seo?: ProfessionSEOOverrides;
   es?: ProfessionEsData;
 }
 
@@ -40,6 +57,30 @@ let loadingPromise: Promise<void> | null = null;
 export function registerProfessions(professions: ProfessionPageData[]) {
   for (const p of professions) {
     registry.set(p.slug, p);
+  }
+}
+
+const MIN_OVERLAY_FAQS = 4;
+
+/** Merge AI-generated FAQ overlays (by English slug) after batch files load. */
+function applyAIFaqOverlays(): void {
+  const raw = aiFaqOverlaysJson as {
+    en?: Record<string, { faqs?: Array<{ question: string; answer: string }> }>;
+    es?: Record<string, { faqs?: Array<{ question: string; answer: string }> }>;
+  };
+  const en = raw.en ?? {};
+  const es = raw.es ?? {};
+  for (const [slug, data] of Object.entries(en)) {
+    const faqs = data?.faqs;
+    if (!faqs || faqs.length < MIN_OVERLAY_FAQS) continue;
+    const p = registry.get(slug);
+    if (p) p.faqs = faqs;
+  }
+  for (const [slug, data] of Object.entries(es)) {
+    const faqs = data?.faqs;
+    if (!faqs || faqs.length < MIN_OVERLAY_FAQS) continue;
+    const p = registry.get(slug);
+    if (p?.es) p.es.faqs = faqs;
   }
 }
 
@@ -77,6 +118,8 @@ async function loadAllModules(): Promise<void> {
       }
     }
 
+    applyAIFaqOverlays();
+
     isLoaded = true;
   })();
 
@@ -103,16 +146,20 @@ export async function getProfessionBySlug(slug: string): Promise<ProfessionPageD
   if (!profession) return undefined;
 
   if (isSpanishProfessionSlug(slug) && profession.es) {
+    const es = profession.es;
     return {
       ...profession,
-      slug: profession.es.slug,
-      title: profession.es.title,
-      keywords: profession.es.keywords,
-      searchIntents: profession.es.searchIntents,
-      topSkills: profession.es.topSkills,
-      atsKeywords: profession.es.atsKeywords,
-      sampleResumeData: profession.es.sampleResumeData,
-      faqs: profession.es.faqs,
+      slug: es.slug,
+      title: es.title,
+      keywords: es.keywords,
+      searchIntents: es.searchIntents,
+      topSkills: es.topSkills,
+      atsKeywords: es.atsKeywords,
+      sampleResumeData: es.sampleResumeData,
+      faqs: es.faqs,
+      categoryId: es.categoryId ?? profession.categoryId,
+      content: es.content ?? profession.content,
+      seo: es.seo ?? profession.seo,
     };
   }
 
@@ -193,4 +240,29 @@ export function getSpanishProfessionSlug(englishSlug: string): string | undefine
  */
 export function getEnglishProfessionSlug(spanishSlug: string): string {
   return normalizeProfessionToEnglishSlug(spanishSlug);
+}
+
+/**
+ * Same-category profession links for internal linking (localized slug + title).
+ */
+export async function getRelatedProfessionSummaries(
+  englishSlug: string,
+  categoryId: ProfessionCategoryId,
+  lang: 'en' | 'es',
+  limit = 8
+): Promise<Array<{ slug: string; title: string }>> {
+  await loadAllModules();
+  const all = Array.from(registry.values());
+  const candidates = all
+    .filter((p) => p.slug !== englishSlug && inferProfessionCategory(p) === categoryId)
+    .sort((a, b) => a.slug.localeCompare(b.slug));
+
+  const out: Array<{ slug: string; title: string }> = [];
+  for (const p of candidates) {
+    if (out.length >= limit) break;
+    const slug = lang === 'es' ? getSpanishProfessionSlug(p.slug) || p.slug : p.slug;
+    const title = lang === 'es' && p.es ? p.es.title : p.title;
+    out.push({ slug, title });
+  }
+  return out;
 }

@@ -6,8 +6,8 @@
  * - HEAD-ONLY: injects <title>, meta, canonical, hreflang, og/twitter, JSON-LD.
  *   No visible <main> before #root — avoids mismatch with React loading spinner + async data.
  * - Writes extensionless HTML files: dist/resume/{slug}, dist/resume-skills/{slug}
- *   S3/CloudFront serves them as real objects; mime for extensionless keys uses
- *   serverless-s3-sync defaultContentType: text/html (see serverless.yml).
+ *   S3 must serve them as text/html: serverless.yml s3Sync params for resume/**
+ *   and resume-skills/** (defaultContentType alone does not apply — see @auth0/s3 + mime).
  *
  * Run after: vite build  (reads dist/index.html template)
  */
@@ -97,6 +97,9 @@ function professionForSpanish(profession) {
     atsKeywords: es.atsKeywords,
     sampleResumeData: es.sampleResumeData,
     faqs: es.faqs,
+    categoryId: es.categoryId ?? profession.categoryId,
+    content: es.content ?? profession.content,
+    seo: es.seo ?? profession.seo,
     es: profession.es,
   };
 }
@@ -118,6 +121,9 @@ function skillForSpanish(skill) {
     resumeTips: es.resumeTips,
     exampleBullets: es.exampleBullets,
     faqs: es.faqs,
+    familyId: es.familyId ?? skill.familyId,
+    content: es.content ?? skill.content,
+    seo: es.seo ?? skill.seo,
     es: skill.es,
   };
 }
@@ -166,6 +172,9 @@ async function main() {
       generateSkillWebPageSchema,
     } = seoMod;
 
+    const resolveProfMod = await vite.ssrLoadModule('/src/data/professions/resolveProfessionPage.ts');
+    const resolveSkillMod = await vite.ssrLoadModule('/src/data/skills/resolveSkillPage.ts');
+
     const professions = await profMod.getAllProfessions();
     const skills = await skillMod.getAllSkills();
 
@@ -174,7 +183,9 @@ async function main() {
 
     for (const profession of professions) {
       const slug = profession.slug;
-      const seo = generateProfessionPageSEO(profession, 'en');
+      const resolved = resolveProfMod.resolveProfessionPage(profession, 'en');
+      const seoOverrides = resolveProfMod.buildProfessionSeoOverrides(profession, resolved, 'en');
+      const seo = generateProfessionPageSEO(profession, 'en', seoOverrides);
       const spanishSlug = profMod.getSpanishProfessionSlug(slug);
       const englishUrl = `${BASE_URL}/resume/${slug}`;
       const spanishUrl = spanishSlug ? `${BASE_URL}/resume/${spanishSlug}` : null;
@@ -187,7 +198,11 @@ async function main() {
 
       const ldBreadcrumb = generateBreadcrumbSchema(breadcrumbs);
       const ldFaq = generateFAQSchema(profession.faqs);
-      const ldPage = generateProfessionWebPageSchema(profession, 'en');
+      const ldPage = generateProfessionWebPageSchema(profession, 'en', {
+        longDescription: resolved.content.overview,
+        skills: profession.topSkills,
+        responsibilities: resolved.content.responsibilities,
+      });
 
       const inject = buildHeadInject({
         seo,
@@ -217,7 +232,9 @@ async function main() {
       const esSlug = profEs.slug;
       // Same path as EN prerender — only one static file; SPA serves locale by slug mapping.
       if (esSlug === enSlug) continue;
-      const seo = generateProfessionPageSEO(profEs, 'es');
+      const resolvedEs = resolveProfMod.resolveProfessionPage(profEs, 'es');
+      const seoOverridesEs = resolveProfMod.buildProfessionSeoOverrides(profEs, resolvedEs, 'es');
+      const seo = generateProfessionPageSEO(profEs, 'es', seoOverridesEs);
       const englishUrl = `${BASE_URL}/resume/${enSlug}`;
       const spanishUrl = `${BASE_URL}/resume/${esSlug}`;
 
@@ -229,7 +246,11 @@ async function main() {
 
       const ldBreadcrumb = generateBreadcrumbSchema(breadcrumbs);
       const ldFaq = generateFAQSchema(profEs.faqs);
-      const ldPage = generateProfessionWebPageSchema(profEs, 'es');
+      const ldPage = generateProfessionWebPageSchema(profEs, 'es', {
+        longDescription: resolvedEs.content.overview,
+        skills: profEs.topSkills,
+        responsibilities: resolvedEs.content.responsibilities,
+      });
 
       const inject = buildHeadInject({
         seo,
@@ -253,7 +274,9 @@ async function main() {
 
     for (const skill of skills) {
       const slug = skill.slug;
-      const seo = generateSkillPageSEO(skill, 'en');
+      const resolvedSk = resolveSkillMod.resolveSkillPage(skill, 'en');
+      const skSeoO = resolveSkillMod.buildSkillSeoOverrides(skill, resolvedSk, 'en');
+      const seo = generateSkillPageSEO(skill, 'en', skSeoO);
       const spanishSlug = skillMod.getSpanishSkillSlug(slug) || skillMap[slug];
       const englishUrl = `${BASE_URL}/resume-skills/${slug}`;
       const spanishUrl = spanishSlug ? `${BASE_URL}/resume-skills/${spanishSlug}` : null;
@@ -266,7 +289,9 @@ async function main() {
 
       const ldBreadcrumb = generateBreadcrumbSchema(breadcrumbs);
       const ldFaq = generateFAQSchema(skill.faqs);
-      const ldPage = generateSkillWebPageSchema(skill, 'en');
+      const ldPage = generateSkillWebPageSchema(skill, 'en', {
+        longDescription: resolvedSk.content.overview,
+      });
 
       const inject = buildHeadInject({
         seo,
@@ -295,7 +320,9 @@ async function main() {
       const enSlug = skill.slug;
       const esSlug = skillEs.slug;
       if (esSlug === enSlug) continue;
-      const seo = generateSkillPageSEO(skillEs, 'es');
+      const resolvedSkEs = resolveSkillMod.resolveSkillPage(skillEs, 'es');
+      const skSeoOEs = resolveSkillMod.buildSkillSeoOverrides(skillEs, resolvedSkEs, 'es');
+      const seo = generateSkillPageSEO(skillEs, 'es', skSeoOEs);
       const englishUrl = `${BASE_URL}/resume-skills/${enSlug}`;
       const spanishUrl = `${BASE_URL}/resume-skills/${esSlug}`;
 
@@ -307,7 +334,9 @@ async function main() {
 
       const ldBreadcrumb = generateBreadcrumbSchema(breadcrumbs);
       const ldFaq = generateFAQSchema(skillEs.faqs);
-      const ldPage = generateSkillWebPageSchema(skillEs, 'es');
+      const ldPage = generateSkillWebPageSchema(skillEs, 'es', {
+        longDescription: resolvedSkEs.content.overview,
+      });
 
       const inject = buildHeadInject({
         seo,

@@ -1788,7 +1788,7 @@ export const professionSlugMappings: Record<string, string> = {
   'logistics-import-export-specialist': 'especialista-en-logistica-importacion-exportacion',
   'logistics-management-specialist': 'especialista-en-gestion-logistica',
   'loreal-social-media-manager': 'loreal-social-media-manager',
-  'loss-mitigation-specialist': 'especialista-en-mitigacion-de-p%C3%A9rdidas',
+  'loss-mitigation-specialist': 'especialista-en-mitigacion-de-pérdidas',
   'lte-test-engineer': 'ingeniero-de-pruebas-lte',
   'lyon-university-phd-student': 'estudiante-de-doctorado-universidad-lyon',
   'machine-learning-scientists': 'cientifico-de-aprendizaje-automatico',

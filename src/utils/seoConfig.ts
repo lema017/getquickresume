@@ -449,6 +449,12 @@ export const commonFAQs = {
   ],
 };
 
+export interface ProfessionSEOInput {
+  metaTitle?: string;
+  metaDescription?: string;
+  ogTitle?: string;
+}
+
 /**
  * Generate SEO metadata for a programmatic profession page
  */
@@ -459,12 +465,24 @@ export function generateProfessionPageSEO(
     keywords: string[];
     totalMonthlySearches: number;
   },
-  language: 'en' | 'es' = 'en'
+  language: 'en' | 'es' = 'en',
+  overrides?: ProfessionSEOInput | null
 ) {
   const { title, slug, keywords } = profession;
   const canonicalUrl = buildCanonicalUrl(`/resume/${slug}`);
   const topKeywords = keywords.slice(0, 5).join(', ');
   const year = new Date().getFullYear();
+
+  if (overrides?.metaTitle?.trim() && overrides?.metaDescription?.trim()) {
+    return {
+      title: overrides.metaTitle.trim(),
+      description: overrides.metaDescription.trim(),
+      canonicalUrl,
+      ogImage: DEFAULT_OG_IMAGE,
+      ogType: 'website' as const,
+      keywords: topKeywords,
+    };
+  }
 
   if (language === 'es') {
     return {
@@ -497,26 +515,44 @@ export function generateProfessionWebPageSchema(
     title: string;
     keywords: string[];
   },
-  language: 'en' | 'es' = 'en'
+  language: 'en' | 'es' = 'en',
+  enrichment?: {
+    longDescription?: string;
+    skills?: string[];
+    responsibilities?: string[];
+  }
 ) {
   const year = new Date().getFullYear();
   const pageUrl = buildCanonicalUrl(`/resume/${profession.slug}`);
+  const longDesc = enrichment?.longDescription?.trim();
+  const skills = enrichment?.skills?.filter(Boolean) ?? [];
+  const responsibilities = enrichment?.responsibilities?.filter(Boolean) ?? [];
+
+  const aboutOccupation: Record<string, unknown> = {
+    '@type': 'Occupation',
+    name: profession.title,
+  };
+  if (skills.length) {
+    aboutOccupation.skills = skills.slice(0, 12).join(', ');
+  }
+  if (responsibilities.length) {
+    aboutOccupation.responsibilities = responsibilities.slice(0, 8).join(' ');
+  }
+
   if (language === 'es') {
+    const baseDesc = `Plantillas de CV gratuitas para ${profession.title}, ejemplos reales, palabras clave ATS y habilidades clave. Crea tu currículum con nuestro creador con IA.`;
     return {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
       name: `Plantillas y ejemplos de currículum de ${profession.title} (${year})`,
-      description: `Plantillas de CV gratuitas para ${profession.title}, ejemplos reales, palabras clave ATS y habilidades clave. Crea tu currículum con nuestro creador con IA.`,
+      description: longDesc && longDesc.length > 80 ? longDesc.slice(0, 500) : baseDesc,
       url: pageUrl,
       isPartOf: {
         '@type': 'WebSite',
         name: SITE_NAME,
         url: BASE_URL,
       },
-      about: {
-        '@type': 'Occupation',
-        name: profession.title,
-      },
+      about: aboutOccupation,
       keywords: profession.keywords.join(', '),
       dateModified: new Date().toISOString().split('T')[0],
       inLanguage: 'es',
@@ -530,21 +566,19 @@ export function generateProfessionWebPageSchema(
       },
     };
   }
+  const baseDescEn = `Free ${profession.title} resume templates, real examples, ATS keywords, and top skills. Build your ${profession.title} resume now with our AI-powered builder.`;
   return {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
     name: `${profession.title} resume templates and examples (${year})`,
-    description: `Free ${profession.title} resume templates, real examples, ATS keywords, and top skills. Build your ${profession.title} resume now with our AI-powered builder.`,
+    description: longDesc && longDesc.length > 80 ? longDesc.slice(0, 500) : baseDescEn,
     url: pageUrl,
     isPartOf: {
       '@type': 'WebSite',
       name: SITE_NAME,
       url: BASE_URL,
     },
-    about: {
-      '@type': 'Occupation',
-      name: profession.title,
-    },
+    about: aboutOccupation,
     keywords: profession.keywords.join(', '),
     dateModified: new Date().toISOString().split('T')[0],
     inLanguage: 'en',
@@ -559,6 +593,12 @@ export function generateProfessionWebPageSchema(
   };
 }
 
+export interface SkillSEOInput {
+  metaTitle?: string;
+  metaDescription?: string;
+  ogTitle?: string;
+}
+
 export function generateSkillPageSEO(
   skill: {
     slug: string;
@@ -566,12 +606,24 @@ export function generateSkillPageSEO(
     keywords: string[];
     totalMonthlySearches: number;
   },
-  language: 'en' | 'es' = 'en'
+  language: 'en' | 'es' = 'en',
+  overrides?: SkillSEOInput | null
 ) {
   const { title, slug, keywords } = skill;
   const canonicalUrl = buildCanonicalUrl(`/resume-skills/${slug}`);
   const topKeywords = keywords.slice(0, 5).join(', ');
   const year = new Date().getFullYear();
+
+  if (overrides?.metaTitle?.trim() && overrides?.metaDescription?.trim()) {
+    return {
+      title: overrides.metaTitle.trim(),
+      description: overrides.metaDescription.trim(),
+      canonicalUrl,
+      ogImage: DEFAULT_OG_IMAGE,
+      ogType: 'website' as const,
+      keywords: topKeywords,
+    };
+  }
 
   if (language === 'es') {
     return {
@@ -600,15 +652,18 @@ export function generateSkillWebPageSchema(
     title: string;
     keywords: string[];
   },
-  language: 'en' | 'es' = 'en'
+  language: 'en' | 'es' = 'en',
+  enrichment?: { longDescription?: string }
 ) {
   const pageUrl = buildCanonicalUrl(`/resume-skills/${skill.slug}`);
+  const longDesc = enrichment?.longDescription?.trim();
   if (language === 'es') {
+    const baseDesc = `Cómo incluir ${skill.title} en tu CV. Incluye ejemplos, palabras clave ATS, habilidades relacionadas y profesiones.`;
     return {
       '@context': 'https://schema.org',
       '@type': 'WebPage',
       name: `Habilidades de ${skill.title} para tu currículum`,
-      description: `Cómo incluir ${skill.title} en tu CV. Incluye ejemplos, palabras clave ATS, habilidades relacionadas y profesiones.`,
+      description: longDesc && longDesc.length > 80 ? longDesc.slice(0, 500) : baseDesc,
       url: pageUrl,
       isPartOf: {
         '@type': 'WebSite',
@@ -623,11 +678,12 @@ export function generateSkillWebPageSchema(
       inLanguage: 'es',
     };
   }
+  const baseDescEn = `Learn how to add ${skill.title} to your resume. Includes resume examples, ATS keywords, related skills, and professions.`;
   return {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
     name: `${skill.title} skills for your resume`,
-    description: `Learn how to add ${skill.title} to your resume. Includes resume examples, ATS keywords, related skills, and professions.`,
+    description: longDesc && longDesc.length > 80 ? longDesc.slice(0, 500) : baseDescEn,
     url: pageUrl,
     isPartOf: {
       '@type': 'WebSite',
@@ -640,6 +696,43 @@ export function generateSkillWebPageSchema(
     },
     keywords: skill.keywords.join(', '),
     inLanguage: 'en',
+  };
+}
+
+/** CollectionPage + ItemList for /resumes/:categoryId hub (cap list in JSON-LD for payload size). */
+export function generateProfessionCategoryHubCollectionSchema(
+  categoryId: string,
+  lng: 'en' | 'es',
+  pageTitle: string,
+  description: string,
+  items: Array<{ name: string; url: string }>,
+  maxItemsInSchema = 120
+) {
+  const pageUrl = buildCanonicalUrl(`/resumes/${categoryId}`);
+  const capped = items.slice(0, maxItemsInSchema);
+  const listItems = capped.map((item, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: item.name,
+    url: item.url,
+  }));
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: pageTitle,
+    description,
+    url: pageUrl,
+    isPartOf: {
+      '@type': 'WebSite',
+      name: SITE_NAME,
+      url: BASE_URL,
+    },
+    inLanguage: lng,
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: items.length,
+      itemListElement: listItems,
+    },
   };
 }
 
